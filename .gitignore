@@ -1,5 +1,5 @@
-# this line ignore every file inside the project
-*
+# this rule ignores everything
+/*
 
-# these are the files which are needed to be included
+# this rule is meant to upload only the src/ folder
 !src/
