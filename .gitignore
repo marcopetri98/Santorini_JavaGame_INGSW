@@ -1,0 +1,5 @@
+# this line ignore every file inside the project
+*
+
+# these are the files which are needed to be included
+!src/
