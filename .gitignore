@@ -3,3 +3,4 @@
 
 # this rule is meant to upload only the src/ folder
 !src/
+!pom.xml
