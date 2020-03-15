@@ -1,6 +1,7 @@
 # this rule ignores everything
 /*
 
-# this rule is meant to upload only the src/ folder
+# this rule is meant to upload only the necessary files
 !src/
 !pom.xml
+!*.pdf
