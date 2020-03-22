@@ -1,4 +1,4 @@
-package it.polimi.ingsw.Core;
+package it.polimi.ingsw.core;
 
 import java.util.Scanner;
 
