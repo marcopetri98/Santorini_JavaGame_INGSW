@@ -4,10 +4,15 @@ public class Cell {
 	private int x;
 	private int y;
 	private Building building;
+	private Worker worker;
 
 	public Cell(int i, int j) {
 		x = i;
 		y = j;
+	}
+
+	public void setWorker(Worker w){
+		this.worker=w;
 	}
 
 	// CLASSES GETTERS
@@ -20,4 +25,6 @@ public class Cell {
 	public Building getBuilding() {
 		return building;
 	}
+
+
 }

@@ -4,7 +4,6 @@ package it.polimi.ingsw.core;
 import java.awt.Color;
 
 public class Worker {
-    private int level;
     private Cell position;
     private Color color;
 
@@ -12,11 +11,13 @@ public class Worker {
         this.color = color;
     }
 
-    // CLASSES GETTERS
-    public int getLevel() {
-        return level;
-    }
+    // getter of position
     public Cell getPos() {
         return position;
+    }
+
+    //setter of position
+    public void setPos(Cell c){
+        position = c;
     }
 }
