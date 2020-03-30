@@ -74,13 +74,16 @@ public class CliMenu implements GraphicMenu {
 				break;
 		}
 	}
+	public void handlePreparation(int param) {
+
+	}
 
 	// getters of the structure set by the client while interacting
 	public String getServerAddress() {
-		return new String(serverAddress);
+		return serverAddress;
 	}
 	public String getNickname() {
-		return new String(nameChosen);
+		return nameChosen;
 	}
 	public int getPlayerNumber() {
 		return playerNumber;
