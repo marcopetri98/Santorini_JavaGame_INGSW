@@ -2,7 +2,6 @@ package it.polimi.ingsw.network;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.util.Constants;
-import it.polimi.ingsw.util.Pair;
 
 // necessary imports of Java SE
 import java.io.IOException;

@@ -32,10 +32,4 @@ public class Map {
 		}
 		return false;
 	}
-
-	// here there are methods which must be overridden
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
 }
