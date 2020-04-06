@@ -9,7 +9,7 @@ public class Player {
     //private int color;    //Moved in Worker class
     private Worker worker1;
     private Worker worker2;
-    private int activeWorker;
+    private Worker activeWorker;
     private GodCard card;
 
     public Player(String playerName, Color color) {  //CHECK IN-GAME IF THERE IS ALREADY ANY PLAYER WITH SPECIFIED NAME && COLOR!!!!
@@ -19,8 +19,8 @@ public class Player {
         worker2 = new Worker(color);
     }
     public void chooseWorker(int chosen){
-        if (chosen == 1) this.activeWorker = 1;
-        else if (chosen == 2) this.activeWorker = 2;
+        if (chosen == 1) this.activeWorker = worker1;
+        else if (chosen == 2) this.activeWorker = worker2;
         else System.out.println("Error");
     }
 
@@ -37,7 +37,7 @@ public class Player {
     public Worker getWorker2() {
         return worker2;
     }
-    public int getActiveWorker() {
+    public Worker getActiveWorker() {
         return activeWorker;
     }
     public GodCard getCard() {

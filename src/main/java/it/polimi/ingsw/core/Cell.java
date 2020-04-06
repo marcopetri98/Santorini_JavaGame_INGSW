@@ -9,6 +9,7 @@ public class Cell {
 	public Cell(int i, int j) {
 		x = i;
 		y = j;
+		this.building = new Building();
 	}
 
 	public void setWorker(Worker w){
@@ -25,6 +26,6 @@ public class Cell {
 	public Building getBuilding() {
 		return building;
 	}
-
+	public Worker getWorker(){ return worker; }
 
 }

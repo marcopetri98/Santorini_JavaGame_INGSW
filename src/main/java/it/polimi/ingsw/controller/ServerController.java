@@ -6,10 +6,8 @@ import java.util.Observer;
 
 // other project's classes needed here
 import it.polimi.ingsw.core.Game;
-import it.polimi.ingsw.core.Player;
 import it.polimi.ingsw.core.Worker;
 import it.polimi.ingsw.core.Cell;
-import it.polimi.ingsw.util.Pair;
 
 public class ServerController extends Observable implements Observer {
 	private Game observedModel;

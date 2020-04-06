@@ -29,4 +29,5 @@ public class Building {
 	public int getLevel() {
 		return level;
 	}
+	public boolean getDome(){ return dome; }
 }

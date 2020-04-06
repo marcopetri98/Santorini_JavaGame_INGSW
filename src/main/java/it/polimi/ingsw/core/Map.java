@@ -19,6 +19,10 @@ public class Map {
 	}
 
 	// getters and other functions which doesn't change the structure of the class
+	public Cell getCell(int X, int Y){
+		return cells.get(X).get(Y);
+	}
+
 	// checks if is possible to move a worker in a certain cell
 	public boolean moveable(Cell c, Worker w) {
 		Cell workerCell = w.getPos();

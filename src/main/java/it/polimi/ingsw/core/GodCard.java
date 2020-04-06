@@ -1,10 +1,17 @@
 package it.polimi.ingsw.core;
+import java.util.List;
 
 public interface GodCard {
+    /*int typeGod;
+    Player owner;
+    int numPlayer;  //Maximum number of possible players supported by the card
+    String name;
+    String description; //TODO: Add description for each card*/
     int getNumPlayer();
-    int getOwnerPlayer();
-    boolean getOwned();
-    boolean isPassive();
-    void check();
-    void apply();
+    Player getOwner();
+    int getTypeGod();
+    String getName();
+    String getDescription();
+    List<Move> checkMove(Map m, Worker w, int type);
+    List<Build> checkBuild(Map m, Worker w, int type);
 }
