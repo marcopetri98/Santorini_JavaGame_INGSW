@@ -91,7 +91,7 @@ public class Minotaur implements GodCard{
 				if(m.getCell(x2, y2).getWorker() == null){	//Check there is no worker [of ANY player] on cell
 					//Adds move
 					Move newMove = new Move(1, m.getCell(x, y), m.getCell(x1, y1), w);
-					newMove.setCondition(new Move(1, m.getCell(x1, y1), m.getCell(x2, y2), m.getCell(x1, y1).getWorker()));
+					newMove.setCondition(new Move(0, m.getCell(x1, y1), m.getCell(x2, y2), m.getCell(x1, y1).getWorker()));
 					moves.add(newMove);
 				}
 			}

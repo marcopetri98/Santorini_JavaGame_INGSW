@@ -62,7 +62,7 @@ public class Apollo implements GodCard{
                                         //TODO: la typeMove di un worker che non comporta il movimento di un altro worker dev'essere 1?!?!
                                         if(m.getCell(x1, y1).getWorker() != null){
                                             Move newMove = new Move(1, m.getCell(x, y), m.getCell(x1, y1), w);
-                                            newMove.setCondition(new Move(1, m.getCell(x1, y1), m.getCell(x, y), m.getCell(x1, y1).getWorker()));
+                                            newMove.setCondition(new Move(0, m.getCell(x1, y1), m.getCell(x, y), m.getCell(x1, y1).getWorker()));
                                             moves.add(newMove);
                                         }
                                         else{
