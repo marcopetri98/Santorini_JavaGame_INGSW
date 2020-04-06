@@ -1,11 +1,17 @@
 package it.polimi.ingsw.util;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * This is a class used to store programs constants
+ */
 public final class Constants {
 	/**
 	 * A Constants class shouldn't be created, it's only a class used to store variables
@@ -20,10 +26,13 @@ public final class Constants {
 
 	/* Game preparation messages */
 	public static final String PREP_TURN = "preparation-info";
-	public static final String PREP_FIRST = "preparation-first";
 	public static final String PREP_COLOR_YOU = "preparation-color-go";
+	public static final String PREP_COLOR_SUCCESS = "preparation-color-success";
 	public static final String PREP_COLOR_OTHER = "preparation-color-wait";
 	public static final String PREP_COLOR_ERROR = "preparation-color-error";
+	public static final String PREP_COLOR_OTHER_CHOICE = "preparation-color-other-choice";
+	public static final String PREP_COLOR_CHOICE = "preparation-color-choice";
+	public static final List<Color> PREP_COLOR_COLORS = Arrays.asList(new Color(0,0,255), new Color(255,0,0), new Color(0,255,0));
 
 	/* General connection messages */
 	public static final String CHECK = "ping";
