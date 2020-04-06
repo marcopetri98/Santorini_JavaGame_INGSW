@@ -18,6 +18,9 @@ public final class Constants {
 	 */
 	private Constants() {}
 
+	/* Version constants */
+	public static final int ACTUAL_VERSION = 1;
+
 	/* Setup messages from client to server */
 	public static final String SETUP_IN_PARTECIPATE = "setup-partecipate";
 	public static final String SETUP_OUT_CONNWORKED = "setup-connection-worked";

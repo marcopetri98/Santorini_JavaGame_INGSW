@@ -40,6 +40,7 @@ public class ClientCLI implements Runnable {
 		// now the client is connected and need to wait to server's message to start the game
 		try {
 			gameCreation();
+			gamePreparation();
 		} catch (IOException e) {
 			// TODO: change this catch
 			System.exit(1);
@@ -99,6 +100,7 @@ public class ClientCLI implements Runnable {
 		Scanner receivedInput = new Scanner(serverSocket.getInputStream());
 		PrintWriter sendOutput = new PrintWriter(serverSocket.getOutputStream());
 		String received = receivedInput.nextLine();
+
 	}
 	private boolean parseMainMenuInput(String received) {
 		if (received.equals("1")) {
