@@ -1,4 +1,6 @@
 package it.polimi.ingsw.core;
+import it.polimi.ingsw.exceptions.NoBuildException;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -13,6 +15,12 @@ public class Pan implements GodCard{
 
 	public Pan(Player player){
 		this.owner = player;
+	}
+
+	public Pan(){
+		this.owner = null;
+		this.moves = null;
+		this.builds = null;
 	}
 
 	public int getNumPlayer(){
@@ -69,8 +77,7 @@ public class Pan implements GodCard{
 	/**
 	 * @return null, because Pan power isn't about buildings
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type){
-		//TODO: oppure lista vuota???
-		return null;
+	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+		throw new NoBuildException();
 	}
 }

@@ -1,4 +1,6 @@
 package it.polimi.ingsw.core;
+import it.polimi.ingsw.exceptions.NoMoveException;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -15,21 +17,27 @@ public class Atlas implements GodCard{
 		this.owner = player;
 	}
 
+	public Atlas(){
+		this.owner = null;
+		this.moves = null;
+		this.builds = null;
+	}
+
 	public int getNumPlayer(){
 		return numPlayer;
-	};
+	}
 	public Player getOwner(){
 		return owner;
-	};
+	}
 	public int getTypeGod(){
 		return typeGod;
-	};
+	}
 	public String getName(){
 		return name;
-	};
+	}
 	public String getDescription(){
 		return description;
-	};
+	}
 
 	/**
 	 * //TODO: o mettiamo direttamente su GOdCard, definendo però tutti i type...?
@@ -64,14 +72,13 @@ public class Atlas implements GodCard{
 			}
 		}
 		return builds;
-	};
+	}
 
 	/**
 	 * @return null, because Atlas power isn't about moves.
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type){
-		//TODO: oppure lista vuota???
-		return null;
-	};
+	public List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException {
+		throw new NoMoveException();
+	}
 
 }

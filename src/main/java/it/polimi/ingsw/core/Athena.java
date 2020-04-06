@@ -16,6 +16,12 @@ public class Athena implements GodCard, Observer {
 
 	public Athena(Player player) { this.owner = player; }
 
+	public Athena(){
+		this.owner = null;
+		this.moves = null;
+		this.builds = null;
+	}
+
 	public int getNumPlayer(){
 		return numPlayer;
 	}
@@ -39,6 +45,10 @@ public class Athena implements GodCard, Observer {
 	}
 	public void setInactive(){
 		wentUp = false;
+	}
+
+	public void update(Observable modifiedWorker, List<Cell> positions){
+		//TODO: Complete observer
 	}
 
 	/**

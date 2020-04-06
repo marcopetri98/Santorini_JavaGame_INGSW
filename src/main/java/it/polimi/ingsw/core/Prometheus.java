@@ -15,6 +15,12 @@ public class Prometheus implements GodCard{
 		this.owner = player;
 	}
 
+	public Prometheus(){
+		this.owner = null;
+		this.moves = null;
+		this.builds = null;
+	}
+
 	public int getNumPlayer(){
 		return numPlayer;
 	}
@@ -62,7 +68,7 @@ public class Prometheus implements GodCard{
 			}
 		}
 		return builds;
-	};
+	}
 
 	/**
 	 *

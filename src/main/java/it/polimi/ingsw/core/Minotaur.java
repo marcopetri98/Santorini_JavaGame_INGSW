@@ -1,4 +1,6 @@
 package it.polimi.ingsw.core;
+import it.polimi.ingsw.exceptions.NoBuildException;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -13,6 +15,12 @@ public class Minotaur implements GodCard{
 
 	public Minotaur(Player player){
 		this.owner = player;
+	}
+
+	public Minotaur(){
+		this.owner = null;
+		this.moves = null;
+		this.builds = null;
 	}
 
 	public int getNumPlayer(){
@@ -31,9 +39,8 @@ public class Minotaur implements GodCard{
 		return description;
 	}
 
-	public List<Build> checkBuild(Map m, Worker w, int type){
-		//TODO: oppure lista vuota???
-		return null;
+	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+		throw new NoBuildException();
 	}
 
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker

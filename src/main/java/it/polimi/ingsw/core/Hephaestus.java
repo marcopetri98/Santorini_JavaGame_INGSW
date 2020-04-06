@@ -1,4 +1,6 @@
 package it.polimi.ingsw.core;
+import it.polimi.ingsw.exceptions.NoMoveException;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -13,6 +15,12 @@ public class Hephaestus implements GodCard{
 
 	public Hephaestus(Player player){
 		this.owner = player;
+	}
+
+	public Hephaestus(){
+		this.owner = null;
+		this.moves = null;
+		this.builds = null;
 	}
 
 	public int getNumPlayer(){
@@ -94,9 +102,8 @@ public class Hephaestus implements GodCard{
 	/**
 	 * @return null, because Demeter power isn't about moves.
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type){
-		//TODO: oppure lista vuota???
-		return null;
+	public List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException {
+		throw new NoMoveException();
 	}
 
 }

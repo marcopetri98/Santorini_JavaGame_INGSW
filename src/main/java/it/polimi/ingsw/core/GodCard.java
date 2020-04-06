@@ -1,4 +1,7 @@
 package it.polimi.ingsw.core;
+import it.polimi.ingsw.exceptions.NoBuildException;
+import it.polimi.ingsw.exceptions.NoMoveException;
+
 import java.util.List;
 
 public interface GodCard {
@@ -12,6 +15,6 @@ public interface GodCard {
     int getTypeGod();
     String getName();
     String getDescription();
-    List<Move> checkMove(Map m, Worker w, int type);
-    List<Build> checkBuild(Map m, Worker w, int type);
+    List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException;
+    List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException;
 }
