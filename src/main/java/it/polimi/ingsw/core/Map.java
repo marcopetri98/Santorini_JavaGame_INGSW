@@ -13,7 +13,7 @@ public class Map {
 		for (int i = 0; i <= 4; i++) {
 			cells.add(new ArrayList<Cell>());
 			for (int j = 0; j <= 4; j++) {
-				cells.get(i).add(new Cell(j,i));
+				cells.get(i).add(new Cell());
 			}
 		}
 	}
@@ -22,12 +22,32 @@ public class Map {
 	public Cell getCell(int X, int Y){
 		return cells.get(X).get(Y);
 	}
+	public int getX(Cell c) {
+		for (int i = 0; i < cells.size(); i++) {
+			if (cells.get(i).contains(c)) {
+				return i;
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+		return -1;
+	}
+	public int getY(Cell c) {
+		for (int i = 0; i < cells.size(); i++) {
+			if (cells.get(i).contains(c)) {
+				return cells.get(i).indexOf(c);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+		return -1;
+	}
 
 	// checks if is possible to move a worker in a certain cell
 	public boolean moveable(Cell c, Worker w) {
 		Cell workerCell = w.getPos();
 
-		if (c.getX() <= workerCell.getX()+1 && c.getX() >= workerCell.getX()-1 && c.getY() <= workerCell.getY()+1 && c.getY() >= workerCell.getY()-1) {
+		if (getX(c) <= getX(workerCell)+1 && getX(c) >= getX(workerCell)-1 && getY(c) <= getY(workerCell)+1 && getY(c) >= getY(workerCell)-1) {
 			return c.getBuilding().getLevel() == w.getPos().getBuilding().getLevel() || c.getBuilding().getLevel() == w.getPos().getBuilding().getLevel() + 1 || c.getBuilding().getLevel() == w.getPos().getBuilding().getLevel() - 1;
 		}
 		return false;
