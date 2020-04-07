@@ -9,7 +9,7 @@ public class Apollo implements GodCard{
     private Player owner;
     int numPlayer = 4;
     String name = "Apollo";
-    String description;
+    String description = "Your Move: Your Worker may move into an opponent Worker’s space by forcing their Worker to the space yours just vacated.";
     List<Move> moves;
     List<Build> builds;
 
@@ -43,9 +43,15 @@ public class Apollo implements GodCard{
         throw new NoBuildException();
     }
 
+    /**
+     * @param m Represents the map
+     * @param w Represents the worker moved by the player during this turn
+     * @param type Represents the typeMove of this particular GodCard. It will perform a "conditioned move"
+     * @return the cells where the Player's Worker could move according to general game rules and his GodCard power
+     */
     public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
-        int y = w.getPos().getY();
-        int x = w.getPos().getX();
+        int y = m.getY(w.getPos());
+        int x = m.getX(w.getPos());
         moves = new ArrayList<>();
         for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
             int x1 = x + i;
@@ -57,7 +63,7 @@ public class Apollo implements GodCard{
                         if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
                             if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() <= 1){ //Check height difference
                                 if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
-                                    if(owner.getWorker1().getPos().getX() != x1 && owner.getWorker1().getPos().getY() != y1 && owner.getWorker2().getPos().getX() != x1 && owner.getWorker2().getPos().getY() != y1){   //Check there is no OWNER worker on cell
+                                    if(m.getX(owner.getWorker1().getPos()) != x1 && m.getY(owner.getWorker1().getPos()) != y1 && m.getX(owner.getWorker2().getPos()) != x1 && m.getY(owner.getWorker2().getPos()) != y1){   //Check there is no OWNER worker on cell
                                         //Checks for opponent's workers because of Apollo's power
                                         //TODO: la typeMove di un worker che non comporta il movimento di un altro worker dev'essere 1?!?!
                                         if(m.getCell(x1, y1).getWorker() != null){

@@ -7,7 +7,9 @@ import java.util.Observable;
 import java.util.List;
 
 public class Worker extends Observable {
+    private Cell previousPosition;
     private Cell position;
+    private Cell lastBuild;
     private Color color;
 
     public Worker(Color color){
@@ -21,15 +23,13 @@ public class Worker extends Observable {
 
     //setter of position
     public void setPos(Cell c){
-        List<Cell> positions = new ArrayList<>();
-        positions.add(this.position);
-        positions.add(c);
+        previousPosition = this.position;
+        Cell[] positions = new Cell[2];
+        positions[0] = this.position;
+        positions[1] = c;
         this.position = c;
         setChanged();
         notifyObservers(positions);
     }
 
-    /*public void notifyAthena(){
-        //athena update();
-    }*/
 }

@@ -9,7 +9,7 @@ public class Atlas implements GodCard{
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Atlas";
-	String description = "Your Build: Your Worker may build a dome at any level.\n";
+	String description = "Your Build: Your Worker may build a dome at any level.";
 	List<Move> moves;
 	List<Build> builds;
 
@@ -40,15 +40,15 @@ public class Atlas implements GodCard{
 	}
 
 	/**
-	 * //TODO: o mettiamo direttamente su GOdCard, definendo però tutti i type...?
+	 * //TODO: o mettiamo direttamente su GodCard, definendo però tutti i type...?
 	 * @param m The map situation of the match
 	 * @param w the worker the player of this turn choose to move
 	 * @param type the typeBuild of Atlas is 0. We choose this means that he performs a "simple build"
 	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
 	 */
 	public List<Build> checkBuild(Map m, Worker w, int type){
-		int y = w.getPos().getY();
-		int x = w.getPos().getX();
+		int y = m.getY(w.getPos());
+		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
@@ -62,7 +62,8 @@ public class Atlas implements GodCard{
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
 									if (m.getCell(x1, y1).getBuilding().getLevel() <= 3) { //Check height building is <=3
 										//don't need to check else, because Atlas can build Dome at any level
-											builds.add(new Build(w, m.getCell(x1, y1), true, 0));
+										builds.add(new Build(w, m.getCell(x1, y1), true, 0));
+										builds.add(new Build(w, m.getCell(x1, y1), false, 0));	//adds the possibility to build another generic building [no dome]
 									}
 								}
 							}

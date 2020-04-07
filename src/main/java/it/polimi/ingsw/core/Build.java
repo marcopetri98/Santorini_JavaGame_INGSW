@@ -18,15 +18,19 @@ public class Build {
 		this.other = o;
 	}
 
-	public int getTypeBuild(){ return typeBuild; }
+	private int getTypeBuild(){ return typeBuild; }
 
-	private Cell getCell(){ return cell; }
+	public Cell getCell(){ return cell; }
 
 	private Worker getWorker(){ return worker; }
 
 	private boolean isDome(){ return dome; }
 
 	private Build getOther(){ return other; }
+
+	public Build clone(){
+		return new Build(this.getWorker(), this.getCell(), this.isDome(), this.getTypeBuild());
+	}
 
 	//TODO: controllare se le condizioni sono corrette!!!
 	public boolean equals(Build o){

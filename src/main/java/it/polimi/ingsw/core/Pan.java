@@ -9,7 +9,7 @@ public class Pan implements GodCard{
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Pan";
-	String description = "Win Condition: You also win if your Worker moves down two or more levels.\n";
+	String description = "Win Condition: You also win if your Worker moves down two or more levels.";
 	List<Move> moves;
 	List<Build> builds;
 
@@ -47,8 +47,8 @@ public class Pan implements GodCard{
 	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
-		int y = w.getPos().getY();
-		int x = w.getPos().getX();
+		int y = m.getY(w.getPos());
+		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
 			int x1 = x + i;
@@ -58,11 +58,10 @@ public class Pan implements GodCard{
 				if(x != x1 || y != y1){ //I shall not move where I am already
 					if(0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4){   //Check that I am inside the map
 						if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
-							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() <= -2){ //Check height difference is at least 2 levels (moving down)
-								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
-									if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-										moves.add(new Move(3, m.getCell(x, y), m.getCell(x1, y1), w));
-									}
+							if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
+								if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
+									if(m.getCell(x, y).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() >= 2) moves.add(new Move(3, m.getCell(x, y), m.getCell(x1, y1), w));	//Check height difference is at least 2 levels (moving down) and adds type 3 move
+									else moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));	//else adds type 0 [simple] move, still doable
 								}
 							}
 						}

@@ -11,7 +11,7 @@ public class Artemis implements GodCard{
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Artemis";
-	String description;
+	String description = "Your Move: Your Worker may move one additional time, but not back to its initial space.";
 	List<Move> moves;
 	List<Build> builds;
 
@@ -45,9 +45,15 @@ public class Artemis implements GodCard{
 		throw new NoBuildException();
 	}
 
+	/**
+	 * @param m Represents the map
+	 * @param w Represents the worker moved by the player during this turn
+	 * @param type Represents the typeMove of this particular GodCard. It will perform a "conditioned move"
+	 * @return the cells where the Player's Worker could move according to general game rules and his GodCard power
+	 */
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
-		int y = w.getPos().getY();
-		int x = w.getPos().getX();
+		int y = m.getY(w.getPos());
+		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
 			int x1 = x + i;
@@ -74,7 +80,14 @@ public class Artemis implements GodCard{
 		return moves;
 	}
 
-
+	/**
+	 * @param m Represents the map
+	 * @param w Represents the worker moved by the player during this turn
+	 * @param type Represents the typeMove of this particular GodCard. It will perform a "conditioned move"
+	 * @param x1,y1 Represent the coordinates of the cell where the player is going to move
+	 * @param x,y Represent the coordinates of the cell where the worker is
+	 * @return the cells where the Player's Worker could move according to general game rules and his GodCard power
+	 */
 	private void addCell(Map m, Worker w, int type, int x1, int y1, int x, int y){
 
 		moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));	//Aggiunta di default: è la mossa che porta artemide a spostarsi di una sola cella senza applicare il potere, e va bene!!!
