@@ -6,8 +6,10 @@ import it.polimi.ingsw.util.Constants;
 // necessary imports of Java SE
 import java.io.Serializable;
 
-public class NetDivinityChoice implements Serializable {
-	public static int serialUID = Constants.ACTUAL_VERSION;
-	private String message;
+public class NetDivinityChoice extends NetObject {
 	private String divinity;
+
+	public NetDivinityChoice(String msg) {
+		super(msg);
+	}
 }

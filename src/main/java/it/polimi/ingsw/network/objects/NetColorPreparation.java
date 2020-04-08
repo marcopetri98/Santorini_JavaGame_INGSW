@@ -7,37 +7,33 @@ import it.polimi.ingsw.util.Constants;
 import java.awt.Color;
 import java.io.Serializable;
 
-public class NetColorPreparation implements Serializable {
+public class NetColorPreparation extends NetObject {
 	public static int serialUID = Constants.ACTUAL_VERSION;
-	private String message;
 	private String player;
 	private int additionalInfo;
 	private Color color;
 	private NetColorPreparation next;
 
-	public NetColorPreparation(String s) {
-		message = s;
+	public NetColorPreparation(String msg) {
+		super(msg);
 	}
-	public NetColorPreparation(String s, int info) {
-		message = s;
+	public NetColorPreparation(String msg, int info) {
+		super(msg);
 		additionalInfo = info;
 	}
 	public NetColorPreparation(String msg, String player, Color c) {
-		this.message = msg;
+		super(msg);
 		this.player = player;
 		this.color = c;
 		this.next = null;
 	}
 	public NetColorPreparation(String msg, String player, Color c, NetColorPreparation next) {
-		this.message = msg;
+		super(msg);
 		this.player = player;
 		this.color = c;
 		this.next = next;
 	}
 
-	public String getMessage() {
-		return message;
-	}
 	public String getPlayer() {
 		return player;
 	}

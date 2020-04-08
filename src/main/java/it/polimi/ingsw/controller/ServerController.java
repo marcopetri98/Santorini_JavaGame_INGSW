@@ -9,7 +9,7 @@ import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Worker;
 import it.polimi.ingsw.core.Cell;
 
-public class ServerController extends Observable implements Observer {
+public class ServerController implements Observer {
 	private Game observedModel;
 	private boolean phaseMove;
 	private boolean phaseBuild;
@@ -21,18 +21,22 @@ public class ServerController extends Observable implements Observer {
 		phaseMove = false;
 		phaseBuild = false;
 	}
+
 	// this is the function which passes the turn
 	public void passTurn() {}
+
 	// this is the function which effectuate a move
 	public boolean move(Worker w, Cell c) {
 		// TODO: inser the code that check that for this worker is possible to move in the cell 'c'
 		return true;
 	}
+
 	// this is the function which effectuate a building
 	public boolean build(Worker w, Cell c) {
 		// TODO: insert the code that check that is possible to build
 		return true;
 	}
+
 	// this function checks if there is a winner
 	/*public Pair<Player, Boolean> checkWin() {
 		// TODO: insert the code which check if there is a winner at the end of the current turn

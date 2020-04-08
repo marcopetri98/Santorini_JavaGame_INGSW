@@ -22,9 +22,14 @@ public final class Constants {
 	public static final int ACTUAL_VERSION = 1;
 
 	/* Setup messages from client to server */
-	public static final String SETUP_IN_PARTECIPATE = "setup-partecipate";
+	public static final String SETUP_PARTICIPATE = "setup-participate";
+	public static final String SETUP_CREATE = "setup-create";
+	public static final String SETUP_SETUPNUM = "setup-choosing-num";
+	public static final String SETUP_CREATE_WORKED = "setup-create-worked";
+	public static final String SETUP_ERROR = "setup-error";
 	public static final String SETUP_OUT_CONNWORKED = "setup-connection-worked";
 	public static final String SETUP_OUT_CONNFAILED = "setup-connection-failed";
+	public static final String SETUP_OUT_CONNERROR = "setup-connection-error";
 	public static final String SETUP_OUT_CONNFINISH = "setup-connection-finished";
 
 	/* Game preparation messages */
@@ -39,6 +44,8 @@ public final class Constants {
 
 	/* General connection messages */
 	public static final String CHECK = "ping";
+
+	/* Exception messages */
 
 	/* Functions useful for all program */
 	public static boolean verifyConnected(Socket socket) {

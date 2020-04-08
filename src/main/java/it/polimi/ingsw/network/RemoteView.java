@@ -1,8 +1,10 @@
 package it.polimi.ingsw.network;
 
 // necessary imports from other packages of the project
+import it.polimi.ingsw.controller.PreGameController;
 import it.polimi.ingsw.controller.ServerController;
 import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.core.PreGame;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
 import it.polimi.ingsw.network.objects.NetOrderPreparation;
 import it.polimi.ingsw.util.Constants;
@@ -20,29 +22,33 @@ import java.util.Observer;
 /**
  * This class is the class which receives input from client's view and forward these commands to the controller, after the controller changed something (on the model) this class is notified cause it observes the model and it notifies its observers. It is observed by the controller, this means that when it receives a valid message from the client it notifies the controller 'cause something is changed (also if none of its attributes is changed, it's changed the status) and it will do what it is programmed to.
  */
-public class ServerGamingThread extends Observable implements Runnable, Observer {
-	private List<Pair<Socket,String>> gamers = new ArrayList<>();
-	private List<Pair<ObjectInputStream, ObjectOutputStream>> connections = new ArrayList<>();
+public class RemoteView extends Observable implements Observer {
+	private List<ServerClientListenerThread> clientHandlers;
 	private Game serverGame;
 	private ServerController serverController;
+	private PreGame serverPreGame;
+	private PreGameController serverPreController;
+	// TODO: eliminate old way of communication with clients
+	private List<Pair<Socket,String>> gamers = new ArrayList<>();
+	private List<Pair<ObjectInputStream, ObjectOutputStream>> connections = new ArrayList<>();
 
-	public ServerGamingThread(List<Pair<Socket,String>> connections) {
+	public RemoteView(List<String> playerNames, List<ServerClientListenerThread> handlers) throws NullPointerException {
+		if (playerNames == null || handlers == null) {
+			throw new NullPointerException();
+		}
+		clientHandlers.addAll(handlers);
+		serverPreGame = new PreGame((String[])playerNames.toArray());
+		serverPreController = new PreGameController(serverPreGame);
+		for (ServerClientListenerThread listener : clientHandlers) {
+			listener.setGameServer(this);
+		}
+	}
+	// TODO: remove old files
+	public RemoteView(List<Pair<Socket,String>> connections) {
 		gamers.addAll(connections);
 	}
 
-	@Override
-	public void run() {
-		try {
-			generateOrder();
-			setupColors();
-			divinityChooseCards();
-			playerChooseCards();
-		} catch (IOException e) {
-			// TODO: put an exception handling
-			System.exit(1);
-		}
-	}
-
+	// TODO: remove old files
 	// SETUP METHODS FOR THE GAME
 	/**
 	 * This method generate random order of play in the game choosing the first player randomly
