@@ -21,15 +21,15 @@ public class Worker extends Observable {
         return position;
     }
 
-    //setter of position
+    //Setter of position, Implements the observable object
     public void setPos(Cell c){
         previousPosition = this.position;
         Cell[] positions = new Cell[2];
-        positions[0] = this.position;
-        positions[1] = c;
+        positions[0] = this.position;   //Old position
+        positions[1] = c;               //New position
         this.position = c;
         setChanged();
         notifyObservers(positions);
-    }
+    }   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
 
 }

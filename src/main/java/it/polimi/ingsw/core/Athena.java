@@ -1,5 +1,7 @@
 package it.polimi.ingsw.core;
 
+import it.polimi.ingsw.exceptions.NoBuildException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -40,46 +42,30 @@ public class Athena implements GodCard, Observer {
 
 	private boolean wentUp = false;
 
-	public void setActive(){
-		wentUp = true;
-	}
-	public void setInactive(){
-		wentUp = false;
-	}
-
-	public void update(Observable modifiedWorker, List<Cell> positions){
-		//TODO: Complete observer
+	//Overridden update method of the Observer
+	public void update(Observable obs, Object arg){
+		Worker modifiedWorker = (Worker) obs;
+		Cell[] positions = (Cell[]) arg;
+		if(modifiedWorker == owner.getWorker1() || modifiedWorker == owner.getWorker2()){	//Then the worker returned as argument of the update method is held by the owner of Athena
+			if(positions[1].getBuilding().getLevel() - positions[0].getBuilding().getLevel() >= 1) wentUp = true;
+			else wentUp = false;
+		}
 	}
 
 	/**
-	 *
 	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn choose to move
-	 * @param type the typeMove of Prometheus is 2. We choose this means that she performs a "losing move"
-	 * @return the cells where the Player's Worker moved up
+	 * @param w the worker the player of this turn chooses to move
+	 * @param type the typeMove of Athena is 2. It represents a loss condition
+	 * @return the cells where the Player's Worker can't move up
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type){
-		int y = w.getPos().getY();
-		int x = w.getPos().getX();
+		int myHeight = w.getPos().getBuilding().getLevel();
 		moves = new ArrayList<>();
-		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
-			int x1 = x + i;
-			for(int j = -1; j <= 1; j++){
-				int y1 = y + j;
 
-				if(x != x1 || y != y1){ //I shall not move where I am already
-					if(0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4){   //Check that I am inside the map
-						if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
-							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() == 1){ //Check height difference is 1 (moving up)
-								//TODO: how does controlorre recognizes it is a voluntary move?
-								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
-									if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-										moves.add(new Move(3, m.getCell(x, y), m.getCell(x1, y1), w));
-									}
-								}
-							}
-						}
-					}
+		if(wentUp){		//Athena's power's applied only if wentUp flag is true
+			for(int x1 = 0; x1 <= 4; x1++){   //x1, y1 all the cells where I mustn't move: I have to check the whole map and return all the cells higher than mine for 1 or more blocks
+				for(int y1 = 0; y1 <= 4; y1++){
+					if(m.getCell(x1, y1).getBuilding().getLevel() - myHeight >= 1) moves.add(new Move(2, w.getPos(), m.getCell(x1, y1), w));
 				}
 			}
 		}
@@ -88,13 +74,11 @@ public class Athena implements GodCard, Observer {
 	}
 
 
-	public List<Build> checkBuild(Map m, Worker w, int type) {
-		//TODO: oppure lista vuota???
-		return null;
+	/**
+	 * @return null, because Pan power isn't about buildings
+	 */
+	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+		throw new NoBuildException();
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
-		//setting wentup..?
-	}
 }

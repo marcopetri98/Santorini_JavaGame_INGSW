@@ -65,7 +65,6 @@ public class Minotaur implements GodCard{
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 									if(m.getX(owner.getWorker1().getPos()) != x1 && m.getY(owner.getWorker1().getPos()) != y1 && m.getX(owner.getWorker2().getPos()) != x1 && m.getY(owner.getWorker2().getPos()) != y1){   //Check there is no OWNER worker on cell
 										//Checks for opponent's workers because of Apollo's power
-										//TODO: la typeMove di un worker che non comporta il movimento di un altro worker dev'essere 1?!?!
 										if(m.getCell(x1, y1).getWorker() != null){
 											addCell(m, w, type, x1, y1, x, y);
 										}

@@ -9,7 +9,7 @@ public interface GodCard {
     Player owner;
     int numPlayer;  //Maximum number of possible players supported by the card
     String name;
-    String description; //TODO: Add description for each card*/
+    String description;*/
     int getNumPlayer();
     Player getOwner();
     int getTypeGod();

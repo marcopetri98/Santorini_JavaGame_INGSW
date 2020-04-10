@@ -27,6 +27,14 @@ public class Player {
 		else System.out.println("Error");
 	}
 
+	public void setGodCard(GodCard card1){  //Ties the observable and the observer together TODO: check the parameters and the behavior of the method
+		card = card1;
+		if(card1 instanceof Athena){
+			worker1.addObserver((Athena) card);
+			worker2.addObserver((Athena) card);
+		}
+	}
+
 	// CLASSES GETTERS
 	public int getPlayerID() {
 		return playerID;

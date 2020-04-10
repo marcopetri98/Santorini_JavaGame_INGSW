@@ -44,8 +44,8 @@ public class Prometheus implements GodCard{
 	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
 	 */
 	public List<Build> checkBuild(Map m, Worker w, int type){
-		int y = w.getPos().getY();
-		int x = w.getPos().getX();
+		int y = m.getY(w.getPos());
+		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
@@ -85,8 +85,8 @@ public class Prometheus implements GodCard{
 		}
 
 		//second build, after a move of the worker in h,k due to checkMove function TODO: test...
-		int h = w.getPos().getX();
-		int k = w.getPos().getY();
+		int h = m.getX(w.getPos());
+		int k = m.getY(w.getPos());
 		for(int i = -1; i <= 1; i++){    //x1,y1 is where i have already build in this turn
 			int x2 = h + i;
 			for(int j = -1; j <= 1; j++){
@@ -134,8 +134,8 @@ public class Prometheus implements GodCard{
 	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
-		int y = w.getPos().getY();
-		int x = w.getPos().getX();
+		int y = m.getX(w.getPos());
+		int x = m.getY(w.getPos());
 		moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
 			int x1 = x + i;
