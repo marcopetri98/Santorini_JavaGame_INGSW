@@ -1,28 +1,30 @@
 package it.polimi.ingsw.core;
 
-import it.polimi.ingsw.util.Pair;
+import it.polimi.ingsw.util.ObservableObject;
+import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 
-public class Game extends Observable implements Observer {
+public class Game extends ObservableObject {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
 	private List<GodCard> godCards;
+	private boolean setupPhase;
 	private Map map;
 
 	// constructors
-	public Game(String[] names, Color[] colors) {   //through nicknames I'm able to know how many players are playing (2 or 3).
-		players = new ArrayList<Player>();
+	public Game(String[] names) {
+		activePlayer = null;
+		players = new ArrayList<>();
+		godCards = new ArrayList<>();
 		map = new Map();
-		for(int i=0; i<names.length; i++){
-			players.add(new Player(names[i], colors[i]));
+		setupPhase = true;
+		for (String name : names) {
+			players.add(new Player(name));
 		}
-		activePlayer = players.get(0);
 		createGodCards();
 	}
 
@@ -56,11 +58,9 @@ public class Game extends Observable implements Observer {
 		return new ArrayList<Player>(players);
 	}
 
-	// TODO: maybe this can be removed
-	// private methods needed only for this class
+	// METHODS USED AT THE BEGINNING OF THE GAME
 	private void createGodCards() {
 		int i = 0;
-		godCards = new ArrayList<>();
 		godCards.add(new Apollo());
 		godCards.add(new Artemis());
 		godCards.add(new Minotaur());
@@ -71,10 +71,105 @@ public class Game extends Observable implements Observer {
 		godCards.add(new Pan());
 		godCards.add(new Prometheus());
 	}
+	// SETTERS USED ON THE BEGINNING
+	public void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
+		if (playerOrder == null || playerOrder.size() != players.size()) {
+			throw new IllegalArgumentException();
+		} else if (!setupPhase) {
+			throw new WrongPhaseException();
+		} else {
+			for (Player player : players) {
+				if (!playerOrder.contains(player.getPlayerName())) {
+					throw new IllegalArgumentException();
+				}
+			}
+		}
 
-	// here there are methods which must be overridden
-	@Override
-	public void update(Observable o, Object arg) {
-
+		List<Player> temp = new ArrayList<>();
+		for (int i = 0; i < playerOrder.size(); i++) {
+			boolean found = false;
+			for (int j = 0; j < players.size() && !found; j++) {
+				if (players.get(j).getPlayerName().equals(playerOrder.get(i))) {
+					found = true;
+					temp.add(players.get(j));
+				}
+			}
+		}
+		players = temp;
+		// notifies the remote view of a change
+		notifyOrder(playerOrder.toArray());
+	}
+	public void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
+		if (player == null || color == null) {
+			throw new IllegalArgumentException();
+		} else if (!setupPhase) {
+			throw new WrongPhaseException();
+		}
+		int i;
+		boolean found = false;
+		for (i = 0; i < players.size() && !found; i++) {
+			if (players.get(i).getPlayerName().equals(player)) {
+				found = true;
+			}
+		}
+		if (i == players.size()) {
+			throw new IllegalArgumentException();
+		} else {
+			players.get(i).setPlayerColor(color);
+		}
+	}
+	public void setPlayerGod(String player, GodCard god) throws IllegalArgumentException, WrongPhaseException {
+		if (player == null || god == null || !godCards.contains(god)) {
+			throw new IllegalArgumentException();
+		} else if (!setupPhase) {
+			throw new WrongPhaseException();
+		}
+		int i;
+		boolean found = false;
+		for (i = 0; i < players.size() && !found; i++) {
+			if (players.get(i).getPlayerName().equals(player)) {
+				found = true;
+			}
+		}
+		if (i == players.size()) {
+			throw new IllegalArgumentException();
+		} else {
+			players.get(i).setGodCard(god);
+		}
+	}
+	public void setGamePhase() {
+		setupPhase = false;
+	}
+	// GETTERS USED ON THE BEGINNING
+	public Color getPlayerColor(String player) throws IllegalArgumentException, IllegalStateException {
+		if (player == null) {
+			throw new IllegalArgumentException();
+		}
+		int i;
+		boolean found = false;
+		for (i = 0; i < players.size() && !found; i++) {
+			if (players.get(i).getPlayerName().equals(player)) {
+				found = true;
+			}
+		}
+		if (i == players.size()) {
+			throw new IllegalArgumentException();
+		} else {
+			return players.get(i).getWorker1().getColor();
+		}
+	}
+	public GodCard getPlayerGodCard(String player) throws IllegalArgumentException, IllegalStateException  {
+		int i;
+		boolean found = false;
+		for (i = 0; i < players.size() && !found; i++) {
+			if (players.get(i).getPlayerName().equals(player)) {
+				found = true;
+			}
+		}
+		if (i == players.size()) {
+			throw new IllegalArgumentException();
+		} else {
+			return players.get(i).getCard();
+		}
 	}
 }

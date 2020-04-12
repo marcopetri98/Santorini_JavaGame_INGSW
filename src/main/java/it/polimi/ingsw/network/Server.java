@@ -1,6 +1,9 @@
 package it.polimi.ingsw.network;
 
 // necessary imports from other packages of the project
+import it.polimi.ingsw.controller.ServerController;
+import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.util.MultipleList;
 import it.polimi.ingsw.util.exceptions.AlreadyStartedException;
 import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 
@@ -15,15 +18,14 @@ import java.util.concurrent.Executors;
  * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby
  */
 public class Server implements Runnable {
-	private List<String> lobbyPlayersNames;
-	private List<ServerClientListenerThread> lobbyPlayersHandlers;
+	private MultipleList<ServerClientListenerThread, String> lobbyClients;
 	private int lobbyDimension;
 	private final Object lobbyLock;
+	// TODO: implement a queue to define the order of arrive
 
 	public Server() {
 		lobbyDimension = 0;
-		lobbyPlayersNames = new ArrayList<>();
-		lobbyPlayersHandlers = new ArrayList<>();
+		lobbyClients = new MultipleList<>();
 		lobbyLock = new Object();
 	}
 
@@ -44,8 +46,7 @@ public class Server implements Runnable {
 		while (true) {
 			try {
 				receivedConnection = serverSocket.accept();
-				lobbyPlayersHandlers.add(new ServerClientListenerThread(receivedConnection,this));
-				lobbyPlayersHandlers.get(lobbyPlayersHandlers.size()-1).start();
+				new ServerClientListenerThread(receivedConnection,this).start();
 			} catch (IOException e) {
 				throw new AssertionError("There has been an error with receiving connection from the server");
 			}
@@ -73,25 +74,22 @@ public class Server implements Runnable {
 
 			// if there aren't player it creates the lobby, otherwise it add the player to the lobby
 			if (lobbyDimension == 0) {
-				lobbyPlayersNames.add(name);
-				lobbyPlayersHandlers.add(handler);
+				lobbyClients.add(handler,name);
 				lobbyDimension = 1;
 				throw new FirstPlayerException();
 			} else {
-				if (lobbyPlayersNames.contains(name)) {
+				if (lobbyClients.containsValue(name)) {
 					return 0;
 				}
 
 				// the player doesn't exist already and it is going to be added to the lobby
-				if (lobbyPlayersNames.size() < lobbyDimension-1) {
-					lobbyPlayersNames.add(name);
-					lobbyPlayersHandlers.add(handler);
+				if (lobbyClients.size() < lobbyDimension-1) {
+					lobbyClients.add(handler,name);
 					return 1;
 				} else {
-					lobbyPlayersNames.add(name);
-					lobbyPlayersHandlers.add(handler);
-					createGame();
-					return 2;
+					lobbyClients.add(handler,name);
+					new Thread(() -> createGame()).start();
+					return 1;
 				}
 			}
 		}
@@ -104,15 +102,14 @@ public class Server implements Runnable {
 	 */
 	public void removePlayer(String name, ServerClientListenerThread handler) throws AlreadyStartedException {
 		synchronized (lobbyLock) {
-			if (!lobbyPlayersNames.contains(name)) {
+			if (!lobbyClients.containsValue(name)) {
 				throw new AlreadyStartedException();
 			} else {
 				if (lobbyDimension == 1) {
 					lobbyDimension--;
 					lobbyLock.notifyAll();
 				}
-				lobbyPlayersNames.remove(name);
-				lobbyPlayersHandlers.remove(handler);
+				lobbyClients.removeByValue(name);
 			}
 		}
 	}
@@ -125,7 +122,7 @@ public class Server implements Runnable {
 	 */
 	public void setPlayerNumber(int dimension, ServerClientListenerThread handler) throws IllegalCallerException, IllegalArgumentException {
 		synchronized (lobbyLock) {
-			if (!lobbyPlayersHandlers.contains(handler)) {
+			if (!lobbyClients.containsKey(handler)) {
 				throw new IllegalCallerException();
 			} else {
 				if (dimension == 2 || dimension == 3) {
@@ -133,8 +130,7 @@ public class Server implements Runnable {
 					lobbyLock.notifyAll();
 				} else {
 					lobbyDimension = 0;
-					lobbyPlayersNames = new ArrayList<>();
-					lobbyPlayersHandlers = new ArrayList<>();
+					lobbyClients = new MultipleList<>();
 					throw new IllegalArgumentException();
 				}
 			}
@@ -148,10 +144,10 @@ public class Server implements Runnable {
 	 */
 	public int getClientPosition(ServerClientListenerThread handler) throws IllegalCallerException {
 		synchronized (lobbyLock) {
-			if (!lobbyPlayersHandlers.contains(handler)) {
+			if (!lobbyClients.containsKey(handler)) {
 				throw new IllegalCallerException();
 			}
-			return lobbyPlayersHandlers.indexOf(handler);
+			return lobbyClients.getIndexByKey(handler);
 		}
 	}
 	/**
@@ -164,20 +160,28 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * This methods passes creates a new RemoteView for a new game in PreGame phase where players need to setup the game. It deletes lists of players names and handlers to continue to create lobbies and games for other players.
+	 * This method create a game where player are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
 	 */
 	private void createGame() {
 		try {
-			RemoteView gamingThreadServer = new RemoteView(lobbyPlayersNames, lobbyPlayersHandlers);
-			lobbyPlayersNames = new ArrayList<>();
-			lobbyPlayersHandlers = new ArrayList<>();
+			Game game = new Game((String[])lobbyClients.getValueList().toArray());
+			ServerController controller = new ServerController(game);
+			for (int i = 0; i < lobbyClients.size(); i++) {
+				RemoteView remoteView = new RemoteView(lobbyClients.getKey(i));
+				lobbyClients.getKey(i).setGamePhase(1);
+				lobbyClients.getKey(i).setGameServer(remoteView);
+				remoteView.addObserver(controller);
+				game.addObserver(remoteView);
+				controller.generateOrder();
+				// TODO: think how to inform threads about the start of the Game
+			}
+			lobbyClients = new MultipleList<>();
 			lobbyDimension = 0;
 		} catch (NullPointerException e) {
-			for (ServerClientListenerThread handler : lobbyPlayersHandlers) {
+			for (ServerClientListenerThread handler : lobbyClients.getKeyList()) {
 				handler.fatalError();
 			}
-			lobbyPlayersNames = new ArrayList<>();
-			lobbyPlayersHandlers = new ArrayList<>();
+			lobbyClients = new MultipleList<>();
 			lobbyDimension = 0;
 			throw new AssertionError("Something's gone wrong and the server tried to create a gaming server with null list of players or handlers");
 		}

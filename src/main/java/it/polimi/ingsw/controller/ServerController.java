@@ -8,49 +8,60 @@ import java.util.Observer;
 import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Worker;
 import it.polimi.ingsw.core.Cell;
+import it.polimi.ingsw.util.ObserverObject;
+import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
-public class ServerController implements Observer {
+public class ServerController implements ObserverObject {
 	private Game observedModel;
+	private Mover moveController;
+	private Builder buildController;
+	private DefeatManager defeatController;
+	private VictoryManager victoryController;
+	private SetupManager setupController;
+	private boolean setupPhase;
 	private boolean phaseMove;
 	private boolean phaseBuild;
 
 	// constructors and setters for this class
 	public ServerController(Game g) throws NullPointerException {
-		if (g == null) throw new NullPointerException("The argument passed is a null pointer");
+		if (g == null) throw new NullPointerException();
+		moveController = new Mover();
+		buildController = new Builder();
+		defeatController = new DefeatManager();
+		victoryController = new VictoryManager();
+		setupController = new SetupManager(g);
 		observedModel = g;
+		setupPhase = true;
 		phaseMove = false;
 		phaseBuild = false;
 	}
 
+	// actions called by the players or the server
+	public void generateOrder() {
+		setupController.generateOrder();
+	}
+
 	// this is the function which passes the turn
-	public void passTurn() {}
+	private void passTurn() {}
 
-	// this is the function which effectuate a move
-	public boolean move(Worker w, Cell c) {
-		// TODO: inser the code that check that for this worker is possible to move in the cell 'c'
-		return true;
-	}
-
-	// this is the function which effectuate a building
-	public boolean build(Worker w, Cell c) {
-		// TODO: insert the code that check that is possible to build
-		return true;
-	}
-
-	// this function checks if there is a winner
-	/*public Pair<Player, Boolean> checkWin() {
-		// TODO: insert the code which check if there is a winner at the end of the current turn
-	}
-	// this function check if the player in the turn is going to loose
-	public Pair<Player, Boolean> checkLoose() {
-		// TODO: insert the code which check if the player of the current turn lost the match
-	}*/
-
-	// getters and other functions which doesn't change the structure of the class
-
-	// here there are methods which must be overridden
 	@Override
-	public void update(Observable o, Object arg) {
+	public void updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException {
+
+	}
+	@Override
+	public void updateGods(Object playerGods) throws IllegalArgumentException, WrongPhaseException {
+
+	}
+	@Override
+	public void updatePositions(Object netObject, boolean finished) throws WrongPhaseException {
+
+	}
+	@Override
+	public void updateMove(Object netMap) throws NullPointerException, WrongPhaseException {
+
+	}
+	@Override
+	public void updateBuild(Object netMap) throws NullPointerException, WrongPhaseException {
 
 	}
 }

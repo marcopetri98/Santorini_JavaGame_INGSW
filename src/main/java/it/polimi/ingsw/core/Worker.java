@@ -20,6 +20,9 @@ public class Worker extends Observable {
     public Cell getPos() {
         return position;
     }
+    public Color getColor() {
+        return color;
+    }
 
     //Setter of position, Implements the observable object
     public void setPos(Cell c){
@@ -31,5 +34,4 @@ public class Worker extends Observable {
         setChanged();
         notifyObservers(positions);
     }   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
-
 }

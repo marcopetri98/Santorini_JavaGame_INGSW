@@ -6,18 +6,15 @@ import java.awt.Color;
 public class Player {
 	private int playerID;
 	private String playerName;
-	//private int color;    //Moved in Worker class
 	private Worker worker1;
 	private Worker worker2;
 	private Worker activeWorker;
 	private GodCard card;
 
 	// constructors
-	public Player(String playerName, Color color) {  //CHECK IN-GAME IF THERE IS ALREADY ANY PLAYER WITH SPECIFIED NAME && COLOR!!!!
+	public Player(String playerName) {
 		this.playerName = playerName;
-		this.playerID = playerName.hashCode();
-		worker1 = new Worker(color);
-		worker2 = new Worker(color);
+		playerID = playerName.hashCode();
 	}
 
 	// STATE CHANGER METHODS
@@ -26,13 +23,16 @@ public class Player {
 		else if (chosen == 2) this.activeWorker = worker2;
 		else System.out.println("Error");
 	}
-
 	public void setGodCard(GodCard card1){  //Ties the observable and the observer together TODO: check the parameters and the behavior of the method
 		card = card1;
 		if(card1 instanceof Athena){
 			worker1.addObserver((Athena) card);
 			worker2.addObserver((Athena) card);
 		}
+	}
+	public void setPlayerColor(Color color) {
+		worker1 = new Worker(color);
+		worker2 = new Worker(color);
 	}
 
 	// CLASSES GETTERS
@@ -42,17 +42,43 @@ public class Player {
 	public String getPlayerName() {
 		return playerName;
 	}
-	public Worker getWorker1() {
+	public Worker getWorker1() throws IllegalStateException {
+		if (worker1 == null) {
+			throw new IllegalStateException();
+		}
 		return worker1;
 	}
-	public Worker getWorker2() {
+	public Worker getWorker2() throws IllegalStateException {
+		if (worker2 == null) {
+			throw new IllegalStateException();
+		}
 		return worker2;
 	}
-	public Worker getActiveWorker() {
+	public Worker getActiveWorker() throws IllegalStateException {
+		if (activeWorker == null) {
+			throw new IllegalStateException();
+		}
 		return activeWorker;
 	}
-	public GodCard getCard() {
+	public GodCard getCard()  throws IllegalStateException {
+		if (card == null) {
+			throw new IllegalStateException();
+		}
 		return card;
 	}
 
+	// OVERRIDDEN METHODS
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Player)) {
+			return false;
+		} else {
+			Player other = (Player)obj;
+			if (playerID == other.getPlayerID() && playerName.equals(other.getPlayerName()) && worker1 == other.getWorker1() && worker2 == other.getWorker2() && card == other.getCard()) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
 }
