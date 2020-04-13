@@ -22,25 +22,21 @@ public class Map {
 	public Cell getCell(int X, int Y){
 		return cells.get(X).get(Y);
 	}
-	public int getX(Cell c) {
+	public int getX(Cell c) throws IllegalArgumentException {
 		for (int i = 0; i < cells.size(); i++) {
 			if (cells.get(i).contains(c)) {
 				return i;
-			} else {
-				throw new IllegalArgumentException();
 			}
 		}
-		return -1;
+		throw new IllegalArgumentException();
 	}
-	public int getY(Cell c) {
+	public int getY(Cell c) throws IllegalArgumentException  {
 		for (int i = 0; i < cells.size(); i++) {
 			if (cells.get(i).contains(c)) {
 				return cells.get(i).indexOf(c);
-			} else {
-				throw new IllegalArgumentException();
 			}
 		}
-		return -1;
+		throw new IllegalArgumentException();
 	}
 
 	// checks if is possible to move a worker in a certain cell
