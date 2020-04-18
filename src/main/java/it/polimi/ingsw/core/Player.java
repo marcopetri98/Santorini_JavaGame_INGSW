@@ -18,12 +18,16 @@ public class Player {
 	}
 
 	// STATE CHANGER METHODS
-	public void chooseWorker(int chosen){
-		if (chosen == 1) this.activeWorker = worker1;
-		else if (chosen == 2) this.activeWorker = worker2;
-		else System.out.println("Error");
+	public void chooseWorker(int chosen) throws IllegalArgumentException {
+		if (chosen == 1) {
+			this.activeWorker = worker1;
+		} else if (chosen==2) {
+			this.activeWorker = worker2;
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
-	public void setGodCard(GodCard card1){  //Ties the observable and the observer together TODO: check the parameters and the behavior of the method
+	public void setGodCard(GodCard card1) {  //Ties the observable and the observer together TODO: check the parameters and the behavior of the method
 		card = card1;
 		if(card1 instanceof Athena){
 			worker1.addObserver((Athena) card);

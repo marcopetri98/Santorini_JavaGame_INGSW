@@ -1,17 +1,13 @@
 package it.polimi.ingsw.controller;
 
 // necessary imports of Java SE
-import java.util.Observable;
-import java.util.Observer;
 
 // other project's classes needed here
 import it.polimi.ingsw.core.Game;
-import it.polimi.ingsw.core.Worker;
-import it.polimi.ingsw.core.Cell;
-import it.polimi.ingsw.util.ObserverObject;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
+import it.polimi.ingsw.util.observers.ObserverObjectController;
 
-public class ServerController implements ObserverObject {
+public class ServerController implements ObserverObjectController {
 	private Game observedModel;
 	private Mover moveController;
 	private Builder buildController;
@@ -62,6 +58,10 @@ public class ServerController implements ObserverObject {
 	}
 	@Override
 	public void updateBuild(Object netMap) throws NullPointerException, WrongPhaseException {
+
+	}
+	@Override
+	public void updateQuit(String playerName) throws NullPointerException {
 
 	}
 }

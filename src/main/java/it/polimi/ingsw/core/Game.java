@@ -1,6 +1,6 @@
 package it.polimi.ingsw.core;
 
-import it.polimi.ingsw.util.ObservableObject;
+import it.polimi.ingsw.util.observers.ObservableObject;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 import java.awt.*;
@@ -12,7 +12,7 @@ public class Game extends ObservableObject {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
 	private List<GodCard> godCards;
-	private boolean setupPhase;
+	private int phase;
 	private Map map;
 
 	// constructors
@@ -21,14 +21,14 @@ public class Game extends ObservableObject {
 		players = new ArrayList<>();
 		godCards = new ArrayList<>();
 		map = new Map();
-		setupPhase = true;
+		phase = 0;
 		for (String name : names) {
 			players.add(new Player(name));
 		}
 		createGodCards();
 	}
 
-	// setters for this class
+	// setters and methods which changes the state of the object
 	public void moveWorker(Worker w, Cell c){  //server controlled if the move was legit
 		w.getPos().setWorker(null);
 		w.setPos(c);
@@ -50,9 +50,12 @@ public class Game extends ObservableObject {
 		}
 	}
 
-	// getters and other functions which doesn't change the structure of the class
+	// getters and other functions which doesn't change the structure of the object
 	public Map getMap() throws CloneNotSupportedException {
 		return (Map)map.clone();
+	}
+	public int getPlayerNum() {
+		return players.size();
 	}
 	public List<Player> getPlayers() {
 		return new ArrayList<Player>(players);
@@ -71,11 +74,13 @@ public class Game extends ObservableObject {
 		godCards.add(new Pan());
 		godCards.add(new Prometheus());
 	}
+
 	// SETTERS USED ON THE BEGINNING
+	// TODO: finish setup methods
 	public void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
 		if (playerOrder == null || playerOrder.size() != players.size()) {
 			throw new IllegalArgumentException();
-		} else if (!setupPhase) {
+		} else if (phase != 0) {
 			throw new WrongPhaseException();
 		} else {
 			for (Player player : players) {
@@ -98,11 +103,13 @@ public class Game extends ObservableObject {
 		players = temp;
 		// notifies the remote view of a change
 		notifyOrder(playerOrder.toArray());
+		// once all clients are notified the phase advance to color selection
+		phase++;
 	}
 	public void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
 		if (player == null || color == null) {
 			throw new IllegalArgumentException();
-		} else if (!setupPhase) {
+		} else if (phase != 1) {
 			throw new WrongPhaseException();
 		}
 		int i;
@@ -121,7 +128,7 @@ public class Game extends ObservableObject {
 	public void setPlayerGod(String player, GodCard god) throws IllegalArgumentException, WrongPhaseException {
 		if (player == null || god == null || !godCards.contains(god)) {
 			throw new IllegalArgumentException();
-		} else if (!setupPhase) {
+		} else if (phase != 2) {
 			throw new WrongPhaseException();
 		}
 		int i;
@@ -137,9 +144,10 @@ public class Game extends ObservableObject {
 			players.get(i).setGodCard(god);
 		}
 	}
-	public void setGamePhase() {
-		setupPhase = false;
+	public void setPhase(int phase) {
+		this.phase = phase;
 	}
+
 	// GETTERS USED ON THE BEGINNING
 	public Color getPlayerColor(String player) throws IllegalArgumentException, IllegalStateException {
 		if (player == null) {
@@ -171,5 +179,8 @@ public class Game extends ObservableObject {
 		} else {
 			return players.get(i).getCard();
 		}
+	}
+	public int getPhase() {
+		return phase;
 	}
 }

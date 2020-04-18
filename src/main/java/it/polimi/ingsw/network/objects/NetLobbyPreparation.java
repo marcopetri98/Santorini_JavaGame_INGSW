@@ -1,23 +1,25 @@
 package it.polimi.ingsw.network.objects;
 
 // necessary imports from other packages of the project
-import it.polimi.ingsw.util.Constants;
 
 // necessary imports of Java SE
-import java.io.Serializable;
 
-public class NetOrderPreparation extends NetObject {
+
+public class NetLobbyPreparation extends NetObject {
 	private String player;
 	private int order;
-	private NetOrderPreparation next;
+	private NetLobbyPreparation next;
 
-	public NetOrderPreparation(String msg, String player, int order) {
+	public NetLobbyPreparation(String msg) {
+		super(msg);
+	}
+	public NetLobbyPreparation(String msg, String player, int order) {
 		super(msg);
 		this.player = player;
 		this.order = order;
 		this.next = null;
 	}
-	public NetOrderPreparation(String msg, String player, int order, NetOrderPreparation next) {
+	public NetLobbyPreparation(String msg, String player, int order, NetLobbyPreparation next) {
 		super(msg);
 		this.player = player;
 		this.order = order;
@@ -30,7 +32,7 @@ public class NetOrderPreparation extends NetObject {
 	public int getOrder() {
 		return order;
 	}
-	public NetOrderPreparation getNext() {
+	public NetLobbyPreparation getNext() {
 		return next;
 	}
 }

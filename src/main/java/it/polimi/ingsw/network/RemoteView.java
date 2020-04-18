@@ -1,24 +1,27 @@
 package it.polimi.ingsw.network;
 
 // necessary imports from other packages of the project
-import it.polimi.ingsw.util.ObservableObject;
-import it.polimi.ingsw.util.ObserverObjectRemoteView;
+import it.polimi.ingsw.network.objects.NetLobbyPreparation;
+import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.observers.ObservableObject;
+import it.polimi.ingsw.util.observers.ObserverObjectRemoteView;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 // necessary imports of Java SE
-import java.io.*;
 
 /**
  * This class is the class which receives input from client's view and forward these commands to the controller, after the controller changed something (on the model) this class is notified cause it observes the model and it notifies its observers. It is observed by the controller, this means that when it receives a valid message from the client it notifies the controller 'cause something is changed (also if none of its attributes is changed, it's changed the status) and it will do what it is programmed to.
  */
 public class RemoteView extends ObservableObject implements ObserverObjectRemoteView {
 	private ServerClientListenerThread clientHandler;
+	private int gamePhase; // 0 = setup order, 1 = game color selection, 2 = divinity selection, 3 = worker position on board (game setup), 4 = your turn, 5 = others turn
 
 	public RemoteView(ServerClientListenerThread handler) throws NullPointerException {
 		if (handler == null) {
 			throw new NullPointerException();
 		}
 		clientHandler = handler;
+		gamePhase = 0;
 	}
 
 	// METHODS FOR THE GAME SETUP
@@ -91,19 +94,23 @@ public class RemoteView extends ObservableObject implements ObserverObjectRemote
 	}
 	@Override
 	public void updateOrder(Object[] order) throws NullPointerException, WrongPhaseException {
-		/*	// builds the sequence object of players to send to player
-		for (int i = gamers.size()-1; i >= 0; i--) {
-			if (i == gamers.size()-1) {
-				netFirst = new NetOrderPreparation(Constants.PREP_TURN,gamers.get(i).getSecond(),i);
+		if (order == null || gamePhase != 0) {
+			clientHandler.fatalError("It has been called the notify of player's order in the wrong phase or maybe with a null parameter");
+		}
+
+		String[] playerNames = (String[]) order;
+		NetLobbyPreparation sendOrder = null;
+		// builds the sequence object of players to send to player
+		for (int i = 0; i < order.length; i++) {
+			if (i == 0) {
+				sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN,playerNames[i],i+1);
 			} else {
-				netFirst = new NetOrderPreparation(Constants.PREP_TURN,gamers.get(i).getSecond(),i,netFirst);
+				sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN,playerNames[i],i+1,sendOrder);
 			}
 		}
-		// sends all the player the ordered list of players in the game
-		for (int i = 0; i < gamers.size(); i++) {
-			connections.get(i).getSecond().writeObject(netFirst);
-			connections.get(i).getSecond().flush();
-		}*/
+		gamePhase++;
+		clientHandler.sendMessage(sendOrder);
+		clientHandler.setGamePhase(gamePhase);
 	}
 	@Override
 	public void updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException {

@@ -11,22 +11,18 @@ import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
-import java.util.concurrent.Executors;
 
 /**
  * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby
  */
 public class Server implements Runnable {
-	private MultipleList<ServerClientListenerThread, String> lobbyClients;
+	private final MultipleList<ServerClientListenerThread, String> lobbyClients;
 	private int lobbyDimension;
-	private final Object lobbyLock;
 	// TODO: implement a queue to define the order of arrive
 
 	public Server() {
 		lobbyDimension = 0;
 		lobbyClients = new MultipleList<>();
-		lobbyLock = new Object();
 	}
 
 	@Override
@@ -43,10 +39,14 @@ public class Server implements Runnable {
 			throw new AssertionError("There has been an error while opening the socket");
 		}
 
-		while (true) {
+		while (functioning) {
 			try {
 				receivedConnection = serverSocket.accept();
-				new ServerClientListenerThread(receivedConnection,this).start();
+				try {
+					new ServerClientListenerThread(receivedConnection, this).start();
+				} catch (IOException e) {
+					functioning = true;
+				}
 			} catch (IOException e) {
 				throw new AssertionError("There has been an error with receiving connection from the server");
 			}
@@ -60,15 +60,16 @@ public class Server implements Runnable {
 	 * @throws FirstPlayerException if this exception is thrown it means that the player must choose the number of player and let the server to create the lobby
 	 */
 	public int addPlayer(String name, ServerClientListenerThread handler) throws FirstPlayerException {
-		synchronized (lobbyLock) {
+		synchronized (lobbyClients) {
 			if (name == null) {
 				return  0;
 			}
 			while (lobbyDimension == 1) {
 				try {
-					lobbyLock.wait();
+					lobbyClients.wait();
 				} catch (InterruptedException e) {
-					// TODO: ask to the tutors how to handle this exception
+					//TODO: see every interrupted exception and implement a more elegant way to handle them
+					throw new AssertionError("Thread was interrupted and the code never interrupts it");
 				}
 			}
 
@@ -88,8 +89,8 @@ public class Server implements Runnable {
 					return 1;
 				} else {
 					lobbyClients.add(handler,name);
-					new Thread(() -> createGame()).start();
-					return 1;
+					createGame();
+					return 2;
 				}
 			}
 		}
@@ -101,13 +102,13 @@ public class Server implements Runnable {
 	 * @throws AlreadyStartedException if the match is already started this exception is thrown
 	 */
 	public void removePlayer(String name, ServerClientListenerThread handler) throws AlreadyStartedException {
-		synchronized (lobbyLock) {
+		synchronized (lobbyClients) {
 			if (!lobbyClients.containsValue(name)) {
 				throw new AlreadyStartedException();
 			} else {
 				if (lobbyDimension == 1) {
 					lobbyDimension--;
-					lobbyLock.notifyAll();
+					lobbyClients.notifyAll();
 				}
 				lobbyClients.removeByValue(name);
 			}
@@ -121,16 +122,16 @@ public class Server implements Runnable {
 	 * @throws IllegalArgumentException The dimension passed is different from 2 or 3
 	 */
 	public void setPlayerNumber(int dimension, ServerClientListenerThread handler) throws IllegalCallerException, IllegalArgumentException {
-		synchronized (lobbyLock) {
+		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
 				throw new IllegalCallerException();
 			} else {
 				if (dimension == 2 || dimension == 3) {
 					lobbyDimension = dimension;
-					lobbyLock.notifyAll();
+					lobbyClients.notifyAll();
 				} else {
 					lobbyDimension = 0;
-					lobbyClients = new MultipleList<>();
+					lobbyClients.clear();
 					throw new IllegalArgumentException();
 				}
 			}
@@ -143,7 +144,7 @@ public class Server implements Runnable {
 	 * @throws IllegalCallerException The thread that called this method isn't a thread which represent a client
 	 */
 	public int getClientPosition(ServerClientListenerThread handler) throws IllegalCallerException {
-		synchronized (lobbyLock) {
+		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
 				throw new IllegalCallerException();
 			}
@@ -155,7 +156,7 @@ public class Server implements Runnable {
 	 * @return return true if the lobby needs the user input for the player number
 	 */
 	public boolean getToBeCreated() {
-		synchronized (lobbyLock) {
+		synchronized (lobbyClients) {
 			return lobbyDimension == 1;
 		}
 	}
@@ -163,27 +164,30 @@ public class Server implements Runnable {
 	 * This method create a game where player are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
 	 */
 	private void createGame() {
-		try {
-			Game game = new Game((String[])lobbyClients.getValueList().toArray());
-			ServerController controller = new ServerController(game);
-			for (int i = 0; i < lobbyClients.size(); i++) {
-				RemoteView remoteView = new RemoteView(lobbyClients.getKey(i));
-				lobbyClients.getKey(i).setGamePhase(1);
-				lobbyClients.getKey(i).setGameServer(remoteView);
-				remoteView.addObserver(controller);
-				game.addObserver(remoteView);
-				controller.generateOrder();
-				// TODO: think how to inform threads about the start of the Game
+		synchronized (lobbyClients) {
+			if (lobbyDimension == lobbyClients.size()) {
+				try {
+					Game game = new Game((String[]) lobbyClients.getValueList().toArray());
+					ServerController controller = new ServerController(game);
+					for (int i = 0; i < lobbyClients.size(); i++) {
+						RemoteView remoteView = new RemoteView(lobbyClients.getKey(i));
+						lobbyClients.getKey(i).setGamePhase(1);
+						lobbyClients.getKey(i).setGameServer(remoteView);
+						remoteView.addObserver(controller);
+						game.addObserver(remoteView);
+					}
+					new Thread(controller::generateOrder).start();
+					lobbyClients.clear();
+					lobbyDimension = 0;
+				} catch (NullPointerException e) {
+					for (ServerClientListenerThread handler : lobbyClients.getKeyList()) {
+						handler.fatalError("During game creation the game was created null and passed to server controller");
+					}
+					lobbyClients.clear();
+					lobbyDimension = 0;
+					throw new AssertionError("Something's gone wrong and the server tried to create a gaming server with null game");
+				}
 			}
-			lobbyClients = new MultipleList<>();
-			lobbyDimension = 0;
-		} catch (NullPointerException e) {
-			for (ServerClientListenerThread handler : lobbyClients.getKeyList()) {
-				handler.fatalError();
-			}
-			lobbyClients = new MultipleList<>();
-			lobbyDimension = 0;
-			throw new AssertionError("Something's gone wrong and the server tried to create a gaming server with null list of players or handlers");
 		}
 	}
 }

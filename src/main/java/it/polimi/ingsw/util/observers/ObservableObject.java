@@ -1,4 +1,4 @@
-package it.polimi.ingsw.util;
+package it.polimi.ingsw.util.observers;
 
 // necessary imports from other packages of the project
 
@@ -110,6 +110,18 @@ public class ObservableObject {
 			if (obs instanceof ObserverObjectRemoteView) {
 				temp = (ObserverObjectRemoteView) obs;
 				temp.updateWinner(playerWinner);
+			}
+		}
+	}
+	public void notifyQuit(String playerName) throws NullPointerException {
+		if (playerName == null) {
+			throw new NullPointerException();
+		}
+		ObserverObjectController temp;
+		for (ObserverObject obs : observers) {
+			if (obs instanceof ObserverObjectController) {
+				temp = (ObserverObjectController) obs;
+				temp.updateQuit(playerName);
 			}
 		}
 	}

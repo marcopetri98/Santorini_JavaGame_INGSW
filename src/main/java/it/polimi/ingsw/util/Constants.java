@@ -21,7 +21,10 @@ public final class Constants {
 	/* Version constants */
 	public static final int ACTUAL_VERSION = 1;
 
-	/* Setup messages from client to server */
+	/* General messages between client and server */
+	public static final String GENERAL_ERROR = "error";
+	public static final String GENERAL_FATAL_ERROR = "error-fatal";
+	/* Setup messages between client and server */
 	public static final String SETUP_PARTICIPATE = "setup-participate";
 	public static final String SETUP_CREATE = "setup-create";
 	public static final String SETUP_SETUPNUM = "setup-choosing-num";
@@ -31,9 +34,11 @@ public final class Constants {
 	public static final String SETUP_OUT_CONNFAILED = "setup-connection-failed";
 	public static final String SETUP_OUT_CONNERROR = "setup-connection-error";
 	public static final String SETUP_OUT_CONNFINISH = "setup-connection-finished";
-
-	/* Game preparation messages */
-	public static final String PREP_TURN = "preparation-info";
+	/* Lobby messages between client and server */
+	public static final String LOBBY_DISCONNECT = "lobby-disconnect";
+	public static final String LOBBY_ERROR = "lobby-error";
+	public static final String LOBBY_TURN = "preparation-info";
+	/* Color messages between client and server */
 	public static final String PREP_COLOR_YOU = "preparation-color-go";
 	public static final String PREP_COLOR_SUCCESS = "preparation-color-success";
 	public static final String PREP_COLOR_OTHER = "preparation-color-wait";
@@ -48,6 +53,7 @@ public final class Constants {
 	/* Exception messages */
 
 	/* Functions useful for all program */
+	// TODO: maybe useless
 	public static boolean verifyConnected(Socket socket) {
 		try {
 			PrintWriter printer = new PrintWriter(socket.getOutputStream());

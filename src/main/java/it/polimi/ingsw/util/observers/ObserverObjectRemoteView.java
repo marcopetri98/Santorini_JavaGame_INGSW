@@ -1,4 +1,4 @@
-package it.polimi.ingsw.util;
+package it.polimi.ingsw.util.observers;
 
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 

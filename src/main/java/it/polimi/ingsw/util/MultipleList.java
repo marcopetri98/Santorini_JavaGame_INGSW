@@ -80,4 +80,8 @@ public class MultipleList<K,V> {
 	public List<V> getValueList() {
 		return new ArrayList<>(valueList);
 	}
+	public void clear() {
+		keyList.clear();
+		valueList.clear();
+	}
 }

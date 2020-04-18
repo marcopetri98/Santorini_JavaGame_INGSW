@@ -5,11 +5,11 @@ import it.polimi.ingsw.util.Constants;
 
 // necessary imports of Java SE
 import java.awt.Color;
-import java.io.Serializable;
 
 public class NetColorPreparation extends NetObject {
 	public static int serialUID = Constants.ACTUAL_VERSION;
 	private String player;
+	// TODO: is still necessary this variable?
 	private int additionalInfo;
 	private Color color;
 	private NetColorPreparation next;

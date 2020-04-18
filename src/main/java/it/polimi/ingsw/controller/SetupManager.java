@@ -46,7 +46,7 @@ public class SetupManager {
 		}
 		try {
 			observedModel.setOrder(gamers);
-		} catch (WrongPhaseException e) {
+		} catch (IllegalArgumentException | WrongPhaseException e) {
 			throw new AssertionError("Generate order called in a phase different from the setup");
 		}
 	}
