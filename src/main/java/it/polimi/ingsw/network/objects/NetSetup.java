@@ -1,18 +1,25 @@
 package it.polimi.ingsw.network.objects;
 
 public class NetSetup extends NetObject {
-	private String player;
-	private int number;
+	public final String player;
+	public final int number;
 
-	public NetSetup(String msg) {
+	public NetSetup(String msg)throws NullPointerException {
 		super(msg);
+		player = null;
+		number = 0;
 	}
-	public NetSetup(String msg, String name) {
+	public NetSetup(String msg, String name) throws NullPointerException  {
 		super(msg);
+		if (name == null) {
+			throw new NullPointerException();
+		}
 		player = name;
+		number = 0;
 	}
-	public NetSetup(String msg, int number) {
+	public NetSetup(String msg, int number) throws NullPointerException {
 		super(msg);
+		player = null;
 		this.number = number;
 	}
 

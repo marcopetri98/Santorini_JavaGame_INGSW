@@ -6,21 +6,30 @@ package it.polimi.ingsw.network.objects;
 
 
 public class NetLobbyPreparation extends NetObject {
-	private String player;
-	private int order;
-	private NetLobbyPreparation next;
+	public final String player;
+	public final int order;
+	public final NetLobbyPreparation next;
 
-	public NetLobbyPreparation(String msg) {
+	public NetLobbyPreparation(String msg) throws NullPointerException {
 		super(msg);
+		player = null;
+		order = 0;
+		next = null;
 	}
-	public NetLobbyPreparation(String msg, String player, int order) {
+	public NetLobbyPreparation(String msg, String player, int order) throws NullPointerException {
 		super(msg);
+		if (player == null) {
+			throw new NullPointerException();
+		}
 		this.player = player;
 		this.order = order;
 		this.next = null;
 	}
-	public NetLobbyPreparation(String msg, String player, int order, NetLobbyPreparation next) {
+	public NetLobbyPreparation(String msg, String player, int order, NetLobbyPreparation next) throws NullPointerException {
 		super(msg);
+		if (player == null) {
+			throw new NullPointerException();
+		}
 		this.player = player;
 		this.order = order;
 		this.next = next;

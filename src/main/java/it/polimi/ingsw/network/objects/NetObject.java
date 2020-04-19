@@ -8,13 +8,12 @@ import java.io.Serializable;
 
 public class NetObject implements Serializable {
 	public static final int serialUID = Constants.ACTUAL_VERSION;
-	private String message;
+	public final String message;
 
-	public NetObject(String msg) {
+	public NetObject(String msg) throws NullPointerException {
+		if (msg == null) {
+			throw new NullPointerException();
+		}
 		message = msg;
-	}
-
-	public String getMessage() {
-		return message;
 	}
 }

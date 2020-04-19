@@ -1,10 +1,13 @@
 package it.polimi.ingsw.core;
 
+// necessary imports from other packages of the project
+import it.polimi.ingsw.network.game.NetMove;
+
 public class Move {
-	private int typeMove;
-	private Cell prev;
-	private Cell next;
-	private Worker worker;
+	public final int typeMove;
+	public final Cell prev;
+	public final Cell next;
+	public final Worker worker;
 	private Move other;
 
 	public Move(int t, Cell p, Cell n, Worker w){
@@ -14,34 +17,35 @@ public class Move {
 		worker = w;
 	}
 
-	private Cell getCellPrev(){
-		return prev;
-	}
-
-	private Cell getCellNext(){
-		return next;
-	}
-
-	private Worker getWorker(){
-		return worker;
-	}
-
-	private Move getOther(){
-		return other;
-	}
-
+	// class setters
 	public void setCondition(Move o){
 		other = o;
 	}
 
+	// class getters
 	public int getType(){
 		return typeMove;
 	}
+	public Cell getCellPrev(){
+		return prev;
+	}
+	public Cell getCellNext(){
+		return next;
+	}
+	public Worker getWorker(){
+		return worker;
+	}
+	public Move getOther(){
+		return other;
+	}
+	public boolean isSameAs(NetMove playerMove) {
+		return next.map.getX(next) == playerMove.cellX && next.map.getY(next) == playerMove.cellY && worker.workerID == playerMove.workerID;
+	}
 
-	//TODO: controllare se le condizioni sono corrette!!!
+	// overridden methods
+	//TODO: fixare perché sbagliata
 	public boolean equals(Move m){
 		if(this.prev == m.getCellPrev() && this.next == m.getCellNext() && this.worker == m.getWorker()) return true;
 		return false;
 	}
-
 }

@@ -1,19 +1,21 @@
 package it.polimi.ingsw.core;
 
 // necessary imports of Java SE
+import it.polimi.ingsw.util.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Map {
-	private List<List<Cell>> cells;
+	private final List<List<Cell>> cells;
 
 	// constructors and setters for this class
 	public Map() {
 		cells = new ArrayList<>();
-		for (int i = 0; i <= 4; i++) {
+		for (int i = 0; i < Constants.MAP_SIDE; i++) {
 			cells.add(new ArrayList<Cell>());
-			for (int j = 0; j <= 4; j++) {
-				cells.get(i).add(new Cell());
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				cells.get(i).add(new Cell(this));
 			}
 		}
 	}

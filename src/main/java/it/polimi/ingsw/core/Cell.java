@@ -1,11 +1,13 @@
 package it.polimi.ingsw.core;
 
 public class Cell {
-	private Building building;
+	public final Map map;
+	public final Building building;
 	private Worker worker;
 
-	public Cell() {
+	public Cell(Map m) {
 		this.building = new Building();
+		this.map = m;
 	}
 
 	public void setWorker(Worker w){

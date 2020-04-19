@@ -23,7 +23,7 @@ public class ServerClientListenerThread extends Thread {
 	private final Socket clientSocket;
 	private final ObjectInputStream input;
 	private final ObjectOutputStream output;
-	private final Object scopeLock, stateLock;
+	private final Object scopeLock, stateLock, playerNameLock;
 
 	/**
 	 * The constructor initialize a listener for client's messages in the setup stage, this server listens for messages of setup until the games start, when it starts it changes the gamePhase and listen to other messages, depending on the game phase
@@ -40,6 +40,7 @@ public class ServerClientListenerThread extends Thread {
 		playerName = null;
 		scopeLock = new Object();
 		stateLock = new Object();
+		playerNameLock = new Object();
 		input = new ObjectInputStream(clientSocket.getInputStream());
 		output = new ObjectOutputStream(clientSocket.getOutputStream());
 	}
@@ -143,7 +144,7 @@ public class ServerClientListenerThread extends Thread {
 		try {
 			name = setupMessage.getPlayer();
 			// if the player wants to participate to a lobby and it has inserted a name it process it
-			if (setupMessage.getMessage().equals(Constants.SETUP_PARTICIPATE) && name != null) {
+			if (setupMessage.message.equals(Constants.SETUP_PARTICIPATE) && name != null) {
 				serverResponse = lobbyServer.addPlayer(setupMessage.getPlayer(),this);
 				// it sends an error to the client because there is a player with such name
 				if (serverResponse == 0) {
@@ -153,16 +154,16 @@ public class ServerClientListenerThread extends Thread {
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED);
 					setGamePhase(0);
 					joinedGame = true;
-					playerName = name;
+					setPlayerName(name);
 				// it says to the client that the game is starting
 				} else {
 					// the game phase is updated by the createGame of the server class
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH);
 					joinedGame = true;
-					playerName = name;
+					setPlayerName(name);
 				}
 			// if the player is trying to setup the number of player inside the lobby it controls that is can do that
-			} else if (setupMessage.getMessage().equals(Constants.SETUP_SETUPNUM)) {
+			} else if (setupMessage.message.equals(Constants.SETUP_SETUPNUM)) {
 				// it controls that the player can set the number of players
 				if (lobbyServer.getToBeCreated() && lobbyServer.getClientPosition(this) == 0) {
 					// it controls that the number is valid
@@ -198,14 +199,9 @@ public class ServerClientListenerThread extends Thread {
 	private void parseLobbyInput(NetLobbyPreparation lobbyMessage) {
 		NetLobbyPreparation lobbyOutput;
 
-		if (lobbyMessage.getMessage().equals(Constants.LOBBY_DISCONNECT)) {
+		if (lobbyMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
 			// it disconnects the user from the lobby
 			disconnect();
-			try {
-				clientSocket.close();
-			} catch (IOException e) {
-				setActive(false);
-			}
 		} else {
 			// user sent a wrong message
 			lobbyOutput = new NetLobbyPreparation(Constants.LOBBY_ERROR);
@@ -213,20 +209,92 @@ public class ServerClientListenerThread extends Thread {
 		}
 	}
 	private void parseColorInput(NetColorPreparation colorMessage) {
+		NetColorPreparation colorOutput;
+
+		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) && Constants.COLOR_COLORS.contains(colorMessage.getColor())) {
+			// the user is trying to choose the color with a well formed message, this is sent to the remoteView
+			gameServer.handleColorRequest(colorMessage);
+		} else if (colorMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
+			// disconnects the user
+			disconnect();
+		} else {
+			// the user has sent a bad message
+			colorOutput = new NetColorPreparation(Constants.GENERAL_ERROR);
+			sendMessage(colorOutput);
+		}
 	}
 	private void parseDivinityInput(NetDivinityChoice divinityMessage) {
+		NetDivinityChoice divinityOutput;
+
+		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS)) {
+			// if the player has sent a well formed message with gods that has to be in the game it sends this to the remote view
+			if ((divinityMessage.getDivinities().size() == 2 || divinityMessage.getDivinities().size() == 3) && Constants.GODS_GOD_NAMES.containsAll(divinityMessage.getDivinities())) {
+				gameServer.handleDivinityRequest(divinityMessage);
+			} else {
+				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
+				sendMessage(divinityOutput);
+			}
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE)) {
+			// if the player chose a divinity it sends the message to the remote view
+			if (Constants.GODS_GOD_NAMES.contains(divinityMessage.getDivinity())) {
+				gameServer.handleDivinityRequest(divinityMessage);
+			} else {
+				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
+				sendMessage(divinityOutput);
+			}
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.getStarter() != null) {
+			// if the player is trying to select a start player with a well formed message it sends the message to the remote view
+			gameServer.handleDivinityRequest(divinityMessage);
+		} else if (divinityMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
+			// it disconnects the user
+			disconnect();
+		} else {
+			// message isn't well formed ==> error message sent
+			divinityOutput = new NetDivinityChoice(Constants.GENERAL_ERROR);
+			sendMessage(divinityOutput);
+		}
 	}
 	private void parseGameSetupInput(NetGameSetup gameSetupMessage) {
+		NetGameSetup gameSetupOutput;
 
+		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE)) {
+			if (gameSetupMessage.worker1.getFirst() <= 4 && gameSetupMessage.worker1.getFirst() >= 0 && gameSetupMessage.worker1.getSecond() <= 4 && gameSetupMessage.worker1.getSecond() >= 0 && gameSetupMessage.worker2.getFirst() <= 4 && gameSetupMessage.worker2.getFirst() >= 0 && gameSetupMessage.worker2.getSecond() <= 4 && gameSetupMessage.worker2.getSecond() >= 0) {
+				gameServer.handlePositionRequest(gameSetupMessage);
+			} else {
+				gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);
+				sendMessage(gameSetupMessage);
+			}
+		} else if (gameSetupMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
+			// it disconnects the user
+			disconnect();
+		} else {
+			// the message isn't well formed
+			gameSetupOutput = new NetGameSetup(Constants.GENERAL_ERROR);
+			sendMessage(gameSetupMessage);
+		}
 	}
 	private void parseTurnInput(NetPlayerTurn playerTurnMessage) {
 
 	}
 	private void parseOtherTurn(NetOtherTurn otherTurnMessage) {
+		NetOtherTurn othersOutput;
 
+		if (otherTurnMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
+			// it disconnects the user from the lobby
+			disconnect();
+		} else {
+			// user sent a wrong message
+			othersOutput = new NetOtherTurn(Constants.OTHERS_ERROR);
+			sendMessage(othersOutput);
+		}
 	}
 
 	// CLASS SETTERS AND SUPPORT METHODS
+	private void setPlayerName(String name) {
+		synchronized (playerNameLock) {
+			playerName = name;
+		}
+	}
 	public void setGameServer(RemoteView gameServer) {
 		synchronized (scopeLock) {
 			this.gameServer = gameServer;
@@ -260,7 +328,17 @@ public class ServerClientListenerThread extends Thread {
 		sendMessage(object);
 	}
 
+	// GETTERS FOR THIS CLASS
+	public String getPlayerName() {
+		synchronized (playerNameLock) {
+			return playerName;
+		}
+	}
+
 	// METHODS CALLED ON THE REMOTE VIEW
+	/**
+	 * This method calls the remote view method that notifies the gaming controller that the player has disconnected
+	 */
 	public void notifyDisconnection() {
 		gameServer.notifyQuit(playerName);
 	}
@@ -288,6 +366,8 @@ public class ServerClientListenerThread extends Thread {
 		if (gamePhase == 0) {
 			try {
 				lobbyServer.removePlayer(playerName,this);
+				clientSocket.close();
+				setActive(false);
 				setActive(false);
 			} catch (AlreadyStartedException e) {
 				// if the user has disconnected during the game creation it waits for the game creation and notifies that to the gaming server
@@ -295,17 +375,29 @@ public class ServerClientListenerThread extends Thread {
 					while (gameServer == null) {
 						try {
 							scopeLock.wait();
-						} catch (InterruptedException ex) {
+						} catch (InterruptedException e2) {
 							throw new AssertionError("Thread was interrupted and the code never interrupts it");
 						}
 					}
 					notifyDisconnection();
-					setActive(false);
+					try {
+						clientSocket.close();
+						setActive(false);
+					} catch (IOException e2) {
+						setActive(false);
+					}
 				}
+			} catch (IOException e) {
+				setActive(false);
 			}
 		} else {
 			notifyDisconnection();
-			setActive(false);
+			try {
+				clientSocket.close();
+				setActive(false);
+			} catch (IOException e2) {
+				setActive(false);
+			}
 		}
 	}
 }

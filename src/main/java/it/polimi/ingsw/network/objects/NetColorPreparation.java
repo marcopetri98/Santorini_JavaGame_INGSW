@@ -8,27 +8,30 @@ import java.awt.Color;
 
 public class NetColorPreparation extends NetObject {
 	public static int serialUID = Constants.ACTUAL_VERSION;
-	private String player;
-	// TODO: is still necessary this variable?
-	private int additionalInfo;
-	private Color color;
-	private NetColorPreparation next;
+	public final String player;
+	public final Color color;
+	public final NetColorPreparation next;
 
-	public NetColorPreparation(String msg) {
+	public NetColorPreparation(String msg) throws NullPointerException {
 		super(msg);
+		player = null;
+		color = null;
+		next = null;
 	}
-	public NetColorPreparation(String msg, int info) {
+	public NetColorPreparation(String msg, String player, Color c) throws NullPointerException {
 		super(msg);
-		additionalInfo = info;
-	}
-	public NetColorPreparation(String msg, String player, Color c) {
-		super(msg);
+		if (player == null || c == null) {
+			throw new NullPointerException();
+		}
 		this.player = player;
 		this.color = c;
 		this.next = null;
 	}
-	public NetColorPreparation(String msg, String player, Color c, NetColorPreparation next) {
+	public NetColorPreparation(String msg, String player, Color c, NetColorPreparation next) throws NullPointerException {
 		super(msg);
+		if (player == null || c == null) {
+			throw new NullPointerException();
+		}
 		this.player = player;
 		this.color = c;
 		this.next = next;

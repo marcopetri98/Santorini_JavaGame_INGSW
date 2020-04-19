@@ -4,8 +4,8 @@ package it.polimi.ingsw.core;
 import java.awt.Color;
 
 public class Player {
-	private int playerID;
-	private String playerName;
+	public final int playerID;
+	public final String playerName;
 	private Worker worker1;
 	private Worker worker2;
 	private Worker activeWorker;
@@ -15,6 +15,10 @@ public class Player {
 	public Player(String playerName) {
 		this.playerName = playerName;
 		playerID = playerName.hashCode();
+		worker1 = null;
+		worker2 = null;
+		activeWorker = null;
+		card = null;
 	}
 
 	// STATE CHANGER METHODS
@@ -35,8 +39,8 @@ public class Player {
 		}
 	}
 	public void setPlayerColor(Color color) {
-		worker1 = new Worker(color);
-		worker2 = new Worker(color);
+		worker1 = new Worker(color,this,1);
+		worker2 = new Worker(color,this,2);
 	}
 
 	// CLASSES GETTERS
@@ -69,6 +73,9 @@ public class Player {
 			throw new IllegalStateException();
 		}
 		return card;
+	}
+	public Player copy() {
+		return new Player(playerName);
 	}
 
 	// OVERRIDDEN METHODS

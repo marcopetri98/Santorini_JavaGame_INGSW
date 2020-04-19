@@ -41,23 +41,23 @@ public class ServerController implements ObserverObjectController {
 	private void passTurn() {}
 
 	@Override
-	public void updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException {
+	public boolean updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException {
 
 	}
 	@Override
-	public void updateGods(Object playerGods) throws IllegalArgumentException, WrongPhaseException {
+	public boolean updateGods(Object playerGods) throws IllegalArgumentException, WrongPhaseException {
 
 	}
 	@Override
-	public void updatePositions(Object netObject, boolean finished) throws WrongPhaseException {
+	public boolean updatePositions(Object netObject, boolean finished) throws WrongPhaseException {
 
 	}
 	@Override
-	public void updateMove(Object netMap) throws NullPointerException, WrongPhaseException {
+	public boolean updateMove(Object netMap) throws NullPointerException, WrongPhaseException {
 
 	}
 	@Override
-	public void updateBuild(Object netMap) throws NullPointerException, WrongPhaseException {
+	public boolean updateBuild(Object netMap) throws NullPointerException, WrongPhaseException {
 
 	}
 	@Override

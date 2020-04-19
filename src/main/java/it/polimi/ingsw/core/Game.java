@@ -12,7 +12,8 @@ public class Game extends ObservableObject {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
 	private List<GodCard> godCards;
-	private int phase;
+	private int phase; // 0 = setup order, 1 = game color selection, 2 = divinity selection, 3 = worker position on board (game setup), 4 = your turn, 5 = others turn
+	private int subPhase; // 1 if the player has to move, 2 if the player has to build, -1 if the game isn't started
 	private Map map;
 
 	// constructors
@@ -22,6 +23,7 @@ public class Game extends ObservableObject {
 		godCards = new ArrayList<>();
 		map = new Map();
 		phase = 0;
+		subPhase = -1;
 		for (String name : names) {
 			players.add(new Player(name));
 		}
@@ -60,6 +62,9 @@ public class Game extends ObservableObject {
 	public List<Player> getPlayers() {
 		return new ArrayList<Player>(players);
 	}
+	public Player getPlayerTurn() {
+		return activePlayer.copy();
+	}
 
 	// METHODS USED AT THE BEGINNING OF THE GAME
 	private void createGodCards() {
@@ -76,7 +81,12 @@ public class Game extends ObservableObject {
 	}
 
 	// SETTERS USED ON THE BEGINNING
-	// TODO: finish setup methods
+	/**
+	 * This method receives a list of player's names and set the order sorting the players arrayList
+	 * @param playerOrder is the ordered list of players turn sequence
+	 * @throws IllegalArgumentException it is thrown if playerOrder is null or if it doesn't represent a permutation of players arrayList
+	 * @throws WrongPhaseException is thrown if this method is called on a different phase from the start
+	 */
 	public void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
 		if (playerOrder == null || playerOrder.size() != players.size()) {
 			throw new IllegalArgumentException();
@@ -101,11 +111,19 @@ public class Game extends ObservableObject {
 			}
 		}
 		players = temp;
+		activePlayer = players.get(0);
 		// notifies the remote view of a change
 		notifyOrder(playerOrder.toArray());
 		// once all clients are notified the phase advance to color selection
 		phase++;
 	}
+	/**
+	 * Sets the player's color indicated
+	 * @param player is the player which the color has to be set
+	 * @param color the color chosen by the player
+	 * @throws IllegalArgumentException if color or player is null or if it is trying to set the color of a player which isn't the active player
+	 * @throws WrongPhaseException if the phase isn't the color selection phase
+	 */
 	public void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
 		if (player == null || color == null) {
 			throw new IllegalArgumentException();
@@ -119,12 +137,19 @@ public class Game extends ObservableObject {
 				found = true;
 			}
 		}
-		if (i == players.size()) {
+		if (i == players.size() || players.get(i) != activePlayer) {
 			throw new IllegalArgumentException();
 		} else {
 			players.get(i).setPlayerColor(color);
 		}
 	}
+	/**
+	 * Sets the player's godCard
+	 * @param player
+	 * @param god
+	 * @throws IllegalArgumentException
+	 * @throws WrongPhaseException
+	 */
 	public void setPlayerGod(String player, GodCard god) throws IllegalArgumentException, WrongPhaseException {
 		if (player == null || god == null || !godCards.contains(god)) {
 			throw new IllegalArgumentException();
@@ -144,8 +169,27 @@ public class Game extends ObservableObject {
 			players.get(i).setGodCard(god);
 		}
 	}
-	public void setPhase(int phase) {
+	/**
+	 * Sets the current phase to the new phase
+	 * @param phase the new phase
+	 * @throws IllegalArgumentException if the parameter is less than 0 or greater than 5
+	 */
+	public void setPhase(int phase) throws IllegalArgumentException {
+		if (subPhase < 0 || subPhase > 5) {
+			throw new IllegalArgumentException();
+		}
 		this.phase = phase;
+	}
+	/**
+	 * Sets the current subPhase to a new value specified in the parameters
+	 * @param subPhase the new sub phase
+	 * @throws IllegalArgumentException if the parameter isn't 1 or 2
+	 */
+	public void setSubPhase(int subPhase) throws IllegalArgumentException {
+		if (subPhase != 1 && subPhase != 2) {
+			throw new IllegalArgumentException();
+		}
+		this.subPhase = subPhase;
 	}
 
 	// GETTERS USED ON THE BEGINNING
@@ -163,7 +207,7 @@ public class Game extends ObservableObject {
 		if (i == players.size()) {
 			throw new IllegalArgumentException();
 		} else {
-			return players.get(i).getWorker1().getColor();
+			return players.get(i).getWorker1().color;
 		}
 	}
 	public GodCard getPlayerGodCard(String player) throws IllegalArgumentException, IllegalStateException  {

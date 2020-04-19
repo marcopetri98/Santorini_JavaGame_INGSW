@@ -10,18 +10,19 @@ public class Worker extends Observable {
     private Cell previousPosition;
     private Cell position;
     private Cell lastBuild;
-    private Color color;
+    public final Color color;
+    public final Player owner;
+    public final int workerID;
 
-    public Worker(Color color){
+    public Worker(Color color, Player owner, int num){
         this.color = color;
+        this.owner = owner;
+        workerID = owner.getPlayerID()+num;
     }
 
     // getter of position
     public Cell getPos() {
         return position;
-    }
-    public Color getColor() {
-        return color;
     }
 
     //Setter of position, Implements the observable object
