@@ -31,4 +31,14 @@ public class Pair<P,Q> {
 	public boolean secondEqual(Pair<P,Q> other) {
 		return q.equals(other.getSecond());
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Pair) {
+			Pair<P,Q> other = (Pair<P,Q>)obj;
+			return p.equals(other.getFirst()) && q.equals(other.getSecond());
+		} else {
+			return false;
+		}
+	}
 }

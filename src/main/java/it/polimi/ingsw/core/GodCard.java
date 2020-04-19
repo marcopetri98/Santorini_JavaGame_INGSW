@@ -1,6 +1,6 @@
 package it.polimi.ingsw.core;
-import it.polimi.ingsw.exceptions.NoBuildException;
-import it.polimi.ingsw.exceptions.NoMoveException;
+import it.polimi.ingsw.util.exceptions.NoBuildException;
+import it.polimi.ingsw.util.exceptions.NoMoveException;
 
 import java.util.List;
 

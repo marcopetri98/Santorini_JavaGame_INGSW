@@ -11,6 +11,7 @@ public class NetBuilding {
 		dome = building.getDome();
 	}
 
+	// TODO: is this really necessary?
 	// security check methods
 	public boolean trueBuilding() {
 		return level <= 3 && level >= 0;

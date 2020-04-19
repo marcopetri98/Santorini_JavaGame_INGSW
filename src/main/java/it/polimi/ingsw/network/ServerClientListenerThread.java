@@ -134,6 +134,7 @@ public class ServerClientListenerThread extends Thread {
 	// USER INPUT PARSING FUNCTIONS
 	/**
 	 * This function parses the input that arrives from the client before being inside a lobby, it calls methods on the server to add the player on a lobby, if there isn't a lobby it catches the FirstPlayerException and asks to the player the number of player that the game should have because he is the first and should create a lobby.
+	 * @param setupMessage the message sent by the client
 	 * @throws AssertionError if this object has passed wrong parameters to the server functions
 	 */
 	private void parseSetupInput(NetSetup setupMessage) {
@@ -258,7 +259,8 @@ public class ServerClientListenerThread extends Thread {
 		NetGameSetup gameSetupOutput;
 
 		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE)) {
-			if (gameSetupMessage.worker1.getFirst() <= 4 && gameSetupMessage.worker1.getFirst() >= 0 && gameSetupMessage.worker1.getSecond() <= 4 && gameSetupMessage.worker1.getSecond() >= 0 && gameSetupMessage.worker2.getFirst() <= 4 && gameSetupMessage.worker2.getFirst() >= 0 && gameSetupMessage.worker2.getSecond() <= 4 && gameSetupMessage.worker2.getSecond() >= 0) {
+			if (gameSetupMessage.worker1.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker1.getFirst() >= 0 && gameSetupMessage.worker1.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker1.getSecond() >= 0 && gameSetupMessage.worker2.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker2.getFirst() >= 0 && gameSetupMessage.worker2.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker2.getSecond() >= 0 && !gameSetupMessage.worker1.equals(gameSetupMessage.worker2)) {
+				// the user is sending coordinates of the map where it want to put workers (not on the same cell)
 				gameServer.handlePositionRequest(gameSetupMessage);
 			} else {
 				gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);
@@ -274,7 +276,26 @@ public class ServerClientListenerThread extends Thread {
 		}
 	}
 	private void parseTurnInput(NetPlayerTurn playerTurnMessage) {
+		NetPlayerTurn playerTurnOutput;
 
+		if (playerTurnMessage.message.equals(Constants.PLAYER_IN_MOVE)) {
+			if (playerTurnMessage.move.cellX >= 0 && playerTurnMessage.move.cellX <= Constants.MAP_SIDE && playerTurnMessage.move.cellY >= 0 && playerTurnMessage.move.cellY <= Constants.MAP_SIDE) {
+				gameServer.handleMoveRequest(playerTurnMessage);
+			} else {
+				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);
+				sendMessage(playerTurnMessage);
+			}
+		} else if (playerTurnMessage.message.equals(Constants.PLAYER_IN_BUILD)) {
+			if (playerTurnMessage.build.cellX >= 0 && playerTurnMessage.build.cellX <= Constants.MAP_SIDE && playerTurnMessage.build.cellY >= 0 && playerTurnMessage.build.cellY <= Constants.MAP_SIDE) {
+				gameServer.handleBuildRequest(playerTurnMessage);
+			} else {
+				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);
+				sendMessage(playerTurnMessage);
+			}
+		} else {
+			playerTurnMessage = new NetPlayerTurn(Constants.GENERAL_ERROR);
+			sendMessage(playerTurnMessage);
+		}
 	}
 	private void parseOtherTurn(NetOtherTurn otherTurnMessage) {
 		NetOtherTurn othersOutput;

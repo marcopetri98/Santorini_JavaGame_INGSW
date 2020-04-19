@@ -50,6 +50,7 @@ public class NetMap {
 		return false;
 	}
 
+	// TODO: are these really necessary?
 	// security check methods
 	/**
 	 * It check if the map isn't corrupted and has the original format

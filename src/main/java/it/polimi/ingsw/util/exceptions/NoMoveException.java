@@ -1,4 +1,4 @@
-package it.polimi.ingsw.exceptions;
+package it.polimi.ingsw.util.exceptions;
 
 public class NoMoveException extends Exception {
 }

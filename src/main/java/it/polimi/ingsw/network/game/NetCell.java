@@ -12,6 +12,7 @@ public class NetCell {
 		worker = new NetWorker(cell.getWorker(), this);
 	}
 
+	// TODO: is this really necessary?
 	// security check methods
 	public boolean trueCell() {
 		if (building == null) {

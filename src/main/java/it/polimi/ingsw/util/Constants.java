@@ -65,27 +65,13 @@ public final class Constants {
 	public static final String GAMESETUP_OTHER_CHOICE = "gamesetup-other-choice";
 	public static final String GAMESETUP_IN_PLACE = "gamesetup-positions";
 	/* Player's turn messages between client and server */
+	public static final String PLAYER_ERROR = "player-error";
+	public static final String PLAYER_IN_MOVE = "player-move";
+	public static final String PLAYER_IN_BUILD = "player-build";
 	/* Other player's turn messages between client and server */
+	public static final String OTHERS_ACTION = "others-action";
 	public static final String OTHERS_ERROR = "others-error";
 
 	/* General connection messages */
 	public static final String CHECK = "ping";
-
-	/* Exception messages */
-
-	/* Functions useful for all program */
-	// TODO: maybe useless
-	public static boolean verifyConnected(Socket socket) {
-		try {
-			PrintWriter printer = new PrintWriter(socket.getOutputStream());
-			printer.println(Constants.CHECK);
-			printer.flush();
-			Thread.sleep(100);
-			Scanner reader = new Scanner(socket.getInputStream());
-			reader.nextLine();
-			return true;
-		} catch (NoSuchElementException | IOException | InterruptedException e) {
-			return false;
-		}
-	}
 }

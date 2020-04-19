@@ -74,29 +74,37 @@ public class RemoteView extends ObservableObject implements ObserverObjectRemote
 	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
 	/**
 	 * It receiver a well formed request of color, meaning that the color is one of the three available colors
-	 * @param req
+	 * @param req represent the message sent by the client
 	 */
 	public void handleColorRequest(NetColorPreparation req) {
 
 	}
 	/**
 	 * It receives a well formed request of divinity choice, meaning that the divinity exists or all divinity exists and there aren't duplicates if the player is the challenger and is choosing the gods to play with
-	 * @param req
+	 * @param req represent the message sent by the client
 	 */
 	public void handleDivinityRequest(NetDivinityChoice req) {
 
 	}
 	/**
 	 * It receives a well formed request of positioning of workers, when with well formed we mean that the position is inside the map
-	 * @param req
+	 * @param req represent the message sent by the client
 	 */
 	public void handlePositionRequest(NetGameSetup req) {
 
 	}
+	/**
+	 * It receives a well formed request of a move, well formed means that the cell is inside the map, it is needed to check worker and if is possible to move there
+	 * @param req represent the message sent by the client
+	 */
 	public void handleMoveRequest(NetPlayerTurn req) {
 
 	}
-	public void handleBuildRequest(NetOtherTurn req) {
+	/**
+	 * It receives a well formed request of build, well formed means that the cell is inside the map, it is needed to check if the build can be done and if all parameters are correct
+	 * @param req represent the message sent by the client
+	 */
+	public void handleBuildRequest(NetPlayerTurn req) {
 
 	}
 

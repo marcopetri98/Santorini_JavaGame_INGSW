@@ -1,6 +1,6 @@
 package it.polimi.ingsw.core;
 
-import it.polimi.ingsw.exceptions.NoBuildException;
+import it.polimi.ingsw.util.exceptions.NoBuildException;
 
 import java.util.ArrayList;
 import java.util.List;

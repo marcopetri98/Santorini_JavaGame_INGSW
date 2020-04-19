@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class Game extends ObservableObject {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
+	// TODO: implement factory method for godCards
 	private List<GodCard> godCards;
 	private int phase; // 0 = setup order, 1 = game color selection, 2 = divinity selection, 3 = worker position on board (game setup), 4 = your turn, 5 = others turn
 	private int subPhase; // 1 if the player has to move, 2 if the player has to build, -1 if the game isn't started
@@ -226,5 +227,8 @@ public class Game extends ObservableObject {
 	}
 	public int getPhase() {
 		return phase;
+	}
+	public int getSubPhase() {
+		return subPhase;
 	}
 }
