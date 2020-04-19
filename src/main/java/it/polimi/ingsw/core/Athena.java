@@ -53,9 +53,16 @@ public class Athena implements GodCard, Observer {
 	}
 
 	/**
-	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn chooses to move
-	 * @param type the typeMove of Athena is 2. It represents a loss condition
+	 * @throws NoBuildException so that controller knows it must use the default action
+	 */
+	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+		throw new NoBuildException();
+	}
+
+	/**
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker can't move up
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type){
@@ -72,13 +79,4 @@ public class Athena implements GodCard, Observer {
 
 		return moves;
 	}
-
-
-	/**
-	 * @return null, because Pan power isn't about buildings
-	 */
-	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
-		throw new NoBuildException();
-	}
-
 }

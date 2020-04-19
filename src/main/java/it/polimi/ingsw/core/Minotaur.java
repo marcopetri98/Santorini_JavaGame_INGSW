@@ -39,15 +39,18 @@ public class Minotaur implements GodCard{
 		return description;
 	}
 
+	/**
+	 * @throws NoBuildException so that controller knows it must use the default action
+	 */
 	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
 		throw new NoBuildException();
 	}
 
 	/**
-	 * @param m Represents the map
-	 * @param w Represents the worker moved by the player during this turn
-	 * @param type Represents the typeMove of this particular GodCard. It will perform a "conditioned move"
-	 * @return the cells where the Player's Worker could move according to general game rules and his GodCard power
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
+	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
 		int y = m.getY(w.getPos());
@@ -63,13 +66,13 @@ public class Minotaur implements GodCard{
 						if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
 							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() <= 1){ //Check height difference
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
-									if(m.getX(owner.getWorker1().getPos()) != x1 && m.getY(owner.getWorker1().getPos()) != y1 && m.getX(owner.getWorker2().getPos()) != x1 && m.getY(owner.getWorker2().getPos()) != y1){   //Check there is no OWNER worker on cell
-										//Checks for opponent's workers because of Apollo's power
+									if((m.getX(owner.getWorker1().getPos()) != x1 || m.getY(owner.getWorker1().getPos()) != y1) && (m.getX(owner.getWorker2().getPos()) != x1 || m.getY(owner.getWorker2().getPos()) != y1)){   //Check there is no OWNER worker on cell
+										//Checks for opponent's workers because of Minotaur's power
 										if(m.getCell(x1, y1).getWorker() != null){
 											addCell(m, w, type, x1, y1, x, y);
 										}
 										else{
-											moves.add(new Move(1, m.getCell(x, y), m.getCell(x1, y1), w));
+											moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));
 										}
 									}
 								}

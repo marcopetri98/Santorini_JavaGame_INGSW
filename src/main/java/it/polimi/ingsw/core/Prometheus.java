@@ -7,7 +7,7 @@ public class Prometheus implements GodCard{
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Prometheus";
-	String description = "Your Turn: If your Worker does not move up, it may build both before and after moving.\n";
+	String description = "Your Turn: If your Worker does not move up, it may build both before and after moving.";
 	List<Move> moves;
 	List<Build> builds;
 
@@ -38,15 +38,16 @@ public class Prometheus implements GodCard{
 	}
 
 	/**
-	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn choose to move
-	 * @param type the typeBuild of Prometheus is 0. We choose this means that he performs a "simple build"
-	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeBuild of this particular GodCard: 0 stands for a "simple construction", 1 for a "conditioned construction"
+	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
+	//This is the "default" building option
 	public List<Build> checkBuild(Map m, Worker w, int type){
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		moves = new ArrayList<>();
+		builds = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
 			for (int j = -1; j <= 1; j++) {
@@ -57,9 +58,8 @@ public class Prometheus implements GodCard{
 						if (-1 <= (x1 - x) && (x1 - x) <= 1 && -1 <= (y1 - y) && (y1 - y) <= 1) {  //Check that distance from original cell is <= 1
 							if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
-									if (m.getCell(x1, y1).getBuilding().getLevel() <= 3) { //Check height building is <=3
-										addCell(m, w, type, x1, y1, x, y);
-									}
+									if(m.getCell(x1, y1).getBuilding().getLevel() <= 2)	builds.add(new Build(w, m.getCell(x1, y1), false, 0));		//adds possible build: one block build
+									else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) builds.add(new Build(w, m.getCell(x1, y1), true, 0));	//adds possible build: single dome on top of three level building
 								}
 							}
 						}
@@ -71,68 +71,12 @@ public class Prometheus implements GodCard{
 	}
 
 	/**
-	 *
-	 * @param x1,y1 cell where the player is going to build the first time
-	 * @param x,y cell where the worker is
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
+	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
-	private void addCell(Map m, Worker w, int type, int x1, int y1, int x, int y){
-
-		//first build
-		if (m.getCell(x1, y1).getBuilding().getLevel() == 3){
-			builds.add(new Build(w, m.getCell(x1, y1), true, 0)); //can build a dome
-		} else {
-			builds.add(new Build(w, m.getCell(x1, y1), false, 0)); //cannot build a dome
-		}
-
-		//second build, after a move of the worker in h,k due to checkMove function TODO: test...
-		int h = m.getX(w.getPos());
-		int k = m.getY(w.getPos());
-		for(int i = -1; i <= 1; i++){    //x1,y1 is where i have already build in this turn
-			int x2 = h + i;
-			for(int j = -1; j <= 1; j++){
-				int y2 = k + j;         //x2,y2 is where i want to build the second time
-				if(x2 != h || y2 != k){	//I shall not build where I am
-					if(0 <= x2 && x2 <= 4 && 0 <= y2 && y2 <= 4){	//Check I am inside the boundaries of the map
-						if(-1 <= (x2-h) && (x2-h) <= 1 && -1 <= (y2-k) && (y2-k) <=1){  //Check that distance from my position is however <= 1
-							if (m.getCell(x2, y2).getWorker() == null) {   //Check there isn't any worker on the cell
-								if (!m.getCell(x2, y2).getBuilding().getDome()) {   //Check there is NO dome
-									if (m.getCell(x2, y2).getBuilding().getLevel() == 3) { //can build dome in x2y2
-										if(m.getCell(x1, y1).getBuilding().getDome()) { //x1y1 built a dome
-											Build firstBuild = new Build(w, m.getCell(x1, y1), true, 0);
-											firstBuild.setCondition(new Build(w, m.getCell(x2, y2), true, 0));
-											builds.add(firstBuild);
-										} else {
-											Build firstBuild = new Build(w, m.getCell(x1, y1), false, 0);
-											firstBuild.setCondition(new Build(w, m.getCell(x2, y2), true, 0));
-											builds.add(firstBuild);
-										}
-									} else {
-										if(m.getCell(x1, y1).getBuilding().getDome()) {
-											Build firstBuild = new Build(w, m.getCell(x1, y1), true, 0);
-											firstBuild.setCondition(new Build(w, m.getCell(x2, y2), false, 0));
-											builds.add(firstBuild);
-										} else {
-											Build firstBuild = new Build(w, m.getCell(x1, y1), false, 0);
-											firstBuild.setCondition(new Build(w, m.getCell(x2, y2), false, 0));
-											builds.add(firstBuild);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 *
-	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn choose to move
-	 * @param type the typeMove of Prometheus is 0. We choose this means that she performs a "simple move"
-	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
-	 */
+	//This is the "default" movement option
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
 		int y = m.getX(w.getPos());
 		int x = m.getY(w.getPos());
@@ -157,8 +101,6 @@ public class Prometheus implements GodCard{
 				}
 			}
 		}
-
 		return moves;
 	}
-
 }

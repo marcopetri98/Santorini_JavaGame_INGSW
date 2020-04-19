@@ -40,11 +40,17 @@ public class Pan implements GodCard{
 	}
 
 	/**
-	 *
-	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn choose to move
-	 * @param type the typeMove of Pan is 3. We choose this means that she performs a "Winning Move"
-	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
+	 * @throws NoBuildException so that controller knows it must use the default action
+	 */
+	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+		throw new NoBuildException();
+	}
+
+	/**
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
+	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
 		int y = m.getY(w.getPos());
@@ -71,12 +77,5 @@ public class Pan implements GodCard{
 		}
 
 		return moves;
-	}
-
-	/**
-	 * @return null, because Pan power isn't about buildings
-	 */
-	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
-		throw new NoBuildException();
 	}
 }

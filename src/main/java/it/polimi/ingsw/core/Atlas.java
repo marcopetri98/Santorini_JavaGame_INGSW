@@ -39,12 +39,12 @@ public class Atlas implements GodCard{
 		return description;
 	}
 
+	//TODO: o mettiamo direttamente su GodCard, definendo però tutti i type...?
 	/**
-	 * //TODO: o mettiamo direttamente su GodCard, definendo però tutti i type...?
-	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn choose to move
-	 * @param type the typeBuild of Atlas is 0. We choose this means that he performs a "simple build"
-	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeBuild of this particular GodCard: 0 stands for a "simple construction", 1 for a "conditioned construction"
+	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
 	public List<Build> checkBuild(Map m, Worker w, int type){
 		int y = m.getY(w.getPos());
@@ -76,10 +76,9 @@ public class Atlas implements GodCard{
 	}
 
 	/**
-	 * @return null, because Atlas power isn't about moves.
+	 * @throws NoMoveException so that controller knows it must use the default action
 	 */
 	public List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException {
 		throw new NoMoveException();
 	}
-
 }

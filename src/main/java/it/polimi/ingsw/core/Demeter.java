@@ -40,11 +40,10 @@ public class Demeter implements GodCard{
 	}
 
 	/**
-	 *
-	 * @param m The map situation of the match
-	 * @param w the worker the player of this turn choose to move
-	 * @param type the typeBuild of Demeter is 1. We choose this means that she performs a "conditioned build"
-	 * @return the cells where the Player's Worker could move according to general game rules and his God card Power
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param type represents the typeBuild of this particular GodCard: 0 stands for a "simple construction", 1 for a "conditioned construction"
+	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
 	public List<Build> checkBuild(Map m, Worker w, int type){
 		int y = m.getY(w.getPos());
@@ -97,5 +96,4 @@ public class Demeter implements GodCard{
 	public List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException {
 		throw new NoMoveException();
 	}
-
 }
