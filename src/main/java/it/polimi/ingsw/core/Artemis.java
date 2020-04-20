@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Artemis implements GodCard{
 
 	//CODICE APOLLO
-	private int typeGod = 0;
+	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Artemis";
@@ -31,7 +31,7 @@ public class Artemis implements GodCard{
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -44,7 +44,7 @@ public class Artemis implements GodCard{
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type) throws NoBuildException {
 		throw new NoBuildException();
 	}
 
@@ -54,7 +54,7 @@ public class Artemis implements GodCard{
 	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
+	public List<Move> checkMove(Map m, Worker w, TypeMove type){   //worker->activeworker
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
@@ -90,9 +90,9 @@ public class Artemis implements GodCard{
 	 * @param x1,y1 represent the coordinates of the cell where the player may move
 	 * @param x,y represent the coordinates of the cell where the worker is
 	 */
-	private void addCell(Map m, Worker w, int type, int x1, int y1, int x, int y){
+	private void addCell(Map m, Worker w, TypeMove type, int x1, int y1, int x, int y){
 
-		moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));	//Adds default move: Artemis can indeed move without using her power
+		moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));	//Adds default move: Artemis can indeed move without using her power
 
 		for(int i = -1; i <= 1; i++){
 			int x2 = x1 + i;
@@ -108,8 +108,8 @@ public class Artemis implements GodCard{
 									if(!m.getCell(x2, y2).getBuilding().getDome()){   //Check there is NO dome
 										if(m.getCell(x2, y2).getWorker() == null){   //Check there is no worker on cell
 											//Adds a move with another linked move
-											Move firstMove = new Move(0, m.getCell(x, y), m.getCell(x1, y1), w);
-											firstMove.setCondition(new Move(0, m.getCell(x1, y1), m.getCell(x2, y2), w));
+											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w);
+											firstMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x1, y1), m.getCell(x2, y2), w));
 											moves.add(firstMove);
 										}
 									}

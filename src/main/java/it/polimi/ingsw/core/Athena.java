@@ -8,7 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class Athena implements GodCard, Observer {
-	private int typeGod = 1;
+	private TypeGod typeGod = TypeGod.OTHER_TURN_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Athena";
@@ -30,7 +30,7 @@ public class Athena implements GodCard, Observer {
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -55,7 +55,7 @@ public class Athena implements GodCard, Observer {
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type) throws NoBuildException {
 		throw new NoBuildException();
 	}
 
@@ -65,14 +65,14 @@ public class Athena implements GodCard, Observer {
 	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker can't move up
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type){
+	public List<Move> checkMove(Map m, Worker w, TypeMove type){
 		int myHeight = w.getPos().getBuilding().getLevel();
 		moves = new ArrayList<>();
 
 		if(wentUp){		//Athena's power's applied only if wentUp flag is true
 			for(int x1 = 0; x1 <= 4; x1++){   //x1, y1 all the cells where I mustn't move: I have to check the whole map and return all the cells higher than mine for 1 or more blocks
 				for(int y1 = 0; y1 <= 4; y1++){
-					if(m.getCell(x1, y1).getBuilding().getLevel() - myHeight >= 1) moves.add(new Move(2, w.getPos(), m.getCell(x1, y1), w));
+					if(m.getCell(x1, y1).getBuilding().getLevel() - myHeight >= 1) moves.add(new Move(TypeMove.FORBIDDEN_MOVE, w.getPos(), m.getCell(x1, y1), w));
 				}
 			}
 		}

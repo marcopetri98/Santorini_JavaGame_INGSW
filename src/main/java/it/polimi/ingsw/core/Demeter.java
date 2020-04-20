@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Demeter implements GodCard{
-	private int typeGod = 0;
+	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Demeter";
@@ -29,7 +29,7 @@ public class Demeter implements GodCard{
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -45,7 +45,7 @@ public class Demeter implements GodCard{
 	 * @param type represents the typeBuild of this particular GodCard: 0 stands for a "simple construction", 1 for a "conditioned construction"
 	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type){
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type){
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		List<Build> tempBuilds = new ArrayList<>();
@@ -61,12 +61,12 @@ public class Demeter implements GodCard{
 							if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
 									if(m.getCell(x1, y1).getBuilding().getLevel() <= 2) {
-										builds.add(new Build(w, m.getCell(x1, y1), false, 0));        //adds possible build: only one block
-										tempBuilds.add(new Build(w, m.getCell(x1, y1), false, 0));
+										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));        //adds possible build: only one block
+										tempBuilds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));
 									}
 									else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) {
-										builds.add(new Build(w, m.getCell(x1, y1), true, 0));    //adds possible build: only dome
-										tempBuilds.add(new Build(w, m.getCell(x1, y1), true, 0));
+										builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));    //adds possible build: only dome
+										tempBuilds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));
 									}
 								}
 							}
@@ -82,7 +82,7 @@ public class Demeter implements GodCard{
 				if(b.getCell() != b1.getCell()) {
 					Build secondBuild = b.copy();
 					secondBuild.setCondition(b1.copy());
-					secondBuild.setTypeBuild(1);
+					secondBuild.setTypeBuild(TypeBuild.CONDITIONED_BUILD);
 					builds.add(secondBuild);
 				}
 			}
@@ -94,7 +94,7 @@ public class Demeter implements GodCard{
 	/**
 	 * @throws NoMoveException so that controller knows it must use the default action
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException {
+	public List<Move> checkMove(Map m, Worker w, TypeMove type) throws NoMoveException {
 		throw new NoMoveException();
 	}
 }

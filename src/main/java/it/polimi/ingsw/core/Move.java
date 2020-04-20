@@ -4,13 +4,13 @@ package it.polimi.ingsw.core;
 import it.polimi.ingsw.network.game.NetMove;
 
 public class Move {
-	public final int typeMove;
+	public final TypeMove typeMove;
 	public final Cell prev;
 	public final Cell next;
 	public final Worker worker;
 	private Move other;
 
-	public Move(int t, Cell p, Cell n, Worker w){
+	public Move(TypeMove t, Cell p, Cell n, Worker w){
 		typeMove = t;
 		prev = p;
 		next = n;
@@ -23,7 +23,7 @@ public class Move {
 	}
 
 	// class getters
-	public int getType(){
+	public TypeMove getType(){
 		return typeMove;
 	}
 	public Cell getCellPrev(){

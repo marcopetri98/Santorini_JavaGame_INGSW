@@ -4,13 +4,13 @@ package it.polimi.ingsw.core;
 import it.polimi.ingsw.network.game.NetBuild;
 
 public class Build {
-	public int typeBuild;
+	public TypeBuild typeBuild;
 	public final Cell cell;
 	public final Worker worker;
 	public final boolean dome;
 	private Build other;
 
-	public Build(Worker w, Cell c, boolean d, int t){
+	public Build(Worker w, Cell c, boolean d, TypeBuild t){
 		this.worker = w;
 		this.cell = c;
 		this.dome = d;
@@ -21,10 +21,10 @@ public class Build {
 	public void setCondition(Build o){
 		this.other = o;
 	}
-	public void setTypeBuild(int t){ this.typeBuild = t; }
+	public void setTypeBuild(TypeBuild t){ this.typeBuild = t; }
 
 	// class getters
-	public int getTypeBuild(){ return typeBuild; }
+	public TypeBuild getTypeBuild(){ return typeBuild; }
 	public Cell getCell(){ return cell; }
 	public Worker getWorker(){ return worker; }
 	public boolean isDome(){ return dome; }

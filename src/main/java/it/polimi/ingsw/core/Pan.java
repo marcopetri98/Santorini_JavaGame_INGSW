@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Pan implements GodCard{
-	private int typeGod = 0;
+	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Pan";
@@ -29,7 +29,7 @@ public class Pan implements GodCard{
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -42,7 +42,7 @@ public class Pan implements GodCard{
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type) throws NoBuildException {
 		throw new NoBuildException();
 	}
 
@@ -52,7 +52,7 @@ public class Pan implements GodCard{
 	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
+	public List<Move> checkMove(Map m, Worker w, TypeMove type){   //worker->activeworker
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
@@ -66,8 +66,8 @@ public class Pan implements GodCard{
 						if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
 							if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 								if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-									if(m.getCell(x, y).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() >= 2) moves.add(new Move(3, m.getCell(x, y), m.getCell(x1, y1), w));	//Check height difference is at least 2 levels (moving down) and adds type 3 move
-									else moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));	//else adds type 0 [simple] move, still doable
+									if(m.getCell(x, y).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() >= 2) moves.add(new Move(TypeMove.VICTORY_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));	//Check height difference is at least 2 levels (moving down) and adds type 3 move
+									else moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));	//else adds type 0 [simple] move, still doable
 								}
 							}
 						}

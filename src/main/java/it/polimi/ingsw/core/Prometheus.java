@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Prometheus implements GodCard{
-	private int typeGod = 2;
+	private TypeGod typeGod = TypeGod.CHANGE_FLOW_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Prometheus";
@@ -27,7 +27,7 @@ public class Prometheus implements GodCard{
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -44,7 +44,7 @@ public class Prometheus implements GodCard{
 	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
 	//This is the "default" building option
-	public List<Build> checkBuild(Map m, Worker w, int type){
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type){
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		builds = new ArrayList<>();
@@ -58,8 +58,8 @@ public class Prometheus implements GodCard{
 						if (-1 <= (x1 - x) && (x1 - x) <= 1 && -1 <= (y1 - y) && (y1 - y) <= 1) {  //Check that distance from original cell is <= 1
 							if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
-									if(m.getCell(x1, y1).getBuilding().getLevel() <= 2)	builds.add(new Build(w, m.getCell(x1, y1), false, 0));		//adds possible build: one block build
-									else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) builds.add(new Build(w, m.getCell(x1, y1), true, 0));	//adds possible build: single dome on top of three level building
+									if(m.getCell(x1, y1).getBuilding().getLevel() <= 2)	builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));		//adds possible build: one block build
+									else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));	//adds possible build: single dome on top of three level building
 								}
 							}
 						}
@@ -77,7 +77,7 @@ public class Prometheus implements GodCard{
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
 	//This is the "default" movement option
-	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
+	public List<Move> checkMove(Map m, Worker w, TypeMove type){   //worker->activeworker
 		int y = m.getX(w.getPos());
 		int x = m.getY(w.getPos());
 		moves = new ArrayList<>();
@@ -92,7 +92,7 @@ public class Prometheus implements GodCard{
 							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() == 0){ //Check worker doesn't move up
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 									if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-										moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));
+										moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
 									}
 								}
 							}

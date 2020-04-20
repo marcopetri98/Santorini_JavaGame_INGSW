@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Minotaur implements GodCard{
-	private int typeGod = 0;
+	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Minotaur";
@@ -29,7 +29,7 @@ public class Minotaur implements GodCard{
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -42,7 +42,7 @@ public class Minotaur implements GodCard{
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type) throws NoBuildException {
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type) throws NoBuildException {
 		throw new NoBuildException();
 	}
 
@@ -52,7 +52,7 @@ public class Minotaur implements GodCard{
 	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type){   //worker->activeworker
+	public List<Move> checkMove(Map m, Worker w, TypeMove type){   //worker->activeworker
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		moves = new ArrayList<>();
@@ -72,7 +72,7 @@ public class Minotaur implements GodCard{
 											addCell(m, w, type, x1, y1, x, y);
 										}
 										else{
-											moves.add(new Move(0, m.getCell(x, y), m.getCell(x1, y1), w));
+											moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
 										}
 									}
 								}
@@ -87,7 +87,7 @@ public class Minotaur implements GodCard{
 	}
 
 
-	private void addCell(Map m, Worker w, int type, int x1, int y1, int x, int y) {
+	private void addCell(Map m, Worker w, TypeMove type, int x1, int y1, int x, int y) {
 		//Finds the next point through a vector representation of line
 		int t = 2;
 		int x2 = x + t * (x1 - x);
@@ -97,8 +97,8 @@ public class Minotaur implements GodCard{
 			if(!m.getCell(x2, y2).getBuilding().getDome()){	//Check there is NO dome
 				if(m.getCell(x2, y2).getWorker() == null){	//Check there is no worker [of ANY player] on cell
 					//Adds move
-					Move newMove = new Move(1, m.getCell(x, y), m.getCell(x1, y1), w);
-					newMove.setCondition(new Move(0, m.getCell(x1, y1), m.getCell(x2, y2), m.getCell(x1, y1).getWorker()));
+					Move newMove = new Move(TypeMove.CONDITIONED_MOVE, m.getCell(x, y), m.getCell(x1, y1), w);
+					newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x1, y1), m.getCell(x2, y2), m.getCell(x1, y1).getWorker()));
 					moves.add(newMove);
 				}
 			}

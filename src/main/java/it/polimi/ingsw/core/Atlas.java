@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Atlas implements GodCard{
-	private int typeGod = 0;
+	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;
 	String name = "Atlas";
@@ -29,7 +29,7 @@ public class Atlas implements GodCard{
 	public Player getOwner(){
 		return owner;
 	}
-	public int getTypeGod(){
+	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 	public String getName(){
@@ -45,7 +45,7 @@ public class Atlas implements GodCard{
 	 * @param type represents the typeBuild of this particular GodCard: 0 stands for a "simple construction", 1 for a "conditioned construction"
 	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
-	public List<Build> checkBuild(Map m, Worker w, int type){
+	public List<Build> checkBuild(Map m, Worker w, TypeBuild type){
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		builds = new ArrayList<>();
@@ -61,8 +61,8 @@ public class Atlas implements GodCard{
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
 									if (m.getCell(x1, y1).getBuilding().getLevel() <= 3) { //Check height building is <=3
 										//don't need to check else, because Atlas can build Dome at any level
-										builds.add(new Build(w, m.getCell(x1, y1), true, 0));
-										builds.add(new Build(w, m.getCell(x1, y1), false, 0));	//adds the possibility to build another generic building [no dome]
+										builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));
+										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));	//adds the possibility to build another generic building [no dome]
 									}
 								}
 							}
@@ -77,7 +77,7 @@ public class Atlas implements GodCard{
 	/**
 	 * @throws NoMoveException so that controller knows it must use the default action
 	 */
-	public List<Move> checkMove(Map m, Worker w, int type) throws NoMoveException {
+	public List<Move> checkMove(Map m, Worker w, TypeMove type) throws NoMoveException {
 		throw new NoMoveException();
 	}
 }
