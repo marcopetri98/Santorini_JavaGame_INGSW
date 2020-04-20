@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class DemeterTest {
 	private Map map;
-	private int type;
+	private TypeBuild type;
 	private Demeter demeter;
 	private Player player;
 	private Player opponent;
@@ -21,7 +21,7 @@ public class DemeterTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = 1; //typeBuild of demeter according to our implementation
+		type = TypeBuild.CONDITIONED_BUILD; //typeBuild of demeter according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -48,26 +48,26 @@ public class DemeterTest {
 		assertEquals(4, demeter.checkBuild(map, player.getWorker1(), type).size());
 
 		i=0; j=1;
-		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), false, 0);
+		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild));
 
 		i=1; j=0;
-		Build newBuild1 = new Build(player.getWorker1(), map.getCell(i, j), false, 0);
+		Build newBuild1 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild1));
 
 		i=0; j=1; s=1; t=0;
-		Build newBuild2 = new Build(player.getWorker1(), map.getCell(i, j), false, 1);
-		newBuild2.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, 0));
+		Build newBuild2 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.CONDITIONED_BUILD);
+		newBuild2.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild2));
 
 		i=1; j=0; s=0; t=1;
-		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, 1);
-		newBuild3.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, 0));
+		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.CONDITIONED_BUILD);
+		newBuild3.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild3));
 
 		i=0; j=1;
-		Build newBuild4 = new Build(player.getWorker1(), map.getCell(i, j), true, 0);
-		assertFalse(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild4)); //assertFalse because he could not build a dome there
+		Build newBuild4 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
+		assertFalse(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild4)); //assertFalse because it could not be built a dome there
 
 	}
 
@@ -108,45 +108,45 @@ public class DemeterTest {
 		assertEquals(9, demeter.checkBuild(map, player.getWorker1(), type).size());
 
 		i=0; j=0;
-		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), false, 0);
+		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild));
 
 		i=1; j=0;
-		Build newBuild1 = new Build(player.getWorker1(), map.getCell(i, j), true, 0);
+		Build newBuild1 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild1));
 
 		i=0; j=2;
-		Build newBuild2 = new Build(player.getWorker1(), map.getCell(i, j), false, 0);
+		Build newBuild2 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild2));
 
 		i=0; j=0; s=1; t=0;
-		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, 1);
-		newBuild3.setCondition(new Build(player.getWorker1(), map.getCell(s, t), true, 0));
+		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.CONDITIONED_BUILD);
+		newBuild3.setCondition(new Build(player.getWorker1(), map.getCell(s, t), true, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild3));
 
 		i=0; j=0; s=0; t=2;
-		Build newBuild4 = new Build(player.getWorker1(), map.getCell(i, j), false, 1);
-		newBuild4.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, 0));
+		Build newBuild4 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.CONDITIONED_BUILD);
+		newBuild4.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild4));
 
 		i=1; j=0; s=0; t=0;
-		Build newBuild5 = new Build(player.getWorker1(), map.getCell(i, j), true, 1);
-		newBuild5.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, 0));
+		Build newBuild5 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.CONDITIONED_BUILD);
+		newBuild5.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild5));
 
 		i=1; j=0; s=0; t=2;
-		Build newBuild6 = new Build(player.getWorker1(), map.getCell(i, j), true, 1);
-		newBuild6.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, 0));
+		Build newBuild6 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.CONDITIONED_BUILD);
+		newBuild6.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild6));
 
 		i=0; j=2; s=0; t=0;
-		Build newBuild7 = new Build(player.getWorker1(), map.getCell(i, j), false, 1);
-		newBuild7.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, 0));
+		Build newBuild7 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.CONDITIONED_BUILD);
+		newBuild7.setCondition(new Build(player.getWorker1(), map.getCell(s, t), false, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild7));
 
 		i=0; j=2; s=1; t=0;
-		Build newBuild8 = new Build(player.getWorker1(), map.getCell(i, j), false, 1);
-		newBuild8.setCondition(new Build(player.getWorker1(), map.getCell(s, t), true, 0));
+		Build newBuild8 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.CONDITIONED_BUILD);
+		newBuild8.setCondition(new Build(player.getWorker1(), map.getCell(s, t), true, TypeBuild.SIMPLE_BUILD));
 		assertTrue(demeter.checkBuild(map, player.getWorker1(), type).contains(newBuild8));
 
 	}
