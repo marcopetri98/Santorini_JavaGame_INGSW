@@ -89,7 +89,7 @@ public class Prometheus implements GodCard{
 				if(x != x1 || y != y1){ //I shall not move where I am already
 					if(0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4){   //Check that I am inside the map
 						if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
-							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() == 0){ //Check worker doesn't move up
+							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() <= 1){
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 									if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 										moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));

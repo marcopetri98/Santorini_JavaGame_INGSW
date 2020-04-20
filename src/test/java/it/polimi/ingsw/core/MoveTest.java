@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class MoveTest {
 	private Player playerA = new Player("Pippo");
-	private int typeMove=0;
+	private TypeMove typeMove = TypeMove.SIMPLE_MOVE;
 	private Cell prev; //TODO: update cell fix
 	private Cell next;
 	private Worker workerA = playerA.getWorker1();

@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class ApolloTest {
 	private Map map;
-	private int type;
+	private TypeMove type;
 	private Apollo apollo;
 	private Player player;
 	private Player opponent;
@@ -22,7 +22,7 @@ public class ApolloTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = 1; //typeMove of Apollo according to our implementation
+		type = TypeMove.CONDITIONED_MOVE; //typeMove of Apollo according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -48,16 +48,16 @@ public class ApolloTest {
 
 		assertEquals(3, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=0; j=1;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=1; j=0;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 	}
@@ -81,36 +81,36 @@ public class ApolloTest {
 
 		assertEquals(8, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=0; j=0;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=0; j=1;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 		i=0; j=2;
-		Move newMove3 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove3));
 
 		i=1; j=0;
-		Move newMove4 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove4));
 
 		i=1; j=2;
-		Move newMove5 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove5));
 
 		i=2; j=0;
-		Move newMove6 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove6 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove6));
 
 		i=2; j=1;
-		Move newMove7 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove7 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove7));
 
 	}
@@ -137,36 +137,36 @@ public class ApolloTest {
 
 		assertEquals(7, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertFalse(apollo.checkMove(map, player.getWorker1(), type).contains(newMove)); //Worker1 cannot move up in a building with a difference in height more than 1.
 
 		i=0; j=0;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=0; j=1;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 		i=0; j=2;
-		Move newMove3 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove3));
 
 		i=1; j=0;
-		Move newMove4 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove4));
 
 		i=1; j=2;
-		Move newMove5 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove5));
 
 		i=2; j=0;
-		Move newMove6 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove6 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove6));
 
 		i=2; j=1;
-		Move newMove7 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove7 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove7));
 
 	}
@@ -192,36 +192,36 @@ public class ApolloTest {
 
 		assertEquals(8, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=0; j=0;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=0; j=1;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 		i=0; j=2;
-		Move newMove3 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove3));
 
 		i=1; j=0;
-		Move newMove4 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove4));
 
 		i=1; j=2;
-		Move newMove5 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove5));
 
 		i=2; j=0;
-		Move newMove6 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove6 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove6));
 
 		i=2; j=1;
-		Move newMove7 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove7 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove7));
 
 	}
@@ -262,37 +262,37 @@ public class ApolloTest {
 
 		assertEquals(5, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker1 bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker1 bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=0; j=0;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=0; j=1;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertFalse(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 		i=0; j=2;
-		Move newMove3 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove3));
 
 		i=1; j=0;
-		Move newMove4 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove4));
 
 		i=1; j=2;
-		Move newMove5 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertFalse(apollo.checkMove(map, player.getWorker1(), type).contains(newMove5));
 
 		i=2; j=0;
-		Move newMove6 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove6 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertFalse(apollo.checkMove(map, player.getWorker1(), type).contains(newMove6));
 
 		i=2; j=1;
-		Move newMove7 = new Move(1, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
-		newMove7.setCondition(new Move(0, map.getCell(i,j), map.getCell(x,y), map.getCell(i, j).getWorker())); //opponent's worker2 bounded to swipe with player's worker1
+		Move newMove7 = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		newMove7.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(x,y), map.getCell(i, j).getWorker())); //opponent's worker2 bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove7));
 
 	}
@@ -312,16 +312,16 @@ public class ApolloTest {
 
 		assertEquals(3, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=4; j=3;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=3; j=4;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 	}
@@ -341,16 +341,16 @@ public class ApolloTest {
 
 		assertEquals(3, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=3; j=0;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=4; j=1;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 	}
@@ -370,16 +370,16 @@ public class ApolloTest {
 
 		assertEquals(3, apollo.checkMove(map, player.getWorker1(), type).size());
 
-		Move newMove = new Move(1, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
-		newMove.setCondition(new Move(0, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
+		Move newMove = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //move due to Apollo's power
+		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(x,y), map.getCell(h, k).getWorker())); //opponent's worker bounded to swipe with player's worker1
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove));
 
 		i=0; j=3;
-		Move newMove1 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove1));
 
 		i=1; j=4;
-		Move newMove2 = new Move(0, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
+		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
 		assertTrue(apollo.checkMove(map, player.getWorker1(), type).contains(newMove2));
 
 	}

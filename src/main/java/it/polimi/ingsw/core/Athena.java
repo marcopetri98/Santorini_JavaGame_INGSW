@@ -42,6 +42,10 @@ public class Athena implements GodCard, Observer {
 
 	private boolean wentUp = false;
 
+	public void setWentUp(boolean wentUp) {
+		this.wentUp = wentUp;
+	}
+
 	//Overridden update method of the Observer
 	public void update(Observable obs, Object arg){
 		Worker modifiedWorker = (Worker) obs;

@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class BuildTest {
 	private Player playerA = new Player("Pippo");
-	private int typeBuild=0;
+	private TypeBuild typeBuild = TypeBuild.SIMPLE_BUILD;
 	private Cell cell; //TODO: update cell fix
 	private Worker workerA = playerA.getWorker1();
 	private boolean dome = false;
