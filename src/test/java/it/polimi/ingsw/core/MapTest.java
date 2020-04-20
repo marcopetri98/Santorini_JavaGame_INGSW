@@ -8,11 +8,11 @@ import static org.junit.Assert.*;
 
 public class MapTest {
 
-	private Player player = new Player("Pippo", Color.RED);
+	private Player player = new Player("Pippo");
 	private Map map = new Map();
 	private int i,j=0;
-	private Cell cell = new Cell(i,j);
-	private Cell cell2 = new Cell(1,1);
+	private Cell cell; //TODO: update cell fix
+	private Cell cell2;
 
 
 	@Test

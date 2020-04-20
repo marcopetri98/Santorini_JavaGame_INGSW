@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class BuildingTest {
 	private Map map = new Map();
 	private int i,j=0;
-	private Cell cell = new Cell(i,j);
+	private Cell cell; //TODO: update cell fix
 
 	@Test
 	public void incrementLevelTest() {

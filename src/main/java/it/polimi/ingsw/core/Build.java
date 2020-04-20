@@ -4,7 +4,7 @@ package it.polimi.ingsw.core;
 import it.polimi.ingsw.network.game.NetBuild;
 
 public class Build {
-	public final int typeBuild;
+	public int typeBuild;
 	public final Cell cell;
 	public final Worker worker;
 	public final boolean dome;
@@ -21,6 +21,7 @@ public class Build {
 	public void setCondition(Build o){
 		this.other = o;
 	}
+	public void setTypeBuild(int t){ this.typeBuild = t; }
 
 	// class getters
 	public int getTypeBuild(){ return typeBuild; }
@@ -37,10 +38,25 @@ public class Build {
 	public Build clone(){
 		return new Build(this.getWorker(), this.getCell(), this.isDome(), this.getTypeBuild());
 	}
-	//TODO: fixare perché sbagliata
-	public boolean equals(Build o){
-		if(this.cell == o.getCell() && this. worker == o.getWorker() && this.dome == o.isDome() && this.typeBuild == o.getTypeBuild()) return true;
-		else return false;
+
+//	//TODO: fixare perché sbagliata
+//	public boolean equals(Build o){
+//		if(this.cell == o.getCell() && this. worker == o.getWorker() && this.dome == o.isDome() && this.typeBuild == o.getTypeBuild()) return true;
+//		else return false;
+//	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj instanceof Build){
+			Build b = (Build) obj;
+			if(this.typeBuild == b.getTypeBuild() && this.cell == b.getCell() && this.dome == b.isDome() && this.worker == b.getWorker() && ((this.other == null && this.other == b.getOther()) || (this.other != null && b.getOther() != null && this.other.equals(b.getOther())))) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

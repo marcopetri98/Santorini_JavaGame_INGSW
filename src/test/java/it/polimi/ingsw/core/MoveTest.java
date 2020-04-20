@@ -7,17 +7,17 @@ import java.awt.*;
 import static org.junit.Assert.*;
 
 public class MoveTest {
-	private Player playerA = new Player("Pippo", Color.RED);
+	private Player playerA = new Player("Pippo");
 	private int typeMove=0;
-	private Cell prev = new Cell(0,0);
-	private Cell next = new Cell (1,1);
+	private Cell prev; //TODO: update cell fix
+	private Cell next;
 	private Worker workerA = playerA.getWorker1();
 	private Move move = new Move(typeMove, prev, next, workerA);
 
-	private Player playerB = new Player("Pluto", Color.yellow);
+	private Player playerB = new Player("Pluto");
 	//same typeMove, for ex.
-	private Cell prev2 = new Cell(1,1);
-	private Cell next2 = new Cell(2,2);
+	private Cell prev2;
+	private Cell next2;
 	private Worker workerB = playerB.getWorker1();
 	private Move other = new Move(typeMove, prev2, next2, workerB);
 

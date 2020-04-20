@@ -42,10 +42,17 @@ public class Move {
 		return next.map.getX(next) == playerMove.cellX && next.map.getY(next) == playerMove.cellY && worker.workerID == playerMove.workerID;
 	}
 
-	// overridden methods
-	//TODO: fixare perché sbagliata
-	public boolean equals(Move m){
-		if(this.prev == m.getCellPrev() && this.next == m.getCellNext() && this.worker == m.getWorker()) return true;
-		return false;
+	@Override
+	public boolean equals(Object obj){
+		if(obj instanceof Move){
+			Move m = (Move) obj;
+			if(this.typeMove == m.getType() && this.prev == m.getCellPrev() && this.next == m.getCellNext() && this.worker == m.getWorker() && ((this.other == null && this.other == m.getOther()) || (this.other != null && m.getOther() != null && this.other.equals(m.getOther())))) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 }

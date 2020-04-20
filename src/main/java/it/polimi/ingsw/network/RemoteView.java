@@ -149,22 +149,22 @@ public class RemoteView extends ObservableObject implements ObserverObjectRemote
 	}
 	@Override
 	public boolean updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException {
-
+		return Boolean.parseBoolean(null);
 	}
 	@Override
 	public boolean updateGods(Object playerGods) throws IllegalArgumentException, WrongPhaseException {
-
+		return Boolean.parseBoolean(null);
 	}
 	@Override
 	public boolean updatePositions(Object netObject, boolean finished) throws WrongPhaseException {
-
+		return Boolean.parseBoolean(null);
 	}
 	@Override
 	public boolean updateMove(Object netMap) throws NullPointerException, WrongPhaseException {
-
+		return Boolean.parseBoolean(null);
 	}
 	@Override
 	public boolean updateBuild(Object netMap) throws NullPointerException, WrongPhaseException {
-
+		return Boolean.parseBoolean(null);
 	}
 }

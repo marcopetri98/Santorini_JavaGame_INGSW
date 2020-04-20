@@ -7,7 +7,7 @@ import java.awt.*;
 import static org.junit.Assert.*;
 
 public class PlayerTest {
-	private Player player = new Player("Pippo", Color.RED);
+	private Player player = new Player("Pippo");
 
 	@Test
 	public void chooseWorkerTest() {

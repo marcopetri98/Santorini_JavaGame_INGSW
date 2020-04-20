@@ -82,6 +82,7 @@ public class Demeter implements GodCard{
 				if(b.getCell() != b1.getCell()) {
 					Build secondBuild = b.clone();
 					secondBuild.setCondition(b1.clone());
+					secondBuild.setTypeBuild(1);
 					builds.add(secondBuild);
 				}
 			}

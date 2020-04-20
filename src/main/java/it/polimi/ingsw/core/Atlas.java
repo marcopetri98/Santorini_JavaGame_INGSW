@@ -39,7 +39,6 @@ public class Atlas implements GodCard{
 		return description;
 	}
 
-	//TODO: o mettiamo direttamente su GodCard, definendo però tutti i type...?
 	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
@@ -49,7 +48,7 @@ public class Atlas implements GodCard{
 	public List<Build> checkBuild(Map m, Worker w, int type){
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		moves = new ArrayList<>();
+		builds = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
 			for (int j = -1; j <= 1; j++) {
