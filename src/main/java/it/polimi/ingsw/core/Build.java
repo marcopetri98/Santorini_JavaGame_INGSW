@@ -33,17 +33,9 @@ public class Build {
 		return cell.map.getY(cell) == playerBuild.cellY && cell.map.getX(cell) == playerBuild.cellX && worker.workerID == playerBuild.workerID && ((cell.getBuilding().getLevel() == playerBuild.level-1 && cell.getBuilding().getLevel() < 3) || dome == playerBuild.dome) && ((other == null && playerBuild.other == null) || (other != null && playerBuild.other != null && other.isSameAs(playerBuild.other)));
 	}
 
-	// overridden methods
-	// TODO: rimuovere perché sbagliata (chiedere perché è stata scritta)
-	public Build clone(){
+	public Build copy(){
 		return new Build(this.getWorker(), this.getCell(), this.isDome(), this.getTypeBuild());
 	}
-
-//	//TODO: fixare perché sbagliata
-//	public boolean equals(Build o){
-//		if(this.cell == o.getCell() && this. worker == o.getWorker() && this.dome == o.isDome() && this.typeBuild == o.getTypeBuild()) return true;
-//		else return false;
-//	}
 
 	@Override
 	public boolean equals(Object obj){

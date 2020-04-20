@@ -75,13 +75,13 @@ public class Demeter implements GodCard{
 				}
 			}
 		}
-		//adds every single allowed permutation of build construction to "builds" arraylist; TODO: may have redundancies, but shouldn't be a problem
+		//adds every single allowed permutation of build construction to "builds" arraylist;
 		//tempBuilds is just a temporary list in order to cycle through the elements of the original arraylist
 		for(Build b : tempBuilds){
 			for(Build b1 : tempBuilds) {
 				if(b.getCell() != b1.getCell()) {
-					Build secondBuild = b.clone();
-					secondBuild.setCondition(b1.clone());
+					Build secondBuild = b.copy();
+					secondBuild.setCondition(b1.copy());
 					secondBuild.setTypeBuild(1);
 					builds.add(secondBuild);
 				}
