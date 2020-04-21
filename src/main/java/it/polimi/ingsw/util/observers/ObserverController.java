@@ -5,6 +5,8 @@ import it.polimi.ingsw.network.game.NetAvailableBuildings;
 import it.polimi.ingsw.network.game.NetAvailablePositions;
 
 public interface ObserverController extends ObserverObject {
+	void updatePositions(ObservableObject observed, Object netObject);
+
 	Turn givePhase();
 	NetAvailablePositions giveAvailablePositions();
 	NetAvailableBuildings giveAvailableBuildings();

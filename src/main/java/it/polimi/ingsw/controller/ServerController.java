@@ -8,6 +8,7 @@ import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.game.NetAvailableBuildings;
 import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.util.observers.ObservableController;
+import it.polimi.ingsw.util.observers.ObservableObject;
 import it.polimi.ingsw.util.observers.ObserverController;
 
 public class ServerController extends ObservableController implements ObserverController {
@@ -38,26 +39,26 @@ public class ServerController extends ObservableController implements ObserverCo
 	private void passTurn() {}
 
 	@Override
-	public void updateColors(Object playerColors) {
+	public void updateColors(ObservableObject observed, Object playerColors) {
 	}
 	@Override
-	public void updateGods(Object playerGods) {
+	public void updateGods(ObservableObject observed, Object playerGods) {
 
 	}
 	@Override
-	public void updatePositions(Object netObject, boolean finished) {
+	public void updatePositions(ObservableObject observed, Object netObject) {
 
 	}
 	@Override
-	public void updateMove(Object netMap) {
+	public void updateMove(ObservableObject observed, Object netMap) {
 
 	}
 	@Override
-	public void updateBuild(Object netMap) {
+	public void updateBuild(ObservableObject observed, Object netMap) {
 
 	}
 	@Override
-	public void updateQuit(String playerName) {
+	public void updateQuit(ObservableObject observed, String playerName) {
 
 	}
 

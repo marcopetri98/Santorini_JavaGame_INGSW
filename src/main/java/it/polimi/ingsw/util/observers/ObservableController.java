@@ -18,9 +18,4 @@ public class ObservableController extends ObservableObject {
 			rvObs.add((ObserverRemoteView)obs);
 		}
 	}
-	public void notifyResult(boolean result) {
-		for (ObserverRemoteView obs : rvObs) {
-			obs.getControllerResult(result);
-		}
-	}
 }

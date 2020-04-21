@@ -23,6 +23,12 @@ public class ObservableRemoteView extends ObservableObject {
 			super.addObserver(obs);
 		}
 	}
+	public void notifyPositions(Object netMap) throws NullPointerException {
+		if (netMap == null) {
+			throw new NullPointerException();
+		}
+		ctrObs.updatePositions(this,netMap);
+	}
 	public Turn askPhase() {
 		return ctrObs.givePhase();
 	}

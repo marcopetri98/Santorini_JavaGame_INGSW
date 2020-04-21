@@ -3,6 +3,8 @@ package it.polimi.ingsw.network;
 // necessary imports from other packages of the project
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.observers.ObservableGame;
+import it.polimi.ingsw.util.observers.ObservableObject;
 import it.polimi.ingsw.util.observers.ObservableRemoteView;
 import it.polimi.ingsw.util.observers.ObserverRemoteView;
 
@@ -13,8 +15,6 @@ import it.polimi.ingsw.util.observers.ObserverRemoteView;
  */
 public class RemoteView extends ObservableRemoteView implements ObserverRemoteView {
 	private final ServerClientListenerThread clientHandler;
-	private boolean hasChanged;
-	private boolean result;
 	private final Object controllerResponseLock;
 
 	public RemoteView(ServerClientListenerThread handler) throws NullPointerException {
@@ -22,8 +22,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			throw new NullPointerException();
 		}
 		clientHandler = handler;
-		hasChanged = false;
-		result = false;
 		controllerResponseLock = new Object();
 	}
 
@@ -76,79 +74,77 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 
 	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
 	/**
-	 * It receiver a well formed request of color, meaning that the color is one of the three available colors, the remote view cannot know if the color is already owned by another player or not, for this reason notifies the ServerController
+	 * It receiver a well formed request of color, meaning that the color is one of the three available colors, the remote view cannot know if the color is already owned by another player or not, for this reason notifies the ServerController. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
+	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handleColorRequest(NetColorPreparation req) {
-		notifyColors(req);
-		waitUntilControllerReplies();
-		if (!result) {
+	public void handleColorRequest(NetColorPreparation req, boolean error) {
+		if (!error) {
+			notifyColors(req);
+		} else {
 			clientHandler.sendMessage(new NetColorPreparation(Constants.COLOR_ERROR));
 		}
 	}
 	/**
-	 * It receives a well formed request of divinity choice, meaning that the divinity exists or all divinity exists and there aren't duplicates if the player is the challenger and is choosing the gods to play with
+	 * It receives a well formed request of divinity choice, meaning that the divinity exists or all divinity exists and there aren't duplicates if the player is the challenger and is choosing the gods to play with. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
+	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handleDivinityRequest(NetDivinityChoice req) {
-
+	public void handleDivinityRequest(NetDivinityChoice req, boolean error) {
+		if (!error) {
+			notifyGods(req);
+		} else {
+			clientHandler.sendMessage(new NetDivinityChoice(Constants.GODS_ERROR));
+		}
 	}
 	/**
-	 * It receives a well formed request of positioning of workers, when with well formed we mean that the position is inside the map
+	 * It receives a well formed request of positioning of workers, when with well formed we mean that the position is inside the map. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
+	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handlePositionRequest(NetGameSetup req) {
-
+	public void handlePositionRequest(NetGameSetup req, boolean error) {
+		if (!error) {
+			notifyPositions(req);
+		} else {
+			clientHandler.sendMessage(new NetGameSetup(Constants.GAMESETUP_ERROR));
+		}
 	}
 	/**
-	 * It receives a well formed request of a move, well formed means that the cell is inside the map, it is needed to check worker and if is possible to move there
+	 * It receives a well formed request of a move, well formed means that the cell is inside the map, it is needed to check worker and if is possible to move there. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
+	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handleMoveRequest(NetPlayerTurn req) {
-
+	public void handleMoveRequest(NetPlayerTurn req, boolean error) {
+		if (!error) {
+			notifyMove(req);
+		} else {
+			clientHandler.sendMessage(new NetPlayerTurn(Constants.PLAYER_ERROR));
+		}
 	}
 	/**
-	 * It receives a well formed request of build, well formed means that the cell is inside the map, it is needed to check if the build can be done and if all parameters are correct
+	 * It receives a well formed request of build, well formed means that the cell is inside the map, it is needed to check if the build can be done and if all parameters are correct. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
+	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handleBuildRequest(NetPlayerTurn req) {
-
-	}
-
-	// SUPPORT METHODS
-	private void waitUntilControllerReplies() {
-		synchronized (controllerResponseLock) {
-			while (!hasChanged) {
-				try {
-					controllerResponseLock.wait();
-				} catch (InterruptedException e) {
-					// TODO: implement a better way to handle interruptedException
-					throw new AssertionError("Error of interruption");
-				}
-			}
-			hasChanged = false;
+	public void handleBuildRequest(NetPlayerTurn req, boolean error) {
+		if (!error) {
+			notifyBuild(req);
+		} else {
+			clientHandler.sendMessage(new NetPlayerTurn(Constants.PLAYER_ERROR));
 		}
 	}
 
 	// METHODS USED TO INFORM THE CONTROLLER ABOUT A REQUEST OF THE CLIENT
 	@Override
-	public void getControllerResult(boolean result) {
-		synchronized (controllerResponseLock) {
-			hasChanged = true;
-			this.result = result;
-			controllerResponseLock.notifyAll();
-		}
-	}
-	@Override
-	public void updateDefeat(Object playerDefeated) {
+	public void updateDefeat(ObservableGame observed, Object playerDefeated) {
 
 	}
 	@Override
-	public void updateWinner(Object playerWinner) {
+	public void updateWinner(ObservableGame observed, Object playerWinner) {
 
 	}
 	@Override
-	public void updateOrder(Object[] order) {
+	public void updateOrder(ObservableGame observed, Object[] order) {
 		if (order == null || clientHandler.getGamePhase() != NetworkPhase.LOBBY) {
 			clientHandler.fatalError("It has been called the notify of player's order in the wrong phase or maybe with a null parameter");
 		}
@@ -178,22 +174,22 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		clientHandler.sendMessage(colorMessage);
 	}
 	@Override
-	public void updateColors(Object playerColors) {
+	public void updateColors(ObservableObject observed, Object playerColors) {
 	}
 	@Override
-	public void updateGods(Object playerGods) {
+	public void updateGods(ObservableObject observed, Object playerGods) {
 	}
 	@Override
-	public void updatePositions(Object netObject, boolean finished) {
+	public void updatePositions(ObservableGame observed, Object netObject, boolean finished) {
 	}
 	@Override
-	public void updateMove(Object netMap) {
+	public void updateMove(ObservableObject observed, Object netMap) {
 	}
 	@Override
-	public void updateBuild(Object netMap) {
+	public void updateBuild(ObservableObject observed, Object netMap) {
 	}
 	@Override
-	public void updateQuit(String playerName) {
+	public void updateQuit(ObservableObject observed, String playerName) {
 
 	}
 }

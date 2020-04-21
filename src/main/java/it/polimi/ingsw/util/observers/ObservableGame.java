@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ObservableGame extends ObservableObject {
-	private List<ObserverRemoteView> rvObs;
+	private final List<ObserverRemoteView> rvObs;
 
 	public ObservableGame() {
 		rvObs = new ArrayList<>();
@@ -23,7 +23,7 @@ public class ObservableGame extends ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverRemoteView obs : rvObs) {
-			obs.updateOrder(order);
+			obs.updateOrder(this,order);
 		}
 	}
 	public void notifyDefeat(Object playerDefeated) throws NullPointerException {
@@ -31,7 +31,7 @@ public class ObservableGame extends ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverRemoteView obs : rvObs) {
-			obs.updateDefeat(playerDefeated);
+			obs.updateDefeat(this,playerDefeated);
 		}
 	}
 	public void notifyWinner(Object playerWinner) throws NullPointerException {
@@ -39,7 +39,15 @@ public class ObservableGame extends ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverRemoteView obs : rvObs) {
-			obs.updateWinner(playerWinner);
+			obs.updateWinner(this,playerWinner);
+		}
+	}
+	public void notifyPositions(Object netMap, boolean finished) throws NullPointerException {
+		if (netMap == null) {
+			throw new NullPointerException();
+		}
+		for (ObserverRemoteView obs : rvObs) {
+			obs.updatePositions(this,netMap,finished);
 		}
 	}
 }

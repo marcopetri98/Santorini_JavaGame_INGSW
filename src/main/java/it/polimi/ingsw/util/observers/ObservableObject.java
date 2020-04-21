@@ -1,14 +1,13 @@
 package it.polimi.ingsw.util.observers;
 
 // necessary imports from other packages of the project
-import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 // necessary imports of Java SE
 import java.util.ArrayList;
 import java.util.List;
 
 public class ObservableObject {
-	private List<ObserverObject> observers;
+	private final List<ObserverObject> observers;
 
 	// constructors
 	public ObservableObject() {
@@ -35,7 +34,7 @@ public class ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverObject obs : observers) {
-			obs.updateColors(playerColors);
+			obs.updateColors(this,playerColors);
 		}
 	}
 	public void notifyGods(Object playerGods) throws NullPointerException {
@@ -43,15 +42,7 @@ public class ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverObject obs : observers) {
-			obs.updateGods(playerGods);
-		}
-	}
-	public void notifyPositions(Object netMap, boolean finished) throws NullPointerException {
-		if (netMap == null) {
-			throw new NullPointerException();
-		}
-		for (ObserverObject obs : observers) {
-			obs.updatePositions(netMap,finished);
+			obs.updateGods(this,playerGods);
 		}
 	}
 	public void notifyMove(Object netMap) throws NullPointerException {
@@ -59,7 +50,7 @@ public class ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverObject obs : observers) {
-			obs.updateMove(netMap);
+			obs.updateMove(this,netMap);
 		}
 	}
 	public void notifyBuild(Object netMap) throws NullPointerException {
@@ -67,7 +58,7 @@ public class ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverObject obs : observers) {
-			obs.updateBuild(netMap);
+			obs.updateBuild(this,netMap);
 		}
 	}
 	public void notifyQuit(String playerName) throws NullPointerException {
@@ -75,7 +66,7 @@ public class ObservableObject {
 			throw new NullPointerException();
 		}
 		for (ObserverObject obs : observers) {
-			obs.updateQuit(playerName);
+			obs.updateQuit(this,playerName);
 		}
 	}
 }
