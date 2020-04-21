@@ -8,6 +8,10 @@ public class Building {
 		level = 0;
 		dome = false;
 	}
+	private Building(int level, boolean dome) {
+		this.level = level;
+		this.dome = dome;
+	}
 
 	// SETTERS AND CHANGERS
 	public void incrementLevel() throws IllegalStateException {
@@ -17,7 +21,7 @@ public class Building {
 			throw new IllegalStateException();
 		}
 	}
-	public void setDome() throws IllegalStateException {
+	public void setDome() {
 		if (!dome) {
 			dome = true;
 		} else {
@@ -41,7 +45,7 @@ public class Building {
 		return false;
 	}
 	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
+	public Building clone() {
+		return new Building(level,dome);
 	}
 }

@@ -11,6 +11,7 @@ public class Player {
 	public final String playerName;
 	private Worker worker1;
 	private Worker worker2;
+	// TODO: delete active worker
 	private Worker activeWorker;
 	private GodCard card;
 
@@ -25,6 +26,7 @@ public class Player {
 	}
 
 	// STATE CHANGER METHODS
+	// TODO: delete the choose worker method
 	public void chooseWorker(int chosen) throws IllegalArgumentException {
 		if (chosen == 1) {
 			this.activeWorker = worker1;
@@ -65,6 +67,7 @@ public class Player {
 		}
 		return worker2;
 	}
+	// TODO: delete active worker get
 	public Worker getActiveWorker() throws IllegalStateException {
 		if (activeWorker == null) {
 			throw new IllegalStateException();
@@ -76,13 +79,6 @@ public class Player {
 			throw new IllegalStateException();
 		}
 		return card;
-	}
-	// TODO: fixme
-	public Player copy() {
-		Player newPlayer = new Player(playerName);
-		newPlayer.setPlayerColor(worker1.getColor());
-		newPlayer.setGodCard(card);
-		return new Player(playerName);
 	}
 
 	// OVERRIDDEN METHODS
@@ -98,5 +94,12 @@ public class Player {
 				return false;
 			}
 		}
+	}
+	@Override
+	public Player clone() {
+		Player newPlayer = new Player(playerName);
+		newPlayer.setPlayerColor(worker1.color);
+		newPlayer.setGodCard(card);
+		return new Player(playerName);
 	}
 }

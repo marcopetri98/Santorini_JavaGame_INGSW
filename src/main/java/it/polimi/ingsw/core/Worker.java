@@ -13,9 +13,10 @@ public class Worker extends Observable {
 	private ArrayDeque<Cell> previousPositions;
 	private Cell position;
 	private Cell lastBuild;
-	private final Color color;
-	private final Player owner;
+	public final Color color;
 	public final int workerID;
+	// FIXME: player owner isn't part of the state of a worker
+	public final Player owner;
 
 	public Worker(Color color, Player owner, int num){
 		this.color = color;
@@ -34,22 +35,16 @@ public class Worker extends Observable {
 	public Cell getLastBuildPos(){
 		return this.lastBuild;
 	}
-	public Color getColor() {
-		return color;
-	}
-	public Player getOwner() {
-		return owner;
-	}
 
 	//SETTERS OF POSITION [Implements the observable object specifically for Athena]
 	public void setPos(Cell c){
-		if(this.position != null)   previousPositions.add(this.position);
+		if (this.position != null) {
+			previousPositions.add(this.position);
+		}
 		Cell[] positions = new Cell[2];
 		positions[0] = this.position;   //Old position
 		positions[1] = c;               //New position
-		//if(this.position != null) this.position.setWorker(null);  //updates worker field in old cell
 		this.position = c;
-		//this.position.setWorker(this);  //updates worker field in new cell
 		setChanged();
 		notifyObservers(positions);
 	}   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
@@ -62,12 +57,8 @@ public class Worker extends Observable {
 	public boolean equals(Object obj) {
 		if (obj instanceof Worker) {
 			Worker other = (Worker) obj;
-			return color.equals(other.color) && workerID == other.workerID && position.getMap().getX(position) == other.position.getMap().getX(other.position) && position.getMap().getY(position) == other.position.getMap().getY(other.position) && position.equals(other.position);
+			return color.equals(other.color) && workerID == other.workerID && position.map.getX(position) == other.position.map.getX(other.position) && position.map.getY(position) == other.position.map.getY(other.position) && position.equals(other.position);
 		}
 		return false;
-	}
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 }

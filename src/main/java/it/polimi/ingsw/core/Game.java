@@ -1,44 +1,50 @@
 package it.polimi.ingsw.core;
 
+// necessary imports from other packages of the project
 import it.polimi.ingsw.core.gods.*;
-import it.polimi.ingsw.util.observers.ObservableObject;
+import it.polimi.ingsw.core.state.Phase;
+import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.network.game.NetBuild;
+import it.polimi.ingsw.network.game.NetMove;
+import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
+// necessary imports of Java SE
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
 
 
-public class Game extends ObservableObject {
+public class Game extends ObservableGame {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
-	// TODO: implement factory method for godCards
 	private List<GodCard> godCards;
-	private int phase; // 0 = setup order, 1 = game color selection, 2 = divinity selection, 3 = worker position on board (game setup), 4 = your turn, 5 = others turn
-	private int subPhase; // 1 if the player has to move, 2 if the player has to build, -1 if the game isn't started
-	private Map map;
+	private Turn turn;
+	private final Map map;
 
 	// constructors
 	public Game(String[] names) {
-		activePlayer = null;
 		players = new ArrayList<>();
 		godCards = new ArrayList<>();
 		map = new Map();
-		phase = 0;
-		subPhase = -1;
+		turn = new Turn();
 		for (String name : names) {
 			players.add(new Player(name));
 		}
-		createGodCards();
 	}
 
-	// setters and methods which changes the state of the object
-	public void moveWorker(Worker w, Cell c){  //server controlled if the move was legit
+	// setters and methods which changes the state of the game
+	public synchronized void applyMove(Move move) {
+	}
+	public synchronized void applyBuild(Build build) {
+	}
+	public synchronized void moveWorker(Worker w, Cell c){
 		w.getPos().setWorker(null);
 		w.setPos(c);
 		c.setWorker(w);
 	}
-	public void changeTurn() {  //active Player become the next one
+	public synchronized void changeTurn() {  //active Player become the next one
 		if(players.size() == 2) {
 			if (players.indexOf(activePlayer) == 0) {
 				activePlayer = players.get(1);
@@ -52,36 +58,43 @@ public class Game extends ObservableObject {
 				activePlayer = players.get(0);
 			}
 		}
+		turn.advance();
 	}
 
 	// getters and other functions which doesn't change the structure of the object
-	public Map getMap() throws CloneNotSupportedException {
-		return (Map)map.clone();
+	public synchronized Map getMap() {
+		// creates a copy of the player's list
+		List<Player> tempPlayers = getPlayers();
+		return map;
 	}
-	public int getPlayerNum() {
+	public synchronized int getPlayerNum() {
 		return players.size();
 	}
-	public List<Player> getPlayers() {
-		return new ArrayList<Player>(players);
+	public synchronized List<Player> getPlayers() {
+		List<Player> temp = new ArrayList<>();
+		for (Player player : players) {
+			Player current = player.clone();
+			temp.add(player.clone());
+		}
+		return temp;
 	}
-	public Player getPlayerTurn() {
-		return activePlayer.copy();
+	public synchronized Player getPlayerTurn() {
+		return activePlayer.clone();
+	}
+
+	// support method
+	private Worker findWorker(int id) throws IllegalArgumentException {
+		for (Player player : players) {
+			if (player.getPlayerID()-1 == id) {
+				return player.getWorker1();
+			} else if (player.getPlayerID()-2 == id) {
+				return player.getWorker2();
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 
 	// METHODS USED AT THE BEGINNING OF THE GAME
-	private void createGodCards() {
-		int i = 0;
-		godCards.add(new Apollo());
-		godCards.add(new Artemis());
-		godCards.add(new Minotaur());
-		godCards.add(new Atlas());
-		godCards.add(new Demeter());
-		godCards.add(new Hephaestus());
-		godCards.add(new Athena());
-		godCards.add(new Pan());
-		godCards.add(new Prometheus());
-	}
-
 	// SETTERS USED ON THE BEGINNING
 	/**
 	 * This method receives a list of player's names and set the order sorting the players arrayList
@@ -89,10 +102,10 @@ public class Game extends ObservableObject {
 	 * @throws IllegalArgumentException it is thrown if playerOrder is null or if it doesn't represent a permutation of players arrayList
 	 * @throws WrongPhaseException is thrown if this method is called on a different phase from the start
 	 */
-	public void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
+	public synchronized void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
 		if (playerOrder == null || playerOrder.size() != players.size()) {
 			throw new IllegalArgumentException();
-		} else if (phase != 0) {
+		} else if (turn.getPhase() != Phase.LOBBY) {
 			throw new WrongPhaseException();
 		} else {
 			for (Player player : players) {
@@ -117,7 +130,7 @@ public class Game extends ObservableObject {
 		// notifies the remote view of a change
 		notifyOrder(playerOrder.toArray());
 		// once all clients are notified the phase advance to color selection
-		phase++;
+		turn.advance();
 	}
 	/**
 	 * Sets the player's color indicated
@@ -126,10 +139,10 @@ public class Game extends ObservableObject {
 	 * @throws IllegalArgumentException if color or player is null or if it is trying to set the color of a player which isn't the active player
 	 * @throws WrongPhaseException if the phase isn't the color selection phase
 	 */
-	public void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
+	public synchronized void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
 		if (player == null || color == null) {
 			throw new IllegalArgumentException();
-		} else if (phase != 1) {
+		} else if (turn.getPhase() != Phase.COLORS) {
 			throw new WrongPhaseException();
 		}
 		int i;
@@ -152,12 +165,13 @@ public class Game extends ObservableObject {
 	 * @throws IllegalArgumentException
 	 * @throws WrongPhaseException
 	 */
-	public void setPlayerGod(String player, GodCard god) throws IllegalArgumentException, WrongPhaseException {
-		if (player == null || god == null || !godCards.contains(god)) {
+	public synchronized void setPlayerGod(String player, String god) throws IllegalArgumentException, WrongPhaseException {
+		if (player == null || god == null || !Constants.GODS_GOD_NAMES.contains(god)) {
 			throw new IllegalArgumentException();
-		} else if (phase != 2) {
+		} else if (turn.getPhase() != Phase.GODS) {
 			throw new WrongPhaseException();
 		}
+		// it search for the player inside the list of players
 		int i;
 		boolean found = false;
 		for (i = 0; i < players.size() && !found; i++) {
@@ -165,37 +179,19 @@ public class Game extends ObservableObject {
 				found = true;
 			}
 		}
+
+		// if present it sets the godCard, if not it throws the exception
 		if (i == players.size()) {
 			throw new IllegalArgumentException();
 		} else {
-			players.get(i).setGodCard(god);
+			GodCard godCreated = GodCardFactory.createGodCard(god,players.get(i));
+			players.get(i).setGodCard(godCreated);
+			godCards.add(godCreated);
 		}
-	}
-	/**
-	 * Sets the current phase to the new phase
-	 * @param phase the new phase
-	 * @throws IllegalArgumentException if the parameter is less than 0 or greater than 5
-	 */
-	public void setPhase(int phase) throws IllegalArgumentException {
-		if (subPhase < 0 || subPhase > 5) {
-			throw new IllegalArgumentException();
-		}
-		this.phase = phase;
-	}
-	/**
-	 * Sets the current subPhase to a new value specified in the parameters
-	 * @param subPhase the new sub phase
-	 * @throws IllegalArgumentException if the parameter isn't 1 or 2
-	 */
-	public void setSubPhase(int subPhase) throws IllegalArgumentException {
-		if (subPhase != 1 && subPhase != 2) {
-			throw new IllegalArgumentException();
-		}
-		this.subPhase = subPhase;
 	}
 
 	// GETTERS USED ON THE BEGINNING
-	public Color getPlayerColor(String player) throws IllegalArgumentException, IllegalStateException {
+	public synchronized Color getPlayerColor(String player) throws IllegalArgumentException, IllegalStateException {
 		if (player == null) {
 			throw new IllegalArgumentException();
 		}
@@ -212,7 +208,7 @@ public class Game extends ObservableObject {
 			return players.get(i).getWorker1().color;
 		}
 	}
-	public GodCard getPlayerGodCard(String player) throws IllegalArgumentException, IllegalStateException  {
+	public synchronized GodCard getPlayerGodCard(String player) throws IllegalArgumentException, IllegalStateException  {
 		int i;
 		boolean found = false;
 		for (i = 0; i < players.size() && !found; i++) {
@@ -226,10 +222,7 @@ public class Game extends ObservableObject {
 			return players.get(i).getCard();
 		}
 	}
-	public int getPhase() {
-		return phase;
-	}
-	public int getSubPhase() {
-		return subPhase;
+	public synchronized Turn getPhase() {
+		return turn.clone();
 	}
 }

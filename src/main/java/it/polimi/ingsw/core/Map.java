@@ -57,8 +57,4 @@ public class Map {
 		}
 		return false;
 	}
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
 }

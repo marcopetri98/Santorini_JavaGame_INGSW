@@ -16,8 +16,7 @@ import java.net.Socket;
 public class ServerClientListenerThread extends Thread {
 	private Server lobbyServer;
 	private RemoteView gameServer;
-	private int gamePhase; // -1 = before lobby, 0 = lobby, 1 = game color selection, 2 = divinity selection, 3 = worker position on board (game setup), 4 = your turn, 5 = others turn
-	private boolean joinedGame;
+	private NetworkPhase gamePhase;
 	private boolean active;
 	private String playerName;
 	private final Socket clientSocket;
@@ -31,8 +30,7 @@ public class ServerClientListenerThread extends Thread {
 	 * @param clientSocket This parameter is the client's socket which this object listen
 	 */
 	public ServerClientListenerThread(Socket clientSocket, Server server) throws IOException {
-		joinedGame = false;
-		gamePhase = -1;
+		gamePhase = NetworkPhase.PRELOBBY;
 		active = true;
 		lobbyServer = server;
 		gameServer = null;
@@ -59,12 +57,12 @@ public class ServerClientListenerThread extends Thread {
 			}
 
 			if (ingoingObject != null) {
-				int phase;
+				NetworkPhase phase;
 				synchronized (stateLock) {
 					phase = gamePhase;
 				}
 				switch (phase) {
-					case -1:
+					case PRELOBBY:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetSetup)) {
 							sendGeneralError();
@@ -73,7 +71,7 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case 0:
+					case LOBBY:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetLobbyPreparation)) {
 							sendGeneralError();
@@ -82,7 +80,7 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case 1:
+					case COLORS:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetColorPreparation)) {
 							sendGeneralError();
@@ -91,7 +89,7 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case 2:
+					case GODS:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetDivinityChoice)) {
 							sendGeneralError();
@@ -100,7 +98,7 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case 3:
+					case SETUP:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetGameSetup)) {
 							sendGeneralError();
@@ -109,7 +107,7 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case 4:
+					case PLAYERTURN:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetPlayerTurn)) {
 							sendGeneralError();
@@ -118,7 +116,7 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case 5:
+					case OTHERTURN:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
 						if (!(ingoingObject instanceof NetOtherTurn)) {
 							sendGeneralError();
@@ -153,14 +151,12 @@ public class ServerClientListenerThread extends Thread {
 				// it says the client it is inside the lobby
 				} else if (serverResponse == 1) {
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED);
-					setGamePhase(0);
-					joinedGame = true;
+					setGamePhase(NetworkPhase.LOBBY);
 					setPlayerName(name);
 				// it says to the client that the game is starting
 				} else {
 					// the game phase is updated by the createGame of the server class
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH);
-					joinedGame = true;
 					setPlayerName(name);
 				}
 			// if the player is trying to setup the number of player inside the lobby it controls that is can do that
@@ -186,9 +182,7 @@ public class ServerClientListenerThread extends Thread {
 			sendMessage(setupOutput);
 		} catch (FirstPlayerException e) {
 			// it asks to the player to specify the player number
-			synchronized (stateLock) {
-				gamePhase = 0;
-			}
+			setGamePhase(NetworkPhase.LOBBY);
 			setupOutput = new NetSetup(Constants.SETUP_CREATE);
 			sendMessage(setupOutput);
 		} catch (IllegalCallerException ex) {
@@ -292,6 +286,9 @@ public class ServerClientListenerThread extends Thread {
 				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);
 				sendMessage(playerTurnMessage);
 			}
+		} else if (playerTurnMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
+			// it disconnects the user from the lobby
+			disconnect();
 		} else {
 			playerTurnMessage = new NetPlayerTurn(Constants.GENERAL_ERROR);
 			sendMessage(playerTurnMessage);
@@ -328,7 +325,7 @@ public class ServerClientListenerThread extends Thread {
 			this.active = active;
 		}
 	}
-	public void setGamePhase(int gamePhase) {
+	public void setGamePhase(NetworkPhase gamePhase) {
 		synchronized (stateLock) {
 			this.gamePhase = gamePhase;
 		}
@@ -350,6 +347,11 @@ public class ServerClientListenerThread extends Thread {
 	}
 
 	// GETTERS FOR THIS CLASS
+	public NetworkPhase getGamePhase() {
+		synchronized (stateLock) {
+			return gamePhase;
+		}
+	}
 	public String getPlayerName() {
 		synchronized (playerNameLock) {
 			return playerName;
@@ -384,7 +386,7 @@ public class ServerClientListenerThread extends Thread {
 	 * This method disconnects the user and set the active flag to false to terminate the thread
 	 */
 	public void disconnect() {
-		if (gamePhase == 0) {
+		if (gamePhase == NetworkPhase.LOBBY) {
 			try {
 				lobbyServer.removePlayer(playerName,this);
 				clientSocket.close();

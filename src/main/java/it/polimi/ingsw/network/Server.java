@@ -171,7 +171,7 @@ public class Server implements Runnable {
 					ServerController controller = new ServerController(game);
 					for (int i = 0; i < lobbyClients.size(); i++) {
 						RemoteView remoteView = new RemoteView(lobbyClients.getKey(i));
-						lobbyClients.getKey(i).setGamePhase(1);
+						lobbyClients.getKey(i).setGamePhase(NetworkPhase.COLORS);
 						lobbyClients.getKey(i).setGameServer(remoteView);
 						remoteView.addObserver(controller);
 						game.addObserver(remoteView);

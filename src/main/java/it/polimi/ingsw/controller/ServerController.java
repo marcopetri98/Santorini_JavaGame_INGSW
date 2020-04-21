@@ -4,19 +4,20 @@ package it.polimi.ingsw.controller;
 
 // other project's classes needed here
 import it.polimi.ingsw.core.Game;
-import it.polimi.ingsw.util.exceptions.WrongPhaseException;
-import it.polimi.ingsw.util.observers.ObserverObjectController;
+import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.network.game.NetAvailableBuildings;
+import it.polimi.ingsw.network.game.NetAvailablePositions;
+import it.polimi.ingsw.util.observers.ObservableController;
+import it.polimi.ingsw.util.observers.ObserverController;
+import it.polimi.ingsw.util.observers.ObserverObject;
 
-public class ServerController implements ObserverObjectController {
-	private Game observedModel;
-	private Mover moveController;
-	private Builder buildController;
-	private DefeatManager defeatController;
-	private VictoryManager victoryController;
-	private SetupManager setupController;
-	private boolean setupPhase;
-	private boolean phaseMove;
-	private boolean phaseBuild;
+public class ServerController extends ObservableController implements ObserverController {
+	private final Game observedModel;
+	private final Mover moveController;
+	private final Builder buildController;
+	private final DefeatManager defeatController;
+	private final VictoryManager victoryController;
+	private final SetupManager setupController;
 
 	// constructors and setters for this class
 	public ServerController(Game g) throws NullPointerException {
@@ -27,9 +28,6 @@ public class ServerController implements ObserverObjectController {
 		victoryController = new VictoryManager();
 		setupController = new SetupManager(g);
 		observedModel = g;
-		setupPhase = true;
-		phaseMove = false;
-		phaseBuild = false;
 	}
 
 	// actions called by the players or the server
@@ -41,31 +39,39 @@ public class ServerController implements ObserverObjectController {
 	private void passTurn() {}
 
 	@Override
-	public boolean updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException {
-		return Boolean.parseBoolean(null);
+	public void updateColors(Object playerColors) {
 	}
 	@Override
-	public boolean updateGods(Object playerGods) throws IllegalArgumentException, WrongPhaseException {
-		return Boolean.parseBoolean(null);
+	public void updateGods(Object playerGods) {
 
 	}
 	@Override
-	public boolean updatePositions(Object netObject, boolean finished) throws WrongPhaseException {
-		return Boolean.parseBoolean(null);
+	public void updatePositions(Object netObject, boolean finished) {
 
 	}
 	@Override
-	public boolean updateMove(Object netMap) throws NullPointerException, WrongPhaseException {
-		return Boolean.parseBoolean(null);
+	public void updateMove(Object netMap) {
 
 	}
 	@Override
-	public boolean updateBuild(Object netMap) throws NullPointerException, WrongPhaseException {
-		return Boolean.parseBoolean(null);
+	public void updateBuild(Object netMap) {
 
 	}
 	@Override
-	public void updateQuit(String playerName) throws NullPointerException {
+	public void updateQuit(String playerName) {
 
+	}
+
+	@Override
+	public Turn givePhase() {
+		return null;
+	}
+	@Override
+	public NetAvailablePositions giveAvailablePositions() {
+		return null;
+	}
+	@Override
+	public NetAvailableBuildings giveAvailableBuildings() {
+		return null;
 	}
 }

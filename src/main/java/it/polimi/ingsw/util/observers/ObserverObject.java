@@ -4,9 +4,10 @@ package it.polimi.ingsw.util.observers;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 public interface ObserverObject {
-	boolean updateColors(Object playerColors) throws IllegalArgumentException, WrongPhaseException;
-	boolean updateGods(Object playerGods) throws IllegalArgumentException, WrongPhaseException;
-	boolean updatePositions(Object netObject, boolean finished) throws WrongPhaseException;
-	boolean updateMove(Object netMap) throws NullPointerException, WrongPhaseException;
-	boolean updateBuild(Object netMap) throws NullPointerException, WrongPhaseException;
+	void updateColors(Object playerColors);
+	void updateGods(Object playerGods);
+	void updatePositions(Object netObject, boolean finished);
+	void updateMove(Object netMap);
+	void updateBuild(Object netMap);
+	void updateQuit(String playerName);
 }

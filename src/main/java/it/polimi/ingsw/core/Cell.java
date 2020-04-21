@@ -1,8 +1,9 @@
 package it.polimi.ingsw.core;
 
 public class Cell {
-	private final Map map;
-	private final Building building;
+	// FIXME: the map isn't part of the cell state
+	public final Map map;
+	public final Building building;
 	private Worker worker;
 
 	public Cell(Map m) {
@@ -10,6 +11,7 @@ public class Cell {
 		this.map = m;
 	}
 
+	// SETTERS
 	public void setWorker(Worker w){
 		this.worker=w;
 	}
@@ -19,9 +21,6 @@ public class Cell {
 		return building;
 	}
 	public Worker getWorker(){ return worker; }
-	public Map getMap() {
-		return map;
-	}
 
 	// OVERRIDDEN METHODS
 	@Override
@@ -31,9 +30,5 @@ public class Cell {
 			return building.equals(other.building) && worker.equals(other.worker);
 		}
 		return false;
-	}
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 }
