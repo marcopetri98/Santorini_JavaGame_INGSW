@@ -1,8 +1,8 @@
 package it.polimi.ingsw.core;
 
 public class Cell {
-	public final Map map;
-	public final Building building;
+	private final Map map;
+	private final Building building;
 	private Worker worker;
 
 	public Cell(Map m) {
@@ -19,4 +19,21 @@ public class Cell {
 		return building;
 	}
 	public Worker getWorker(){ return worker; }
+	public Map getMap() {
+		return map;
+	}
+
+	// OVERRIDDEN METHODS
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Cell) {
+			Cell other = (Cell)obj;
+			return building.equals(other.building) && worker.equals(other.worker);
+		}
+		return false;
+	}
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

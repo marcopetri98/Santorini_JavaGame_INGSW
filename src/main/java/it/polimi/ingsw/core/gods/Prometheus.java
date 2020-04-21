@@ -1,8 +1,10 @@
-package it.polimi.ingsw.core;
+package it.polimi.ingsw.core.gods;
+import it.polimi.ingsw.core.*;
+
 import java.util.List;
 import java.util.ArrayList;
 
-public class Prometheus implements GodCard{
+public class Prometheus implements GodCard {
 	private TypeGod typeGod = TypeGod.CHANGE_FLOW_GOD;
 	private Player owner;
 	int numPlayer = 4;

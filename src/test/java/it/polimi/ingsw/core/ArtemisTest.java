@@ -1,5 +1,6 @@
 package it.polimi.ingsw.core;
 
+import it.polimi.ingsw.core.gods.Artemis;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -13,8 +13,8 @@ public class Worker extends Observable {
 	private ArrayDeque<Cell> previousPositions;
 	private Cell position;
 	private Cell lastBuild;
-	public final Color color;
-	public final Player owner;
+	private final Color color;
+	private final Player owner;
 	public final int workerID;
 
 	public Worker(Color color, Player owner, int num){
@@ -34,6 +34,12 @@ public class Worker extends Observable {
 	public Cell getLastBuildPos(){
 		return this.lastBuild;
 	}
+	public Color getColor() {
+		return color;
+	}
+	public Player getOwner() {
+		return owner;
+	}
 
 	//SETTERS OF POSITION [Implements the observable object specifically for Athena]
 	public void setPos(Cell c){
@@ -49,5 +55,19 @@ public class Worker extends Observable {
 	}   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
 	public void setLastBuildPos(Cell c){
 		this.lastBuild = c;
+	}
+
+	// OVERRIDDEN METHODS
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Worker) {
+			Worker other = (Worker) obj;
+			return color.equals(other.color) && workerID == other.workerID && position.getMap().getX(position) == other.position.getMap().getX(other.position) && position.getMap().getY(position) == other.position.getMap().getY(other.position) && position.equals(other.position);
+		}
+		return false;
+	}
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

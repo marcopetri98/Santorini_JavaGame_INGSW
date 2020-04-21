@@ -1,23 +1,24 @@
-package it.polimi.ingsw.core;
+package it.polimi.ingsw.core.gods;
+import it.polimi.ingsw.core.*;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class Demeter implements GodCard{
+public class Atlas implements GodCard {
 	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;
-	String name = "Demeter";
-	String description = "Your Build: Your Worker may build one additional time, but not on the same space.";
+	String name = "Atlas";
+	String description = "Your Build: Your Worker may build a dome at any level.";
 	List<Move> moves;
 	List<Build> builds;
 
-	public Demeter(Player player){
+	public Atlas(Player player){
 		this.owner = player;
 	}
 
-	public Demeter(){
+	public Atlas(){
 		this.owner = null;
 		this.moves = null;
 		this.builds = null;
@@ -48,7 +49,6 @@ public class Demeter implements GodCard{
 	public List<Build> checkBuild(Map m, Worker w, TypeBuild type){
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		List<Build> tempBuilds = new ArrayList<>();
 		builds = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
@@ -60,13 +60,10 @@ public class Demeter implements GodCard{
 						if (-1 <= (x1 - x) && (x1 - x) <= 1 && -1 <= (y1 - y) && (y1 - y) <= 1) {  //Check that distance from original cell is <= 1
 							if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
-									if(m.getCell(x1, y1).getBuilding().getLevel() <= 2) {
-										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));        //adds possible build: only one block
-										tempBuilds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));
-									}
-									else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) {
-										builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));    //adds possible build: only dome
-										tempBuilds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));
+									if (m.getCell(x1, y1).getBuilding().getLevel() <= 3) { //Check height building is <=3
+										//don't need to check else, because Atlas can build Dome at any level
+										builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));
+										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));	//adds the possibility to build another generic building [no dome]
 									}
 								}
 							}
@@ -75,19 +72,6 @@ public class Demeter implements GodCard{
 				}
 			}
 		}
-		//adds every single allowed permutation of build construction to "builds" arraylist;
-		//tempBuilds is just a temporary list in order to cycle through the elements of the original arraylist
-		for(Build b : tempBuilds){
-			for(Build b1 : tempBuilds) {
-				if(b.getCell() != b1.getCell()) {
-					Build secondBuild = b.copy();
-					secondBuild.setCondition(b1.copy());
-					secondBuild.setTypeBuild(TypeBuild.CONDITIONED_BUILD);
-					builds.add(secondBuild);
-				}
-			}
-		}
-
 		return builds;
 	}
 

@@ -1,10 +1,11 @@
-package it.polimi.ingsw.core;
+package it.polimi.ingsw.core.gods;
+import it.polimi.ingsw.core.*;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class Pan implements GodCard{
+public class Pan implements GodCard {
 	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	private Player owner;
 	int numPlayer = 4;

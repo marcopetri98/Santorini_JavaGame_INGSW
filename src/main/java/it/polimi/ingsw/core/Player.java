@@ -1,6 +1,9 @@
 package it.polimi.ingsw.core;
 
 // necessary imports of Java SE
+import it.polimi.ingsw.core.gods.Athena;
+import it.polimi.ingsw.core.gods.GodCard;
+
 import java.awt.Color;
 
 public class Player {
@@ -74,7 +77,11 @@ public class Player {
 		}
 		return card;
 	}
+	// TODO: fixme
 	public Player copy() {
+		Player newPlayer = new Player(playerName);
+		newPlayer.setPlayerColor(worker1.getColor());
+		newPlayer.setGodCard(card);
 		return new Player(playerName);
 	}
 
@@ -85,7 +92,7 @@ public class Player {
 			return false;
 		} else {
 			Player other = (Player)obj;
-			if (playerID == other.getPlayerID() && playerName.equals(other.getPlayerName()) && worker1 == other.getWorker1() && worker2 == other.getWorker2() && card == other.getCard()) {
+			if (playerID == other.playerID && playerName.equals(other.playerName) && worker1.equals(other.worker1) && worker2.equals(other.worker2) && card.equals(other.card)) {
 				return true;
 			} else {
 				return false;

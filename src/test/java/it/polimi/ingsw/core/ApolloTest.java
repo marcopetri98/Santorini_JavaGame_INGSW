@@ -1,11 +1,10 @@
 package it.polimi.ingsw.core;
 
+import it.polimi.ingsw.core.gods.Apollo;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 

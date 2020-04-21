@@ -30,4 +30,18 @@ public class Building {
 		return level;
 	}
 	public boolean getDome(){ return dome; }
+
+	// OVERRIDDEN METHODS
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Building) {
+			Building other = (Building)obj;
+			return level == other.level && dome == other.dome;
+		}
+		return false;
+	}
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

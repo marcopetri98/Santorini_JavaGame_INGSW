@@ -1,5 +1,6 @@
-package it.polimi.ingsw.core;
+package it.polimi.ingsw.core.gods;
 
+import it.polimi.ingsw.core.*;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
 
 import java.util.ArrayList;

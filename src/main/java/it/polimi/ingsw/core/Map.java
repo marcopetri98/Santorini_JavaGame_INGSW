@@ -41,17 +41,22 @@ public class Map {
 		throw new IllegalArgumentException();
 	}
 
-	// checks if is possible to move a worker in a certain cell
-	public boolean moveable(Cell c, Worker w) {
-		Cell workerCell = w.getPos();
-
-		if (getX(c) <= getX(workerCell)+1 && getX(c) >= getX(workerCell)-1 && getY(c) <= getY(workerCell)+1 && getY(c) >= getY(workerCell)-1) {
-			return c.getBuilding().getLevel() == w.getPos().getBuilding().getLevel() || c.getBuilding().getLevel() == w.getPos().getBuilding().getLevel() + 1 || c.getBuilding().getLevel() == w.getPos().getBuilding().getLevel() - 1;
+	// here there are methods which must be overridden
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Map) {
+			Map other = (Map)obj;
+			for (int x = 0; x < Constants.MAP_SIDE; x++) {
+				for (int y = 0; y < Constants.MAP_SIDE; y++) {
+					if (!cells.get(x).get(y).equals(other.cells.get(x).get(y))) {
+						return false;
+					}
+				}
+			}
+			return true;
 		}
 		return false;
 	}
-
-	// here there are methods which must be overridden
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return super.clone();
