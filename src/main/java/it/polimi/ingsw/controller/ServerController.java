@@ -9,7 +9,6 @@ import it.polimi.ingsw.network.game.NetAvailableBuildings;
 import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.util.observers.ObservableController;
 import it.polimi.ingsw.util.observers.ObserverController;
-import it.polimi.ingsw.util.observers.ObserverObject;
 
 public class ServerController extends ObservableController implements ObserverController {
 	private final Game observedModel;
@@ -22,10 +21,10 @@ public class ServerController extends ObservableController implements ObserverCo
 	// constructors and setters for this class
 	public ServerController(Game g) throws NullPointerException {
 		if (g == null) throw new NullPointerException();
-		moveController = new Mover();
-		buildController = new Builder();
-		defeatController = new DefeatManager();
-		victoryController = new VictoryManager();
+		moveController = new Mover(g);
+		buildController = new Builder(g);
+		defeatController = new DefeatManager(g);
+		victoryController = new VictoryManager(g);
 		setupController = new SetupManager(g);
 		observedModel = g;
 	}

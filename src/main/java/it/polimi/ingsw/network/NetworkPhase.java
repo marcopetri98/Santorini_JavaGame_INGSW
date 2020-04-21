@@ -1,5 +1,5 @@
 package it.polimi.ingsw.network;
 
 public enum NetworkPhase {
-	PRELOBBY, LOBBY, COLORS, GODS, SETUP, PLAYERTURN, OTHERTURN
+	PRELOBBY, LOBBY, COLORS, GODS, SETUP, PLAYERTURN, OTHERTURN, OBSERVER, END
 }

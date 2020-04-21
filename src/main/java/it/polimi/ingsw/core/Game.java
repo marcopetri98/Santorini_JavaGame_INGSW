@@ -22,6 +22,7 @@ public class Game extends ObservableGame {
 	private List<GodCard> godCards;
 	private Turn turn;
 	private final Map map;
+	private Player winner;
 
 	// constructors
 	public Game(String[] names) {
@@ -32,6 +33,7 @@ public class Game extends ObservableGame {
 		for (String name : names) {
 			players.add(new Player(name));
 		}
+		winner = null;
 	}
 
 	// setters and methods which changes the state of the game
