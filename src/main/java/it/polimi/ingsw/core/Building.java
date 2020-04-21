@@ -10,18 +10,18 @@ public class Building {
 	}
 
 	// SETTERS AND CHANGERS
-	public void incrementLevel() {
+	public void incrementLevel() throws IllegalStateException {
 		if (level <= 2) {
 			level++;
 		} else {
-			// TODO: add an exception here
+			throw new IllegalStateException();
 		}
 	}
-	public void setDome() {
+	public void setDome() throws IllegalStateException {
 		if (!dome) {
 			dome = true;
 		} else {
-			// TODO: add an exception here
+			throw new IllegalStateException();
 		}
 	}
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.core;
 
+import it.polimi.ingsw.core.gods.*;
 import it.polimi.ingsw.util.observers.ObservableObject;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
