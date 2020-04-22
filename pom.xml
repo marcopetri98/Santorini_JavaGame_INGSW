@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>it.polimi.ingsw</groupId>
-  <artifactId>GC9</artifactId>
+  <artifactId>GC09</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>GC9</name>
+  <name>GC09</name>
   <url>http://www.example.com</url>
 
   <properties>
@@ -75,8 +75,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>13</source>
-          <target>13</target>
+          <source>14</source>
+          <target>14</target>
         </configuration>
       </plugin>
     </plugins>
