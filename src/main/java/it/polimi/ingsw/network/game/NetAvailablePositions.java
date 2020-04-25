@@ -4,13 +4,14 @@ package it.polimi.ingsw.network.game;
 import it.polimi.ingsw.core.Move;
 
 // necessary imports of Java SE
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This class is used to send to the user the positions where a specified worker can move
  */
-public class NetAvailablePositions {
+public class NetAvailablePositions implements Serializable {
 	public final List<NetMove> moves;
 
 	public NetAvailablePositions(List<Move> possibleMoves) {

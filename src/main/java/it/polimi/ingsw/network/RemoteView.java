@@ -1,12 +1,20 @@
 package it.polimi.ingsw.network;
 
 // necessary imports from other packages of the project
+import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.observers.ObservableObject;
 import it.polimi.ingsw.util.observers.ObservableRemoteView;
 import it.polimi.ingsw.util.observers.ObserverRemoteView;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 // necessary imports of Java SE
 
@@ -16,6 +24,9 @@ import it.polimi.ingsw.util.observers.ObserverRemoteView;
 public class RemoteView extends ObservableRemoteView implements ObserverRemoteView {
 	private final ServerClientListenerThread clientHandler;
 	private final Object controllerResponseLock;
+	private int playersNum;
+	// TODO: there is a little bit of information duplication (the challenger is the first
+	private boolean challenger;
 
 	public RemoteView(ServerClientListenerThread handler) throws NullPointerException {
 		if (handler == null) {
@@ -23,54 +34,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 		clientHandler = handler;
 		controllerResponseLock = new Object();
+		playersNum = 1;
+		challenger = false;
 	}
-
-	// TODO: translate old methods in new methods
-	/*private void setupColors() throws IOException {
-		List<Color> colors = new ArrayList<>();
-		String[] playersNames = new String[gamers.size()];
-		NetColorPreparation receivedObject = null;
-		NetColorPreparation sendObject = null;
-
-		// it iterates over players to make them choose their color contacting them by the socket
-		for (int playerDone = 0; playerDone < gamers.size(); playerDone++) {
-			try {
-				-- sendObject = new NetColorPreparation(Constants.PREP_COLOR_YOU);
-				-- connections.get(playerDone).getSecond().writeObject(sendObject);
-				-- connections.get(playerDone).getSecond().flush();
-				## receivedObject = (NetColorPreparation) connections.get(playerDone).getFirst().readObject();
-				if (receivedObject.message.equals(Constants.PREP_COLOR_CHOICE) && Constants.PREP_COLOR_COLORS.contains(receivedObject.getColor()) && (colors.size() == 0 || !colors.contains(receivedObject.getColor()))) {
-					colors.add(receivedObject.getColor());
-					sendObject = new NetColorPreparation(Constants.PREP_COLOR_SUCCESS);
-					connections.get(playerDone).getSecond().writeObject(sendObject);
-					connections.get(playerDone).getSecond().flush();
-				} else {
-					sendObject = new NetColorPreparation(Constants.PREP_COLOR_ERROR,1);
-					connections.get(playerDone).getSecond().writeObject(sendObject);
-					connections.get(playerDone).getSecond().flush();
-					playerDone--;
-				}
-			} catch (ClassNotFoundException e) {
-				sendObject = new NetColorPreparation(Constants.PREP_COLOR_ERROR,2);
-				connections.get(playerDone).getSecond().writeObject(sendObject);
-				connections.get(playerDone).getSecond().flush();
-				playerDone--;
-			}
-		}
-		// it builds the object used to alert players of other players' color
-		for (int playerDone = gamers.size()-1; playerDone >= 0; playerDone--) {
-			if (playerDone == gamers.size()-1) {
-				sendObject = new NetColorPreparation(Constants.PREP_COLOR_OTHER_CHOICE, gamers.get(playerDone).getSecond(), colors.get(playerDone));
-			} else {
-				sendObject = new NetColorPreparation(Constants.PREP_COLOR_OTHER_CHOICE, gamers.get(playerDone).getSecond(), colors.get(playerDone),sendObject);
-			}
-		}
-		// it alerts other players of other's color
-		for (int playerDone = 0; playerDone < gamers.size(); playerDone++) {
-			connections.get(playerDone).getSecond().writeObject(sendObject);
-			connections.get(playerDone).getSecond().flush();
-		}
-	}*/
 
 	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
 	/**
@@ -136,60 +102,185 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 
 	// METHODS USED TO INFORM THE CONTROLLER ABOUT A REQUEST OF THE CLIENT
 	@Override
-	public void updateDefeat(ObservableGame observed, Object playerDefeated) {
+	public synchronized void updateDefeat(ObservableGame observed, String playerDefeated) {
 
 	}
 	@Override
-	public void updateWinner(ObservableGame observed, Object playerWinner) {
+	public synchronized void updateWinner(ObservableGame observed, String playerWinner) {
 
 	}
+	/**
+	 * It receives the change of the game state, it receives the order and communicate it to the client
+	 * @param observed observable game that called this method
+	 * @param order an array with players' order
+	 */
 	@Override
-	public void updateOrder(ObservableGame observed, Object[] order) {
-		if (order == null || clientHandler.getGamePhase() != NetworkPhase.LOBBY) {
+	public synchronized void updateOrder(ObservableGame observed, String[] order) {
+		if (observed == null || order == null || clientHandler.getGamePhase() != NetworkPhase.LOBBY) {
 			clientHandler.fatalError("It has been called the notify of player's order in the wrong phase or maybe with a null parameter");
-		}
-
-		String[] playerNames = (String[]) order;
-		NetLobbyPreparation sendOrder = null;
-		// builds the sequence object of players to send to player
-		for (int i = 0; i < order.length; i++) {
-			if (i == 0) {
-				sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN,playerNames[i],i+1);
-			} else {
-				sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN,playerNames[i],i+1,sendOrder);
-			}
-		}
-		// it communicated to the client the play order
-		clientHandler.sendMessage(sendOrder);
-		clientHandler.setGamePhase(NetworkPhase.COLORS);
-
-
-		// it says to the player if it has to choose the color or if it has to wait the others choice
-		NetColorPreparation colorMessage;
-		if (playerNames[0].equals(clientHandler.getPlayerName())) {
-			colorMessage = new NetColorPreparation(Constants.COLOR_YOU);
 		} else {
-			colorMessage = new NetColorPreparation(Constants.COLOR_OTHER);
-		}
-		clientHandler.sendMessage(colorMessage);
-	}
-	@Override
-	public void updateColors(ObservableObject observed, Object playerColors) {
-	}
-	@Override
-	public void updateGods(ObservableObject observed, Object playerGods) {
-	}
-	@Override
-	public void updatePositions(ObservableGame observed, Object netObject, boolean finished) {
-	}
-	@Override
-	public void updateMove(ObservableObject observed, Object netMap) {
-	}
-	@Override
-	public void updateBuild(ObservableObject observed, Object netMap) {
-	}
-	@Override
-	public void updateQuit(ObservableObject observed, String playerName) {
+			playersNum = order.length;
+			NetLobbyPreparation sendOrder = null;
+			// builds the sequence object of players to send to player
+			for (int i = 0; i < order.length; i++) {
+				if (i == 0) {
+					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[i], i + 1);
+				} else {
+					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[i], i + 1, sendOrder);
+				}
+			}
+			// it communicated to the client the play order
+			clientHandler.sendMessage(sendOrder);
+			clientHandler.setGamePhase(NetworkPhase.COLORS);
 
+			// it says to the player if it has to choose the color or if it has to wait the others choice
+			NetColorPreparation colorMessage;
+			if (order[0].equals(clientHandler.getPlayerName())) {
+				colorMessage = new NetColorPreparation(Constants.COLOR_YOU);
+			} else {
+				colorMessage = new NetColorPreparation(Constants.COLOR_OTHER);
+			}
+			clientHandler.sendMessage(colorMessage);
+		}
+	}
+	/**
+	 * When this method is called it informs the player about the color chosen by the other players, if all players have chosen card it change the handler phase and says to the client that he enters in the god selection phase
+	 * @param observed observable game that called this method
+	 * @param playerColors an HashMap that matches every player with the selected color
+	 */
+	@Override
+	public synchronized void updateColors(ObservableGame observed, HashMap<String, Color> playerColors) {
+		if (observed == null || playerColors == null || clientHandler.getGamePhase() != NetworkPhase.COLORS || playerColors.size() == 0) {
+			clientHandler.fatalError("It has been called the notify of players' color with null parameter or in the wrong phase");
+		} else {
+			NetColorPreparation colorMessage = null;
+			int i = 0;
+			// it builds the entire list about players' colors
+			for (String playerName : playerColors.keySet()) {
+				if (i == 0) {
+					colorMessage = new NetColorPreparation(Constants.COLOR_CHOICES,playerName,playerColors.get(playerName));
+					i++;
+				} else {
+					colorMessage = new NetColorPreparation(Constants.COLOR_CHOICES,playerName,playerColors.get(playerName),colorMessage);
+				}
+			}
+			clientHandler.sendMessage(colorMessage);
+
+			Game caller = (Game) observed;
+			NetDivinityChoice divinityChoice = null;
+			// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
+			if (playerColors.size() == playersNum) {
+				clientHandler.setGamePhase(NetworkPhase.GODS);
+				if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+					// the player is the challenger and it is informed about that
+					divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER);
+				} else {
+					// the player isn't the challenger and it is informed about that
+					divinityChoice = new NetDivinityChoice(Constants.GODS_OTHER);
+				}
+			} else if (caller.getPlayers().get(playerColors.size()).getPlayerName().equals(clientHandler.getPlayerName())) {
+				// it says to the current player that is its turn to choose the color
+				divinityChoice = new NetDivinityChoice(Constants.COLOR_YOU);
+			}
+			clientHandler.sendMessage(divinityChoice);
+		}
+	}
+	/**
+	 * This function says to all players the gods chosen by the challenger for this game
+	 * @param observed observable game that called this method
+	 * @param godsInfo it represent the list of gods that are chosen by the challenger
+	 */
+	@Override
+	public synchronized void updateGods(ObservableObject observed, List<GodCard> godsInfo) {
+		if (observed == null || godsInfo == null || clientHandler.getGamePhase() != NetworkPhase.GODS) {
+			clientHandler.fatalError("The gods update on a wrong phase or with wrong parameters");
+		} else {
+			List<String> godsNames = new ArrayList<>();
+			for (GodCard card : godsInfo) {
+				godsNames.add(card.getName());
+			}
+			NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_GODS,godsNames);
+			clientHandler.sendMessage(godsMessage);
+
+			Game caller = (Game) observed;
+			// if the player is the first in clockwise order from the challenger it says to it to select a godCard
+			if (caller.getPlayers().get(1).equals(clientHandler.getPlayerName())) {
+				godsMessage = new NetDivinityChoice(Constants.GODS_YOU);
+			} else {
+				godsMessage = new NetDivinityChoice(Constants.GODS_OTHER);
+			}
+			clientHandler.sendMessage(godsMessage);
+		}
+	}
+	/**
+	 * This function says to the player all gods selected till now by the players
+	 * @param observed observable game that called this method
+	 * @param godsInfo it represent the gods chosen by the current player turn
+	 */
+	@Override
+	public synchronized void updateGods(ObservableObject observed, HashMap<String,GodCard> godsInfo) {
+		if (observed == null || godsInfo == null || clientHandler.getGamePhase() != NetworkPhase.GODS) {
+			clientHandler.fatalError("The gods update on a wrong phase or with wrong parameters");
+		} else {
+			NetDivinityChoice godsMessage = null;
+			int i = 0;
+			// it builds the entire list about players' colors
+			for (String playerName : godsInfo.keySet()) {
+				if (i == 0) {
+					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName());
+					i++;
+				} else {
+					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName(),godsMessage);
+				}
+			}
+			clientHandler.sendMessage(godsMessage);
+
+			Game caller = (Game) observed;
+			// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
+			if (caller.getPlayers().get(godsInfo.size()).getPlayerName().equals(clientHandler.getPlayerName())) {
+				// it says to the current player that is its turn to choose the color
+				godsMessage = new NetDivinityChoice(Constants.COLOR_YOU);
+			}
+			clientHandler.sendMessage(godsMessage);
+		}
+	}
+	/**
+	 * This function says to the player the player who starts to position its workers on the game board
+	 * @param observed observable game that called this method
+	 * @param godsInfo it contains the information about the player that start to position workers
+	 */
+	@Override
+	public synchronized void updateGods(ObservableObject observed, String godsInfo) {
+		if (observed == null || godsInfo == null || clientHandler.getGamePhase() != NetworkPhase.GODS) {
+			clientHandler.fatalError("The gods update on a wrong phase or with wrong parameters");
+		} else {
+
+		}
+	}
+	@Override
+	public synchronized void updatePositions(ObservableGame observed, Object netObject, boolean finished) {
+	}
+	@Override
+	public synchronized void updateMove(ObservableObject observed, Object netMap) {
+	}
+	@Override
+	public synchronized void updateBuild(ObservableObject observed, Object netMap) {
+	}
+	@Override
+	public synchronized void updateQuit(ObservableObject observed, String playerName) {
+
+	}
+	/**
+	 * This function contacts the player to say him he must perform an action because is its turn
+	 * @param observed observable game that called this method
+	 * @param playerName the name of the player that should play at this moment of the game
+	 */
+	@Override
+	public void updateActivePlayer(ObservableGame observed, String playerName) {
+		if (observed == null || playerName == null) {
+			clientHandler.fatalError("It has been called the update on active player with a null parameter");
+		} else {
+
+		}
 	}
 }

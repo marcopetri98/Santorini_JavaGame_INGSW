@@ -3,7 +3,9 @@ package it.polimi.ingsw.network.game;
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.Cell;
 
-public class NetCell {
+import java.io.Serializable;
+
+public class NetCell implements Serializable {
 	public final NetBuilding building;
 	public final NetWorker worker;
 

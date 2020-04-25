@@ -2,16 +2,16 @@ package it.polimi.ingsw.core;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.gods.*;
+import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
-import it.polimi.ingsw.network.game.NetBuild;
-import it.polimi.ingsw.network.game.NetMove;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 // necessary imports of Java SE
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -41,13 +41,26 @@ public class Game extends ObservableGame {
 	}
 	public synchronized void applyBuild(Build build) {
 	}
+	public synchronized void applyWin(Player player) {
+	}
+	public synchronized void applyDefeat(Player player) {
+	}
+	public synchronized void applyDisconnection(String playerName) {
+	}
 	public synchronized void moveWorker(Worker w, Cell c){
 		w.getPos().setWorker(null);
 		w.setPos(c);
 		c.setWorker(w);
 	}
 	public synchronized void changeTurn() {  //active Player become the next one
-		if(players.size() == 2) {
+		changeActivePlayer();
+		turn.advance();
+	}
+	/**
+	 * This function is called whenever there is a change of game phase
+	 */
+	public synchronized void changeActivePlayer() {
+		if (players.size() == 2) {
 			if (players.indexOf(activePlayer) == 0) {
 				activePlayer = players.get(1);
 			} else {
@@ -60,7 +73,35 @@ public class Game extends ObservableGame {
 				activePlayer = players.get(0);
 			}
 		}
-		turn.advance();
+		notifyActivePlayer(activePlayer.getPlayerName());
+	}
+	/**
+	 * This function is called during the starter selection in god selection phase
+	 * @param playerName
+	 * @throws IllegalArgumentException
+	 * @throws WrongPhaseException
+	 */
+	public synchronized void changeActivePlayer(String playerName) throws IllegalArgumentException, WrongPhaseException {
+		boolean found = false;
+		if (playerName == null) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE) {
+			throw new WrongPhaseException();
+		}
+
+		// it searches the player and change the active player for the turn
+		for (int i = 0; i < players.size() && !found; i++) {
+			if (players.get(i).getPlayerName().equals(playerName)) {
+				activePlayer = players.get(i);
+				found = true;
+			}
+		}
+		// the player doesn't exist and it throws an exception
+		if (!found) {
+			throw new IllegalArgumentException();
+		} else {
+			notifyGods(playerName);
+		}
 	}
 
 	// getters and other functions which doesn't change the structure of the object
@@ -130,12 +171,12 @@ public class Game extends ObservableGame {
 		players = temp;
 		activePlayer = players.get(0);
 		// notifies the remote view of a change
-		notifyOrder(playerOrder.toArray());
+		notifyOrder((String[])playerOrder.toArray());
 		// once all clients are notified the phase advance to color selection
 		turn.advance();
 	}
 	/**
-	 * Sets the player's color indicated
+	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap<String,Color> with player names and color chosen
 	 * @param player is the player which the color has to be set
 	 * @param color the color chosen by the player
 	 * @throws IllegalArgumentException if color or player is null or if it is trying to set the color of a player which isn't the active player
@@ -162,34 +203,70 @@ public class Game extends ObservableGame {
 	}
 	/**
 	 * Sets the player's godCard
-	 * @param player
+	 * @param playerName
 	 * @param god
 	 * @throws IllegalArgumentException
 	 * @throws WrongPhaseException
 	 */
-	public synchronized void setPlayerGod(String player, String god) throws IllegalArgumentException, WrongPhaseException {
-		if (player == null || god == null || !Constants.GODS_GOD_NAMES.contains(god)) {
+	public synchronized void setPlayerGod(String playerName, String god) throws IllegalArgumentException, WrongPhaseException {
+		GodCard playerGod = null;
+
+		if (playerName == null || god == null || !Constants.GODS_GOD_NAMES.contains(god)) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.GODS) {
 			throw new WrongPhaseException();
+		} else {
+			boolean godFound = false;
+			for (GodCard card : godCards) {
+				if (card.getName().equals(god)) {
+					godFound = true;
+					playerGod = card;
+				}
+			}
+
+			if (!godFound) {
+				throw new IllegalArgumentException();
+			}
 		}
+
 		// it search for the player inside the list of players
 		int i;
 		boolean found = false;
 		for (i = 0; i < players.size() && !found; i++) {
-			if (players.get(i).getPlayerName().equals(player)) {
+			if (players.get(i).getPlayerName().equals(playerName)) {
 				found = true;
 			}
 		}
-
 		// if present it sets the godCard, if not it throws the exception
 		if (i == players.size()) {
 			throw new IllegalArgumentException();
+		}
+
+		players.get(i).setGodCard(playerGod);
+		HashMap<String,GodCard> godsInfo = new HashMap<>();
+		for (Player player : players) {
+			godsInfo.put(player.getPlayerName(),player.getCard());
+		}
+		notifyGods(godsInfo);
+	}
+	public synchronized void setGameGods(String[] godNames) throws IllegalArgumentException, WrongPhaseException {
+		if (godNames == null || godNames.length != players.size()) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
+			throw new WrongPhaseException();
 		} else {
-			GodCard godCreated = GodCardFactory.createGodCard(god,players.get(i));
-			players.get(i).setGodCard(godCreated);
+			for (String godName : godNames) {
+				if (!Constants.GODS_GOD_NAMES.contains(godName)) {
+					throw new IllegalArgumentException();
+				}
+			}
+		}
+
+		for (String godName : godNames) {
+			GodCard godCreated = GodCardFactory.createGodCard(godName);
 			godCards.add(godCreated);
 		}
+		notifyGods(godCards);
 	}
 
 	// GETTERS USED ON THE BEGINNING

@@ -29,22 +29,6 @@ public class ObservableObject {
 
 		observers.remove(obs);
 	}
-	public void notifyColors(Object playerColors) throws NullPointerException {
-		if (playerColors == null) {
-			throw new NullPointerException();
-		}
-		for (ObserverObject obs : observers) {
-			obs.updateColors(this,playerColors);
-		}
-	}
-	public void notifyGods(Object playerGods) throws NullPointerException {
-		if (playerGods == null) {
-			throw new NullPointerException();
-		}
-		for (ObserverObject obs : observers) {
-			obs.updateGods(this,playerGods);
-		}
-	}
 	public void notifyMove(Object netMap) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();

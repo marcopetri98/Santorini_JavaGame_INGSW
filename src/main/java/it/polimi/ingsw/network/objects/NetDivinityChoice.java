@@ -6,36 +6,31 @@ import java.util.List;
 
 public class NetDivinityChoice extends NetObject {
 	public final String divinity;
-	public final String starter;
+	public final String player;
 	public final NetDivinityChoice next;
 
 	public NetDivinityChoice(String msg) throws NullPointerException {
 		super(msg);
 		divinity = null;
-		starter = null;
+		player = null;
 		next = null;
 	}
-	public NetDivinityChoice(String msg, String name, boolean divinity) throws NullPointerException {
+	public NetDivinityChoice(String msg, String name, String god) throws NullPointerException {
 		super(msg);
 		if (name == null) {
 			throw new NullPointerException();
 		}
-		if (!divinity) {
-			this.divinity = null;
-			starter = name;
-		} else {
-			this.divinity = name;
-			starter = null;
-		}
+		divinity = god;
+		player = name;
 		next = null;
 	}
-	public NetDivinityChoice(String msg, String name, NetDivinityChoice next) throws NullPointerException {
+	public NetDivinityChoice(String msg, String name, String god, NetDivinityChoice next) throws NullPointerException {
 		super(msg);
 		if (name == null) {
 			throw new NullPointerException();
 		}
-		divinity = name;
-		starter = null;
+		divinity = god;
+		player = name;
 		this.next = next;
 	}
 	public NetDivinityChoice(String msg, List<String> divinities) throws NullPointerException {
@@ -51,15 +46,15 @@ public class NetDivinityChoice extends NetObject {
 				next = null;
 			}
 		}
-		starter = null;
+		player = null;
 	}
 
 	// getters
 	public String getDivinity() {
 		return divinity;
 	}
-	public String getStarter() {
-		return starter;
+	public String getPlayer() {
+		return player;
 	}
 	public List<String> getDivinities() {
 		if (divinity == null) {

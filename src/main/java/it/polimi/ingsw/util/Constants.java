@@ -25,6 +25,8 @@ public final class Constants {
 	public static final String GENERAL_ERROR = "error";
 	public static final String GENERAL_FATAL_ERROR = "error-fatal";
 	public static final String GENERAL_DISCONNECT = "disconnect";
+	public static final String GENERAL_PHASE_CHANGE = "phase-change";
+	public static final String GENERAL_PLAYER_DISCONNECTED = "player-disconnected";
 	/* Setup messages between client and server */
 	public static final String SETUP_PARTICIPATE = "setup-participate";
 	public static final String SETUP_CREATE = "setup-create";
@@ -40,19 +42,19 @@ public final class Constants {
 	/* Color messages between client and server */
 	public static final String COLOR_YOU = "color-go";
 	public static final String COLOR_OTHER = "color-wait";
-	public static final String COLOR_SUCCESS = "color-success";
 	public static final String COLOR_ERROR = "color-error";
-	public static final String COLOR_OTHER_CHOICE = "color-other-choice";
+	public static final String COLOR_CHOICES = "color-other-choice";
 	public static final String COLOR_IN_CHOICE = "color-choice";
 	public static final List<Color> COLOR_COLORS = List.of(new Color(0, 0, 255), new Color(255, 0, 0), new Color(0, 255, 0));
 	/* Divinity choice messages between client and server */
 	public static final String GODS_CHALLENGER = "gods-challenger";
+	public static final String GODS_GODS = "gods-gods";
 	public static final String GODS_CHOOSE_STARTER = "gods-choose-starter";
 	public static final String GODS_YOU = "gods-go";
 	public static final String GODS_OTHER = "gods-wait";
 	public static final String GODS_SUCCESS = "gods-success";
 	public static final String GODS_ERROR = "gods-error";
-	public static final String GODS_OTHER_CHOICE = "gods-other-choice";
+	public static final String GODS_CHOICES = "gods-choices";
 	public static final String GODS_IN_GAME_GODS = "gods-game-gods";
 	public static final String GODS_IN_CHOICE = "gods-choice";
 	public static final String GODS_IN_START_PLAYER = "gods-starter";

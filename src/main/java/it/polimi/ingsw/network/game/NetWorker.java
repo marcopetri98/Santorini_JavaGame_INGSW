@@ -6,11 +6,12 @@ import it.polimi.ingsw.util.Constants;
 
 // necessary imports of Java SE
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * This class represent a worker on the game map, this worker is obviously owned by a player which is represented by a string that is its name, all clients has a list of all players inside the game and this makes possible to recognize a worker by the owner.
  */
-public class NetWorker {
+public class NetWorker implements Serializable {
 	public final Color color;
 	public final String owner;
 	public final int workerID;

@@ -31,7 +31,7 @@ public class PlayerTest {
 
 	@Test
 	public void copyTest(){
-		Player player2 = player1.copy();
+		Player player2 = player1.clone();
 		assertEquals(player2, player1);
 	}
 

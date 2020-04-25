@@ -7,7 +7,6 @@ import it.polimi.ingsw.util.Constants;
 import java.awt.Color;
 
 public class NetColorPreparation extends NetObject {
-	public static int serialUID = Constants.ACTUAL_VERSION;
 	public final String player;
 	public final Color color;
 	public final NetColorPreparation next;

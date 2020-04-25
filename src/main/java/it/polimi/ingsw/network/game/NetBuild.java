@@ -3,10 +3,12 @@ package it.polimi.ingsw.network.game;
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.Build;
 
+import java.io.Serializable;
+
 /**
  * This class is used by the player to communicate to the server if
  */
-public class NetBuild {
+public class NetBuild implements Serializable {
 	public final int workerID;
 	public final int cellX;
 	public final int cellY;

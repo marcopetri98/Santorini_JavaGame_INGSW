@@ -6,10 +6,11 @@ import it.polimi.ingsw.core.Worker;
 import it.polimi.ingsw.util.Constants;
 
 // necessary imports of Java SE
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetMap {
+public class NetMap implements Serializable {
 	public final List<List<NetCell>> cells;
 
 	public NetMap(Map map) {

@@ -2,7 +2,9 @@ package it.polimi.ingsw.network.game;
 
 import it.polimi.ingsw.core.Building;
 
-public class NetBuilding {
+import java.io.Serializable;
+
+public class NetBuilding implements Serializable {
 	public final int level;
 	public final boolean dome;
 
