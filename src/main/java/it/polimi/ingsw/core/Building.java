@@ -14,14 +14,14 @@ public class Building {
 	}
 
 	// SETTERS AND CHANGERS
-	public void incrementLevel() throws IllegalStateException {
+	void incrementLevel() throws IllegalStateException {
 		if (level <= 2) {
 			level++;
 		} else {
 			throw new IllegalStateException();
 		}
 	}
-	public void setDome() {
+	void setDome() {
 		if (!dome) {
 			dome = true;
 		} else {

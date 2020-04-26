@@ -15,6 +15,12 @@ public class NetDivinityChoice extends NetObject {
 		player = null;
 		next = null;
 	}
+	public NetDivinityChoice(String msg, String starter) throws NullPointerException {
+		super(msg);
+		player = starter;
+		next = null;
+		divinity = null;
+	}
 	public NetDivinityChoice(String msg, String name, String god) throws NullPointerException {
 		super(msg);
 		if (name == null) {

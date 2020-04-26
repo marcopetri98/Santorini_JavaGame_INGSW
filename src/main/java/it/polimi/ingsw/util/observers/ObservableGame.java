@@ -1,6 +1,7 @@
 package it.polimi.ingsw.util.observers;
 
 // necessary imports of Java SE
+import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
 
 import java.awt.*;
@@ -78,7 +79,7 @@ public class ObservableGame extends ObservableObject {
 			obs.updateWinner(this,playerWinner);
 		}
 	}
-	public void notifyPositions(Object netMap, boolean finished) throws NullPointerException {
+	public void notifyPositions(Map netMap, boolean finished) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();
 		}

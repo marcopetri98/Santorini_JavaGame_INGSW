@@ -25,8 +25,10 @@ public final class Constants {
 	public static final String GENERAL_ERROR = "error";
 	public static final String GENERAL_FATAL_ERROR = "error-fatal";
 	public static final String GENERAL_DISCONNECT = "disconnect";
-	public static final String GENERAL_PHASE_CHANGE = "phase-change";
 	public static final String GENERAL_PLAYER_DISCONNECTED = "player-disconnected";
+	public static final String GENERAL_WINNER = "player-winner";
+	public static final String GENERAL_DEFEATED = "player-defeated";
+	public static final String GENERAL_GAMEMAP_UPDATE = "gamemap-update";
 	/* Setup messages between client and server */
 	public static final String SETUP_PARTICIPATE = "setup-participate";
 	public static final String SETUP_CREATE = "setup-create";
@@ -50,9 +52,9 @@ public final class Constants {
 	public static final String GODS_CHALLENGER = "gods-challenger";
 	public static final String GODS_GODS = "gods-gods";
 	public static final String GODS_CHOOSE_STARTER = "gods-choose-starter";
+	public static final String GODS_STARTER = "gods-starter";
 	public static final String GODS_YOU = "gods-go";
 	public static final String GODS_OTHER = "gods-wait";
-	public static final String GODS_SUCCESS = "gods-success";
 	public static final String GODS_ERROR = "gods-error";
 	public static final String GODS_CHOICES = "gods-choices";
 	public static final String GODS_IN_GAME_GODS = "gods-game-gods";
@@ -61,17 +63,14 @@ public final class Constants {
 	public static final List<String> GODS_GOD_NAMES = List.of("Apollo","Artemis","Athena","Atlas","Demeter","Hephaestus","Minotaur","Pan","Prometheus");
 	/* Game setup messages between client and server */
 	public static final String GAMESETUP_PLACE = "gamestup-place";
-	public static final String GAMESETUP_SUCCESS = "gamesetup-success";
 	public static final String GAMESETUP_ERROR = "gamesetup-error";
-	public static final String GAMESETUP_WAIT = "gamesetup-wait";
-	public static final String GAMESETUP_OTHER_CHOICE = "gamesetup-other-choice";
-	public static final String GAMESETUP_IN_PLACE = "gamesetup-positions";
+	public static final String GAMESETUP_IN_PLACE = "gamesetup-player-positions";
 	/* Player's turn messages between client and server */
 	public static final String PLAYER_ERROR = "player-error";
 	public static final String PLAYER_IN_MOVE = "player-move";
 	public static final String PLAYER_IN_BUILD = "player-build";
 	/* Other player's turn messages between client and server */
-	public static final String OTHERS_ACTION = "others-action";
+	public static final String OTHERS_FINISHED = "others-finished";
 	public static final String OTHERS_ERROR = "others-error";
 
 	/* General connection messages */

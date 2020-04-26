@@ -10,6 +10,7 @@ import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 import java.io.*;
 import java.net.Socket;
 
+// TODO: add the possibility to be an observer
 /**
  * This class is the base class for Server and client communication, it receives client input and send to the client server output regarding to the match the client's playing.
  */

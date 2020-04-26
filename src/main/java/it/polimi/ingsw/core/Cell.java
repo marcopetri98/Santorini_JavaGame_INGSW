@@ -12,7 +12,7 @@ public class Cell {
 	}
 
 	// SETTERS
-	public void setWorker(Worker w){
+	void setWorker(Worker w){
 		this.worker=w;
 	}
 
