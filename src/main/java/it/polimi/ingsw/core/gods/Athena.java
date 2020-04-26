@@ -1,7 +1,10 @@
 package it.polimi.ingsw.core.gods;
 
 import it.polimi.ingsw.core.*;
+import it.polimi.ingsw.core.state.GamePhase;
+import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
+import it.polimi.ingsw.util.exceptions.NoMoveException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,17 +63,21 @@ public class Athena implements GodCard, Observer {
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
-	public List<Build> checkBuild(Map m, Worker w, TypeBuild type) throws NoBuildException {
+	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
 		throw new NoBuildException();
 	}
 
 	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
-	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker can't move up
 	 */
-	public List<Move> checkMove(Map m, Worker w, TypeMove type){
+	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {
+		// if the phase isn't the move phase it throws a move exception
+		if (turn.getGamePhase() != GamePhase.MOVE) {
+			throw new NoMoveException();
+		}
+
 		int myHeight = w.getPos().getBuilding().getLevel();
 		moves = new ArrayList<>();
 

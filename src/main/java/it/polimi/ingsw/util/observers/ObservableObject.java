@@ -29,22 +29,6 @@ public class ObservableObject {
 
 		observers.remove(obs);
 	}
-	public void notifyMove(Object netMap) throws NullPointerException {
-		if (netMap == null) {
-			throw new NullPointerException();
-		}
-		for (ObserverObject obs : observers) {
-			obs.updateMove(this,netMap);
-		}
-	}
-	public void notifyBuild(Object netMap) throws NullPointerException {
-		if (netMap == null) {
-			throw new NullPointerException();
-		}
-		for (ObserverObject obs : observers) {
-			obs.updateBuild(this,netMap);
-		}
-	}
 	public void notifyQuit(String playerName) throws NullPointerException {
 		if (playerName == null) {
 			throw new NullPointerException();

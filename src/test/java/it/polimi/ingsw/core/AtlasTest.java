@@ -22,7 +22,6 @@ public class AtlasTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = TypeBuild.SIMPLE_BUILD; //typeBuild of Atlas according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -46,23 +45,23 @@ public class AtlasTest {
 		map.getCell(h1, k1).setWorker(opponent.getWorker2());
 		opponent.getWorker2().setPos(map.getCell(h1, k1));
 
-		assertEquals(4, atlas.checkBuild(map, player.getWorker1(), type).size());
+		assertEquals(4, atlas.checkBuild(map, player.getWorker1()).size());
 
 		i=0; j=1;
 		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild));
 
 		i=0; j=1;
 		Build newBuild1 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild1));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild1));
 
 		i=1; j=0;
 		Build newBuild2 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild2));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild2));
 
 		i=1; j=0;
 		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild3));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild3));
 
 	}
 
@@ -100,31 +99,31 @@ public class AtlasTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(6, atlas.checkBuild(map, player.getWorker1(), type).size());
+		assertEquals(6, atlas.checkBuild(map, player.getWorker1()).size());
 
 		i=0; j=0;
 		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild));
 
 		i=0; j=0;
 		Build newBuild1 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild1));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild1));
 
 		i=1; j=0;
 		Build newBuild2= new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild2));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild2));
 
 		i=1; j=0;
 		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild3));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild3));
 
 		i=0; j=2;
 		Build newBuild4 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild4));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild4));
 
 		i=0; j=2;
 		Build newBuild5 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), type).contains(newBuild5));
+		assertTrue(atlas.checkBuild(map, player.getWorker1()).contains(newBuild5));
 
 	}
 }

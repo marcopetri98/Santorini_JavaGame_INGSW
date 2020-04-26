@@ -11,8 +11,8 @@ public class Player {
 	public final String playerName;
 	private Worker worker1;
 	private Worker worker2;
-	// TODO: delete active worker
 	private Worker activeWorker;
+	private boolean workerLocked;
 	private GodCard card;
 
 	// constructors
@@ -23,6 +23,7 @@ public class Player {
 		worker2 = null;
 		activeWorker = null;
 		card = null;
+		workerLocked = false;
 	}
 
 	// STATE CHANGER METHODS
@@ -30,8 +31,10 @@ public class Player {
 	public void chooseWorker(int chosen) throws IllegalArgumentException {
 		if (chosen == 1) {
 			this.activeWorker = worker1;
+			workerLocked = true;
 		} else if (chosen==2) {
 			this.activeWorker = worker2;
+			workerLocked = true;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -46,6 +49,9 @@ public class Player {
 	public void setPlayerColor(Color color) {
 		worker1 = new Worker(color,this,1);
 		worker2 = new Worker(color,this,2);
+	}
+	void resetLocking() {
+		workerLocked = false;
 	}
 
 	// CLASSES GETTERS
@@ -67,7 +73,6 @@ public class Player {
 		}
 		return worker2;
 	}
-	// TODO: delete active worker get
 	public Worker getActiveWorker() throws IllegalStateException {
 		if (activeWorker == null) {
 			throw new IllegalStateException();
@@ -79,6 +84,9 @@ public class Player {
 			throw new IllegalStateException();
 		}
 		return card;
+	}
+	public boolean isWorkerLocked() {
+		return workerLocked;
 	}
 
 	// OVERRIDDEN METHODS

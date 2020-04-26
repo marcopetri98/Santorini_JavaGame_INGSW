@@ -1,6 +1,9 @@
 package it.polimi.ingsw.core.gods;
 import it.polimi.ingsw.core.*;
+import it.polimi.ingsw.core.state.GamePhase;
+import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
+import it.polimi.ingsw.util.exceptions.NoMoveException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,17 +46,21 @@ public class Apollo implements GodCard {
     /**
      * @throws NoBuildException so that controller knows it must use the default action
      */
-    public List<Build> checkBuild(Map m, Worker w, TypeBuild type) throws NoBuildException {
+    public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
         throw new NoBuildException();
     }
 
     /**
      * @param m represents the map
      * @param w represents the worker moved by the player during this turn
-     * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
      * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
      */
-    public List<Move> checkMove(Map m, Worker w, TypeMove type){   //worker->activeworker
+    public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException  {   //worker->activeworker
+        // if the phase isn't the move phase it throws a move exception
+        if (turn.getGamePhase() != GamePhase.MOVE) {
+            throw new NoMoveException();
+        }
+
         int y = m.getY(w.getPos());
         int x = m.getX(w.getPos());
         moves = new ArrayList<>();

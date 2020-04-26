@@ -45,26 +45,26 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, NetMove move) throws NullPointerException {
+	public NetPlayerTurn(String msg, String player, NetMove move) throws NullPointerException {
 		super(msg);
 		if (move == null) {
 			throw new NullPointerException();
 		}
 		this.move = move;
 		build = null;
-		player = null;
+		this.player = player;
 		gameMap = null;
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, NetBuild build) throws NullPointerException {
+	public NetPlayerTurn(String msg, String player, NetBuild build) throws NullPointerException {
 		super(msg);
 		if (build == null) {
 			throw new NullPointerException();
 		}
 		move = null;
 		this.build = build;
-		player = null;
+		this.player = player;
 		gameMap = null;
 		availablePositions = null;
 		availableBuildings = null;

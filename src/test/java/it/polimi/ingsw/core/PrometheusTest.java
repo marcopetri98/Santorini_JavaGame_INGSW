@@ -22,8 +22,6 @@ public class PrometheusTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		typeM = TypeMove.SIMPLE_MOVE; //typeMove of Prometheus according to our implementation
-		typeB = TypeBuild.SIMPLE_BUILD; //typeBuild of Prometheus according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -65,19 +63,19 @@ public class PrometheusTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, prometheus.checkMove(map, player.getWorker1(), typeM).size());
+		assertEquals(3, prometheus.checkMove(map, player.getWorker1()).size());
 
 		i=0; j=0;
 		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(prometheus.checkMove(map, player.getWorker1(), typeM).contains(newMove3));
+		assertTrue(prometheus.checkMove(map, player.getWorker1()).contains(newMove3));
 
 		i=0; j=2;
 		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(prometheus.checkMove(map, player.getWorker1(), typeM).contains(newMove4));
+		assertTrue(prometheus.checkMove(map, player.getWorker1()).contains(newMove4));
 
 		i=1; j=0;
 		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(prometheus.checkMove(map, player.getWorker1(), typeM).contains(newMove5));
+		assertTrue(prometheus.checkMove(map, player.getWorker1()).contains(newMove5));
 
 	}
 
@@ -115,19 +113,19 @@ public class PrometheusTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, prometheus.checkBuild(map, player.getWorker1(), typeB).size());
+		assertEquals(3, prometheus.checkBuild(map, player.getWorker1()).size());
 
 		i=0; j=0;
 		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(prometheus.checkBuild(map, player.getWorker1(), typeB).contains(newBuild));
+		assertTrue(prometheus.checkBuild(map, player.getWorker1()).contains(newBuild));
 
 		i=1; j=0;
 		Build newBuild1= new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
-		assertTrue(prometheus.checkBuild(map, player.getWorker1(), typeB).contains(newBuild1));
+		assertTrue(prometheus.checkBuild(map, player.getWorker1()).contains(newBuild1));
 
 		i=0; j=2;
 		Build newBuild2 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(prometheus.checkBuild(map, player.getWorker1(), typeB).contains(newBuild2));
+		assertTrue(prometheus.checkBuild(map, player.getWorker1()).contains(newBuild2));
 
 	}
 }

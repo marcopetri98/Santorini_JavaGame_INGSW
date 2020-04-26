@@ -2,17 +2,24 @@ package it.polimi.ingsw.controller;
 
 // other project's classes needed here
 import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.Player;
+import it.polimi.ingsw.core.state.GodsPhase;
+import it.polimi.ingsw.network.objects.NetColorPreparation;
+import it.polimi.ingsw.network.objects.NetDivinityChoice;
+import it.polimi.ingsw.network.objects.NetGameSetup;
+import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.exceptions.BadRequestException;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
-import java.io.IOException;
+// necessary imports of Java SE
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-
-// necessary imports of Java SE
+import java.util.stream.Collectors;
 
 public class SetupManager {
-	private Game observedModel;
+	private final Game observedModel;
 
 	// constructor for this class
 	public SetupManager(Game g) {
@@ -48,6 +55,76 @@ public class SetupManager {
 			observedModel.setOrder(gamers);
 		} catch (IllegalArgumentException | WrongPhaseException e) {
 			throw new AssertionError("Generate order called in a phase different from the setup");
+		}
+	}
+	/**
+	 *
+	 * @param playerColors
+	 * @throws BadRequestException
+	 * @throws WrongPhaseException
+	 */
+	public void changeColor(NetColorPreparation playerColors) throws BadRequestException, WrongPhaseException {
+		List<Color> chosenColors = observedModel.getPlayers().stream().map((player) -> player.getWorker1().color).collect(Collectors.toList());
+		if (chosenColors.contains(playerColors.color)) {
+			throw new BadRequestException();
+		} else {
+			observedModel.setPlayerColor(playerColors.player,playerColors.color);
+		}
+	}
+	/**
+	 *
+	 * @param request
+	 * @return is true if the god selection phase is ended, false if not
+	 * @throws BadRequestException
+	 * @throws WrongPhaseException
+	 */
+	public boolean handleGodMessage(NetDivinityChoice request) throws BadRequestException, WrongPhaseException {
+		if (Constants.GODS_IN_GAME_GODS.equals(request.message)) {
+			// if the player is the challenger it changes the gods for this game
+			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.player) || observedModel.getPhase().getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
+				throw new BadRequestException();
+			} else {
+				try {
+					observedModel.setGameGods(request.getDivinities());
+				} catch (IllegalArgumentException e) {
+					throw new BadRequestException();
+				}
+			}
+		} else if (Constants.GODS_IN_CHOICE.equals(request.message)) {
+			// if the god is already chosen it throws an exception, if not it sets the god
+			List<String> cardsChosen = observedModel.getPlayers().stream().filter((player) -> { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map((player) -> player.getCard().getName()).collect(Collectors.toList());
+			if (cardsChosen.contains(request.divinity) || observedModel.getPhase().getGodsPhase() != GodsPhase.GODS_CHOICE) {
+				throw new BadRequestException();
+			} else {
+				observedModel.setPlayerGod(request.player,request.divinity);
+			}
+		} else {
+			// if the player is the challenger it chooses the starter player
+			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.player) || observedModel.getPhase().getGodsPhase() != GodsPhase.STARTER_CHOICE) {
+				throw new BadRequestException();
+			} else {
+				try {
+					observedModel.setStarter(request.player);
+				} catch (IllegalStateException e) {
+					throw new BadRequestException();
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	/**
+	 *
+	 * @param positions
+	 * @throws BadRequestException
+	 */
+	public void positionWorkers(NetGameSetup positions) throws BadRequestException {
+		Map gameMap = observedModel.getMap();
+		// if there aren't workers in that position it set the workers in that position
+		if (gameMap.getCell(positions.worker1.getFirst(),positions.worker1.getSecond()).getWorker() != null || gameMap.getCell(positions.worker2.getFirst(),positions.worker2.getSecond()).getWorker() != null) {
+			throw new BadRequestException();
+		} else {
+			observedModel.setWorkerPositions(positions.player,positions.worker1,positions.worker2);
 		}
 	}
 }

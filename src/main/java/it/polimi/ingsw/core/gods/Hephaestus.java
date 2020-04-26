@@ -1,5 +1,8 @@
 package it.polimi.ingsw.core.gods;
 import it.polimi.ingsw.core.*;
+import it.polimi.ingsw.core.state.GamePhase;
+import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.util.exceptions.NoBuildException;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
 
 import java.util.List;
@@ -43,10 +46,14 @@ public class Hephaestus implements GodCard {
 	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
-	 * @param type represents the typeBuild of this particular GodCard: 0 stands for a "simple construction", 1 for a "conditioned construction"
 	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
-	public List<Build> checkBuild(Map m, Worker w, TypeBuild type){
+	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
+		// if it isn't during the building phase this god has no power and throws an exception
+		if (turn.getGamePhase() != GamePhase.BUILD) {
+			throw new NoBuildException();
+		}
+
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
 		builds = new ArrayList<>();
@@ -83,7 +90,7 @@ public class Hephaestus implements GodCard {
 	/**
 	 * @throws NoMoveException so that controller knows it must use the default action
 	 */
-	public List<Move> checkMove(Map m, Worker w, TypeMove type) throws NoMoveException {
+	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {
 		throw new NoMoveException();
 	}
 }

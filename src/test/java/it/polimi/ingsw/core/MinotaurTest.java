@@ -22,7 +22,6 @@ public class MinotaurTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = TypeMove.CONDITIONED_MOVE; //typeMove of minotaur according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -64,29 +63,29 @@ public class MinotaurTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(5, minotaur.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(5, minotaur.checkMove(map, player.getWorker1()).size());
 
 		i=0; j=0;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove));
 
 		i=1; j=0;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove1));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove1));
 
 		i=0; j=2;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove2));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove2));
 
 		s=3; t=1;
 		Move newMove3 = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h1, k1), player.getWorker1()); //moving to position of opponent worker2
 		newMove3.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h1,k1), map.getCell(s,t), map.getCell(h1, k1).getWorker())); //pushing backwards opponent worker2
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove3));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove3));
 
 		s=3; t=3;
 		Move newMove4 = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x, y), map.getCell(h, k), player.getWorker1()); //moving to position of opponent worker1
 		newMove4.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h,k), map.getCell(s,t), map.getCell(h, k).getWorker())); //pushing backwards opponent worker1
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove4));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove4));
 
 	}
 
@@ -127,20 +126,20 @@ public class MinotaurTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, minotaur.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(3, minotaur.checkMove(map, player.getWorker1()).size());
 
 		i=2; j=1;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove));
 
 		i=0; j=2;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove1));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove1));
 
 		s=1; t=3;
 		Move newMove2 = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x,y), map.getCell(h1,k1), player.getWorker1());
 		newMove2.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h1,k1), map.getCell(s,t), map.getCell(h1, k1).getWorker()));
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove2));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove2));
 
 	}
 
@@ -180,20 +179,20 @@ public class MinotaurTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, minotaur.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(3, minotaur.checkMove(map, player.getWorker1()).size());
 
 		i=2; j=1;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove));
 
 		i=0; j=2;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x,y), map.getCell(i,j), player.getWorker1());
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove1));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove1));
 
 		s=1; t=3;
 		Move newMove2 = new Move(TypeMove.CONDITIONED_MOVE, map.getCell(x,y), map.getCell(h1,k1), player.getWorker1());
 		newMove2.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(h1,k1), map.getCell(s,t), map.getCell(h1, k1).getWorker()));
-		assertTrue(minotaur.checkMove(map, player.getWorker1(), type).contains(newMove2));
+		assertTrue(minotaur.checkMove(map, player.getWorker1()).contains(newMove2));
 
 	}
 

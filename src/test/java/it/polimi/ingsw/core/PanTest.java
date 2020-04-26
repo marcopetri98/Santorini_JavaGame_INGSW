@@ -22,7 +22,6 @@ public class PanTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = TypeMove.VICTORY_MOVE; //typeMove of Pan according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -66,19 +65,19 @@ public class PanTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, pan.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(3, pan.checkMove(map, player.getWorker1()).size());
 
 		i=0; j=0;
 		Move newMove = new Move(TypeMove.VICTORY_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(pan.checkMove(map, player.getWorker1(), type).contains(newMove));
+		assertTrue(pan.checkMove(map, player.getWorker1()).contains(newMove));
 
 		i=0; j=2;
 		Move newMove1 = new Move(TypeMove.VICTORY_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(pan.checkMove(map, player.getWorker1(), type).contains(newMove1));
+		assertTrue(pan.checkMove(map, player.getWorker1()).contains(newMove1));
 
 		i=1; j=0;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(pan.checkMove(map, player.getWorker1(), type).contains(newMove2));
+		assertTrue(pan.checkMove(map, player.getWorker1()).contains(newMove2));
 
 	}
 }

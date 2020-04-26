@@ -21,7 +21,6 @@ public class AthenaTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = TypeMove.FORBIDDEN_MOVE; //typeMove of Athena according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -68,19 +67,19 @@ public class AthenaTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, athena.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(3, athena.checkMove(map, player.getWorker1()).size());
 
 		i=1; j=0;
 		Move newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1(), type).contains(newMove3));
+		assertTrue(athena.checkMove(map, player.getWorker1()).contains(newMove3));
 
 		i=2; j=0;
 		Move newMove4 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1(), type).contains(newMove4));
+		assertTrue(athena.checkMove(map, player.getWorker1()).contains(newMove4));
 
 		i=2; j=2;
 		Move newMove5 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1(), type).contains(newMove5));
+		assertTrue(athena.checkMove(map, player.getWorker1()).contains(newMove5));
 
 	}
 }

@@ -4,6 +4,7 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
+import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.game.NetMap;
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.util.Constants;
@@ -32,6 +33,14 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 		clientHandler = handler;
 		playersNum = 1;
+	}
+
+	// METHODS USED TO INFORM THE PLAYER ABOUT AN ERROR
+	/**
+	 * This function is called from the controller when user send a well formed request he cannot send for some reason: it isn't its turn or he cannot because of game state
+	 */
+	public void communicateError() {
+
 	}
 
 	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
@@ -188,7 +197,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
 			if (playerColors.size() == playersNum) {
 				clientHandler.setGamePhase(NetworkPhase.GODS);
-				if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+				if (caller.getPlayerTurn().getPlayerName().equals(clientHandler.getPlayerName())) {
 					// the player is the challenger and it is informed about that
 					divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER);
 				} else {
@@ -250,15 +259,15 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			clientHandler.sendMessage(godsMessage);
 
 			Game caller = (Game) observed;
-			NetDivinityChoice divinityChoice = null;
 			// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
 			if (godsInfo.size() == playersNum) {
-				if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+				NetDivinityChoice divinityChoice = null;
+				if (caller.getPlayerTurn().getPlayerName().equals(clientHandler.getPlayerName())) {
 					// the player is the challenger and it is informed about that
 					divinityChoice = new NetDivinityChoice(Constants.GODS_CHOOSE_STARTER);
 				}
+				clientHandler.sendMessage(divinityChoice);
 			}
-			clientHandler.sendMessage(divinityChoice);
 		}
 	}
 	/**
@@ -285,7 +294,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			clientHandler.sendMessage(gameSetupMessage);
 
 			if (finished) {
-				if (((Game)observed).getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+				if (((Game)observed).getPlayerTurn().getPlayerName().equals(clientHandler.getPlayerName())) {
 					clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
 				} else {
 					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
@@ -294,8 +303,8 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	@Override
-	public synchronized void updateMove(ObservableObject observed, Object netMap) {
-		if (observed == null || !(netMap instanceof Map)) {
+	public synchronized void updateMove(ObservableObject observed, Map netMap) {
+		if (observed == null || netMap != null) {
 			clientHandler.fatalError("It is called the move update with wrong or null parameters");
 		} else {
 			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
@@ -306,8 +315,8 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	@Override
-	public synchronized void updateBuild(ObservableObject observed, Object netMap) {
-		if (observed == null || !(netMap instanceof Map)) {
+	public synchronized void updateBuild(ObservableObject observed, Map netMap) {
+		if (observed == null || netMap != null) {
 			clientHandler.fatalError("It is called the move update with wrong or null parameters");
 		} else {
 			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
@@ -330,6 +339,11 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			playersNum--;
 		}
 	}
+	@Override
+	public void updatePhaseChange(ObservableGame observed, Turn turn) {
+
+	}
+
 	/**
 	 * This function contacts the player to say him he must perform an action because is its turn
 	 * @param observed observable game that called this method

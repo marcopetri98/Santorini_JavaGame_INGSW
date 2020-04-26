@@ -3,6 +3,7 @@ package it.polimi.ingsw.util.observers;
 // necessary imports of Java SE
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
+import it.polimi.ingsw.core.state.Turn;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -85,6 +86,30 @@ public class ObservableGame extends ObservableObject {
 		}
 		for (ObserverRemoteView obs : rvObs) {
 			obs.updatePositions(this,netMap,finished);
+		}
+	}
+	public void notifyMove(Map netMap) throws NullPointerException {
+		if (netMap == null) {
+			throw new NullPointerException();
+		}
+		for (ObserverRemoteView obs : rvObs) {
+			obs.updateMove(this,netMap);
+		}
+	}
+	public void notifyBuild(Map netMap) throws NullPointerException {
+		if (netMap == null) {
+			throw new NullPointerException();
+		}
+		for (ObserverRemoteView obs : rvObs) {
+			obs.updateBuild(this,netMap);
+		}
+	}
+	public void notifyPhaseChange(Turn turn) throws NullPointerException {
+		if (turn == null) {
+			throw new NullPointerException();
+		}
+		for (ObserverRemoteView obs : rvObs) {
+			obs.updatePhaseChange(this,turn);
 		}
 	}
 	public void notifyActivePlayer(String player) throws NullPointerException {

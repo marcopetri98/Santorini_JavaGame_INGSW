@@ -13,6 +13,7 @@ public class Worker extends Observable {
 	private ArrayDeque<Cell> previousPositions;
 	private Cell position;
 	private Cell lastBuild;
+	private boolean hasBuilt; // always false apart during the turn (at the end of the turn this is set to false)
 	public final Color color;
 	public final int workerID;
 	// FIXME: player owner isn't part of the state of a worker
@@ -23,9 +24,13 @@ public class Worker extends Observable {
 		this.owner = owner;
 		workerID = owner.getPlayerID()+num;
 		previousPositions = new ArrayDeque<>();
+		hasBuilt = false;
 	}
 
 	//GETTERS OF POSITION
+	public boolean itHasBuilt() {
+		return hasBuilt;
+	}
 	public Cell getPos() {
 		return position;
 	}
@@ -49,6 +54,7 @@ public class Worker extends Observable {
 		notifyObservers(positions);
 	}   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
 	public void setLastBuildPos(Cell c){
+		hasBuilt = true;
 		this.lastBuild = c;
 	}
 

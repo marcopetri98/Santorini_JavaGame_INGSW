@@ -207,7 +207,7 @@ public class ServerClientListenerThread extends Thread {
 	private void parseColorInput(NetColorPreparation colorMessage) {
 		NetColorPreparation colorOutput;
 
-		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) && Constants.COLOR_COLORS.contains(colorMessage.getColor())) {
+		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) && colorMessage.player.equals(playerName) && Constants.COLOR_COLORS.contains(colorMessage.getColor())) {
 			// the user is trying to choose the color with a well formed message, this is sent to the remoteView
 			gameServer.handleColorRequest(colorMessage,false);
 		} else if (colorMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
@@ -222,7 +222,7 @@ public class ServerClientListenerThread extends Thread {
 	private void parseDivinityInput(NetDivinityChoice divinityMessage) {
 		NetDivinityChoice divinityOutput;
 
-		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS)) {
+		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS) && divinityMessage.player.equals(playerName)) {
 			// if the player has sent a well formed message with gods that has to be in the game it sends this to the remote view
 			if ((divinityMessage.getDivinities().size() == 2 || divinityMessage.getDivinities().size() == 3) && Constants.GODS_GOD_NAMES.containsAll(divinityMessage.getDivinities())) {
 				gameServer.handleDivinityRequest(divinityMessage,false);
@@ -230,7 +230,7 @@ public class ServerClientListenerThread extends Thread {
 				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
 				sendMessage(divinityOutput);
 			}
-		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE)) {
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE) && divinityMessage.player.equals(playerName)) {
 			// if the player chose a divinity it sends the message to the remote view
 			if (Constants.GODS_GOD_NAMES.contains(divinityMessage.getDivinity())) {
 				gameServer.handleDivinityRequest(divinityMessage,false);
@@ -238,7 +238,7 @@ public class ServerClientListenerThread extends Thread {
 				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
 				sendMessage(divinityOutput);
 			}
-		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.getPlayer() != null) {
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.player.equals(playerName)) {
 			// if the player is trying to select a start player with a well formed message it sends the message to the remote view
 			gameServer.handleDivinityRequest(divinityMessage,false);
 		} else if (divinityMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
@@ -253,8 +253,8 @@ public class ServerClientListenerThread extends Thread {
 	private void parseGameSetupInput(NetGameSetup gameSetupMessage) {
 		NetGameSetup gameSetupOutput;
 
-		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE)) {
-			if (gameSetupMessage.worker1.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker1.getFirst() >= 0 && gameSetupMessage.worker1.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker1.getSecond() >= 0 && gameSetupMessage.worker2.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker2.getFirst() >= 0 && gameSetupMessage.worker2.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker2.getSecond() >= 0 && !gameSetupMessage.worker1.equals(gameSetupMessage.worker2)) {
+		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE) && gameSetupMessage.player.equals(playerName)) {
+			if (gameSetupMessage.worker1.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker1.getFirst() >= 0 && gameSetupMessage.worker1.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker1.getSecond() >= 0 && gameSetupMessage.worker2.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker2.getFirst() >= 0 && gameSetupMessage.worker2.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker2.getSecond() >= 0 && !gameSetupMessage.worker1.equals(gameSetupMessage.worker2) && gameSetupMessage.worker1.getFirst() != null && gameSetupMessage.worker1.getSecond() != null && gameSetupMessage.worker2.getFirst() != null && gameSetupMessage.worker2.getSecond() != null) {
 				// the user is sending coordinates of the map where it want to put workers (not on the same cell)
 				gameServer.handlePositionRequest(gameSetupMessage,false);
 			} else {
@@ -273,15 +273,15 @@ public class ServerClientListenerThread extends Thread {
 	private void parseTurnInput(NetPlayerTurn playerTurnMessage) {
 		NetPlayerTurn playerTurnOutput;
 
-		if (playerTurnMessage.message.equals(Constants.PLAYER_IN_MOVE)) {
-			if (playerTurnMessage.move.cellX >= 0 && playerTurnMessage.move.cellX <= Constants.MAP_SIDE && playerTurnMessage.move.cellY >= 0 && playerTurnMessage.move.cellY <= Constants.MAP_SIDE) {
+		if (playerTurnMessage.message.equals(Constants.PLAYER_IN_MOVE) && playerTurnMessage.player.equals(playerName)) {
+			if (playerTurnMessage.move != null && playerTurnMessage.move.cellX >= 0 && playerTurnMessage.move.cellX <= Constants.MAP_SIDE && playerTurnMessage.move.cellY >= 0 && playerTurnMessage.move.cellY <= Constants.MAP_SIDE) {
 				gameServer.handleMoveRequest(playerTurnMessage,false);
 			} else {
 				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);
 				sendMessage(playerTurnMessage);
 			}
-		} else if (playerTurnMessage.message.equals(Constants.PLAYER_IN_BUILD)) {
-			if (playerTurnMessage.build.cellX >= 0 && playerTurnMessage.build.cellX <= Constants.MAP_SIDE && playerTurnMessage.build.cellY >= 0 && playerTurnMessage.build.cellY <= Constants.MAP_SIDE) {
+		} else if (playerTurnMessage.message.equals(Constants.PLAYER_IN_BUILD) && playerTurnMessage.player.equals(playerName)) {
+			if (playerTurnMessage.build != null && playerTurnMessage.build.cellX >= 0 && playerTurnMessage.build.cellX <= Constants.MAP_SIDE && playerTurnMessage.build.cellY >= 0 && playerTurnMessage.build.cellY <= Constants.MAP_SIDE) {
 				gameServer.handleBuildRequest(playerTurnMessage,false);
 			} else {
 				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);

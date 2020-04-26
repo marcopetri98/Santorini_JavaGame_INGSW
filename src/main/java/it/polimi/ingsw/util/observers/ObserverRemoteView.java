@@ -2,6 +2,7 @@ package it.polimi.ingsw.util.observers;
 
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
+import it.polimi.ingsw.core.state.Turn;
 
 import java.awt.Color;
 import java.util.List;
@@ -14,7 +15,10 @@ public interface ObserverRemoteView extends ObserverObject {
 	void updateColors(ObservableGame observed, HashMap<String,Color> playerColors);
 	void updateOrder(ObservableGame observed, String[] order);
 	void updatePositions(ObservableGame observed, Map gameMap, boolean finished);
+	void updateMove(ObservableObject observed, Map netMap);
+	void updateBuild(ObservableObject observed, Map netMap);
 	void updateDefeat(ObservableGame observed, String playerDefeated);
 	void updateWinner(ObservableGame observed, String playerWinner);
 	void updateActivePlayer(ObservableGame observed, String playerName);
+	void updatePhaseChange(ObservableGame observed, Turn turn);
 }

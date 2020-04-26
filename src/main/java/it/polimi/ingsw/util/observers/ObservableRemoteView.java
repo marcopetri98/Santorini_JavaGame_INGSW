@@ -5,6 +5,8 @@ import it.polimi.ingsw.network.game.NetAvailableBuildings;
 import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
 import it.polimi.ingsw.network.objects.NetDivinityChoice;
+import it.polimi.ingsw.network.objects.NetGameSetup;
+import it.polimi.ingsw.network.objects.NetPlayerTurn;
 
 public class ObservableRemoteView extends ObservableObject {
 	private ObserverController ctrObs;
@@ -23,7 +25,7 @@ public class ObservableRemoteView extends ObservableObject {
 			super.addObserver(obs);
 		}
 	}
-	public void notifyPositions(Object netMap) throws NullPointerException {
+	public void notifyPositions(NetGameSetup netMap) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();
 		}
@@ -40,6 +42,18 @@ public class ObservableRemoteView extends ObservableObject {
 			throw new NullPointerException();
 		}
 		ctrObs.updateGods(this,playerGods);
+	}
+	public void notifyMove(NetPlayerTurn netMap) throws NullPointerException {
+		if (netMap == null) {
+			throw new NullPointerException();
+		}
+		ctrObs.updateMove(this,netMap);
+	}
+	public void notifyBuild(NetPlayerTurn netMap) throws NullPointerException {
+		if (netMap == null) {
+			throw new NullPointerException();
+		}
+		ctrObs.updateBuild(this,netMap);
 	}
 
 	public Turn askPhase() {

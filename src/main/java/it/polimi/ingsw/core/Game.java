@@ -2,10 +2,12 @@ package it.polimi.ingsw.core;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.gods.*;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
@@ -53,8 +55,31 @@ public class Game extends ObservableGame {
 		c.setWorker(w);
 	}
 	public synchronized void changeTurn() {  //active Player become the next one
-		changeActivePlayer();
-		turn.advance();
+		if (turn.getPhase() == Phase.COLORS && players.indexOf(activePlayer) != players.size()-1) {
+			changeActivePlayer();
+			turn.advance();
+		} else if ((turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE) || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.GODS_CHOICE && players.indexOf(activePlayer) == 0) || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE)) {
+			if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE) {
+				changeActivePlayer();
+			} else if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE) {
+				notifyActivePlayer(activePlayer.getPlayerName());
+			}
+			turn.advance();
+		} else if (turn.getPhase() == Phase.SETUP) {
+			if (players.indexOf(activePlayer) == players.size()-1) {
+				changeActivePlayer();
+				turn.advance();
+			} else {
+				changeActivePlayer();
+			}
+		} else {
+			if (turn.getGamePhase() == GamePhase.END) {
+				activePlayer.resetLocking();
+				changeActivePlayer();
+			}
+			turn.advance();
+			notifyPhaseChange(turn);
+		}
 	}
 	/**
 	 * This function is called whenever there is a change of game phase
@@ -113,16 +138,19 @@ public class Game extends ObservableGame {
 	public synchronized int getPlayerNum() {
 		return players.size();
 	}
-	public synchronized List<Player> getPlayers() {
-		List<Player> temp = new ArrayList<>();
-		for (Player player : players) {
-			Player current = player.clone();
-			temp.add(player.clone());
+	public synchronized Player getPlayerByName(String name) throws IllegalArgumentException {
+		for (Player p : players) {
+			if (p.getPlayerName().equals(name)) {
+				return p;
+			}
 		}
-		return temp;
+		throw new IllegalArgumentException();
+	}
+	public synchronized List<Player> getPlayers() {
+		return new ArrayList<>(players);
 	}
 	public synchronized Player getPlayerTurn() {
-		return activePlayer.clone();
+		return activePlayer;
 	}
 
 	// support method
@@ -249,8 +277,8 @@ public class Game extends ObservableGame {
 		}
 		notifyGods(godsInfo);
 	}
-	public synchronized void setGameGods(String[] godNames) throws IllegalArgumentException, WrongPhaseException {
-		if (godNames == null || godNames.length != players.size()) {
+	public synchronized void setGameGods(List<String> godNames) throws IllegalArgumentException, WrongPhaseException {
+		if (godNames == null || godNames.size() != players.size()) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
 			throw new WrongPhaseException();
@@ -267,6 +295,54 @@ public class Game extends ObservableGame {
 			godCards.add(godCreated);
 		}
 		notifyGods(godCards);
+	}
+	public synchronized void setStarter(String starterName) throws IllegalStateException, WrongPhaseException {
+		Player starter = null;
+		if (starterName == null) {
+			throw new IllegalStateException();
+		} else if (turn.getPhase() != Phase.GODS || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE)) {
+			throw new WrongPhaseException();
+		} else {
+			boolean found = false;
+			for (int i = 0; i < players.size() && !found; i++) {
+				if (players.get(i).getPlayerName().equals(starterName)) {
+					found = true;
+					starter = players.get(i);
+				}
+			}
+			if (!found) {
+				throw new IllegalStateException();
+			}
+		}
+
+		if (players.indexOf(starter) != 0) {
+			List<Player> temp = new ArrayList<>();
+			for (int i = players.indexOf(starter); i < players.size(); i++) {
+				temp.add(players.get(i));
+			}
+			for (int i = 0; i < players.indexOf(starter); i++) {
+				temp.add(players.get(i));
+			}
+			players = temp;
+		}
+		activePlayer = starter;
+		notifyActivePlayer(starterName);
+	}
+	public synchronized void setWorkerPositions(String playerName, Pair<Integer,Integer> worker1, Pair<Integer,Integer> worker2) throws NullPointerException {
+		if (worker1 == null || worker2 == null) {
+			throw new NullPointerException();
+		}
+
+		boolean finished = true;
+		Player player = getPlayerByName(playerName);
+		player.getWorker1().setPos(map.getCell(worker1.getFirst(),worker1.getSecond()));
+		player.getWorker2().setPos(map.getCell(worker1.getFirst(),worker1.getSecond()));
+		for (int i = 0; i < players.size() && finished; i++) {
+			if (players.get(i).getWorker1().getPos() == null) {
+				finished = false;
+			}
+		}
+		notifyPositions(map,finished);
 	}
 
 	// GETTERS USED ON THE BEGINNING

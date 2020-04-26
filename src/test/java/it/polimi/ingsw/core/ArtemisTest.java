@@ -22,7 +22,6 @@ public class ArtemisTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		type = TypeMove.SIMPLE_MOVE; //typeMove of Artemis according to our implementation
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		opponent = new Player("Pluto");
@@ -46,45 +45,45 @@ public class ArtemisTest {
 		map.getCell(h1, k1).setWorker(opponent.getWorker2());
 		opponent.getWorker2().setPos(map.getCell(h1, k1));
 
-		assertEquals(8, artemis.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(8, artemis.checkMove(map, player.getWorker1()).size());
 
 		i=0; j=1; s=0; t=2;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove));
 
 		i=0; j=1; s=1; t=2;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove1.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove1));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove1));
 
 		i=0; j=1; s=1; t=0;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove2.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove2));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove2));
 
 		i=1; j=0; s=0; t=1;
 		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove3.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove3));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove3));
 
 		i=1; j=0; s=2; t=0;
 		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove4.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove4));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove4));
 
 		i=1; j=0; s=2; t=1;
 		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove5.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove5));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove5));
 
 		i=1; j=0;
 		Move newMove6 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove6));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove6));
 
 		i=0; j=1;
 		Move newMove7 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove7));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove7));
 
 	}
 
@@ -122,34 +121,34 @@ public class ArtemisTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(6, artemis.checkMove(map, player.getWorker1(), type).size());
+		assertEquals(6, artemis.checkMove(map, player.getWorker1()).size());
 
 		i=1; j=0; s=0; t=0;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove));
 
 		i=0; j=2; s=0; t=3;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove1.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove1));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove1));
 
 		i=0; j=2; s=1; t=3;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		newMove2.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove2));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove2));
 
 		i=0; j=0;
 		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove3));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove3));
 
 		i=0; j=2;
 		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove4));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove4));
 
 		i=1; j=0;
 		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(artemis.checkMove(map, player.getWorker1(), type).contains(newMove5));
+		assertTrue(artemis.checkMove(map, player.getWorker1()).contains(newMove5));
 
 	}
 }
