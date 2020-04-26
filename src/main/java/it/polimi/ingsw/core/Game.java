@@ -41,10 +41,28 @@ public class Game extends ObservableGame {
 	// setters and methods which changes the state of the game
 	public synchronized void applyMove(Move move) {
 	}
+
+	/**
+	 * This function applies the construction in the map.
+	 * @param build is the construction checked by the controller.
+	 */
 	public synchronized void applyBuild(Build build) {
+		if(build.dome == true) {
+			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.setDome();
+		} else {
+			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.incrementLevel(); //or == "build.level"; should work in this way though.
+		}
 	}
+
+	/**
+	 * If this function is called, there is a winner!
+	 * @param player is the winner
+	 */
 	public synchronized void applyWin(Player player) {
+		winner = player.clone();
+		notifyWinner(player.playerName);
 	}
+
 	public synchronized void applyDefeat(Player player) {
 	}
 	public synchronized void applyDisconnection(String playerName) {

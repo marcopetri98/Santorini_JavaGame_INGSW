@@ -47,9 +47,9 @@ public class NetBuild implements Serializable {
 		cellY = build.cell.map.getY(build.cell);
 		if (build.dome) {
 			dome = true;
-			level = -1;
+			level = build.cell.building.getLevel();
 		} else {
-			level = build.cell.building.getLevel() + 1;
+			level = build.cell.building.getLevel();
 			dome = false;
 		}
 		if (build.getOther() == null) {
