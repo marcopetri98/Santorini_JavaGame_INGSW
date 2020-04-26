@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Pan implements GodCard {
-	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
+
+	//CODICE PAN
 	private Player owner;
-	int numPlayer = 4;
-	String name = "Pan";
-	String description = "Win Condition: You also win if your Worker moves down two or more levels.";
-	List<Move> moves;
-	List<Build> builds;
+	public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
+	public final List<Integer> numPlayer = List.of(2,3,4);
+	public final String name = "Pan";
+	public final String description = "Win Condition: You also win if your Worker moves down two or more levels.";
 
 	public Pan(Player player){
 		this.owner = player;
@@ -23,26 +23,15 @@ public class Pan implements GodCard {
 
 	public Pan(){
 		this.owner = null;
-		this.moves = null;
-		this.builds = null;
 	}
 
-	public int getNumPlayer(){
-		return numPlayer;
-	}
+	//GETTERS
 	public Player getOwner(){
 		return owner;
 	}
-	public TypeGod getTypeGod(){
-		return typeGod;
-	}
-	public String getName(){
-		return name;
-	}
-	public String getDescription(){
-		return description;
-	}
 
+
+	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
@@ -63,7 +52,7 @@ public class Pan implements GodCard {
 
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		moves = new ArrayList<>();
+		List<Move> moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
 			int x1 = x + i;
 			for(int j = -1; j <= 1; j++){

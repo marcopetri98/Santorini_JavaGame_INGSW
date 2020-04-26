@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Hephaestus implements GodCard {
-	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
+
+	//CODICE HEPHAESTUS
 	private Player owner;
-	int numPlayer = 4;
-	String name = "Hephaestus";
-	String description = "Your Build: Your Worker may build one additional block (not dome) on top of your first block.";
-	List<Move> moves;
-	List<Build> builds;
+	public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
+	public final List<Integer> numPlayer = List.of(2,3,4);
+	public final String name = "Hephaestus";
+	public final String description = "Your Build: Your Worker may build one additional block (not dome) on top of your first block.";
 
 	public Hephaestus(Player player){
 		this.owner = player;
@@ -23,26 +23,15 @@ public class Hephaestus implements GodCard {
 
 	public Hephaestus(){
 		this.owner = null;
-		this.moves = null;
-		this.builds = null;
 	}
 
-	public int getNumPlayer(){
-		return numPlayer;
-	}
+	//GETTERS
 	public Player getOwner(){
 		return owner;
 	}
-	public TypeGod getTypeGod(){
-		return typeGod;
-	}
-	public String getName(){
-		return name;
-	}
-	public String getDescription(){
-		return description;
-	}
 
+
+	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
@@ -56,7 +45,7 @@ public class Hephaestus implements GodCard {
 
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		builds = new ArrayList<>();
+		List<Build> builds = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
 			for (int j = -1; j <= 1; j++) {

@@ -10,14 +10,12 @@ import java.util.ArrayList;
 
 public class Artemis implements GodCard {
 
-	//CODICE APOLLO
-	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
+	//CODICE ARTEMIS
 	private Player owner;
-	int numPlayer = 4;
-	String name = "Artemis";
-	String description = "Your Move: Your Worker may move one additional time, but not back to its initial space.";
-	List<Move> moves;
-	List<Build> builds;
+	public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
+	public final List<Integer> numPlayer = List.of(2,3,4);
+	public final String name = "Artemis";
+	public final String description = "Your Move: Your Worker may move one additional time, but not back to its initial space.";
 
 	public Artemis(Player player){
 		this.owner = player;
@@ -25,26 +23,15 @@ public class Artemis implements GodCard {
 
 	public Artemis(){
 		this.owner = null;
-		this.moves = null;
-		this.builds = null;
 	}
 
-	public int getNumPlayer(){
-		return numPlayer;
-	}
+	//GETTERS
 	public Player getOwner(){
 		return owner;
 	}
-	public TypeGod getTypeGod(){
-		return typeGod;
-	}
-	public String getName(){
-		return name;
-	}
-	public String getDescription(){
-		return description;
-	}
 
+
+	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
@@ -65,7 +52,8 @@ public class Artemis implements GodCard {
 
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		moves = new ArrayList<>();
+		List<Move> moves = new ArrayList<>();
+
 		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
 			int x1 = x + i;
 			for(int j = -1; j <= 1; j++){
@@ -78,7 +66,7 @@ public class Artemis implements GodCard {
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 									if(m.getCell(x1, y1).getWorker() == null){   //Check there is no worker [of ANY player] on cell
 										//Demando tutto il check dell'ulteriore cella e l'aggiunta di tutte le celle a un altro metodo addCell
-										addCell(m, w, x1, y1, x, y);
+										addCell(m, w, x1, y1, x, y, moves);
 									}
 								}
 							}
@@ -97,23 +85,23 @@ public class Artemis implements GodCard {
 	 * @param x1,y1 represent the coordinates of the cell where the player may move
 	 * @param x,y represent the coordinates of the cell where the worker is
 	 */
-	private void addCell(Map m, Worker w, int x1, int y1, int x, int y){
+	private void addCell(Map m, Worker w, int x1, int y1, int x, int y, List<Move> moves) {
 
-		moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));	//Adds default move: Artemis can indeed move without using her power
+		moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));    //Adds default move: Artemis can indeed move without using her power
 
-		for(int i = -1; i <= 1; i++){
+		for (int i = -1; i <= 1; i++) {
 			int x2 = x1 + i;
-			for(int j = -1; j <= 1; j++){
+			for (int j = -1; j <= 1; j++) {
 				int y2 = y1 + j;
 
-				if(x2 != x1 || y2 != y1){ //I shall not move where I am already
-					if(x2 != x || y2 != y){	//I shall not move where I was at the beginning
+				if (x2 != x1 || y2 != y1) { //I shall not move where I am already
+					if (x2 != x || y2 != y) {    //I shall not move where I was at the beginning
 
-						if(0 <= x2 && x2 <= 4 && 0 <= y2 && y2 <= 4){	//Check I am inside the boundaries of the map
-							if(-1 <= (x2-x1) && (x2-x1) <= 1 && -1 <= (y2-y1) && (y2-y1) <=1){  //Check that distance from original is cell <= 1: useless?
-								if(m.getCell(x2, y2).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() <= 1){ //Check height difference
-									if(!m.getCell(x2, y2).getBuilding().getDome()){   //Check there is NO dome
-										if(m.getCell(x2, y2).getWorker() == null){   //Check there is no worker on cell
+						if (0 <= x2 && x2 <= 4 && 0 <= y2 && y2 <= 4) {    //Check I am inside the boundaries of the map
+							if (-1 <= (x2 - x1) && (x2 - x1) <= 1 && -1 <= (y2 - y1) && (y2 - y1) <= 1) {  //Check that distance from original is cell <= 1: useless?
+								if (m.getCell(x2, y2).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() <= 1) { //Check height difference
+									if (!m.getCell(x2, y2).getBuilding().getDome()) {   //Check there is NO dome
+										if (m.getCell(x2, y2).getWorker() == null) {   //Check there is no worker on cell
 											//Adds a move with another linked move
 											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w);
 											firstMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x1, y1), m.getCell(x2, y2), w));

@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Minotaur implements GodCard {
-	private TypeGod typeGod = TypeGod.SIMPLE_GOD;
+
+	//CODICE MINOTAUR
 	private Player owner;
-	int numPlayer = 4;
-	String name = "Minotaur";
-	String description = "Your Move: Your Worker may move into an opponent Worker’s space, if their Worker can be forced one space straight backwards to an unoccupied space at any level.";
-	List<Move> moves;
-	List<Build> builds;
+	public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
+	public final List<Integer> numPlayer = List.of(2,3,4);
+	public final String name = "Minotaur";
+	public final String description = "Your Move: Your Worker may move into an opponent Worker’s space, if their Worker can be forced one space straight backwards to an unoccupied space at any level.";
 
 	public Minotaur(Player player){
 		this.owner = player;
@@ -23,26 +23,15 @@ public class Minotaur implements GodCard {
 
 	public Minotaur(){
 		this.owner = null;
-		this.moves = null;
-		this.builds = null;
 	}
 
-	public int getNumPlayer(){
-		return numPlayer;
-	}
+	//GETTERS
 	public Player getOwner(){
 		return owner;
 	}
-	public TypeGod getTypeGod(){
-		return typeGod;
-	}
-	public String getName(){
-		return name;
-	}
-	public String getDescription(){
-		return description;
-	}
 
+
+	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
 	 * @throws NoBuildException so that controller knows it must use the default action
 	 */
@@ -63,7 +52,7 @@ public class Minotaur implements GodCard {
 
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		moves = new ArrayList<>();
+		List<Move> moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
 			int x1 = x + i;
 			for(int j = -1; j <= 1; j++){
@@ -77,7 +66,7 @@ public class Minotaur implements GodCard {
 									if((m.getX(owner.getWorker1().getPos()) != x1 || m.getY(owner.getWorker1().getPos()) != y1) && (m.getX(owner.getWorker2().getPos()) != x1 || m.getY(owner.getWorker2().getPos()) != y1)){   //Check there is no OWNER worker on cell
 										//Checks for opponent's workers because of Minotaur's power
 										if(m.getCell(x1, y1).getWorker() != null){
-											addCell(m, w, x1, y1, x, y);
+											addCell(m, w, x1, y1, x, y, moves);
 										}
 										else{
 											moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
@@ -95,7 +84,7 @@ public class Minotaur implements GodCard {
 	}
 
 
-	private void addCell(Map m, Worker w, int x1, int y1, int x, int y) {
+	private void addCell(Map m, Worker w, int x1, int y1, int x, int y, List<Move> moves) {
 		//Finds the next point through a vector representation of line
 		int t = 2;
 		int x2 = x + t * (x1 - x);

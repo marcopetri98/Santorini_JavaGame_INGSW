@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Apollo implements GodCard {
-    private TypeGod typeGod = TypeGod.SIMPLE_GOD;
+
+    //APOLLO CODE
     private Player owner;
-    int numPlayer = 4;
-    String name = "Apollo";
-    String description = "Your Move: Your Worker may move into an opponent Worker’s space by forcing their Worker to the space yours just vacated.";
-    List<Move> moves;
-    List<Build> builds;
+    public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
+    public final List<Integer> numPlayer = List.of(2,3,4);
+    public final String name = "Apollo";
+    public final String description = "Your Move: Your Worker may move into an opponent Worker’s space by forcing their Worker to the space yours just vacated.";
 
     public Apollo(Player player){
         this.owner = player;
@@ -23,26 +23,15 @@ public class Apollo implements GodCard {
 
     public Apollo(){
         this.owner = null;
-        this.moves = null;
-        this.builds = null;
     }
 
-    public int getNumPlayer(){
-        return numPlayer;
-    }
+    //GETTERS
     public Player getOwner(){
         return owner;
     }
-    public TypeGod getTypeGod(){
-        return typeGod;
-    }
-    public String getName(){
-        return name;
-    }
-    public String getDescription(){
-        return description;
-    }
 
+
+    //CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
     /**
      * @throws NoBuildException so that controller knows it must use the default action
      */
@@ -55,7 +44,7 @@ public class Apollo implements GodCard {
      * @param w represents the worker moved by the player during this turn
      * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
      */
-    public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException  {   //worker->activeworker
+    public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {   //worker->activeworker
         // if the phase isn't the move phase it throws a move exception
         if (turn.getGamePhase() != GamePhase.MOVE) {
             throw new NoMoveException();
@@ -63,7 +52,7 @@ public class Apollo implements GodCard {
 
         int y = m.getY(w.getPos());
         int x = m.getX(w.getPos());
-        moves = new ArrayList<>();
+        List<Move> moves = new ArrayList<>();
         for(int i = -1; i <= 1; i++){   //i->x   j->y     x1, y1 all the cells where I MAY move
             int x1 = x + i;
             for(int j = -1; j <= 1; j++){

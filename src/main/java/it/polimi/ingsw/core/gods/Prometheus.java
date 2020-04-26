@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Prometheus implements GodCard {
-	private TypeGod typeGod = TypeGod.CHANGE_FLOW_GOD;
+
+	//CODICE PROMETHEUS
 	private Player owner;
-	int numPlayer = 4;
-	String name = "Prometheus";
-	String description = "Your Turn: If your Worker does not move up, it may build both before and after moving.";
-	List<Move> moves;
-	List<Build> builds;
+	public final TypeGod typeGod = TypeGod.CHANGE_FLOW_GOD;
+	public final List<Integer> numPlayer = List.of(2,3,4);
+	public final String name = "Prometheus";
+	public final String description = "Your Turn: If your Worker does not move up, it may build both before and after moving.";
 
 	public Prometheus(Player player){
 		this.owner = player;
@@ -23,26 +23,15 @@ public class Prometheus implements GodCard {
 
 	public Prometheus(){
 		this.owner = null;
-		this.moves = null;
-		this.builds = null;
 	}
 
-	public int getNumPlayer(){
-		return numPlayer;
-	}
+	//GETTERS
 	public Player getOwner(){
 		return owner;
 	}
-	public TypeGod getTypeGod(){
-		return typeGod;
-	}
-	public String getName(){
-		return name;
-	}
-	public String getDescription(){
-		return description;
-	}
 
+
+	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
@@ -57,7 +46,7 @@ public class Prometheus implements GodCard {
 
 		int y = m.getY(w.getPos());
 		int x = m.getX(w.getPos());
-		builds = new ArrayList<>();
+		List<Build> builds = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
 			int x1 = x + i;
 			for (int j = -1; j <= 1; j++) {
@@ -96,7 +85,7 @@ public class Prometheus implements GodCard {
 		}
 
 		// if the player has built before moving it should not move up
-		moves = new ArrayList<>();
+		List<Move> moves = new ArrayList<>();
 		if (w.itHasBuilt()) {
 			int y = m.getX(w.getPos());
 			int x = m.getY(w.getPos());
