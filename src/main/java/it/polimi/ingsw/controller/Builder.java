@@ -25,7 +25,7 @@ public class Builder {
 	public boolean build(NetBuild netBuild, List<Build> possibilities) {
 		boolean value = false;
 		for(Build b : possibilities){
-			if(netBuild.workerID == b.worker.workerID && netBuild.dome == b.dome && netBuild.cellX == b.cell.map.getX(b.cell) && netBuild.cellY == b.cell.map.getY(b.cell) && netBuild.level == b.cell.building.getLevel() && netBuild.other.equals(b.getOther()) ) {
+			if(netBuild.workerID == b.worker.workerID && netBuild.dome == b.dome && netBuild.cellX == observedModel.getMap().getX(b.cell) && netBuild.cellY == observedModel.getMap().getY(b.cell) && netBuild.level == b.cell.building.getLevel() && netBuild.other != null && netBuild.other.workerID == b.getOther().worker.workerID && netBuild.other.dome == b.getOther().dome && netBuild.other.cellX == observedModel.getMap().getX(b.getOther().cell) && netBuild.other.cellY == observedModel.getMap().getY(b.getOther().cell) && netBuild.other.level == b.getOther().cell.building.getLevel() ) {
 				observedModel.applyBuild(b);
 				value = true;
 			} else {
@@ -34,5 +34,4 @@ public class Builder {
 		}
 		return value;
 	}
-
 }

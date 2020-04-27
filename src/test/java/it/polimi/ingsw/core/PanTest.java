@@ -1,6 +1,8 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.gods.Pan;
+import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.util.exceptions.NoMoveException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import java.awt.*;
 import static org.junit.Assert.*;
 
 public class PanTest {
+	private Turn turn;
 	private Map map;
 	private TypeMove type;
 	private Pan pan;
@@ -27,6 +30,7 @@ public class PanTest {
 		opponent = new Player("Pluto");
 		opponent.setPlayerColor(Color.BLACK);
 		pan = new Pan(player);
+		turn = new Turn();
 	}
 
 	/**
@@ -34,7 +38,7 @@ public class PanTest {
 	 *
 	 */
 	@Test
-	public void checkMoveTestGeneral() {
+	public void checkMoveTestGeneral() throws NoMoveException {
 		x=1; y=1; x1=1; y1=2;
 		h=2; k=2; h1=2; k1=1;
 		map.getCell(x, y).getBuilding().incrementLevel();
@@ -65,19 +69,19 @@ public class PanTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, pan.checkMove(map, player.getWorker1()).size());
+		assertEquals(3, pan.checkMove(map, player.getWorker1(), turn).size());
 
 		i=0; j=0;
 		Move newMove = new Move(TypeMove.VICTORY_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(pan.checkMove(map, player.getWorker1()).contains(newMove));
+		assertTrue(pan.checkMove(map, player.getWorker1(), turn).contains(newMove));
 
 		i=0; j=2;
 		Move newMove1 = new Move(TypeMove.VICTORY_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(pan.checkMove(map, player.getWorker1()).contains(newMove1));
+		assertTrue(pan.checkMove(map, player.getWorker1(), turn).contains(newMove1));
 
 		i=1; j=0;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(pan.checkMove(map, player.getWorker1()).contains(newMove2));
+		assertTrue(pan.checkMove(map, player.getWorker1(), turn).contains(newMove2));
 
 	}
 }

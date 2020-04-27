@@ -1,6 +1,8 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.gods.Athena;
+import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.util.exceptions.NoMoveException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import java.awt.*;
 import static org.junit.Assert.*;
 
 public class AthenaTest {
+	private Turn turn;
 	private Map map;
 	private TypeMove type;
 	private Athena athena;
@@ -26,6 +29,7 @@ public class AthenaTest {
 		opponent = new Player("Pluto");
 		opponent.setPlayerColor(Color.BLACK);
 		athena = new Athena(player);
+		turn = new Turn();
 
 		athena.setWentUp(true);
 	}
@@ -37,7 +41,7 @@ public class AthenaTest {
 	 * the opponent worker won't move to these cells returned.
 	 */
 	@Test
-	public void checkMoveTestGeneral() {
+	public void checkMoveTestGeneral() throws NoMoveException {
 		x=1; y=1; x1=1; y1=2;
 		h=2; k=2; h1=2; k1=1;
 		map.getCell(x, y).getBuilding().incrementLevel();
@@ -67,19 +71,19 @@ public class AthenaTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, athena.checkMove(map, player.getWorker1()).size());
+		assertEquals(3, athena.checkMove(map, player.getWorker1(), turn).size());
 
 		i=1; j=0;
 		Move newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1()).contains(newMove3));
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
 
 		i=2; j=0;
 		Move newMove4 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1()).contains(newMove4));
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove4));
 
 		i=2; j=2;
 		Move newMove5 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1()).contains(newMove5));
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove5));
 
 	}
 }
