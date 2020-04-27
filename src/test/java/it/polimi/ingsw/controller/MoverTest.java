@@ -23,8 +23,7 @@ public class MoverTest {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
 		mover = new Mover(gameStub);
 		gameMap = gameStub.getMap();
-		gamePlayer1 = new Player("Aldo");
-		gamePlayer1.setPlayerColor(Color.BLACK);
+		gamePlayer1 = gameStub.getPlayerByName("Aldo");
 	}
 
 	@Test

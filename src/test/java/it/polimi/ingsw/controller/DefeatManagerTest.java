@@ -22,8 +22,7 @@ public class DefeatManagerTest {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
 		defeatController = new DefeatManager(gameStub);
 		gameMap = gameStub.getMap();
-		gamePlayer1 = new Player("Aldo");
-		gamePlayer1.setPlayerColor(Color.BLACK);
+		gamePlayer1 = gameStub.getPlayerByName("Aldo");
 	}
 
 	@Test
