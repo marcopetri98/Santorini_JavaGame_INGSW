@@ -25,7 +25,7 @@ public class VictoryManagerTest {
 	public void setVariables() {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
 		victoryController = new VictoryManager(gameStub);
-		gameMap = new Map();
+		gameMap = gameStub.getMap();
 		gamePlayer1 = new Player("Aldo");
 		gamePlayer1.setPlayerColor(Color.BLACK);
 		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));

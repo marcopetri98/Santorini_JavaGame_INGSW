@@ -22,9 +22,8 @@ public class BuilderTest {
 	public void setVariables() {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
 		builder = new Builder(gameStub);
-		gameMap = new Map();
-		gamePlayer1 = new Player("Aldo");
-		gamePlayer1.setPlayerColor(Color.BLACK);
+		gameMap = gameStub.getMap();
+		gamePlayer1 = gameStub.getPlayerByName("Aldo");
 	}
 
 	@Test

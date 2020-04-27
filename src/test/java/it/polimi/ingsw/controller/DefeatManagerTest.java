@@ -21,7 +21,7 @@ public class DefeatManagerTest {
 	public void setVariables() {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
 		defeatController = new DefeatManager(gameStub);
-		gameMap = new Map();
+		gameMap = gameStub.getMap();
 		gamePlayer1 = new Player("Aldo");
 		gamePlayer1.setPlayerColor(Color.BLACK);
 	}
