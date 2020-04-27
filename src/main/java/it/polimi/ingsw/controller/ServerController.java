@@ -224,7 +224,7 @@ public class ServerController implements ObserverController {
 				if (possibleMoves.size() != 0) {
 					if (movingPlayer.isWorkerLocked()) {
 						if (movingPlayer.getActiveWorker().workerID == moveMessage.move.workerID) {
-							if (!moveController.move(moveMessage, possibleMoves)) {
+							if (!moveController.move(moveMessage.move, possibleMoves)) {
 								caller.communicateError();
 							} else {
 								victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
@@ -234,7 +234,7 @@ public class ServerController implements ObserverController {
 							caller.communicateError();
 						}
 					} else {
-						if (!moveController.move(moveMessage, possibleMoves)) {
+						if (!moveController.move(moveMessage.move, possibleMoves)) {
 							caller.communicateError();
 						} else {
 							victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
@@ -279,7 +279,7 @@ public class ServerController implements ObserverController {
 				if (possibleBuilds.size() != 0) {
 					if (buildingPlayer.isWorkerLocked()) {
 						if (buildingPlayer.getActiveWorker().workerID == buildMessage.move.workerID) {
-							if (!buildController.build(buildMessage, possibleBuilds)) {
+							if (!buildController.build(buildMessage.build, possibleBuilds)) {
 								caller.communicateError();
 							} else {
 								otherMoveDefeat();
@@ -289,7 +289,7 @@ public class ServerController implements ObserverController {
 							caller.communicateError();
 						}
 					} else {
-						if (!buildController.build(buildMessage, possibleBuilds)) {
+						if (!buildController.build(buildMessage.build, possibleBuilds)) {
 							caller.communicateError();
 						} else {
 							otherMoveDefeat();
