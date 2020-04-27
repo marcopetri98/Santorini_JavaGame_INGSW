@@ -40,6 +40,15 @@ public class Game extends ObservableGame {
 
 	// setters and methods which changes the state of the game
 	public synchronized void applyMove(Move move) {
+		//TODO: check if the model is completely updated
+		move.prev.setWorker(null);
+		move.next.setWorker(move.worker);
+		move.worker.setPos(move.next);
+		if(move.getOther() != null){
+			move.getOther().prev.setWorker(null);
+			move.getOther().next.setWorker(move.worker);
+			move.getOther().worker.setPos(move.next);
+		}
 	}
 
 	/**
@@ -47,7 +56,7 @@ public class Game extends ObservableGame {
 	 * @param build is the construction checked by the controller.
 	 */
 	public synchronized void applyBuild(Build build) {
-		if(build.dome == true) {
+		if(build.dome) {
 			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.setDome();
 		} else {
 			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.incrementLevel(); //or == "build.level"; should work in this way though.
@@ -63,8 +72,23 @@ public class Game extends ObservableGame {
 		notifyWinner(player.playerName);
 	}
 
+	/**
+	 * The function manages the defeat of a player
+	 * @param player is the looser
+	 */
 	public synchronized void applyDefeat(Player player) {
+		//TODO: check if applywin is correctly called
+		this.players.remove(player);
+		if(this.players.size() == 1){
+			try {
+				applyWin(players.get(0));
+			}
+			catch(IndexOutOfBoundsException ex){
+				ex.printStackTrace();
+			}
+		}
 	}
+
 	public synchronized void applyDisconnection(String playerName) {
 	}
 	public synchronized void moveWorker(Worker w, Cell c){

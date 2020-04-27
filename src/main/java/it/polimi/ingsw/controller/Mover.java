@@ -1,6 +1,11 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.core.Move;
+import it.polimi.ingsw.core.TypeMove;
+import it.polimi.ingsw.network.game.NetMove;
+
+import java.util.List;
 
 public class Mover {
 	private Game observedModel;
@@ -8,5 +13,29 @@ public class Mover {
 	// constructor for this class
 	public Mover(Game g) {
 		observedModel = g;
+	}
+
+
+	/**
+	 * The function checks if the NetMove returned by the client is indeed possible, and if it is, it applies it
+	 * @param netmove the move returned by the client
+	 * @param possibilities the possible moves of the active player
+	 * @return true if the NetMove is contained in the possibilities list
+	 */
+	public boolean move(NetMove netmove, List<Move> possibilities){
+		for(Move move : possibilities){
+			if((move.worker.workerID == netmove.workerID && observedModel.getMap().getX(move.next) == netmove.cellX && observedModel.getMap().getY(move.next) == netmove.cellY) || move.getOther() != null && (move.getOther().worker.workerID == netmove.workerID && observedModel.getMap().getX(move.getOther().next) == netmove.cellX && observedModel.getMap().getY(move.getOther().next) == netmove.cellY)){
+				//move o move.other corrisponde alla netbuild
+				if(move.typeMove == TypeMove.SIMPLE_MOVE || move.typeMove == TypeMove.CONDITIONED_MOVE || move.typeMove == TypeMove.VICTORY_MOVE){
+					observedModel.applyMove(move);
+					return true;
+				}
+				else if(move.typeMove == TypeMove.FORBIDDEN_MOVE){
+					//TODO: correct this
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

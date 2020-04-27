@@ -27,9 +27,26 @@ public class Athena implements GodCard, Observer {
 	}
 
 	//GETTERS
+	public List<Integer> getNumPlayer(){
+		return numPlayer;
+	}
+
 	public Player getOwner(){
 		return owner;
 	}
+
+	public TypeGod getTypeGod(){
+		return typeGod;
+	}
+
+	public String getName(){
+		return name;
+	}
+
+	public String getDescription(){
+		return description;
+	}
+
 
 
 	//OBSERVER-RELATED ATTRIBUTES AND METHODS
@@ -60,7 +77,6 @@ public class Athena implements GodCard, Observer {
 	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
-	 * @param type represents the typeMove of this particular GodCard: 0 stands for a "simple move", 1 for a "conditioned move", 2 for a "defeat move", 3 for a "victory move"
 	 * @return the cells where the Player's Worker can't move up
 	 */
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {

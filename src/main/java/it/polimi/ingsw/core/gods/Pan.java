@@ -26,9 +26,26 @@ public class Pan implements GodCard {
 	}
 
 	//GETTERS
+	public List<Integer> getNumPlayer(){
+		return numPlayer;
+	}
+
 	public Player getOwner(){
 		return owner;
 	}
+
+	public TypeGod getTypeGod(){
+		return typeGod;
+	}
+
+	public String getName(){
+		return name;
+	}
+
+	public String getDescription(){
+		return description;
+	}
+
 
 
 	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
