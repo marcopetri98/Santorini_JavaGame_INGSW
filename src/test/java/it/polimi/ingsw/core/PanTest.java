@@ -1,6 +1,7 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.gods.Pan;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
 import org.junit.Before;
@@ -31,6 +32,9 @@ public class PanTest {
 		opponent.setPlayerColor(Color.BLACK);
 		pan = new Pan(player);
 		turn = new Turn();
+		while(turn.getGamePhase() != GamePhase.MOVE){
+			turn.advance();
+		}
 	}
 
 	/**

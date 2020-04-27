@@ -6,6 +6,7 @@ import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
 import org.junit.Before;
 import org.junit.Test;
+import java.util.List;
 
 import java.awt.*;
 
@@ -21,6 +22,7 @@ public class ApolloTest {
 	int x,y,x1,y1; //player's workers positions
 	int h,k,h1,k1; //opponent's workers positions
 	int i,j; //simple move position
+	List<Move> moves;
 
 	@Before
 	public void testSetup(){
@@ -51,6 +53,12 @@ public class ApolloTest {
 		opponent.getWorker1().setPos(map.getCell(h, k));
 		map.getCell(h1, k1).setWorker(opponent.getWorker2());
 		opponent.getWorker2().setPos(map.getCell(h1, k1));
+
+		Cell cella = map.getCell(0,0);
+
+		map.getX(cella);
+
+		moves = apollo.checkMove(map, player.getWorker1(), turn);
 
 		assertEquals(3, apollo.checkMove(map, player.getWorker1(), turn).size());
 
@@ -125,7 +133,7 @@ public class ApolloTest {
 	 * Worker1 in (1,1) (level 0), opponent worker in (2,2) (level 3): it should return only the 7 cells adjacent (1,1) which I compare "manually" with the returned arrayList of the checkMove.
 	 * Worker1 cannot move up in a building with a difference in height more than 1.
 	 */
-	@Test(expected = NoMoveException.class)
+	@Test
 	public void checkMoveTestNotCornerDifferenceInHeight() throws Exception {
 		x=1; y=1; x1=1; y1=4;
 		h=2; k=2; h1=2; k1=4;

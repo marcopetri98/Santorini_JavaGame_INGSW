@@ -1,6 +1,7 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.gods.Prometheus;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
@@ -32,6 +33,7 @@ public class PrometheusTest {
 		opponent.setPlayerColor(Color.BLACK);
 		prometheus = new Prometheus(player);
 		turn = new Turn();
+
 	}
 
 	/**
@@ -39,6 +41,9 @@ public class PrometheusTest {
 	 */
 	@Test
 	public void checkMoveTestGeneral() throws NoMoveException {
+		while(turn.getGamePhase() != GamePhase.MOVE){
+			turn.advance();
+		}
 		x=1; y=1; x1=1; y1=2;
 		h=2; k=2; h1=2; k1=1;
 		map.getCell(x, y).getBuilding().incrementLevel();
@@ -89,6 +94,9 @@ public class PrometheusTest {
 	 */
 	@Test
 	public void checkBuildTestGeneral() throws NoBuildException {
+		while(turn.getGamePhase() != GamePhase.BEFOREMOVE){
+			turn.advance();
+		}
 		x=1; y=1; x1=1; y1=2;
 		h=2; k=2; h1=2; k1=1;
 		map.getCell(x, y).getBuilding().incrementLevel();

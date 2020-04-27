@@ -96,7 +96,7 @@ public class Player {
 			return false;
 		} else {
 			Player other = (Player)obj;
-			if (playerID == other.playerID && playerName.equals(other.playerName) && worker1.equals(other.worker1) && worker2.equals(other.worker2) && card.equals(other.card)) {
+			if (playerID == other.playerID && playerName.equals(other.playerName) && worker1.equals(other.worker1) && worker2.equals(other.worker2) && card.equals(other.getCard())) {
 				return true;
 			} else {
 				return false;
@@ -104,10 +104,12 @@ public class Player {
 		}
 	}
 	@Override
-	public Player clone() {
+	public Player clone() {	//TODO: doesn't make the previuos positions the same!! Should not be a problem though
 		Player newPlayer = new Player(playerName);
 		newPlayer.setPlayerColor(worker1.color);
-		newPlayer.setGodCard(card);
-		return new Player(playerName);
+		newPlayer.worker1.setPos(this.worker1.getPos());
+		newPlayer.worker2.setPos(this.worker2.getPos());
+		newPlayer.setGodCard(this.card);
+		return newPlayer;
 	}
 }

@@ -31,6 +31,9 @@ public class MapTest {
 	@Test
 	public void getCellTest(){
 		x=0; y=0;
-		assertEquals(cells.get(x).get(y), map.getCell(x,y));
+		Cell cella = map.getCell(x, y);
+		assertEquals(map.getX(cella), 0);
+
+		//assertEquals(cells.get(x).get(y), map.getCell(x,y));
 	}
 }

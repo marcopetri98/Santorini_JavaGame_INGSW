@@ -1,6 +1,7 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.gods.Minotaur;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
 import org.junit.Before;
@@ -31,6 +32,9 @@ public class MinotaurTest {
 		opponent.setPlayerColor(Color.BLACK);
 		minotaur = new Minotaur(player);
 		turn = new Turn();
+		while(turn.getGamePhase() != GamePhase.MOVE){
+			turn.advance();
+		}
 	}
 
 	/**

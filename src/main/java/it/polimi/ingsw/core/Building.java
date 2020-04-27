@@ -40,7 +40,7 @@ public class Building {
 	public boolean equals(Object obj) {
 		if (obj instanceof Building) {
 			Building other = (Building)obj;
-			return level == other.level && dome == other.dome;
+			return level == other.getLevel() && dome == other.getDome();
 		}
 		return false;
 	}

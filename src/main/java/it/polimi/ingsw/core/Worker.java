@@ -63,7 +63,7 @@ public class Worker extends Observable {
 	public boolean equals(Object obj) {
 		if (obj instanceof Worker) {
 			Worker other = (Worker) obj;
-			return color.equals(other.color) && workerID == other.workerID && position.map.getX(position) == other.position.map.getX(other.position) && position.map.getY(position) == other.position.map.getY(other.position) && position.equals(other.position);
+			return color.equals(other.color) && workerID == other.workerID && position == other.position; //TODO: may not check everything
 		}
 		return false;
 	}

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.gods.Hephaestus;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
 import org.junit.Before;
@@ -31,6 +32,9 @@ public class HephaestusTest {
 		opponent.setPlayerColor(Color.BLACK);
 		hephaestus = new Hephaestus(player);
 		turn = new Turn();
+		while(turn.getGamePhase() != GamePhase.BUILD){
+			turn.advance();
+		}
 	}
 
 	/**

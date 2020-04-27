@@ -22,13 +22,25 @@ public class Cell {
 	}
 	public Worker getWorker(){ return worker; }
 
-	// OVERRIDDEN METHODS
-	@Override
+	// OVERRIDDEN METHODS //TODO: really necessary to override?!?!
+	/*@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Cell) {
 			Cell other = (Cell)obj;
-			return building.equals(other.building) && worker.equals(other.worker);
+			if(this.getBuilding().equals(other.getBuilding())){
+				if(this.worker == null && other.worker == null){
+					return true;
+				}
+				else if(this.worker != null && other.getWorker() != null && this.worker.equals(other.worker)){
+					return true;
+				}
+			}
+
+
+
+
+			//return (worker == null && other.getWorker() == null && building.equals(other.building)) || (other.getWorker() != null && this.worker != null && building.equals(other.building) && worker.equals(other.getWorker()));
 		}
 		return false;
-	}
+	}*/
 }
