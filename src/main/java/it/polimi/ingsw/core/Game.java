@@ -21,15 +21,17 @@ import java.util.ArrayList;
 public class Game extends ObservableGame {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
-	private List<GodCard> godCards;
-	private Turn turn;
+	private final List<GodCard> godCards;
+	private final Turn turn;
 	private final Map map;
+	private final List<Player> defeatedPlayers;
 	private Player winner;
 
 	// constructors
 	public Game(String[] names) {
 		players = new ArrayList<>();
 		godCards = new ArrayList<>();
+		defeatedPlayers = new ArrayList<>();
 		map = new Map();
 		turn = new Turn();
 		for (String name : names) {
@@ -49,8 +51,8 @@ public class Game extends ObservableGame {
 			move.getOther().next.setWorker(move.worker);
 			move.getOther().worker.setPos(move.next);
 		}
+		notifyMove(getMap());
 	}
-
 	/**
 	 * This function applies the construction in the map.
 	 * @param build is the construction checked by the controller.
@@ -61,8 +63,8 @@ public class Game extends ObservableGame {
 		} else {
 			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.incrementLevel(); //or == "build.level"; should work in this way though.
 		}
+		notifyBuild(getMap());
 	}
-
 	/**
 	 * If this function is called, there is a winner!
 	 * @param player is the winner
@@ -71,7 +73,6 @@ public class Game extends ObservableGame {
 		winner = player.clone();
 		notifyWinner(player.playerName);
 	}
-
 	/**
 	 * The function manages the defeat of a player
 	 * @param player is the looser
@@ -79,16 +80,16 @@ public class Game extends ObservableGame {
 	public synchronized void applyDefeat(Player player) {
 		//TODO: check if applywin is correctly called
 		this.players.remove(player);
+		defeatedPlayers.add(player);
 		if(this.players.size() == 1){
 			try {
 				applyWin(players.get(0));
-			}
-			catch(IndexOutOfBoundsException ex){
+			} catch(IndexOutOfBoundsException ex){
 				ex.printStackTrace();
 			}
 		}
+		notifyDefeat(player.getPlayerName());
 	}
-
 	public synchronized void applyDisconnection(String playerName) {
 	}
 	public synchronized void moveWorker(Worker w, Cell c){

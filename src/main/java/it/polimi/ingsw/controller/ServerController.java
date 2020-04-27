@@ -121,7 +121,7 @@ public class ServerController implements ObserverController {
 	private void moveDefeat(Player player) {
 
 	}
-	private void otherMoveDefeat() {
+	private void buildDefeat(Player player) {
 
 	}
 
@@ -282,7 +282,6 @@ public class ServerController implements ObserverController {
 							if (!buildController.build(buildMessage.build, possibleBuilds)) {
 								caller.communicateError();
 							} else {
-								otherMoveDefeat();
 								observedModel.changeTurn();
 							}
 						} else {
@@ -292,7 +291,6 @@ public class ServerController implements ObserverController {
 						if (!buildController.build(buildMessage.build, possibleBuilds)) {
 							caller.communicateError();
 						} else {
-							otherMoveDefeat();
 							buildingPlayer.chooseWorker(buildMessage.move.workerID-buildingPlayer.getPlayerID());
 							observedModel.changeTurn();
 						}

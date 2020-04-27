@@ -15,6 +15,8 @@ public final class Constants {
 	 */
 	private Constants() {}
 
+	/* Client CLI game constants */
+
 	/* Game constants */
 	public static final int MAP_SIDE = 5;
 
