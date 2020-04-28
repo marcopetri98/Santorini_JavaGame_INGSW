@@ -250,7 +250,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			// it builds the entire list about players' colors
 			for (String playerName : godsInfo.keySet()) {
 				if (i == 0) {
-					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName());
+					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName(),false);
 					i++;
 				} else {
 					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName(),godsMessage);

@@ -6,35 +6,40 @@ import java.util.List;
 
 public class NetDivinityChoice extends NetObject {
 	public final String divinity;
+	public final String challenger;
 	public final String player;
 	public final NetDivinityChoice next;
 
 	public NetDivinityChoice(String msg) throws NullPointerException {
 		super(msg);
 		divinity = null;
+		challenger = null;
 		player = null;
 		next = null;
 	}
 	public NetDivinityChoice(String msg, String starter) throws NullPointerException {
 		super(msg);
+		challenger = null;
 		player = starter;
 		next = null;
 		divinity = null;
 	}
-	public NetDivinityChoice(String msg, String name, String god) throws NullPointerException {
+	public NetDivinityChoice(String msg, String player, String other, boolean start) throws NullPointerException {
 		super(msg);
-		if (name == null) {
+		if (player == null || other == null) {
 			throw new NullPointerException();
 		}
-		divinity = god;
-		player = name;
+		challenger = start ? player : null;
+		this.player = start ? other : player;
 		next = null;
+		divinity = start ? null : other;
 	}
 	public NetDivinityChoice(String msg, String name, String god, NetDivinityChoice next) throws NullPointerException {
 		super(msg);
 		if (name == null) {
 			throw new NullPointerException();
 		}
+		challenger = null;
 		divinity = god;
 		player = name;
 		this.next = next;
@@ -53,6 +58,7 @@ public class NetDivinityChoice extends NetObject {
 			}
 		}
 		player = null;
+		challenger = null;
 	}
 
 	// getters

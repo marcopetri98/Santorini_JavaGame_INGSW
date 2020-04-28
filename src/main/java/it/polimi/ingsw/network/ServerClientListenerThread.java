@@ -238,7 +238,7 @@ public class ServerClientListenerThread extends Thread {
 				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
 				sendMessage(divinityOutput);
 			}
-		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.player.equals(playerName)) {
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.challenger.equals(playerName) && divinityMessage.player != null) {
 			// if the player is trying to select a start player with a well formed message it sends the message to the remote view
 			gameServer.handleDivinityRequest(divinityMessage,false);
 		} else if (divinityMessage.message.equals(Constants.GENERAL_DISCONNECT)) {

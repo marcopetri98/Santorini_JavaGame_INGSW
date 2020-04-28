@@ -96,7 +96,7 @@ public class Player {
 			return false;
 		} else {
 			Player other = (Player)obj;
-			if (playerID == other.playerID && playerName.equals(other.playerName) && worker1.equals(other.worker1) && worker2.equals(other.worker2) && card.equals(other.getCard())) {
+			if (playerID == other.playerID && playerName.equals(other.playerName) && ((worker1 == null && other.worker1 == null) || (worker1 != null && other.worker1 != null && worker1.equals(other.worker1) && worker2.equals(other.worker2))) && ((card == null && other.card == null) || (card != null && other.card != null && card.equals(other.card)))) {
 				return true;
 			} else {
 				return false;

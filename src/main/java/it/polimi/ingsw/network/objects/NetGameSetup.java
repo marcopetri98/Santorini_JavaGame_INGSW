@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.objects;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.network.game.NetMap;
+import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
 
 public class NetGameSetup extends NetObject {
@@ -31,12 +32,33 @@ public class NetGameSetup extends NetObject {
 		super(msg);
 		if (worker1 == null || worker2 == null) {
 			throw new NullPointerException();
-		} else if (worker1.getFirst() <= 4 && worker1.getFirst() >= 0 && worker1.getSecond() <= 4 && worker1.getSecond() >= 0 && worker2.getFirst() <= 4 && worker2.getFirst() >= 0 && worker2.getSecond() <= 4 && worker2.getSecond() >= 0) {
+		} else if (!(worker1.getFirst() <= 4 && worker1.getFirst() >= 0 && worker1.getSecond() <= 4 && worker1.getSecond() >= 0 && worker2.getFirst() <= 4 && worker2.getFirst() >= 0 && worker2.getSecond() <= 4 && worker2.getSecond() >= 0)) {
 			throw new IllegalArgumentException();
 		}
 		this.player = player;
 		gameMap = null;
 		this.worker1 = worker1;
 		this.worker2 = worker2;
+	}
+
+	public boolean isWellFormed() {
+		if (gameMap == null) {
+			if (worker1 == null || worker2 == null) {
+				return false;
+			} else {
+				if (worker1.getFirst() < 0 || worker1.getFirst() >= Constants.MAP_SIDE || worker1.getSecond() < 0 || worker1.getSecond() >= Constants.MAP_SIDE || worker2.getFirst() < 0 || worker2.getFirst() >= Constants.MAP_SIDE || worker2.getSecond() < 0 || worker2.getSecond() >= Constants.MAP_SIDE) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		} else {
+			if (worker1 != null || worker2 != null) {
+				return false;
+			} else {
+				// TODO: is the netMap well formed?
+				return true;
+			}
+		}
 	}
 }

@@ -39,8 +39,13 @@ public class VictoryManager {
 	 * @param before the origin cell of the worker.
 	 * @param after the cell where the worker is moving to.
 	 * @param possibleCells the list of possible moves returned by the God's checkMove function.
+	 * @throws NullPointerException if the parameter is null
 	 */
-	public void checkVictory(Cell before, Cell after, List<Move> possibleCells){
+	public void checkVictory(Cell before, Cell after, List<Move> possibleCells) throws NullPointerException {
+		if (before == null || after == null || possibleCells == null) {
+			throw new NullPointerException();
+		}
+
 		for(Move m: possibleCells){
 			if (m.typeMove == TypeMove.SIMPLE_MOVE && m.prev.equals(before) && m.next.equals(after) && m.next.building.getLevel() == 3 && m.prev.building.getLevel() == 2) { //check the standard condition of winning: a Player's worker moved up (only 1 level) to a building level 3 during his own turn.
 				observedModel.applyWin(observedModel.getPlayerTurn());

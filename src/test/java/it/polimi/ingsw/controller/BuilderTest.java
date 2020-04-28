@@ -20,7 +20,7 @@ public class BuilderTest {
 
 	@Before
 	public void setVariables() {
-		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
+		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"},true,true);
 		builder = new Builder(gameStub);
 		gameMap = gameStub.getMap();
 		gamePlayer1 = gameStub.getPlayerByName("Aldo");
@@ -40,7 +40,7 @@ public class BuilderTest {
 		assertTrue(gameStub.isApplyBuildCalled());
 	}
 
-	@Test
+	@Test (expected = NullPointerException.class)
 	public void firstNull() {
 		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
 		Build build1 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
@@ -53,7 +53,7 @@ public class BuilderTest {
 		assertFalse(gameStub.isApplyBuildCalled());
 	}
 
-	@Test
+	@Test (expected = NullPointerException.class)
 	public void secondNull() {
 		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
 		Build build1 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
@@ -63,7 +63,7 @@ public class BuilderTest {
 		assertFalse(gameStub.isApplyBuildCalled());
 	}
 
-	@Test
+	@Test (expected = NullPointerException.class)
 	public void bothNull() {
 		assertFalse(builder.build(null,null));
 		assertFalse(gameStub.isApplyBuildCalled());

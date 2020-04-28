@@ -21,17 +21,19 @@ public class Builder {
 	 * @param netBuild the build communicated to the server.
 	 * @param possibilities the list of possible builds the player could do.
 	 * @return true if the netBuild is contained in the possibilities list and call applyBuild in Game class; else return false.
+	 * @throws NullPointerException if the parameter is null
 	 */
-	public boolean build(NetBuild netBuild, List<Build> possibilities) {
-		boolean value = false;
+	public boolean build(NetBuild netBuild, List<Build> possibilities) throws NullPointerException {
+		if (netBuild == null || possibilities == null) {
+			throw new NullPointerException();
+		}
+
 		for(Build b : possibilities){
-			if(netBuild.workerID == b.worker.workerID && netBuild.dome == b.dome && netBuild.cellX == observedModel.getMap().getX(b.cell) && netBuild.cellY == observedModel.getMap().getY(b.cell) && netBuild.level == b.cell.building.getLevel() && netBuild.other != null && netBuild.other.workerID == b.getOther().worker.workerID && netBuild.other.dome == b.getOther().dome && netBuild.other.cellX == observedModel.getMap().getX(b.getOther().cell) && netBuild.other.cellY == observedModel.getMap().getY(b.getOther().cell) && netBuild.other.level == b.getOther().cell.building.getLevel() ) {
+			if (b.isSameAs(netBuild)) {
 				observedModel.applyBuild(b);
-				value = true;
-			} else {
-				value = false;
+				return true;
 			}
 		}
-		return value;
+		return false;
 	}
 }

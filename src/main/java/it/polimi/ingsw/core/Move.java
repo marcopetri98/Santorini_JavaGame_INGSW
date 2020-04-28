@@ -39,7 +39,7 @@ public class Move {
 		return other;
 	}
 	public boolean isSameAs(NetMove playerMove) {
-		return next.map.getX(next) == playerMove.cellX && next.map.getY(next) == playerMove.cellY && worker.workerID == playerMove.workerID;
+		return next.map.getX(next) == playerMove.cellX && next.map.getY(next) == playerMove.cellY && worker.workerID == playerMove.workerID && ((other == null && playerMove.other == null) || (other != null && playerMove.other != null && other.isSameAs(playerMove.other)));
 	}
 
 	@Override

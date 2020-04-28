@@ -12,15 +12,22 @@ public class NetMove implements Serializable {
 	public final int workerID;
 	public final int cellX;
 	public final int cellY;
+	public final NetMove other;
 
 	public NetMove(NetWorker worker, NetCell cell, NetMap map) {
 		workerID = worker.workerID;
 		cellX = map.getX(cell);
 		cellY = map.getY(cell);
+		other = null;
 	}
 	public NetMove(Move move) {
 		workerID = move.worker.workerID;
 		cellX = move.next.map.getX(move.next);
 		cellY = move.next.map.getY(move.next);
+		if (move.getOther() == null) {
+			other = null;
+		} else {
+			other = new NetMove(move.getOther());
+		}
 	}
 }

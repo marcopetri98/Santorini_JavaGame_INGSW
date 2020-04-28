@@ -7,9 +7,12 @@ import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.network.objects.NetGameSetup;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
+import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
+import javax.print.DocFlavor;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +22,7 @@ public class GameStub extends Game {
 	private boolean applyBuildCalled;
 	private boolean applyWinCalled;
 	private boolean applyDefeatCalled;
-	private boolean setOrderCalled;
+	private boolean setOrderCalledCorrectly;
 	private boolean setPlayerColorCalled;
 	private boolean setGameGodsCalled;
 	private boolean setPlayerGodCalled;
@@ -33,13 +36,13 @@ public class GameStub extends Game {
 	private Player winner;
 	private Turn turn;
 
-	public GameStub(String[] names) {
+	public GameStub(String[] names, boolean setColors, boolean setGods) {
 		super(names);
 		applyMoveCalled = false;
 		applyBuildCalled = false;
 		applyWinCalled = false;
 		applyDefeatCalled = false;
-		setOrderCalled = false;
+		setOrderCalledCorrectly = false;
 		setPlayerColorCalled = false;
 		setGameGodsCalled = false;
 		setPlayerGodCalled = false;
@@ -52,9 +55,13 @@ public class GameStub extends Game {
 		turn = new Turn();
 		for (int i = 0; i < names.length; i++) {
 			players.add(new Player(names[i]));
-			players.get(i).setPlayerColor(new Color(255,255,255-i));
-			godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
-			players.get(i).setGodCard(godCards.get(i));
+			if (setColors) {
+				players.get(i).setPlayerColor(Constants.COLOR_COLORS.get(i));
+			}
+			if (setGods) {
+				godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
+				players.get(i).setGodCard(godCards.get(i));
+			}
 		}
 	}
 
@@ -71,22 +78,91 @@ public class GameStub extends Game {
 	public void applyDefeat(Player player) {
 		applyDefeatCalled = true;
 	}
-	public void setOrder(List<String> playerOrder) {
-		setOrderCalled = true;
+	public void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
+		if (playerOrder == null || playerOrder.size() != players.size()) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.LOBBY) {
+			throw new WrongPhaseException();
+		} else {
+			for (Player player : players) {
+				if (!playerOrder.contains(player.getPlayerName())) {
+					throw new IllegalArgumentException();
+				}
+			}
+		}
+		setOrderCalledCorrectly = true;
 	}
-	public void setPlayerColor(String player, Color color) {
+	public void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
+		if (player == null || color == null) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.COLORS) {
+			throw new WrongPhaseException();
+		}
 		setPlayerColorCalled = true;
 	}
-	public void setPlayerGod(String playerName, String god) {
+	public void setPlayerGod(String playerName, String god) throws IllegalArgumentException, WrongPhaseException {
+		GodCard playerGod = null;
+		if (playerName == null || god == null || !Constants.GODS_GOD_NAMES.contains(god)) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.GODS) {
+			throw new WrongPhaseException();
+		} else {
+			boolean godFound = false;
+			for (GodCard card : godCards) {
+				if (card.getName().equals(god)) {
+					godFound = true;
+					playerGod = card;
+				}
+			}
+
+			if (godFound) {
+				throw new IllegalArgumentException();
+			}
+		}
 		setPlayerGodCalled = true;
 	}
-	public void setGameGods(List<String> godNames) {
+	public void setGameGods(List<String> godNames) throws IllegalArgumentException, WrongPhaseException {
+		if (godNames == null || godNames.size() != players.size()) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
+			throw new WrongPhaseException();
+		} else {
+			for (String godName : godNames) {
+				if (!Constants.GODS_GOD_NAMES.contains(godName)) {
+					throw new IllegalArgumentException();
+				}
+			}
+		}
 		setGameGodsCalled = true;
 	}
-	public void setStarter(String starterName) {
+	public void setStarter(String starterName) throws IllegalStateException, WrongPhaseException {
+		Player starter = null;
+		if (starterName == null) {
+			throw new IllegalStateException();
+		} else if (turn.getPhase() != Phase.GODS || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE)) {
+			throw new WrongPhaseException();
+		} else {
+			boolean found = false;
+			for (int i = 0; i < players.size() && !found; i++) {
+				if (players.get(i).getPlayerName().equals(starterName)) {
+					found = true;
+					starter = players.get(i);
+				}
+			}
+			if (!found) {
+				throw new IllegalStateException();
+			}
+		}
 		setStarterCalled = true;
 	}
-	public void setWorkerPositions(String playerName, Pair<Integer,Integer> worker1, Pair<Integer,Integer> worker2) {
+	public void setWorkerPositions(NetGameSetup req) throws IllegalArgumentException, WrongPhaseException {
+		if (req == null || !req.isWellFormed()) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.SETUP) {
+			throw new WrongPhaseException();
+		} else if (map.getCell(req.worker1.getFirst(),req.worker1.getSecond()).getWorker() != null || map.getCell(req.worker2.getFirst(),req.worker2.getSecond()).getWorker() != null) {
+			throw new IllegalArgumentException();
+		}
 		setWorkerPositionsCalled = true;
 	}
 
@@ -152,7 +228,7 @@ public class GameStub extends Game {
 		applyBuildCalled = false;
 		applyWinCalled = false;
 		applyDefeatCalled = false;
-		setOrderCalled = false;
+		setOrderCalledCorrectly = false;
 		setPlayerColorCalled = false;
 		setGameGodsCalled = false;
 		setPlayerGodCalled = false;
@@ -180,6 +256,25 @@ public class GameStub extends Game {
 	public void setActivePlayer(String player) {
 		activePlayer = getPlayerByName(player);
 	}
+	public void setAColor() {
+		for (int i = 0; i < players.size(); i++) {
+			try {
+				players.get(i).getWorker1();
+			} catch (IllegalStateException e) {
+				players.get(i).setPlayerColor(Constants.COLOR_COLORS.get(i));
+			}
+		}
+	}
+	public void setAGod() {
+		for (int i = 0; i < players.size(); i++) {
+			try {
+				players.get(i).getCard();
+			} catch (IllegalStateException e) {
+				godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
+				players.get(i).setGodCard(godCards.get(godCards.size()-1));
+			}
+		}
+	}
 	public boolean isApplyMoveCalled() {
 		return applyMoveCalled;
 	}
@@ -192,8 +287,8 @@ public class GameStub extends Game {
 	public boolean isApplyDefeatCalled() {
 		return applyDefeatCalled;
 	}
-	public boolean isSetOrderCalled() {
-		return setOrderCalled;
+	public boolean isSetOrderCalledCorrectly() {
+		return setOrderCalledCorrectly;
 	}
 	public boolean isSetPlayerColorCalled() {
 		return setPlayerColorCalled;

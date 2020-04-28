@@ -19,10 +19,35 @@ public class DefeatManagerTest {
 
 	@Before
 	public void setVariables() {
-		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
+		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"},true,true);
 		defeatController = new DefeatManager(gameStub);
 		gameMap = gameStub.getMap();
 		gamePlayer1 = gameStub.getPlayerByName("Aldo");
+	}
+
+	@Test (expected = NullPointerException.class)
+	public void movefirstNull() {
+		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		List<Move> list1 = new ArrayList<>();
+		List<Move> list2 = new ArrayList<>();
+		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
+		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
+
+		defeatController.moveDefeat(null,list2);
+		assertTrue(gameStub.isApplyDefeatCalled());
+	}
+
+	@Test (expected = NullPointerException.class)
+	public void movesecondNull() {
+		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		List<Move> list1 = new ArrayList<>();
+		List<Move> list2 = new ArrayList<>();
+		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
+		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
+
+		gameStub.resetCounters();
+		defeatController.moveDefeat(list1,null);
+		assertTrue(gameStub.isApplyDefeatCalled());
 	}
 
 	@Test
@@ -33,24 +58,6 @@ public class DefeatManagerTest {
 		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
 
-		defeatController.moveDefeat(null,null);
-		assertTrue(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
-		defeatController.moveDefeat(null,list2);
-		assertTrue(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
-		list2.add(move2);
-		defeatController.moveDefeat(null,list2);
-		assertFalse(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
-		defeatController.moveDefeat(list1,null);
-		assertTrue(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
-		list2.clear();
 		defeatController.moveDefeat(list1,list2);
 		assertTrue(gameStub.isApplyDefeatCalled());
 
@@ -62,10 +69,6 @@ public class DefeatManagerTest {
 		gameStub.resetCounters();
 		list1.add(move1);
 		list2.clear();
-		defeatController.moveDefeat(list1,null);
-		assertFalse(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
 		defeatController.moveDefeat(list1,list2);
 		assertFalse(gameStub.isApplyDefeatCalled());
 
@@ -87,14 +90,12 @@ public class DefeatManagerTest {
 
 		defeatController.moveDefeat(list1,list2);
 		assertFalse(gameStub.isApplyDefeatCalled());
+	}
 
-		gameStub.resetCounters();
-		defeatController.moveDefeat(list1,null);
-		assertFalse(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
-		defeatController.moveDefeat(null,list2);
-		assertFalse(gameStub.isApplyDefeatCalled());
+	@Test (expected = NullPointerException.class)
+	public void buildNullValue() {
+		defeatController.buildDefeat(null);
+		assertTrue(gameStub.isApplyDefeatCalled());
 	}
 
 	@Test
@@ -103,10 +104,6 @@ public class DefeatManagerTest {
 		List<Build> list = new ArrayList<>();
 		Build build = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
 
-		defeatController.buildDefeat(null);
-		assertTrue(gameStub.isApplyDefeatCalled());
-
-		gameStub.resetCounters();
 		defeatController.buildDefeat(list);
 		assertTrue(gameStub.isApplyDefeatCalled());
 

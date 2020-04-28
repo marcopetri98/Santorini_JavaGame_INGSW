@@ -23,7 +23,7 @@ public class VictoryManagerTest {
 
 	@Before
 	public void setVariables() {
-		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"});
+		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"},true,true);
 		victoryController = new VictoryManager(gameStub);
 		gameMap = gameStub.getMap();
 		gamePlayer1 = gameStub.getPlayerByName("Aldo");
@@ -37,7 +37,7 @@ public class VictoryManagerTest {
 		Building nextCellBuilding = after.building;
 		List<Move> list = new ArrayList<>();
 		Move move1 = new Move(TypeMove.SIMPLE_MOVE,before,after,gamePlayer1.getWorker1());
-		Move move2 = new Move(TypeMove.FORBIDDEN_MOVE,before,after,gamePlayer1.getWorker1());
+		list.add(move1);
 
 		// set accessible the increment method for this building object and the height of the arrive to 3 and the before height to 2
 		gameStub.resetCounters();
@@ -50,15 +50,6 @@ public class VictoryManagerTest {
 		method.invoke(after.building);
 
 		victoryController.checkVictory(before,after,list);
-		assertTrue(gameStub.isApplyWinCalled());
-
-		gameStub.resetCounters();
-		list.clear();
-		victoryController.checkVictory(before,after,list);
-		assertTrue(gameStub.isApplyWinCalled());
-
-		gameStub.resetCounters();
-		victoryController.checkVictory(before,after,null);
 		assertTrue(gameStub.isApplyWinCalled());
 	}
 
@@ -80,8 +71,34 @@ public class VictoryManagerTest {
 		assertTrue(gameStub.isApplyWinCalled());
 	}
 
-	@Test
-	public void checkNotVictoryStandard() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+	@Test (expected = NullPointerException.class)
+	public void firstNull() {
+		after = gameMap.getCell(0,1);
+		Building nextCellBuilding = after.building;
+		List<Move> list = new ArrayList<>();
+		Move move1 = new Move(TypeMove.SIMPLE_MOVE,before,after,gamePlayer1.getWorker1());
+		Move move2 = new Move(TypeMove.FORBIDDEN_MOVE,before,after,gamePlayer1.getWorker1());
+
+		// it not throws exceptions ==> it can have a null parameter
+		victoryController.checkVictory(null,after,list);
+		assertFalse(gameStub.isApplyWinCalled());
+	}
+
+	@Test (expected = NullPointerException.class)
+	public void secondNull() {
+		after = gameMap.getCell(0,1);
+		Building nextCellBuilding = after.building;
+		List<Move> list = new ArrayList<>();
+		Move move1 = new Move(TypeMove.SIMPLE_MOVE,before,after,gamePlayer1.getWorker1());
+		Move move2 = new Move(TypeMove.FORBIDDEN_MOVE,before,after,gamePlayer1.getWorker1());
+
+		// it not throws exceptions ==> it can have a null parameter
+		victoryController.checkVictory(before,null,list);
+		assertFalse(gameStub.isApplyWinCalled());
+	}
+
+	@Test (expected = NullPointerException.class)
+	public void thirdNull() {
 		after = gameMap.getCell(0,1);
 		Building nextCellBuilding = after.building;
 		List<Move> list = new ArrayList<>();
@@ -91,14 +108,15 @@ public class VictoryManagerTest {
 		// it not throws exceptions ==> it can have a null parameter
 		victoryController.checkVictory(before,after,null);
 		assertFalse(gameStub.isApplyWinCalled());
+	}
 
-		// it not throws exceptions ==> it can have a null parameter
-		victoryController.checkVictory(before,null,list);
-		assertFalse(gameStub.isApplyWinCalled());
-
-		// it not throws exceptions ==> it can have a null parameter
-		victoryController.checkVictory(null,after,list);
-		assertFalse(gameStub.isApplyWinCalled());
+	@Test
+	public void checkNotVictoryStandard() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		after = gameMap.getCell(0,1);
+		Building nextCellBuilding = after.building;
+		List<Move> list = new ArrayList<>();
+		Move move1 = new Move(TypeMove.SIMPLE_MOVE,before,after,gamePlayer1.getWorker1());
+		Move move2 = new Move(TypeMove.FORBIDDEN_MOVE,before,after,gamePlayer1.getWorker1());
 
 		// same high == no victory
 		victoryController.checkVictory(before,after,list);

@@ -5,6 +5,7 @@ import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.Player;
 import it.polimi.ingsw.core.state.GodsPhase;
+import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
 import it.polimi.ingsw.network.objects.NetDivinityChoice;
 import it.polimi.ingsw.network.objects.NetGameSetup;
@@ -64,11 +65,15 @@ public class SetupManager {
 	 * @throws WrongPhaseException
 	 */
 	public void changeColor(NetColorPreparation playerColors) throws BadRequestException, WrongPhaseException {
-		List<Color> chosenColors = observedModel.getPlayers().stream().map((player) -> player.getWorker1().color).collect(Collectors.toList());
-		if (chosenColors.contains(playerColors.color)) {
+		List<Color> chosenColors = observedModel.getPlayers().stream().filter((player) -> {try { player.getWorker1(); return true; } catch (IllegalStateException e) { return false; }}).map((player) -> player.getWorker1().color).collect(Collectors.toList());
+		if (chosenColors.contains(playerColors.color) || !observedModel.getPlayerTurn().getPlayerName().equals(playerColors.player) || !playerColors.message.equals(Constants.COLOR_IN_CHOICE) || !observedModel.getPlayers().contains(observedModel.getPlayerByName(playerColors.player)) || !Constants.COLOR_COLORS.contains(playerColors.color)) {
 			throw new BadRequestException();
 		} else {
-			observedModel.setPlayerColor(playerColors.player,playerColors.color);
+			try {
+				observedModel.setPlayerColor(playerColors.player,playerColors.color);
+			} catch (WrongPhaseException | IllegalArgumentException e) {
+				throw new BadRequestException();
+			}
 		}
 	}
 	/**
@@ -79,6 +84,15 @@ public class SetupManager {
 	 * @throws WrongPhaseException
 	 */
 	public boolean handleGodMessage(NetDivinityChoice request) throws BadRequestException, WrongPhaseException {
+		if (request == null || observedModel.getPhase().getPhase() != Phase.GODS) {
+			throw new BadRequestException();
+		} else {
+			try {
+				observedModel.getPlayerByName(request.player);
+			} catch (IllegalArgumentException e) {
+				throw new BadRequestException();
+			}
+		}
 		if (Constants.GODS_IN_GAME_GODS.equals(request.message)) {
 			// if the player is the challenger it changes the gods for this game
 			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.player) || observedModel.getPhase().getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
@@ -121,10 +135,16 @@ public class SetupManager {
 	public void positionWorkers(NetGameSetup positions) throws BadRequestException {
 		Map gameMap = observedModel.getMap();
 		// if there aren't workers in that position it set the workers in that position
-		if (gameMap.getCell(positions.worker1.getFirst(),positions.worker1.getSecond()).getWorker() != null || gameMap.getCell(positions.worker2.getFirst(),positions.worker2.getSecond()).getWorker() != null) {
+		if (!positions.isWellFormed() || !observedModel.getPlayerTurn().equals(observedModel.getPlayerByName(positions.player))) {
+			throw new BadRequestException();
+		} else if (gameMap.getCell(positions.worker1.getFirst(),positions.worker1.getSecond()).getWorker() != null || gameMap.getCell(positions.worker2.getFirst(),positions.worker2.getSecond()).getWorker() != null || positions.worker1.equals(positions.worker2)) {
 			throw new BadRequestException();
 		} else {
-			observedModel.setWorkerPositions(positions.player,positions.worker1,positions.worker2);
+			try {
+				observedModel.setWorkerPositions(positions);
+			} catch (IllegalArgumentException | WrongPhaseException e) {
+				throw new BadRequestException();
+			}
 		}
 	}
 }

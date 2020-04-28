@@ -6,6 +6,7 @@ import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.network.objects.NetGameSetup;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.util.observers.ObservableGame;
@@ -295,7 +296,7 @@ public class Game extends ObservableGame {
 				}
 			}
 
-			if (!godFound) {
+			if (godFound) {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -371,15 +372,19 @@ public class Game extends ObservableGame {
 		activePlayer = starter;
 		notifyActivePlayer(starterName);
 	}
-	public synchronized void setWorkerPositions(String playerName, Pair<Integer,Integer> worker1, Pair<Integer,Integer> worker2) throws NullPointerException {
-		if (worker1 == null || worker2 == null) {
-			throw new NullPointerException();
+	public synchronized void setWorkerPositions(NetGameSetup req) throws IllegalArgumentException, WrongPhaseException {
+		if (req == null || !req.isWellFormed()) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.SETUP) {
+			throw new WrongPhaseException();
+		} else if (map.getCell(req.worker1.getFirst(),req.worker1.getSecond()).getWorker() != null || map.getCell(req.worker2.getFirst(),req.worker2.getSecond()).getWorker() != null) {
+			throw new IllegalArgumentException();
 		}
 
 		boolean finished = true;
-		Player player = getPlayerByName(playerName);
-		player.getWorker1().setPos(map.getCell(worker1.getFirst(),worker1.getSecond()));
-		player.getWorker2().setPos(map.getCell(worker1.getFirst(),worker1.getSecond()));
+		Player player = getPlayerByName(req.player);
+		player.getWorker1().setPos(map.getCell(req.worker1.getFirst(),req.worker1.getSecond()));
+		player.getWorker2().setPos(map.getCell(req.worker2.getFirst(),req.worker2.getSecond()));
 		for (int i = 0; i < players.size() && finished; i++) {
 			if (players.get(i).getWorker1().getPos() == null) {
 				finished = false;
