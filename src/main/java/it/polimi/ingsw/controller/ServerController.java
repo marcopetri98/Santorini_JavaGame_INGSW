@@ -118,11 +118,64 @@ public class ServerController implements ObserverController {
 		}
 		return false;
 	}
-	private void moveDefeat(Player player) {
-
+	private boolean moveDefeat(Player player) {
+		List<Move> worker1Moves = new ArrayList<>();
+		List<Move> worker2Moves = new ArrayList<>();
+		worker1Moves.addAll(generateWorkerMoves(player,1));
+		worker2Moves.addAll(generateWorkerMoves(player,2));
+		return defeatController.moveDefeat(worker1Moves,worker2Moves);
 	}
-	private void buildDefeat(Player player) {
-
+	private boolean buildDefeat() {
+		Player buildingPlayer = observedModel.getPlayerTurn();
+		Worker activeWorker = buildingPlayer.getActiveWorker();
+		Turn nextTurn = observedModel.getPhase();
+		nextTurn.advance();
+		List<Build> builds = new ArrayList<>();
+		try {
+			builds.addAll(buildingPlayer.getCard().checkBuild(observedModel.getMap(),activeWorker,nextTurn));
+		} catch (NoBuildException e) {
+			builds.addAll(generateStandardBuilds(activeWorker));
+		}
+		return defeatController.buildDefeat(builds);
+	}
+	/**
+	 * This function returns possible moves of a worker only if it is the phase move part of the turn, if not it doesn't return
+	 * @param player
+	 * @param worker
+	 * @return
+	 * @throws NoMoveException
+	 */
+	private List<Move> generateWorkerMoves(Player player, int worker) {
+		List<Move> moves = new ArrayList<>();
+		Turn activeTurn = observedModel.getPhase();
+		if (worker == 1) {
+			try {
+				moves.addAll(player.getCard().checkMove(observedModel.getMap(),player.getWorker1(),observedModel.getPhase()));
+			} catch (NoMoveException e) {
+				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
+					moves.addAll(generateStandardMoves(player.getWorker1()));
+				}
+			}
+		} else {
+			try {
+				moves.addAll(player.getCard().checkMove(observedModel.getMap(), player.getWorker2(), observedModel.getPhase()));
+			} catch (NoMoveException e) {
+				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
+					moves.addAll(generateStandardMoves(player.getWorker2()));
+				}
+			}
+		}
+		for (Player otherPlayer : observedModel.getPlayers()) {
+			if (otherPlayer != observedModel.getPlayerTurn() && otherPlayer.getCard().getTypeGod() == TypeGod.OTHER_TURN_GOD && activeTurn.getGamePhase() == GamePhase.MOVE) {
+				try {
+					moves.addAll(otherPlayer.getCard().checkMove(observedModel.getMap(),player.getWorker1(),activeTurn));
+					moves.addAll(otherPlayer.getCard().checkMove(observedModel.getMap(),player.getWorker2(),activeTurn));
+				} catch (NoMoveException e) {
+					throw new AssertionError("Controller called a check move on a god that isn't an other turn god for moves");
+				}
+			}
+		}
+		return moves;
 	}
 
 	// OVERRIDDEN METHODS FROM THE OBSERVER
@@ -153,9 +206,8 @@ public class ServerController implements ObserverController {
 			caller.communicateError();
 		} else {
 			try {
-				if (!setupController.handleGodMessage(playerGods)) {
-					observedModel.changeTurn();
-				}
+				setupController.handleGodMessage(playerGods);
+				observedModel.changeTurn();
 			} catch (WrongPhaseException | BadRequestException e) {
 				caller.communicateError();
 			}
@@ -177,6 +229,11 @@ public class ServerController implements ObserverController {
 			}
 		}
 	}
+	/**
+	 * This function is called when a player can move and want to perform a certain move, if it can't move this function will never be called
+	 * @param observed
+	 * @param moveMessage
+	 */
 	@Override
 	public synchronized void updateMove(ObservableObject observed, NetPlayerTurn moveMessage) {
 		// it controls if the player which sent the request is in its turn and can choose a color
@@ -190,6 +247,7 @@ public class ServerController implements ObserverController {
 			Worker selectedWorker;
 			Turn turn = observedModel.getPhase();
 			List<GodCard> playersCards = observedModel.getPlayers().stream().filter((player) -> { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map((player) -> player.getCard()).collect(Collectors.toList());
+			boolean hasMoves = false;
 
 			if (moveMessage.move.workerID == movingPlayer.getPlayerID()+1) {
 				selectedWorker = movingPlayer.getWorker1();
@@ -197,7 +255,7 @@ public class ServerController implements ObserverController {
 				selectedWorker = movingPlayer.getWorker2();
 			}
 			for (GodCard card : playersCards) {
-				if (card.getTypeGod() == TypeGod.OTHER_TURN_GOD) {
+				if (card.getOwner() != movingPlayer && card.getTypeGod() == TypeGod.OTHER_TURN_GOD && turn.getGamePhase() == GamePhase.MOVE) {
 					try {
 						possibleMoves.addAll(card.checkMove(observedModel.getMap(),selectedWorker,turn));
 					} catch (NoMoveException e) {
@@ -208,37 +266,39 @@ public class ServerController implements ObserverController {
 
 			try {
 				possibleMoves.addAll(movingPlayer.getCard().checkMove(observedModel.getMap(),selectedWorker,turn));
+				hasMoves = true;
 			} catch (NoMoveException e) {
 				// if it is the move phase and none of the gods change the standard way of moving it will be called the standard method
 				if (turn.getGamePhase() == GamePhase.MOVE) {
-					if (possibleMoves.size() == 0) {
-						possibleMoves = generateStandardMoves(selectedWorker);
-					}
+					possibleMoves.addAll(generateStandardMoves(selectedWorker));
+					hasMoves = true;
 				} else {
 					// it can't move and it isn't in the move phase
-					if (possibleMoves.size() == 0) {
-						observedModel.changeTurn();
-					}
+					caller.communicateError();
 				}
-			} finally {
-				if (possibleMoves.size() != 0) {
-					if (movingPlayer.isWorkerLocked()) {
-						if (movingPlayer.getActiveWorker().workerID == moveMessage.move.workerID) {
-							if (!moveController.move(moveMessage.move, possibleMoves)) {
-								caller.communicateError();
-							} else {
-								victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
-								observedModel.changeTurn();
-							}
-						} else {
-							caller.communicateError();
-						}
-					} else {
+			}
+
+			if (hasMoves) {
+				if (movingPlayer.isWorkerLocked()) {
+					if (movingPlayer.getActiveWorker().workerID == moveMessage.move.workerID) {
 						if (!moveController.move(moveMessage.move, possibleMoves)) {
 							caller.communicateError();
 						} else {
 							victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
-							movingPlayer.chooseWorker(moveMessage.move.workerID-movingPlayer.getPlayerID());
+							if (!buildDefeat()) {
+								observedModel.changeTurn();
+							}
+						}
+					} else {
+						caller.communicateError();
+					}
+				} else {
+					if (!moveController.move(moveMessage.move, possibleMoves)) {
+						caller.communicateError();
+					} else {
+						victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
+						observedModel.applyWorkerLock(movingPlayer,selectedWorker.workerID-movingPlayer.getPlayerID());
+						if (!buildDefeat()) {
 							observedModel.changeTurn();
 						}
 					}
@@ -246,6 +306,11 @@ public class ServerController implements ObserverController {
 			}
 		}
 	}
+	/**
+	 * This method is called when a client send a build command to the server, if so it is possible for it to build somewhere, if not it is a loser and this function will never be called.
+	 * @param observed
+	 * @param buildMessage
+	 */
 	@Override
 	public synchronized void updateBuild(ObservableObject observed, NetPlayerTurn buildMessage) {
 		// it controls if the player which sent the request is in its turn and can choose a color
@@ -273,27 +338,29 @@ public class ServerController implements ObserverController {
 					possibleBuilds = generateStandardBuilds(selectedWorker);
 				} else {
 					// it can't move and it isn't in the move phase
-					observedModel.changeTurn();
+					caller.communicateError();
 				}
-			} finally {
-				if (possibleBuilds.size() != 0) {
-					if (buildingPlayer.isWorkerLocked()) {
-						if (buildingPlayer.getActiveWorker().workerID == buildMessage.move.workerID) {
-							if (!buildController.build(buildMessage.build, possibleBuilds)) {
-								caller.communicateError();
-							} else {
-								observedModel.changeTurn();
-							}
-						} else {
-							caller.communicateError();
-						}
-					} else {
+			}
+
+			if (possibleBuilds.size() != 0) {
+				if (buildingPlayer.isWorkerLocked()) {
+					if (buildingPlayer.getActiveWorker().workerID == buildMessage.move.workerID) {
+						// the phase is the building phase, for this reason i need to check if
+						defeatController.buildDefeat(possibleBuilds);
 						if (!buildController.build(buildMessage.build, possibleBuilds)) {
 							caller.communicateError();
 						} else {
-							buildingPlayer.chooseWorker(buildMessage.move.workerID-buildingPlayer.getPlayerID());
 							observedModel.changeTurn();
 						}
+					} else {
+						caller.communicateError();
+					}
+				} else {
+					if (!buildController.build(buildMessage.build, possibleBuilds)) {
+						caller.communicateError();
+					} else {
+						observedModel.applyWorkerLock(buildingPlayer,selectedWorker.workerID-buildingPlayer.getPlayerID());
+						observedModel.changeTurn();
 					}
 				}
 			}
@@ -311,17 +378,45 @@ public class ServerController implements ObserverController {
 		}
 	}
 
-	// TODO: is that necessary?
-	@Override
-	public Turn givePhase() {
-		return null;
-	}
 	@Override
 	public NetAvailablePositions giveAvailablePositions() {
-		return null;
+		NetAvailablePositions possibleMoves;
+		List<Move> generatedMoves;
+
+		generatedMoves = generateWorkerMoves(observedModel.getPlayerTurn(),1);
+		generatedMoves.addAll(generateWorkerMoves(observedModel.getPlayerTurn(),2));
+		generatedMoves = DefeatManager.filterMoves(generatedMoves);
+		possibleMoves = new NetAvailablePositions(generatedMoves);
+		if (generatedMoves.size() == 0) {
+			throw new AssertionError("The function has been called by the remote view when the player cannot move and has loose");
+		}
+		return possibleMoves;
 	}
 	@Override
 	public NetAvailableBuildings giveAvailableBuildings() {
-		return null;
+		NetAvailableBuildings possibleBuilds;
+		List<Build> builds = new ArrayList<>();
+
+		if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
+			try {
+				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getWorker1(),observedModel.getPhase()));
+				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getWorker2(),observedModel.getPhase()));
+				possibleBuilds = new NetAvailableBuildings(builds);
+			} catch (NoBuildException e) {
+				possibleBuilds = null;
+				observedModel.changeTurn();
+			}
+		} else {
+			try {
+				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getActiveWorker(),observedModel.getPhase()));
+			} catch (NoBuildException e) {
+				builds.addAll(generateStandardBuilds(observedModel.getPlayerTurn().getActiveWorker()));
+			}
+			possibleBuilds = new NetAvailableBuildings(builds);
+		}
+		if (builds.size() == 0) {
+			throw new AssertionError("The function has been called by the remote view when the player cannot build because has loose");
+		}
+		return possibleBuilds;
 	}
 }

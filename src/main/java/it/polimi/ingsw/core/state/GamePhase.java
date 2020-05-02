@@ -1,7 +1,7 @@
 package it.polimi.ingsw.core.state;
 
 public enum GamePhase {
-	BEFOREMOVE, MOVE, BEFOREBUILD, BUILD, END;
+	BEFOREMOVE, MOVE, BUILD;
 
 	public GamePhase advance(GamePhase ph) throws IllegalStateException {
 		switch (ph) {
@@ -9,13 +9,7 @@ public enum GamePhase {
 				return MOVE;
 
 			case MOVE:
-				return BEFOREBUILD;
-
-			case BEFOREBUILD:
 				return BUILD;
-
-			case BUILD:
-				return END;
 
 			default:
 				return BEFOREMOVE;

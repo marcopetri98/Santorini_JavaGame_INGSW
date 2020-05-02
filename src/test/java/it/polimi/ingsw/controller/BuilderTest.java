@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -18,6 +20,22 @@ public class BuilderTest {
 	private Map gameMap;
 	private Player gamePlayer1;
 
+	// support methods
+	private void setWorkerPosition(int w, int x, int y) {
+		try {
+			Method setPos = Worker.class.getDeclaredMethod("setPos", Cell.class);
+			setPos.setAccessible(true);
+			if (w == 1) {
+				setPos.invoke(gamePlayer1.getWorker1(),gameMap.getCell(x, y));
+			} else {
+				setPos.invoke(gamePlayer1.getWorker2(),gameMap.getCell(x, y));
+			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
+		}
+	}
+
+	// testing methods
 	@Before
 	public void setVariables() {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"},true,true);
@@ -28,7 +46,7 @@ public class BuilderTest {
 
 	@Test
 	public void correctBuild() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Build build1 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
 		Build build2 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(0,1), false, TypeBuild.SIMPLE_BUILD);
 		NetBuild netBuild1 = new NetBuild(build1);
@@ -42,7 +60,7 @@ public class BuilderTest {
 
 	@Test (expected = NullPointerException.class)
 	public void firstNull() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Build build1 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
 		Build build2 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(0,1), false, TypeBuild.SIMPLE_BUILD);
 		List<Build> constructionPossibilities = new ArrayList<>();
@@ -55,7 +73,7 @@ public class BuilderTest {
 
 	@Test (expected = NullPointerException.class)
 	public void secondNull() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Build build1 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
 		NetBuild netBuild1 = new NetBuild(build1);
 
@@ -71,7 +89,7 @@ public class BuilderTest {
 
 	@Test
 	public void incorrectBuild() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Build build1 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(1,1), false, TypeBuild.SIMPLE_BUILD);
 		Build build2 = new Build(gamePlayer1.getWorker1(),gameMap.getCell(0,1), false, TypeBuild.SIMPLE_BUILD);
 		Build incorrectBuild = new Build(gamePlayer1.getWorker1(),gameMap.getCell(2,2), false, TypeBuild.SIMPLE_BUILD);

@@ -27,6 +27,23 @@ public class Worker extends Observable {
 		hasBuilt = false;
 	}
 
+	//SETTERS OF POSITION [Implements the observable object specifically for Athena]
+	void setPos(Cell c){
+		if (this.position != null) {
+			previousPositions.add(this.position);
+		}
+		Cell[] positions = new Cell[2];
+		positions[0] = this.position;   //Old position
+		positions[1] = c;               //New position
+		this.position = c;
+		setChanged();
+		notifyObservers(positions);
+	}   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
+	void setLastBuildPos(Cell c){
+		hasBuilt = true;
+		this.lastBuild = c;
+	}
+
 	//GETTERS OF POSITION
 	public boolean itHasBuilt() {
 		return hasBuilt;
@@ -39,23 +56,6 @@ public class Worker extends Observable {
 	}
 	public Cell getLastBuildPos(){
 		return this.lastBuild;
-	}
-
-	//SETTERS OF POSITION [Implements the observable object specifically for Athena]
-	public void setPos(Cell c){
-		if (this.position != null) {
-			previousPositions.add(this.position);
-		}
-		Cell[] positions = new Cell[2];
-		positions[0] = this.position;   //Old position
-		positions[1] = c;               //New position
-		this.position = c;
-		setChanged();
-		notifyObservers(positions);
-	}   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
-	public void setLastBuildPos(Cell c){
-		hasBuilt = true;
-		this.lastBuild = c;
 	}
 
 	// OVERRIDDEN METHODS

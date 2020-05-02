@@ -18,11 +18,13 @@ public class DefeatStub extends DefeatManager {
 	}
 
 	// stub methods
-	public void moveDefeat(List<Move> worker1_possible_moves, List<Move> worker2_possible_moves) {
+	public boolean moveDefeat(List<Move> worker1_possible_moves, List<Move> worker2_possible_moves) {
 		moveDefeatCalled = true;
+		return true;
 	}
-	public void buildDefeat(List<Build> worker_possible_builds) {
+	public boolean buildDefeat(List<Build> worker_possible_builds) {
 		buildDefeatCalled = true;
+		return true;
 	}
 
 	// check if called

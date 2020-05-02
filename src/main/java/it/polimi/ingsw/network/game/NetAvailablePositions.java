@@ -20,4 +20,10 @@ public class NetAvailablePositions implements Serializable {
 			moves.add(new NetMove(m));
 		}
 	}
+
+	public void appendMoves(List<Move> movesList) {
+		for (Move m : movesList) {
+			moves.add(new NetMove(m));
+		}
+	}
 }

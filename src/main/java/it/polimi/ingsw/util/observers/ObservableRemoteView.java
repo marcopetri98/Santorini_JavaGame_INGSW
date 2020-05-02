@@ -56,9 +56,10 @@ public class ObservableRemoteView extends ObservableObject {
 		ctrObs.updateBuild(this,netMap);
 	}
 
-	public Turn askPhase() {
+	// TODO: maybe askPhase isn't necessary
+	/*public Turn askPhase() {
 		return ctrObs.givePhase();
-	}
+	}*/
 	public NetAvailablePositions askPositions() {
 		return ctrObs.giveAvailablePositions();
 	}

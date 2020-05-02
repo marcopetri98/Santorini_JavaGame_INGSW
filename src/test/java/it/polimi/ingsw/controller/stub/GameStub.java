@@ -1,6 +1,7 @@
 package it.polimi.ingsw.controller.stub;
 
 import it.polimi.ingsw.core.*;
+import it.polimi.ingsw.core.gods.Apollo;
 import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.gods.GodCardFactory;
 import it.polimi.ingsw.core.state.GamePhase;
@@ -14,6 +15,8 @@ import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 import javax.print.DocFlavor;
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,15 +56,23 @@ public class GameStub extends Game {
 		map = new Map();
 		defeatedPlayers = new ArrayList<>();
 		turn = new Turn();
-		for (int i = 0; i < names.length; i++) {
-			players.add(new Player(names[i]));
-			if (setColors) {
-				players.get(i).setPlayerColor(Constants.COLOR_COLORS.get(i));
+		try {
+			Method playerColor = Player.class.getDeclaredMethod("setPlayerColor", Color.class);
+			playerColor.setAccessible(true);
+			Method playerGod = Player.class.getDeclaredMethod("setGodCard", GodCard.class);
+			playerGod.setAccessible(true);
+			for (int i = 0; i < names.length; i++) {
+				players.add(new Player(names[i]));
+				if (setColors) {
+					playerColor.invoke(players.get(i), Constants.COLOR_COLORS.get(i));
+				}
+				if (setGods) {
+					godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
+					playerGod.invoke(players.get(i),godCards.get(i));
+				}
 			}
-			if (setGods) {
-				godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
-				players.get(i).setGodCard(godCards.get(i));
-			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
 		}
 	}
 
@@ -257,22 +268,34 @@ public class GameStub extends Game {
 		activePlayer = getPlayerByName(player);
 	}
 	public void setAColor() {
-		for (int i = 0; i < players.size(); i++) {
-			try {
-				players.get(i).getWorker1();
-			} catch (IllegalStateException e) {
-				players.get(i).setPlayerColor(Constants.COLOR_COLORS.get(i));
+		try {
+			Method playerColor = Player.class.getDeclaredMethod("setPlayerColor", Color.class);
+			playerColor.setAccessible(true);
+			for (int i = 0; i < players.size(); i++) {
+				try {
+					players.get(i).getWorker1();
+				} catch (IllegalStateException e) {
+					playerColor.invoke(players.get(i), Constants.COLOR_COLORS.get(i));
+				}
 			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
 		}
 	}
 	public void setAGod() {
-		for (int i = 0; i < players.size(); i++) {
-			try {
-				players.get(i).getCard();
-			} catch (IllegalStateException e) {
-				godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
-				players.get(i).setGodCard(godCards.get(godCards.size()-1));
+		try {
+			Method playerGod = Player.class.getDeclaredMethod("setGodCard", GodCard.class);
+			playerGod.setAccessible(true);
+			for (int i = 0; i < players.size(); i++) {
+				try {
+					players.get(i).getCard();
+				} catch (IllegalStateException e) {
+					godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
+					playerGod.invoke(players.get(i),godCards.get(godCards.size()-1));
+				}
 			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
 		}
 	}
 	public boolean isApplyMoveCalled() {

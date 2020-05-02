@@ -46,7 +46,7 @@ public class Move {
 	public boolean equals(Object obj){
 		if(obj instanceof Move){
 			Move m = (Move) obj;
-			if(this.typeMove == m.getType() && this.prev == m.getCellPrev() && this.next == m.getCellNext() && this.worker == m.getWorker() && ((this.other == null && this.other == m.getOther()) || (this.other != null && m.getOther() != null && this.other.equals(m.getOther())))) {
+			if (this.typeMove == m.getType() && this.prev == m.getCellPrev() && this.next == m.getCellNext() && this.worker == m.getWorker() && ((this.other == null && this.other == m.getOther()) || (this.other != null && m.getOther() != null && this.other.equals(m.getOther())))) {
 				return true;
 			} else {
 				return false;

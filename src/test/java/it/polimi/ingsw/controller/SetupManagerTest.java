@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.stub.GameStub;
 import it.polimi.ingsw.core.Cell;
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.Player;
+import it.polimi.ingsw.core.Worker;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
@@ -19,6 +20,8 @@ import org.junit.Test;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
 
@@ -221,7 +224,13 @@ public class SetupManagerTest {
 	public void positionWorkersOnOtherWorker() throws BadRequestException {
 		setVariablesChoice(true,true);
 		gameStub.setPhase(Phase.SETUP);
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(1,1));
+		try {
+			Method setPos = Worker.class.getDeclaredMethod("setPos", Cell.class);
+			setPos.setAccessible(true);
+			setPos.invoke(gamePlayer1.getWorker1(),gameMap.getCell(1, 1));
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
+		}
 		NetGameSetup message = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Giovanni",new Pair<Integer, Integer>(1,1),new Pair<Integer, Integer>(2,2));
 
 		setupController.positionWorkers(message);

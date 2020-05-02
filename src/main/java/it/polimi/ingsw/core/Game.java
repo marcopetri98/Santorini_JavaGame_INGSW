@@ -28,7 +28,6 @@ public class Game extends ObservableGame {
 	private final List<Player> defeatedPlayers;
 	private Player winner;
 
-	// constructors
 	public Game(String[] names) {
 		players = new ArrayList<>();
 		godCards = new ArrayList<>();
@@ -41,7 +40,15 @@ public class Game extends ObservableGame {
 		winner = null;
 	}
 
-	// setters and methods which changes the state of the game
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *		MODIFIERS FOR THE GAME USED				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	public synchronized void applyMove(Move move) {
 		//TODO: check if the model is completely updated
 		move.prev.setWorker(null);
@@ -71,7 +78,7 @@ public class Game extends ObservableGame {
 	 * @param player is the winner
 	 */
 	public synchronized void applyWin(Player player) {
-		winner = player.clone();
+		winner = player;
 		notifyWinner(player.playerName);
 	}
 	/**
@@ -79,7 +86,6 @@ public class Game extends ObservableGame {
 	 * @param player is the looser
 	 */
 	public synchronized void applyDefeat(Player player) {
-		//TODO: check if applywin is correctly called
 		this.players.remove(player);
 		defeatedPlayers.add(player);
 		if(this.players.size() == 1){
@@ -93,31 +99,35 @@ public class Game extends ObservableGame {
 	}
 	public synchronized void applyDisconnection(String playerName) {
 	}
-	public synchronized void moveWorker(Worker w, Cell c){
-		w.getPos().setWorker(null);
-		w.setPos(c);
-		c.setWorker(w);
+	public synchronized void applyWorkerLock(Player player, int worker) throws IllegalArgumentException {
+		if (player == null || !players.contains(player) || (worker != 1 && worker != 2)) {
+			throw new IllegalArgumentException();
+		}
+		player.chooseWorker(worker);
 	}
+	/**
+	 * This function handles the advancing of the turn, it means that it checks if it is needed only to advance the subphase (for god setup: challenger choice, gods choice and starter choice, for game turn: before move (which is also the start of the turn), move, before build, build, end turn) of the current phase or if is needed also to change the active player.
+	 */
 	public synchronized void changeTurn() {  //active Player become the next one
-		if (turn.getPhase() == Phase.COLORS && players.indexOf(activePlayer) != players.size()-1) {
-			changeActivePlayer();
-			turn.advance();
-		} else if ((turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE) || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.GODS_CHOICE && players.indexOf(activePlayer) == 0) || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE)) {
-			if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE) {
-				changeActivePlayer();
-			} else if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE) {
-				notifyActivePlayer(activePlayer.getPlayerName());
+		if (turn.getPhase() == Phase.COLORS) {
+			if (players.indexOf(activePlayer) != players.size()-1) {
+				turn.advance();
 			}
-			turn.advance();
+			changeActivePlayer();
+		} else if (turn.getPhase() == Phase.GODS) {
+			if (turn.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE || (turn.getGodsPhase() == GodsPhase.GODS_CHOICE && players.indexOf(activePlayer) == 0) || (turn.getGodsPhase() == GodsPhase.STARTER_CHOICE)) {
+				turn.advance();
+			}
+			if (turn.getGodsPhase() != GodsPhase.STARTER_CHOICE) {
+				changeActivePlayer();
+			}
 		} else if (turn.getPhase() == Phase.SETUP) {
 			if (players.indexOf(activePlayer) == players.size()-1) {
-				changeActivePlayer();
 				turn.advance();
-			} else {
-				changeActivePlayer();
 			}
+			changeActivePlayer();
 		} else {
-			if (turn.getGamePhase() == GamePhase.END) {
+			if (turn.getGamePhase() == GamePhase.BUILD) {
 				activePlayer.resetLocking();
 				changeActivePlayer();
 			}
@@ -128,7 +138,7 @@ public class Game extends ObservableGame {
 	/**
 	 * This function is called whenever there is a change of game phase
 	 */
-	public synchronized void changeActivePlayer() {
+	private synchronized void changeActivePlayer() {
 		if (players.size() == 2) {
 			if (players.indexOf(activePlayer) == 0) {
 				activePlayer = players.get(1);
@@ -144,43 +154,18 @@ public class Game extends ObservableGame {
 		}
 		notifyActivePlayer(activePlayer.getPlayerName());
 	}
-	/**
-	 * This function is called during the starter selection in god selection phase
-	 * @param playerName
-	 * @throws IllegalArgumentException
-	 * @throws WrongPhaseException
-	 */
-	public synchronized void changeActivePlayer(String playerName) throws IllegalArgumentException, WrongPhaseException {
-		boolean found = false;
-		if (playerName == null) {
-			throw new IllegalArgumentException();
-		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE) {
-			throw new WrongPhaseException();
-		}
 
-		// it searches the player and change the active player for the turn
-		for (int i = 0; i < players.size() && !found; i++) {
-			if (players.get(i).getPlayerName().equals(playerName)) {
-				activePlayer = players.get(i);
-				found = true;
-			}
-		}
-		// the player doesn't exist and it throws an exception
-		if (!found) {
-			throw new IllegalArgumentException();
-		} else {
-			notifyGods(playerName);
-		}
-	}
-
-	// getters and other functions which doesn't change the structure of the object
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *		GETTERS FOR THE GAME USED				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	public synchronized Map getMap() {
-		// creates a copy of the player's list
-		List<Player> tempPlayers = getPlayers();
 		return map;
-	}
-	public synchronized int getPlayerNum() {
-		return players.size();
 	}
 	public synchronized Player getPlayerByName(String name) throws IllegalArgumentException {
 		for (Player p : players) {
@@ -191,26 +176,24 @@ public class Game extends ObservableGame {
 		throw new IllegalArgumentException();
 	}
 	public synchronized List<Player> getPlayers() {
-		return new ArrayList<>(players);
+		return players;
 	}
 	public synchronized Player getPlayerTurn() {
 		return activePlayer;
 	}
-
-	// support method
-	private Worker findWorker(int id) throws IllegalArgumentException {
-		for (Player player : players) {
-			if (player.getPlayerID()-1 == id) {
-				return player.getWorker1();
-			} else if (player.getPlayerID()-2 == id) {
-				return player.getWorker2();
-			}
-		}
-		throw new IllegalArgumentException();
+	public synchronized Player getWinner() {
+		return winner;
 	}
 
-	// METHODS USED AT THE BEGINNING OF THE GAME
-	// SETTERS USED ON THE BEGINNING
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 * METHODS USED AT THE BEGINNING OF THE GAME	*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	/**
 	 * This method receives a list of player's names and set the order sorting the players arrayList
 	 * @param playerOrder is the ordered list of players turn sequence
@@ -296,7 +279,7 @@ public class Game extends ObservableGame {
 				}
 			}
 
-			if (godFound) {
+			if (!godFound) {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -310,11 +293,13 @@ public class Game extends ObservableGame {
 			}
 		}
 		// if present it sets the godCard, if not it throws the exception
-		if (i == players.size()) {
+		if (!found) {
 			throw new IllegalArgumentException();
 		}
 
-		players.get(i).setGodCard(playerGod);
+		GodCard newGod = GodCardFactory.createGodCard(playerGod.getName());
+		godCards.set(godCards.indexOf(playerGod),newGod);
+		players.get(i).setGodCard(newGod);
 		HashMap<String,GodCard> godsInfo = new HashMap<>();
 		for (Player player : players) {
 			godsInfo.put(player.getPlayerName(),player.getCard());
@@ -340,6 +325,12 @@ public class Game extends ObservableGame {
 		}
 		notifyGods(godCards);
 	}
+	/**
+	 * It sets the starting player positioning it on the first position of the arrayList
+	 * @param starterName
+	 * @throws IllegalStateException
+	 * @throws WrongPhaseException
+	 */
 	public synchronized void setStarter(String starterName) throws IllegalStateException, WrongPhaseException {
 		Player starter = null;
 		if (starterName == null) {
@@ -369,7 +360,7 @@ public class Game extends ObservableGame {
 			}
 			players = temp;
 		}
-		activePlayer = starter;
+		activePlayer = players.get(0);
 		notifyActivePlayer(starterName);
 	}
 	public synchronized void setWorkerPositions(NetGameSetup req) throws IllegalArgumentException, WrongPhaseException {
@@ -394,37 +385,6 @@ public class Game extends ObservableGame {
 	}
 
 	// GETTERS USED ON THE BEGINNING
-	public synchronized Color getPlayerColor(String player) throws IllegalArgumentException, IllegalStateException {
-		if (player == null) {
-			throw new IllegalArgumentException();
-		}
-		int i;
-		boolean found = false;
-		for (i = 0; i < players.size() && !found; i++) {
-			if (players.get(i).getPlayerName().equals(player)) {
-				found = true;
-			}
-		}
-		if (i == players.size()) {
-			throw new IllegalArgumentException();
-		} else {
-			return players.get(i).getWorker1().color;
-		}
-	}
-	public synchronized GodCard getPlayerGodCard(String player) throws IllegalArgumentException, IllegalStateException  {
-		int i;
-		boolean found = false;
-		for (i = 0; i < players.size() && !found; i++) {
-			if (players.get(i).getPlayerName().equals(player)) {
-				found = true;
-			}
-		}
-		if (i == players.size()) {
-			throw new IllegalArgumentException();
-		} else {
-			return players.get(i).getCard();
-		}
-	}
 	public synchronized Turn getPhase() {
 		return turn.clone();
 	}

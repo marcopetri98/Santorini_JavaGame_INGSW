@@ -15,7 +15,8 @@ public interface ObserverController extends ObserverObject {
 	void updateMove(ObservableObject observed, NetPlayerTurn netMap);
 	void updateBuild(ObservableObject observed, NetPlayerTurn netMap);
 
-	Turn givePhase();
+	// TODO: maybe givePhase isn't necessary
+	//Turn givePhase();
 	NetAvailablePositions giveAvailablePositions();
 	NetAvailableBuildings giveAvailableBuildings();
 }

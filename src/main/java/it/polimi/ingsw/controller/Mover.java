@@ -40,6 +40,7 @@ public class Mover {
 		return false;
 	}
 
+	// TODO: maybe necessary to be used?
 	private List<Move> filterMoves(List<Move> possibilities) {
 		List<Move> newList = new ArrayList<>(possibilities);
 		for (int i = 0; i < possibilities.size(); i++) {

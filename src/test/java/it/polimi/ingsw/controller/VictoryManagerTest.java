@@ -21,13 +21,29 @@ public class VictoryManagerTest {
 	private Cell before;
 	private Cell after;
 
+	// support methods
+	private void setWorkerPosition(int w, int x, int y) {
+		try {
+			Method setPos = Worker.class.getDeclaredMethod("setPos", Cell.class);
+			setPos.setAccessible(true);
+			if (w == 1) {
+				setPos.invoke(gamePlayer1.getWorker1(),gameMap.getCell(x, y));
+			} else {
+				setPos.invoke(gamePlayer1.getWorker2(),gameMap.getCell(x, y));
+			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
+		}
+	}
+
+	// testing methods
 	@Before
 	public void setVariables() {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"},true,true);
 		victoryController = new VictoryManager(gameStub);
 		gameMap = gameStub.getMap();
 		gamePlayer1 = gameStub.getPlayerByName("Aldo");
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		before = gameMap.getCell(0,0);
 	}
 

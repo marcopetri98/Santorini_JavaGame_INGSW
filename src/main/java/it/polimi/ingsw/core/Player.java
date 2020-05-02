@@ -27,8 +27,7 @@ public class Player {
 	}
 
 	// STATE CHANGER METHODS
-	// TODO: delete the choose worker method
-	public void chooseWorker(int chosen) throws IllegalArgumentException {
+	void chooseWorker(int chosen) throws IllegalArgumentException {
 		if (chosen == 1) {
 			this.activeWorker = worker1;
 			workerLocked = true;
@@ -39,14 +38,18 @@ public class Player {
 			throw new IllegalArgumentException();
 		}
 	}
-	public void setGodCard(GodCard card1) {  //Ties the observable and the observer together TODO: check the parameters and the behavior of the method
+	void setGodCard(GodCard card1) throws NullPointerException {
+		if (card1 == null) {
+			throw new NullPointerException();
+		}
+
 		card = card1;
 		if(card1 instanceof Athena){
 			worker1.addObserver((Athena) card);
 			worker2.addObserver((Athena) card);
 		}
 	}
-	public void setPlayerColor(Color color) {
+	void setPlayerColor(Color color) {
 		worker1 = new Worker(color,this,1);
 		worker2 = new Worker(color,this,2);
 	}

@@ -20,6 +20,22 @@ public class MoverTest {
 	private Map gameMap;
 	private Player gamePlayer1;
 
+	//support methods
+	private void setWorkerPosition(int w, int x, int y) {
+		try {
+			Method setPos = Worker.class.getDeclaredMethod("setPos", Cell.class);
+			setPos.setAccessible(true);
+			if (w == 1) {
+				setPos.invoke(gamePlayer1.getWorker1(),gameMap.getCell(x, y));
+			} else {
+				setPos.invoke(gamePlayer1.getWorker2(),gameMap.getCell(x, y));
+			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
+		}
+	}
+
+	// testing methods
 	@Before
 	public void setVariables() {
 		gameStub = new GameStub(new String[]{"Aldo", "Giovanni", "Giacomo"},true,true);
@@ -30,7 +46,7 @@ public class MoverTest {
 
 	@Test
 	public void correctMove() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
 		NetMove netMove = new NetMove(move1);
@@ -44,7 +60,7 @@ public class MoverTest {
 
 	@Test (expected = NullPointerException.class)
 	public void firstNull() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
 		List<Move> movePossibilities = new ArrayList<>();
@@ -57,7 +73,7 @@ public class MoverTest {
 
 	@Test (expected = NullPointerException.class)
 	public void secondNull() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		NetMove netMove = new NetMove(move1);
 
@@ -73,7 +89,7 @@ public class MoverTest {
 
 	@Test
 	public void notPresentMove() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
 		Move move3 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,1), gamePlayer1.getWorker1());
@@ -88,7 +104,7 @@ public class MoverTest {
 
 	@Test
 	public void forbiddenMove() {
-		gamePlayer1.getWorker1().setPos(gameMap.getCell(0,0));
+		setWorkerPosition(1,0,0);
 		Move move1 = new Move(TypeMove.FORBIDDEN_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		Move move2 = new Move(TypeMove.FORBIDDEN_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
 		NetMove netMove = new NetMove(move2);
@@ -102,7 +118,7 @@ public class MoverTest {
 
 	@Test
 	public void filterMoves() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		/*Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
+		Move move1 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(0,1), gamePlayer1.getWorker1());
 		Move move2 = new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(0,0), gameMap.getCell(1,0), gamePlayer1.getWorker1());
 		Move move3 = new Move(TypeMove.FORBIDDEN_MOVE, gameMap.getCell(0,0), gameMap.getCell(2,2), gamePlayer1.getWorker1());
 		Move move4 = new Move(TypeMove.VICTORY_MOVE, gameMap.getCell(0,0), gameMap.getCell(2,2), gamePlayer1.getWorker1());
@@ -111,10 +127,9 @@ public class MoverTest {
 		movePossibilities.add(move2);
 		movePossibilities.add(move3);
 		movePossibilities.add(move4);
-		// TODO: ask to the tutor how to test that PRIVATE METHOD! PRIVATE!!!!!!!!!!
-		Method method = mover.getClass().getDeclaredMethod("filterMoves",movePossibilities.getClass());
+		Method method = Mover.class.getDeclaredMethod("filterMoves",List.class);
 		method.setAccessible(true);
 		List<Move> returnList = (List<Move>) method.invoke(mover,movePossibilities);
-		assertTrue(movePossibilities.containsAll(returnList));*/
+		assertTrue(movePossibilities.containsAll(returnList));
 	}
 }

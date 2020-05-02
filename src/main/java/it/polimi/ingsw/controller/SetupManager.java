@@ -83,7 +83,7 @@ public class SetupManager {
 	 * @throws BadRequestException
 	 * @throws WrongPhaseException
 	 */
-	public boolean handleGodMessage(NetDivinityChoice request) throws BadRequestException, WrongPhaseException {
+	public void handleGodMessage(NetDivinityChoice request) throws BadRequestException, WrongPhaseException {
 		if (request == null || observedModel.getPhase().getPhase() != Phase.GODS) {
 			throw new BadRequestException();
 		} else {
@@ -123,9 +123,7 @@ public class SetupManager {
 					throw new BadRequestException();
 				}
 			}
-			return true;
 		}
-		return false;
 	}
 	/**
 	 *
