@@ -120,4 +120,9 @@ public class ObservableGame extends ObservableObject {
 			obs.updateActivePlayer(this,player);
 		}
 	}
+	public void notifyEndForDisconnection() {
+		for (ObserverRemoteView obs : rvObs) {
+			obs.updateGameFinished(this);
+		}
+	}
 }

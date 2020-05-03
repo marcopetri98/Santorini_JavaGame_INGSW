@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.game;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.Build;
+import it.polimi.ingsw.util.Constants;
 
 import java.io.Serializable;
 
@@ -56,6 +57,18 @@ public class NetBuild implements Serializable {
 			other = null;
 		} else {
 			other = new NetBuild(build.getOther());
+		}
+	}
+
+	public boolean isWellFormed() {
+		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID > 0 && level >= 1 && level <= 3) {
+			if (other != null) {
+				return other.isWellFormed();
+			} else {
+				return true;
+			}
+		} else {
+			return false;
 		}
 	}
 }

@@ -10,7 +10,6 @@ import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 import java.io.*;
 import java.net.Socket;
 
-// TODO: add the possibility to be an observer
 /**
  * This class is the base class for Server and client communication, it receives client input and send to the client server output regarding to the match the client's playing.
  */
@@ -108,21 +107,12 @@ public class ServerClientListenerThread extends Thread {
 						}
 						break;
 
-					case PLAYERTURN:
+					default:
 						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetPlayerTurn)) {
+						if (!(ingoingObject instanceof NetGaming)) {
 							sendGeneralError();
 						} else {
-							parseTurnInput((NetPlayerTurn)ingoingObject);
-						}
-						break;
-
-					case OTHERTURN:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetOtherTurn)) {
-							sendGeneralError();
-						} else {
-							parseOtherTurn((NetOtherTurn)ingoingObject);
+							parseGamingInput((NetGaming)ingoingObject);
 						}
 						break;
 				}
@@ -130,7 +120,15 @@ public class ServerClientListenerThread extends Thread {
 		}
 	}
 
-	// USER INPUT PARSING FUNCTIONS
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *			INPUT PARSING FUNCTIONS				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	/**
 	 * This function parses the input that arrives from the client before being inside a lobby, it calls methods on the server to add the player on a lobby, if there isn't a lobby it catches the FirstPlayerException and asks to the player the number of player that the game should have because he is the first and should create a lobby.
 	 * @param setupMessage the message sent by the client
@@ -144,7 +142,7 @@ public class ServerClientListenerThread extends Thread {
 		try {
 			name = setupMessage.getPlayer();
 			// if the player wants to participate to a lobby and it has inserted a name it process it
-			if (setupMessage.message.equals(Constants.SETUP_PARTICIPATE) && name != null) {
+			if (setupMessage.message.equals(Constants.SETUP_IN_PARTICIPATE) && name != null) {
 				serverResponse = lobbyServer.addPlayer(setupMessage.getPlayer(),this);
 				// it sends an error to the client because there is a player with such name
 				if (serverResponse == 0) {
@@ -161,7 +159,7 @@ public class ServerClientListenerThread extends Thread {
 					setPlayerName(name);
 				}
 			// if the player is trying to setup the number of player inside the lobby it controls that is can do that
-			} else if (setupMessage.message.equals(Constants.SETUP_SETUPNUM)) {
+			} else if (setupMessage.message.equals(Constants.SETUP_IN_SETUPNUM)) {
 				// it controls that the player can set the number of players
 				if (lobbyServer.getToBeCreated() && lobbyServer.getClientPosition(this) == 0) {
 					// it controls that the number is valid
@@ -270,45 +268,62 @@ public class ServerClientListenerThread extends Thread {
 			sendMessage(gameSetupMessage);
 		}
 	}
-	private void parseTurnInput(NetPlayerTurn playerTurnMessage) {
-		NetPlayerTurn playerTurnOutput;
+	private void parseGamingInput(NetGaming gamingMsg) {
+		NetGaming playerTurnOutput;
+		NetworkPhase currentPhase = getGamePhase();
 
-		if (playerTurnMessage.message.equals(Constants.PLAYER_IN_MOVE) && playerTurnMessage.player.equals(playerName)) {
-			if (playerTurnMessage.move != null && playerTurnMessage.move.cellX >= 0 && playerTurnMessage.move.cellX <= Constants.MAP_SIDE && playerTurnMessage.move.cellY >= 0 && playerTurnMessage.move.cellY <= Constants.MAP_SIDE) {
-				gameServer.handleMoveRequest(playerTurnMessage,false);
+		if (currentPhase == NetworkPhase.PLAYERTURN) {
+			if (gamingMsg.message.equals(Constants.PLAYER_IN_MOVE) && gamingMsg.player.equals(playerName)) {
+				if (gamingMsg.move != null && gamingMsg.build.isWellFormed()) {
+					gameServer.handleMoveRequest(gamingMsg, false);
+				} else {
+					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);
+					sendMessage(gamingMsg);
+				}
+			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_BUILD) && gamingMsg.player.equals(playerName)) {
+				if (gamingMsg.build != null && gamingMsg.build.isWellFormed()) {
+					gameServer.handleBuildRequest(gamingMsg, false);
+				} else {
+					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);
+					sendMessage(gamingMsg);
+				}
+			} else if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {
+				// it disconnects the user from the lobby
+				disconnect();
 			} else {
-				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);
-				sendMessage(playerTurnMessage);
+				gamingMsg = new NetGaming(Constants.PLAYER_ERROR);
+				sendMessage(gamingMsg);
 			}
-		} else if (playerTurnMessage.message.equals(Constants.PLAYER_IN_BUILD) && playerTurnMessage.player.equals(playerName)) {
-			if (playerTurnMessage.build != null && playerTurnMessage.build.cellX >= 0 && playerTurnMessage.build.cellX <= Constants.MAP_SIDE && playerTurnMessage.build.cellY >= 0 && playerTurnMessage.build.cellY <= Constants.MAP_SIDE) {
-				gameServer.handleBuildRequest(playerTurnMessage,false);
+		} else if (currentPhase == NetworkPhase.OTHERTURN) {
+			if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {
+				// it disconnects the user from the lobby
+				disconnect();
 			} else {
-				playerTurnMessage = new NetPlayerTurn(Constants.PLAYER_ERROR);
-				sendMessage(playerTurnMessage);
+				gamingMsg = new NetGaming(Constants.OTHERS_ERROR);
+				sendMessage(gamingMsg);
 			}
-		} else if (playerTurnMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
-			// it disconnects the user from the lobby
-			disconnect();
 		} else {
-			playerTurnMessage = new NetPlayerTurn(Constants.GENERAL_ERROR);
-			sendMessage(playerTurnMessage);
+			// the player is an observer and can only observe the game or disconnect
+			if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {
+				// it disconnects the user from the lobby
+				gameServer.handleObserverQuit();
+				closeSocketAndTerminate();
+			} else {
+				gamingMsg = new NetGaming(Constants.GENERAL_ERROR);
+				sendMessage(gamingMsg);
+			}
 		}
 	}
-	private void parseOtherTurn(NetOtherTurn otherTurnMessage) {
-		NetOtherTurn othersOutput;
 
-		if (otherTurnMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
-			// it disconnects the user from the lobby
-			disconnect();
-		} else {
-			// user sent a wrong message
-			othersOutput = new NetOtherTurn(Constants.OTHERS_ERROR);
-			sendMessage(othersOutput);
-		}
-	}
-
-	// CLASS SETTERS AND SUPPORT METHODS
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *	MODIFIERS OF THE SERVER LISTENER THREAD		*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	private void setPlayerName(String name) {
 		synchronized (playerNameLock) {
 			playerName = name;
@@ -346,8 +361,24 @@ public class ServerClientListenerThread extends Thread {
 		NetObject object = new NetObject(Constants.GENERAL_ERROR);
 		sendMessage(object);
 	}
+	public void closeSocketAndTerminate() {
+		try {
+			clientSocket.close();
+			setActive(false);
+		} catch (IOException e2) {
+			setActive(false);
+		}
+	}
 
-	// GETTERS FOR THIS CLASS
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *			GETTERS FOR THIS CLASS				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	public NetworkPhase getGamePhase() {
 		synchronized (stateLock) {
 			return gamePhase;
@@ -359,12 +390,21 @@ public class ServerClientListenerThread extends Thread {
 		}
 	}
 
-	// METHODS CALLED ON THE REMOTE VIEW
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *			UPDATERS OF THE REMOTE VIEW			*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	/**
 	 * This method calls the remote view method that notifies the gaming controller that the player has disconnected
 	 */
 	public void notifyDisconnection() {
 		gameServer.notifyQuit(playerName);
+		gameServer.removeAllObservers();
 	}
 
 	// METHODS CALLED THAT CHANGES THE STATE OF THE LISTENER THREAD
@@ -376,12 +416,7 @@ public class ServerClientListenerThread extends Thread {
 		NetObject sendError = new NetObject(Constants.GENERAL_FATAL_ERROR);
 		sendMessage(sendError);
 		disconnect();
-		try {
-			clientSocket.close();
-			setActive(false);
-		} catch (IOException e) {
-			setActive(false);
-		}
+		closeSocketAndTerminate();
 		throw new AssertionError("A fatal error occurred and these are the info about it: "+info);
 	}
 	/**
@@ -391,9 +426,7 @@ public class ServerClientListenerThread extends Thread {
 		if (gamePhase == NetworkPhase.LOBBY) {
 			try {
 				lobbyServer.removePlayer(playerName,this);
-				clientSocket.close();
-				setActive(false);
-				setActive(false);
+				closeSocketAndTerminate();
 			} catch (AlreadyStartedException e) {
 				// if the user has disconnected during the game creation it waits for the game creation and notifies that to the gaming server
 				synchronized (scopeLock) {
@@ -405,24 +438,12 @@ public class ServerClientListenerThread extends Thread {
 						}
 					}
 					notifyDisconnection();
-					try {
-						clientSocket.close();
-						setActive(false);
-					} catch (IOException e2) {
-						setActive(false);
-					}
+					closeSocketAndTerminate();
 				}
-			} catch (IOException e) {
-				setActive(false);
 			}
 		} else {
 			notifyDisconnection();
-			try {
-				clientSocket.close();
-				setActive(false);
-			} catch (IOException e2) {
-				setActive(false);
-			}
+			closeSocketAndTerminate();
 		}
 	}
 }

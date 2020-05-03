@@ -59,7 +59,7 @@ public class ClientCLI implements Runnable {
 
 		receivedInput = new Scanner(serverSocket.getInputStream());
 		sendOutput = new PrintWriter(serverSocket.getOutputStream());
-		sendOutput.println(Constants.SETUP_PARTICIPATE +" "+numPlayer+" "+nickname);
+		sendOutput.println(Constants.SETUP_IN_PARTICIPATE +" "+numPlayer+" "+nickname);
 		sendOutput.flush();
 		mainMenu.handleConnection(1);
 

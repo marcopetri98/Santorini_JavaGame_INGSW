@@ -4,6 +4,8 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
+import it.polimi.ingsw.core.state.GodsPhase;
+import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.game.NetMap;
 import it.polimi.ingsw.network.objects.*;
@@ -19,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-// TODO: insert the possibility to observe the match when you lost and the other two players are playing [MEANING TO ADD THE NETOBSERVER OBJECT AND HANDLE EVENTS]
 /**
  * This class is the class which receives input from client's view and forward these commands to the controller, after the controller changed something (on the model) this class is notified cause it observes the model and it notifies its observers. It is observed by the controller, this means that when it receives a valid message from the client it notifies the controller 'cause something is changed (also if none of its attributes is changed, it's changed the status) and it will do what it is programmed to.
  */
@@ -40,9 +41,24 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 * This function is called from the controller when user send a well formed request he cannot send for some reason: it isn't its turn or he cannot because of game state
 	 */
 	public void communicateError() {
-
+		switch (clientHandler.getGamePhase()) {
+			case COLORS -> clientHandler.sendMessage(new NetColorPreparation(Constants.COLOR_ERROR));
+			case GODS -> clientHandler.sendMessage(new NetDivinityChoice(Constants.GODS_ERROR));
+			case SETUP -> clientHandler.sendMessage(new NetGameSetup(Constants.GAMESETUP_ERROR));
+			case PLAYERTURN -> clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
+			case OTHERTURN -> clientHandler.sendMessage(new NetGaming(Constants.OTHERS_ERROR));
+		}
 	}
 
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *	METHODS CALLED TO HANDLE CLIENT REQUESTS	*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
 	/**
 	 * It receiver a well formed request of color, meaning that the color is one of the three available colors, the remote view cannot know if the color is already owned by another player or not, for this reason notifies the ServerController. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
@@ -85,11 +101,11 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 * @param req represent the message sent by the client
 	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handleMoveRequest(NetPlayerTurn req, boolean error) {
+	public void handleMoveRequest(NetGaming req, boolean error) {
 		if (!error) {
 			notifyMove(req);
 		} else {
-			clientHandler.sendMessage(new NetPlayerTurn(Constants.PLAYER_ERROR));
+			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
 		}
 	}
 	/**
@@ -97,25 +113,38 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 * @param req represent the message sent by the client
 	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
-	public void handleBuildRequest(NetPlayerTurn req, boolean error) {
+	public void handleBuildRequest(NetGaming req, boolean error) {
 		if (!error) {
 			notifyBuild(req);
 		} else {
-			clientHandler.sendMessage(new NetPlayerTurn(Constants.PLAYER_ERROR));
+			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
+		}
+	}
+	public void handleObserverQuit() {
+		if (clientHandler.getGamePhase() != NetworkPhase.OBSERVER) {
+			notifyObserverQuit();
+			removeAllObservers();
+		} else {
+			throw new AssertionError("It has been called by the ClientListenerThread the quit of an observer in a different phase from the observing");
 		}
 	}
 
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *	UPDATE OF THE GAME TO SEND TO THE CLIENT	*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	// METHODS USED TO INFORM THE CONTROLLER ABOUT A REQUEST OF THE CLIENT
 	@Override
 	public synchronized void updateDefeat(ObservableGame observed, String playerDefeated) {
 		if (observed == null || playerDefeated == null) {
 			clientHandler.fatalError("");
 		} else {
-			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
-				NetPlayerTurn yourMessage = new NetPlayerTurn(Constants.GENERAL_DEFEATED, playerDefeated);
-			} else if (clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {
-				NetOtherTurn otherMessage = new NetOtherTurn(Constants.GENERAL_DEFEATED, playerDefeated);
-			}
+			NetGaming yourMessage = new NetGaming(Constants.GENERAL_DEFEATED, playerDefeated);
 			playersNum--;
 
 			if (clientHandler.getPlayerName().equals(playerDefeated)) {
@@ -128,11 +157,10 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		if (observed == null || playerWinner == null) {
 			clientHandler.fatalError("");
 		} else {
-			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
-				NetPlayerTurn yourMessage = new NetPlayerTurn(Constants.GENERAL_WINNER, playerWinner);
-			} else if (clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {
-				NetOtherTurn otherMessage = new NetOtherTurn(Constants.GENERAL_WINNER, playerWinner);
-			}
+			clientHandler.setGamePhase(NetworkPhase.END);
+			NetGaming yourMessage = new NetGaming(Constants.GENERAL_WINNER, playerWinner);
+			clientHandler.closeSocketAndTerminate();
+			observed.removeObserver(this);
 		}
 	}
 	/**
@@ -191,21 +219,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 				}
 			}
 			clientHandler.sendMessage(colorMessage);
-
-			Game caller = (Game) observed;
-			NetDivinityChoice divinityChoice = null;
-			// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
-			if (playerColors.size() == playersNum) {
-				clientHandler.setGamePhase(NetworkPhase.GODS);
-				if (caller.getPlayerTurn().getPlayerName().equals(clientHandler.getPlayerName())) {
-					// the player is the challenger and it is informed about that
-					divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER);
-				} else {
-					// the player isn't the challenger and it is informed about that
-					divinityChoice = new NetDivinityChoice(Constants.GODS_OTHER);
-				}
-			}
-			clientHandler.sendMessage(divinityChoice);
 		}
 	}
 	/**
@@ -223,15 +236,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 				godsNames.add(card.getName());
 			}
 			NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_GODS,godsNames);
-			clientHandler.sendMessage(godsMessage);
-
-			Game caller = (Game) observed;
-			// if the player is the first in clockwise order from the challenger it says to it to select a godCard
-			if (caller.getPlayers().get(1).getPlayerName().equals(clientHandler.getPlayerName())) {
-				godsMessage = new NetDivinityChoice(Constants.GODS_YOU);
-			} else {
-				godsMessage = new NetDivinityChoice(Constants.GODS_OTHER);
-			}
 			clientHandler.sendMessage(godsMessage);
 		}
 	}
@@ -257,17 +261,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 				}
 			}
 			clientHandler.sendMessage(godsMessage);
-
-			Game caller = (Game) observed;
-			// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
-			if (godsInfo.size() == playersNum) {
-				NetDivinityChoice divinityChoice = null;
-				if (caller.getPlayerTurn().getPlayerName().equals(clientHandler.getPlayerName())) {
-					// the player is the challenger and it is informed about that
-					divinityChoice = new NetDivinityChoice(Constants.GODS_CHOOSE_STARTER);
-				}
-				clientHandler.sendMessage(divinityChoice);
-			}
 		}
 	}
 	/**
@@ -285,6 +278,12 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			clientHandler.setGamePhase(NetworkPhase.SETUP);
 		}
 	}
+	/**
+	 *
+	 * @param observed
+	 * @param gameMap
+	 * @param finished
+	 */
 	@Override
 	public synchronized void updatePositions(ObservableGame observed, Map gameMap, boolean finished) {
 		if (observed == null || gameMap == null) {
@@ -292,56 +291,99 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		} else {
 			NetGameSetup gameSetupMessage = new NetGameSetup(Constants.GENERAL_GAMEMAP_UPDATE,new NetMap(gameMap));
 			clientHandler.sendMessage(gameSetupMessage);
-
-			if (finished) {
-				if (((Game)observed).getPlayerTurn().getPlayerName().equals(clientHandler.getPlayerName())) {
-					clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
-				} else {
-					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
-				}
-			}
 		}
 	}
+	/**
+	 *
+	 * @param observed
+	 * @param netMap
+	 */
 	@Override
 	public synchronized void updateMove(ObservableObject observed, Map netMap) {
 		if (observed == null || netMap != null) {
 			clientHandler.fatalError("It is called the move update with wrong or null parameters");
 		} else {
-			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
-				NetPlayerTurn yourMessage = new NetPlayerTurn(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
-			} else if (clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {
-				NetOtherTurn otherMessage = new NetOtherTurn(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
-			}
+			NetGaming yourMessage = new NetGaming(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
 		}
 	}
+	/**
+	 *
+	 * @param observed
+	 * @param netMap
+	 */
 	@Override
 	public synchronized void updateBuild(ObservableObject observed, Map netMap) {
 		if (observed == null || netMap != null) {
 			clientHandler.fatalError("It is called the move update with wrong or null parameters");
 		} else {
-			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
-				NetPlayerTurn yourMessage = new NetPlayerTurn(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
-			} else if (clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {
-				NetOtherTurn otherMessage = new NetOtherTurn(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
-			}
+			NetGaming yourMessage = new NetGaming(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
 		}
 	}
+	/**
+	 *
+	 * @param observed
+	 * @param playerName
+	 */
 	@Override
 	public synchronized void updateQuit(ObservableObject observed, String playerName) {
 		if (observed == null || playerName == null) {
 			clientHandler.fatalError("It is called the quit of a player with a null parameter");
 		} else {
-			if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
-				NetPlayerTurn yourMessage = new NetPlayerTurn(Constants.GENERAL_PLAYER_DISCONNECTED, playerName);
-			} else if (clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {
-				NetOtherTurn otherMessage = new NetOtherTurn(Constants.GENERAL_PLAYER_DISCONNECTED, playerName);
-			}
+			NetGaming yourMessage = new NetGaming(Constants.GENERAL_PLAYER_DISCONNECTED, playerName);
 			playersNum--;
 		}
 	}
+	/**
+	 *
+	 * @param observed
+	 * @param turn
+	 */
 	@Override
 	public void updatePhaseChange(ObservableGame observed, Turn turn) {
+		if (observed == null || turn == null) {
+			clientHandler.fatalError("It has been called the update phase with wrong parameters");
+		} else {
+			switch (clientHandler.getGamePhase()) {
+				case COLORS -> {
+					clientHandler.setGamePhase(NetworkPhase.GODS);
+					clientHandler.sendMessage(new NetColorPreparation(Constants.GENERAL_PHASE_UPDATE));
 
+					Game caller = (Game) observed;
+					NetDivinityChoice divinityChoice = null;
+					if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+						// the player is the challenger and it is informed about that
+						divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER);
+					} else {
+						// the player isn't the challenger and it is informed about that
+						divinityChoice = new NetDivinityChoice(Constants.GODS_OTHER);
+					}
+					clientHandler.sendMessage(divinityChoice);
+				}
+				case GODS ->  {
+					Game caller = (Game) observed;
+					// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
+					if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE) {
+						NetDivinityChoice divinityChoice = null;
+						if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+							// the player is the challenger and it is informed about that
+							divinityChoice = new NetDivinityChoice(Constants.GODS_CHOOSE_STARTER);
+						}
+						clientHandler.sendMessage(divinityChoice);
+					} else if (turn.getPhase() == Phase.SETUP) {
+						clientHandler.setGamePhase(NetworkPhase.SETUP);
+						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE));
+					}
+				}
+				case SETUP ->  {
+					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
+					clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_PHASE_UPDATE));
+				}
+				case PLAYERTURN ->  {
+					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
+					clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));
+				}
+			}
+		}
 	}
 
 	/**
@@ -372,15 +414,54 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 						clientHandler.fatalError("It became the player's turn and the handler thinks it is the same as before");
 					}
 					case OTHERTURN -> {
-						NetOtherTurn otherPlayersTurn = new NetOtherTurn(Constants.OTHERS_FINISHED);
+						NetGaming otherPlayersTurn = new NetGaming(Constants.OTHERS_TURN);
 						clientHandler.sendMessage(otherPlayersTurn);
 					}
 				}
 			} else {
 				if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
 					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
+				} else {
+					switch (clientHandler.getGamePhase()) {
+						case COLORS -> {
+							NetColorPreparation colorPhase = new NetColorPreparation(Constants.OTHERS_TURN);
+							clientHandler.sendMessage(colorPhase);
+						}
+						case GODS -> {
+							NetDivinityChoice godsPhase = new NetDivinityChoice(Constants.OTHERS_TURN);
+							clientHandler.sendMessage(godsPhase);
+						}
+						case SETUP -> {
+							NetGameSetup setupPhase = new NetGameSetup(Constants.OTHERS_TURN);
+							clientHandler.sendMessage(setupPhase);
+						}
+						default -> {
+							NetGaming otherPlayersTurn = new NetGaming(Constants.OTHERS_TURN);
+							clientHandler.sendMessage(otherPlayersTurn);
+						}
+					}
 				}
 			}
+		}
+	}
+	/**
+	 * This methods get the information that the game finished because someone disconnected during the setup
+	 * @param observed observable game that called this method
+	 */
+	@Override
+	public void updateGameFinished(ObservableGame observed) {
+		if (observed == null || clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN || clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {
+			throw new AssertionError("The update method has been called with a null parameter or not during the setup");
+		} else {
+			switch (clientHandler.getGamePhase()) {
+				case LOBBY -> clientHandler.sendMessage(new NetLobbyPreparation(Constants.GENERAL_SETUP_DISCONNECT));
+				case COLORS -> clientHandler.sendMessage(new NetColorPreparation(Constants.GENERAL_SETUP_DISCONNECT));
+				case GODS -> clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_SETUP_DISCONNECT));
+				case SETUP -> clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_SETUP_DISCONNECT));
+			}
+			clientHandler.closeSocketAndTerminate();
+			observed.removeObserver(this);
+			removeAllObservers();
 		}
 	}
 }

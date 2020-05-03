@@ -56,7 +56,6 @@ public class NetGameSetup extends NetObject {
 			if (worker1 != null || worker2 != null) {
 				return false;
 			} else {
-				// TODO: is the netMap well formed?
 				return true;
 			}
 		}

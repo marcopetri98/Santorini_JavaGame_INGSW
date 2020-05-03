@@ -1,12 +1,11 @@
 package it.polimi.ingsw.util.observers;
 
-import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.game.NetAvailableBuildings;
 import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
 import it.polimi.ingsw.network.objects.NetDivinityChoice;
 import it.polimi.ingsw.network.objects.NetGameSetup;
-import it.polimi.ingsw.network.objects.NetPlayerTurn;
+import it.polimi.ingsw.network.objects.NetGaming;
 
 public class ObservableRemoteView extends ObservableObject {
 	private ObserverController ctrObs;
@@ -25,35 +24,55 @@ public class ObservableRemoteView extends ObservableObject {
 			super.addObserver(obs);
 		}
 	}
+	@Override
+	public void removeAllObservers() {
+		super.removeAllObservers();
+		ctrObs = null;
+	}
 	public void notifyPositions(NetGameSetup netMap) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();
 		}
-		ctrObs.updatePositions(this,netMap);
+		if (ctrObs != null) {
+			ctrObs.updatePositions(this,netMap);
+		}
 	}
 	public void notifyColors(NetColorPreparation playerColors) throws NullPointerException {
 		if (playerColors == null) {
 			throw new NullPointerException();
 		}
-		ctrObs.updateColors(this,playerColors);
+		if (ctrObs != null) {
+			ctrObs.updateColors(this,playerColors);
+		}
 	}
 	public void notifyGods(NetDivinityChoice playerGods) throws NullPointerException {
 		if (playerGods == null) {
 			throw new NullPointerException();
 		}
-		ctrObs.updateGods(this,playerGods);
+		if (ctrObs != null) {
+			ctrObs.updateGods(this,playerGods);
+		}
 	}
-	public void notifyMove(NetPlayerTurn netMap) throws NullPointerException {
+	public void notifyMove(NetGaming netMap) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();
 		}
-		ctrObs.updateMove(this,netMap);
+		if (ctrObs != null) {
+			ctrObs.updateMove(this,netMap);
+		}
 	}
-	public void notifyBuild(NetPlayerTurn netMap) throws NullPointerException {
+	public void notifyBuild(NetGaming netMap) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();
 		}
-		ctrObs.updateBuild(this,netMap);
+		if (ctrObs != null) {
+			ctrObs.updateBuild(this,netMap);
+		}
+	}
+	public void notifyObserverQuit() {
+		if (ctrObs != null) {
+			ctrObs.observerQuit(this);
+		}
 	}
 
 	// TODO: maybe askPhase isn't necessary
@@ -61,9 +80,15 @@ public class ObservableRemoteView extends ObservableObject {
 		return ctrObs.givePhase();
 	}*/
 	public NetAvailablePositions askPositions() {
-		return ctrObs.giveAvailablePositions();
+		if (ctrObs != null) {
+			return ctrObs.giveAvailablePositions();
+		}
+		return null;
 	}
 	public NetAvailableBuildings askBuildings() {
-		return ctrObs.giveAvailableBuildings();
+		if (ctrObs != null) {
+			return ctrObs.giveAvailableBuildings();
+		}
+		return null;
 	}
 }

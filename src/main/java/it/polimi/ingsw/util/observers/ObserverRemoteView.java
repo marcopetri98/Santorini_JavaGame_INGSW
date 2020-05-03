@@ -21,4 +21,5 @@ public interface ObserverRemoteView extends ObserverObject {
 	void updateWinner(ObservableGame observed, String playerWinner);
 	void updateActivePlayer(ObservableGame observed, String playerName);
 	void updatePhaseChange(ObservableGame observed, Turn turn);
+	void updateGameFinished(ObservableGame observed);
 }

@@ -16,7 +16,6 @@ public class Worker extends Observable {
 	private boolean hasBuilt; // always false apart during the turn (at the end of the turn this is set to false)
 	public final Color color;
 	public final int workerID;
-	// FIXME: player owner isn't part of the state of a worker
 	public final Player owner;
 
 	public Worker(Color color, Player owner, int num){

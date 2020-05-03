@@ -2,7 +2,9 @@ package it.polimi.ingsw.network.game;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.Move;
+import it.polimi.ingsw.util.Constants;
 
+import java.io.Console;
 import java.io.Serializable;
 
 /**
@@ -28,6 +30,18 @@ public class NetMove implements Serializable {
 			other = null;
 		} else {
 			other = new NetMove(move.getOther());
+		}
+	}
+
+	public boolean isWellFormed() {
+		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID > 0) {
+			if (other != null) {
+				return other.isWellFormed();
+			} else {
+				return true;
+			}
+		} else {
+			return false;
 		}
 	}
 }

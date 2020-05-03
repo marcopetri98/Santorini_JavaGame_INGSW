@@ -13,13 +13,15 @@ import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
 import it.polimi.ingsw.network.objects.NetDivinityChoice;
 import it.polimi.ingsw.network.objects.NetGameSetup;
-import it.polimi.ingsw.network.objects.NetPlayerTurn;
+import it.polimi.ingsw.network.objects.NetGaming;
 import it.polimi.ingsw.util.exceptions.BadRequestException;
 import it.polimi.ingsw.util.exceptions.NoBuildException;
 import it.polimi.ingsw.util.exceptions.NoMoveException;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 import it.polimi.ingsw.util.observers.ObservableObject;
+import it.polimi.ingsw.util.observers.ObservableRemoteView;
 import it.polimi.ingsw.util.observers.ObserverController;
+import it.polimi.ingsw.util.observers.ObserverRemoteView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,10 +107,7 @@ public class ServerController implements ObserverController {
 
 	// support methods
 	private boolean isMovablePhase() {
-		if (observedModel.getPhase().getGamePhase() == GamePhase.MOVE) {
-			return true;
-		}
-		return false;
+		return observedModel.getPhase().getGamePhase() == GamePhase.MOVE;
 	}
 	private boolean isBuildablePhase() {
 		if (observedModel.getPhase().getGamePhase() == GamePhase.BUILD || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
@@ -183,7 +182,7 @@ public class ServerController implements ObserverController {
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
 		// if the player is trying to choose a color already chosen or isn't its turn it returns an error
-		if (!activePlayer.equals(playerColors.player)) {
+		if (observedModel.isFinished() || !activePlayer.equals(playerColors.player)) {
 			caller.communicateError();
 		} else {
 			// the player can choose this color
@@ -200,7 +199,7 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (!activePlayer.equals(playerGods.player)) {
+		if (observedModel.isFinished() || !activePlayer.equals(playerGods.player)) {
 			caller.communicateError();
 		} else {
 			try {
@@ -216,7 +215,7 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (!activePlayer.equals(netObject.player)) {
+		if (observedModel.isFinished() || !activePlayer.equals(netObject.player)) {
 			caller.communicateError();
 		} else {
 			try {
@@ -233,11 +232,11 @@ public class ServerController implements ObserverController {
 	 * @param moveMessage
 	 */
 	@Override
-	public synchronized void updateMove(ObservableObject observed, NetPlayerTurn moveMessage) {
+	public synchronized void updateMove(ObservableObject observed, NetGaming moveMessage) {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (!activePlayer.equals(moveMessage.player) || !isMovablePhase()) {
+		if (observedModel.isFinished() || !activePlayer.equals(moveMessage.player) || !isMovablePhase()) {
 			caller.communicateError();
 		} else {
 			List<Move> possibleMoves = new ArrayList<>();
@@ -310,11 +309,11 @@ public class ServerController implements ObserverController {
 	 * @param buildMessage
 	 */
 	@Override
-	public synchronized void updateBuild(ObservableObject observed, NetPlayerTurn buildMessage) {
+	public synchronized void updateBuild(ObservableObject observed, NetGaming buildMessage) {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (!activePlayer.equals(buildMessage.player) || !isBuildablePhase()) {
+		if (observedModel.isFinished() || !activePlayer.equals(buildMessage.player) || !isBuildablePhase()) {
 			caller.communicateError();
 		} else {
 			List<Build> possibleBuilds = new ArrayList<>();
@@ -369,10 +368,18 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		List<String> playerNames = observedModel.getPlayers().stream().map(Player::getPlayerName).collect(Collectors.toList());
-		if (!playerNames.contains(playerName)) {
+		if (observedModel.isFinished() || !playerNames.contains(playerName)) {
 			caller.communicateError();
 		} else {
 			observedModel.applyDisconnection(playerName);
+		}
+	}
+	@Override
+	public synchronized void observerQuit(ObservableRemoteView observed) {
+		try {
+			observedModel.removeObserver((ObserverRemoteView)observed);
+		} catch (IllegalArgumentException e) {
+			throw new AssertionError("The server controller has been called to remove an observer that doesn't exist");
 		}
 	}
 
@@ -381,7 +388,9 @@ public class ServerController implements ObserverController {
 		NetAvailablePositions possibleMoves;
 		List<Move> generatedMoves;
 
-		moveDefeat(observedModel.getPlayerTurn());
+		if (observedModel.getPhase().getGamePhase() == GamePhase.MOVE) {
+			moveDefeat(observedModel.getPlayerTurn());
+		}
 		generatedMoves = generateWorkerMoves(observedModel.getPlayerTurn(),1);
 		generatedMoves.addAll(generateWorkerMoves(observedModel.getPlayerTurn(),2));
 		generatedMoves = DefeatManager.filterMoves(generatedMoves);

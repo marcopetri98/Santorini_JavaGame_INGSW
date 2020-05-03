@@ -2,7 +2,7 @@ package it.polimi.ingsw.network.objects;
 
 import it.polimi.ingsw.network.game.*;
 
-public class NetPlayerTurn extends NetObject {
+public class NetGaming extends NetObject {
 	public final NetMove move;
 	public final NetBuild build;
 	public final String player;
@@ -10,7 +10,7 @@ public class NetPlayerTurn extends NetObject {
 	public final NetAvailablePositions availablePositions;
 	public final NetAvailableBuildings availableBuildings;
 
-	public NetPlayerTurn(String msg) throws NullPointerException {
+	public NetGaming(String msg) throws NullPointerException {
 		super(msg);
 		move = null;
 		build = null;
@@ -19,7 +19,7 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, String player) throws NullPointerException {
+	public NetGaming(String msg, String player) throws NullPointerException {
 		super(msg);
 		if (player == null) {
 			throw new NullPointerException();
@@ -32,7 +32,7 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, NetMap map) throws NullPointerException {
+	public NetGaming(String msg, NetMap map) throws NullPointerException {
 		super(msg);
 		if (map == null) {
 			throw new NullPointerException();
@@ -45,7 +45,7 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, String player, NetMove move) throws NullPointerException {
+	public NetGaming(String msg, String player, NetMove move) throws NullPointerException {
 		super(msg);
 		if (move == null) {
 			throw new NullPointerException();
@@ -57,7 +57,7 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, String player, NetBuild build) throws NullPointerException {
+	public NetGaming(String msg, String player, NetBuild build) throws NullPointerException {
 		super(msg);
 		if (build == null) {
 			throw new NullPointerException();
@@ -69,7 +69,7 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = null;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, NetAvailablePositions positions) throws NullPointerException {
+	public NetGaming(String msg, NetAvailablePositions positions) throws NullPointerException {
 		super(msg);
 		if (positions == null) {
 			throw new NullPointerException();
@@ -81,7 +81,7 @@ public class NetPlayerTurn extends NetObject {
 		availablePositions = positions;
 		availableBuildings = null;
 	}
-	public NetPlayerTurn(String msg, NetAvailableBuildings buildings) throws NullPointerException {
+	public NetGaming(String msg, NetAvailableBuildings buildings) throws NullPointerException {
 		super(msg);
 		if (buildings == null) {
 			throw new NullPointerException();

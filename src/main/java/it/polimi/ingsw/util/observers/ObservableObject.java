@@ -29,6 +29,9 @@ public class ObservableObject {
 
 		observers.remove(obs);
 	}
+	public void removeAllObservers() {
+		observers.clear();
+	}
 	public void notifyQuit(String playerName) throws NullPointerException {
 		if (playerName == null) {
 			throw new NullPointerException();

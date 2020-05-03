@@ -26,6 +26,7 @@ public class Game extends ObservableGame {
 	private final Map map;
 	private final List<Player> defeatedPlayers;
 	private Player winner;
+	private boolean isFinished;
 
 	public Game(String[] names) {
 		players = new ArrayList<>();
@@ -37,6 +38,7 @@ public class Game extends ObservableGame {
 			players.add(new Player(name));
 		}
 		winner = null;
+		isFinished = false;
 	}
 
 	/* **********************************************
@@ -85,6 +87,7 @@ public class Game extends ObservableGame {
 
 		// sets the winner and close the game
 		winner = player;
+		isFinished = true;
 		notifyWinner(player.playerName);
 	}
 	/**
@@ -109,23 +112,30 @@ public class Game extends ObservableGame {
 			throw new IllegalArgumentException();
 		}
 
-		// applies the disconnection, if the player doesn't exist this line throws IllegalArgumentException
-		Player player = getPlayerByName(playerName);
-		int playerIndex = players.indexOf(player);
-
-		if (players.size() == 2) {
-			notifyQuit(playerName);
-			applyWin(players.get(0));
+		// if someone disconnects during the setup the game finished
+		if (turn.getPhase() != Phase.PLAYERTURN) {
+			isFinished = true;
+			notifyEndForDisconnection();
+			removeAllObservers();
 		} else {
-			// distinguish if the disconnecting player is the active player or not because the game isn't finished
-			if (player == activePlayer) {
-				activePlayer = players.get(playerIndex == players.size()-1 ? 0 : playerIndex+1);
-				removePlayer(player);
+			// applies the disconnection, if the player doesn't exist this line throws IllegalArgumentException
+			Player player = getPlayerByName(playerName);
+			int playerIndex = players.indexOf(player);
+
+			if (players.size() == 2) {
 				notifyQuit(playerName);
-				notifyActivePlayer(activePlayer.getPlayerName());
+				applyWin(players.get(0));
 			} else {
-				removePlayer(player);
-				notifyQuit(playerName);
+				// distinguish if the disconnecting player is the active player or not because the game isn't finished
+				if (player == activePlayer) {
+					activePlayer = players.get(playerIndex == players.size() - 1 ? 0 : playerIndex + 1);
+					removePlayer(player);
+					notifyQuit(playerName);
+					notifyActivePlayer(activePlayer.getPlayerName());
+				} else {
+					removePlayer(player);
+					notifyQuit(playerName);
+				}
 			}
 		}
 	}
@@ -142,18 +152,19 @@ public class Game extends ObservableGame {
 		if (turn.getPhase() == Phase.COLORS) {
 			if (players.indexOf(activePlayer) != players.size()-1) {
 				turn.advance();
+				notifyPhaseChange(turn.clone());
 			}
 			changeActivePlayer();
 		} else if (turn.getPhase() == Phase.GODS) {
 			if (turn.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE || (turn.getGodsPhase() == GodsPhase.GODS_CHOICE && players.indexOf(activePlayer) == 0) || (turn.getGodsPhase() == GodsPhase.STARTER_CHOICE)) {
 				turn.advance();
+				notifyPhaseChange(turn.clone());
 			}
-			if (turn.getGodsPhase() != GodsPhase.STARTER_CHOICE) {
-				changeActivePlayer();
-			}
+			changeActivePlayer();
 		} else if (turn.getPhase() == Phase.SETUP) {
 			if (players.indexOf(activePlayer) == players.size()-1) {
 				turn.advance();
+				notifyPhaseChange(turn.clone());
 			}
 			changeActivePlayer();
 		} else {
@@ -166,7 +177,7 @@ public class Game extends ObservableGame {
 				changeActivePlayer();
 			}
 			turn.advance();
-			notifyPhaseChange(turn);
+			notifyPhaseChange(turn.clone());
 		}
 	}
 	/**
@@ -234,6 +245,9 @@ public class Game extends ObservableGame {
 	public synchronized Player getWinner() {
 		return winner;
 	}
+	public synchronized boolean isFinished() {
+		return isFinished;
+	}
 
 	/* **********************************************
 	 *												*
@@ -244,6 +258,7 @@ public class Game extends ObservableGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	// TODO: in all methods call the notify active player when the active player change and REFACTOR the communication of the active players on the RemoteView
 	/**
 	 * This method receives a list of player's names and set the order sorting the players arrayList
 	 * @param playerOrder is the ordered list of players turn sequence
@@ -302,9 +317,13 @@ public class Game extends ObservableGame {
 		}
 		if (i == players.size() || players.get(i) != activePlayer) {
 			throw new IllegalArgumentException();
-		} else {
-			players.get(i).setPlayerColor(color);
 		}
+
+		HashMap<String,Color> colorInfo = new HashMap<>();
+		for (int j = 0; j < i; j++) {
+			colorInfo.put(players.get(i).getPlayerName(),players.get(i).getWorker1().color);
+		}
+		notifyColors(colorInfo);
 	}
 	/**
 	 * Sets the player's godCard
@@ -410,8 +429,8 @@ public class Game extends ObservableGame {
 			}
 			players = temp;
 		}
-		activePlayer = players.get(0);
-		notifyActivePlayer(starterName);
+		activePlayer = players.get(players.size()-1);
+		notifyGods(starterName);
 	}
 	public synchronized void setWorkerPositions(NetGameSetup req) throws IllegalArgumentException, WrongPhaseException {
 		if (req == null || !req.isWellFormed()) {
@@ -422,8 +441,9 @@ public class Game extends ObservableGame {
 			throw new IllegalArgumentException();
 		}
 
-		boolean finished = true;
+		// this row throws Illegal argument exception if the player doesn't exist
 		Player player = getPlayerByName(req.player);
+		boolean finished = true;
 		player.getWorker1().setPos(map.getCell(req.worker1.getFirst(),req.worker1.getSecond()));
 		player.getWorker2().setPos(map.getCell(req.worker2.getFirst(),req.worker2.getSecond()));
 		for (int i = 0; i < players.size() && finished; i++) {
