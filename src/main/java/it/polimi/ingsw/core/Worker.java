@@ -28,20 +28,23 @@ public class Worker extends Observable {
 	}
 
 	//SETTERS OF POSITION [Implements the observable object specifically for Athena]
-	void setPos(Cell c){
+	void setPos(Cell c) {
 		if (this.position != null) {
 			previousPositions.add(this.position);
 		}
-		Cell[] positions = new Cell[2];
-		positions[0] = this.position;   //Old position
-		positions[1] = c;               //New position
+		Cell[] positions = new Cell[]{this.position,c};
 		this.position = c;
+
+		//ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
 		setChanged();
 		notifyObservers(positions);
-	}   //ADD TO OBSERVER ONLY THE ONES CREATED BY THE PLAYER WITH ATHENA
+	}
 	void setLastBuildPos(Cell c){
 		hasBuilt = true;
 		this.lastBuild = c;
+	}
+	void resetBuilding() {
+		hasBuilt = false;
 	}
 
 	//GETTERS OF POSITION

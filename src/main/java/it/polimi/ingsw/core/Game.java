@@ -8,7 +8,6 @@ import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.objects.NetGameSetup;
 import it.polimi.ingsw.util.Constants;
-import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
@@ -44,40 +43,47 @@ public class Game extends ObservableGame {
 	 *												*
 	 *												*
 	 *												*
-	 *		MODIFIERS FOR THE GAME USED				*
+	 *		MODIFIERS FOR THE GAME USED AND			*
+	 * 		INTERFACES EXPOSED TO OTHER PACKS		*
 	 * 												*
 	 * 												*
 	 * 												*
 	 ************************************************/
-	public synchronized void applyMove(Move move) {
-		//TODO: check if the model is completely updated
-		move.prev.setWorker(null);
-		move.next.setWorker(move.worker);
-		move.worker.setPos(move.next);
-		if(move.getOther() != null){
-			move.getOther().prev.setWorker(null);
-			move.getOther().next.setWorker(move.worker);
-			move.getOther().worker.setPos(move.next);
+	public synchronized void applyMove(Move move) throws NullPointerException {
+		if (move == null) {
+			throw new NullPointerException();
 		}
+
+		moveWorkers(move);
 		notifyMove(getMap());
 	}
 	/**
 	 * This function applies the construction in the map.
 	 * @param build is the construction checked by the controller.
 	 */
-	public synchronized void applyBuild(Build build) {
+	public synchronized void applyBuild(Build build) throws NullPointerException {
+		if (build == null) {
+			throw new NullPointerException();
+		}
+
 		if(build.dome) {
 			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.setDome();
 		} else {
 			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.incrementLevel(); //or == "build.level"; should work in this way though.
 		}
+		build.worker.setLastBuildPos(build.cell);
 		notifyBuild(getMap());
 	}
 	/**
 	 * If this function is called, there is a winner!
 	 * @param player is the winner
 	 */
-	public synchronized void applyWin(Player player) {
+	public synchronized void applyWin(Player player) throws IllegalArgumentException {
+		if (!players.contains(player)) {
+			throw new IllegalArgumentException();
+		}
+
+		// sets the winner and close the game
 		winner = player;
 		notifyWinner(player.playerName);
 	}
@@ -85,19 +91,43 @@ public class Game extends ObservableGame {
 	 * The function manages the defeat of a player
 	 * @param player is the looser
 	 */
-	public synchronized void applyDefeat(Player player) {
-		this.players.remove(player);
-		defeatedPlayers.add(player);
-		if(this.players.size() == 1){
-			try {
-				applyWin(players.get(0));
-			} catch(IndexOutOfBoundsException ex){
-				ex.printStackTrace();
-			}
+	public synchronized void applyDefeat(Player player) throws IllegalArgumentException {
+		if (!players.contains(player)) {
+			throw new IllegalArgumentException();
 		}
+
+		// removes the player and his workers
+		removePlayer(player);
+		if(this.players.size() == 1){
+			applyWin(players.get(0));
+		}
+
 		notifyDefeat(player.getPlayerName());
 	}
-	public synchronized void applyDisconnection(String playerName) {
+	public synchronized void applyDisconnection(String playerName) throws IllegalArgumentException {
+		if (playerName == null) {
+			throw new IllegalArgumentException();
+		}
+
+		// applies the disconnection, if the player doesn't exist this line throws IllegalArgumentException
+		Player player = getPlayerByName(playerName);
+		int playerIndex = players.indexOf(player);
+
+		if (players.size() == 2) {
+			notifyQuit(playerName);
+			applyWin(players.get(0));
+		} else {
+			// distinguish if the disconnecting player is the active player or not because the game isn't finished
+			if (player == activePlayer) {
+				activePlayer = players.get(playerIndex == players.size()-1 ? 0 : playerIndex+1);
+				removePlayer(player);
+				notifyQuit(playerName);
+				notifyActivePlayer(activePlayer.getPlayerName());
+			} else {
+				removePlayer(player);
+				notifyQuit(playerName);
+			}
+		}
 	}
 	public synchronized void applyWorkerLock(Player player, int worker) throws IllegalArgumentException {
 		if (player == null || !players.contains(player) || (worker != 1 && worker != 2)) {
@@ -127,7 +157,11 @@ public class Game extends ObservableGame {
 			}
 			changeActivePlayer();
 		} else {
+			// the turn is finished and this if resets the player turn values
 			if (turn.getGamePhase() == GamePhase.BUILD) {
+				activePlayer.resetLocking();
+				activePlayer.getWorker1().resetBuilding();
+				activePlayer.getWorker2().resetBuilding();
 				activePlayer.resetLocking();
 				changeActivePlayer();
 			}
@@ -153,6 +187,22 @@ public class Game extends ObservableGame {
 			}
 		}
 		notifyActivePlayer(activePlayer.getPlayerName());
+	}
+	private synchronized void removePlayer(Player player) {
+		players.remove(player);
+		defeatedPlayers.add(player);
+		player.getWorker1().getPos().setWorker(null);
+		player.getWorker1().setPos(null);
+		player.getWorker2().getPos().setWorker(null);
+		player.getWorker2().setPos(null);
+	}
+	private synchronized void moveWorkers(Move move) {
+		move.prev.setWorker(null);
+		move.next.setWorker(move.worker);
+		move.worker.setPos(move.next);
+		if(move.getOther() != null){
+			moveWorkers(move.getOther());
+		}
 	}
 
 	/* **********************************************

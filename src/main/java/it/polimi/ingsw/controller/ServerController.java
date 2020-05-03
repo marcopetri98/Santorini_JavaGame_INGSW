@@ -6,7 +6,6 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.core.*;
 import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.state.GamePhase;
-import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.RemoteView;
 import it.polimi.ingsw.network.game.NetAvailableBuildings;
@@ -22,7 +21,6 @@ import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 import it.polimi.ingsw.util.observers.ObservableObject;
 import it.polimi.ingsw.util.observers.ObserverController;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,7 +104,7 @@ public class ServerController implements ObserverController {
 	}
 
 	// support methods
-	private boolean isMoveablePhase() {
+	private boolean isMovablePhase() {
 		if (observedModel.getPhase().getGamePhase() == GamePhase.MOVE) {
 			return true;
 		}
@@ -150,7 +148,7 @@ public class ServerController implements ObserverController {
 		Turn activeTurn = observedModel.getPhase();
 		if (worker == 1) {
 			try {
-				moves.addAll(player.getCard().checkMove(observedModel.getMap(),player.getWorker1(),observedModel.getPhase()));
+				moves.addAll(player.getCard().checkMove(observedModel.getMap(),player.getWorker1(),activeTurn));
 			} catch (NoMoveException e) {
 				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
 					moves.addAll(generateStandardMoves(player.getWorker1()));
@@ -158,7 +156,7 @@ public class ServerController implements ObserverController {
 			}
 		} else {
 			try {
-				moves.addAll(player.getCard().checkMove(observedModel.getMap(), player.getWorker2(), observedModel.getPhase()));
+				moves.addAll(player.getCard().checkMove(observedModel.getMap(), player.getWorker2(),activeTurn));
 			} catch (NoMoveException e) {
 				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
 					moves.addAll(generateStandardMoves(player.getWorker2()));
@@ -239,7 +237,7 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (!activePlayer.equals(moveMessage.player) || !isMoveablePhase()) {
+		if (!activePlayer.equals(moveMessage.player) || !isMovablePhase()) {
 			caller.communicateError();
 		} else {
 			List<Move> possibleMoves = new ArrayList<>();
@@ -383,12 +381,13 @@ public class ServerController implements ObserverController {
 		NetAvailablePositions possibleMoves;
 		List<Move> generatedMoves;
 
+		moveDefeat(observedModel.getPlayerTurn());
 		generatedMoves = generateWorkerMoves(observedModel.getPlayerTurn(),1);
 		generatedMoves.addAll(generateWorkerMoves(observedModel.getPlayerTurn(),2));
 		generatedMoves = DefeatManager.filterMoves(generatedMoves);
 		possibleMoves = new NetAvailablePositions(generatedMoves);
 		if (generatedMoves.size() == 0) {
-			throw new AssertionError("The function has been called by the remote view when the player cannot move and has loose");
+			return null;
 		}
 		return possibleMoves;
 	}
