@@ -45,7 +45,7 @@ public class ServerClientListenerThread extends Thread {
 
 	@Override
 	public void run() {
-		NetObject ingoingObject, outgoingObject;
+		NetObject ingoingObject;
 
 		while (active) {
 			// it tries to read an object, if it doesn't succeed it sends the user an error, if he has disconnected it flags the variable active to false to terminate the thread and calls the method disconnect

@@ -44,7 +44,7 @@ public final class Constants {
 	public static final String SETUP_OUT_CONNFINISH = "setup-connection-finished";		// sent to the user to indicate to the user that lobby is finished and game is starting
 	/* Lobby messages between client and server */
 	public static final String LOBBY_ERROR = "lobby-error";								// sent to the user that the message sent was wrong
-	public static final String LOBBY_TURN = "lobby-info";								// sent to the user to indicate information about the lobby
+	public static final String LOBBY_TURN = "lobby-info";								// sent to the user to indicate information about the lobby (has the order of players)
 	/* Color messages between client and server */
 	public static final String COLOR_YOU = "color-go";									// sent to the user to indicate that he must choose a color
 	public static final String COLOR_OTHER = "color-wait";								// sent to the user to indicate that others are choosing the color

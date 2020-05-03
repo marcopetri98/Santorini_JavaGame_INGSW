@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 public class NetObject implements Serializable {
 	public static final int serialUID = Constants.ACTUAL_VERSION;
+	// TODO: add message number to implement safety in arrive order for messages
+	//public final int messageNumber;
 	public final String message;
 
 	public NetObject(String msg) throws NullPointerException {
