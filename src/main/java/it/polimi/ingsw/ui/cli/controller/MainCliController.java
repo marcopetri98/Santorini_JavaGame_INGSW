@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.cli.controller;
 
+import it.polimi.ingsw.network.ClientMessageListener;
 import it.polimi.ingsw.network.NetworkPhase;
 import it.polimi.ingsw.network.game.NetMap;
 import it.polimi.ingsw.network.objects.NetSetup;
@@ -16,6 +17,8 @@ public class MainCliController implements GraphicInterface {
 	private CliGame gameView;
 	private CliInitial pregameView;
 	private CliInput inputHandler;
+	private ClientMessageListener listener;
+	private UserInputController inputController;
 	private NetworkPhase currentPhase;
 	private NetMap currentMap;
 	private List<String> players;
@@ -23,6 +26,8 @@ public class MainCliController implements GraphicInterface {
 	public MainCliController(CliInitial pregameView) {
 		this.pregameView = pregameView;
 		currentPhase = NetworkPhase.PRELOBBY;
+		inputController = new UserInputController(listener);
+		pregameView.setUserInputController(inputController);
 	}
 
 	/* **********************************************
@@ -53,6 +58,9 @@ public class MainCliController implements GraphicInterface {
 			throw new NullPointerException();
 		}
 		inputHandler = handler;
+	}
+	public void setListener(ClientMessageListener listener) throws NullPointerException {
+		this.listener = listener;
 	}
 
 	/* **********************************************
@@ -90,30 +98,13 @@ public class MainCliController implements GraphicInterface {
 	public void retrieveConnectionMsg(NetSetup connMsg) {
 		// TODO: insert after cli push when parameters are known
 		switch (connMsg.message) {
-			case Constants.SETUP_OUT_CONNFAILED -> {
-				inputHandler.setTimeout();
-				// pregameView.printError();
+			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR -> {
+				pregameView.queueMessageMenu(connMsg);
+				pregameView.notifyCliMenu();
 			}
-			case Constants.SETUP_OUT_CONNWORKED -> {
+			case Constants.SETUP_OUT_CONNFINISH, Constants.SETUP_CREATE -> {
 				inputHandler.setTimeout();
-				// pregameView.printSomething() ?
-			}
-			case Constants.SETUP_OUT_CONNFINISH -> {
-				inputHandler.setTimeout();
-				// pregameView.printSomething() ?
-			}
-			case Constants.SETUP_ERROR -> {
-				inputHandler.setTimeout();
-				// pregameView.printError();
-			}
-			case Constants.SETUP_CREATE -> {
-				inputHandler.setTimeout();
-				// pregameView.queueMessage(connMsg);
-				// pregame.wakeUp();
-			}
-			case Constants.SETUP_CREATE_WORKED -> {
-				inputHandler.setTimeout();
-				// pregameView.printSomething() ?
+				pregameView.queueMessageMenu(connMsg);
 			}
 		}
 	}

@@ -5,7 +5,6 @@ import it.polimi.ingsw.util.exceptions.UserInputTimeoutException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 
 public class CliInput {
 	private int timePassed;
@@ -58,6 +57,8 @@ public class CliInput {
 
 		if (userInput == null) {
 			// if there was a timeout it throws an exception
+			dropTimeout();
+			System.out.print("\n");
 			throw new UserInputTimeoutException();
 		} else {
 			// it resets the time passed for the next input call
@@ -75,8 +76,8 @@ public class CliInput {
 	}
 	private void resetInsertedInput() throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		while (!reader.ready()) {
-			// TODO: the last line without \n isn't deleted
+		while (reader.ready()) {
+			// TODO: maybe the last line isn't deleted
 			reader.readLine();
 		}
 	}

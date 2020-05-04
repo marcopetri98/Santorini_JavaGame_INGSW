@@ -1,67 +1,118 @@
 package it.polimi.ingsw.ui.cli.view;
 
-import it.polimi.ingsw.core.state.Phase;
-import it.polimi.ingsw.network.game.NetCell;
-import it.polimi.ingsw.network.game.NetMap;
-import it.polimi.ingsw.network.game.NetMove;
-import it.polimi.ingsw.network.objects.NetGameSetup;
-import it.polimi.ingsw.network.objects.NetLobbyPreparation;
-import it.polimi.ingsw.network.objects.NetObject;
-import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.network.game.*;
+import it.polimi.ingsw.network.objects.*;
+import it.polimi.ingsw.ui.cli.controller.UserInputController;
+import it.polimi.ingsw.util.exceptions.UserInputTimeoutException;
 
+import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 public class CliGame {
-	private Phase phase; //Phase? didn't decide yet...
+	// other view object and attributes relative to the connection with server
 	private Deque<NetObject> messages;
-	private int i;
-	private int j;
+	private CliInput inputGetter;
+	private UserInputController inputController;
+	// state attributes that are used to represent the view
+	private Turn phase;
+	private List<String> players;
+	private List<Color> playerColors;
+	private List<String> gods;
 	private NetMap netMap;
 	private List<NetMove> netMoves;
+	private List<NetBuild> netBuilds;
 	private boolean drawPoss = false;
+	// attributes used for functioning
+	private boolean functioning;
+	private final Object inputLock;
 
-	public void setNetMap(NetMap map){
-		netMap = map;
+	public CliGame(){
+		messages = new ArrayDeque<>();
+		functioning = true;
+		inputLock = new Object();
 	}
 
-	public void addToQueue(String message){
-		messages.add(new NetObject(message));
-	}
+	// start method which is the core of game cli class
+	public void start() {
+		Command currentCommand = null;
 
-	public CliGame(){ messages = new ArrayDeque<>(); }
-	//eventually setters and getters...
-	public void start(){
-		while(true){
-			String message = messages.getLast().message;
-			if(message.equals(Constants.GENERAL_GAMEMAP_UPDATE)){
-				drawMap();
+		// functioning is set to false by parseSyntax if the user wants to quit the game
+		while (functioning) {
+			try {
+				// it tries to read user input without interrupting and to be interrupted
+				typeInputPrint();
+				currentCommand = inputGetter.getInput();
+				if (parseSyntax(currentCommand)) {
+					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
+					inputController.getCommand(currentCommand);
+					synchronized (inputLock) {
+						try {
+							inputLock.wait();
+						} catch (InterruptedException e){
+							throw new AssertionError(e);
+						}
+					}
+					parseMessages();
+				} else {
+					printError();
+				}
+			} catch (IOException | UserInputTimeoutException e) {
+				// the user input read has been interrupted because server has sent a message to the player, this message must be handled
+				parseMessages();
 			}
 		}
 	}
-	private void parseMessages(){
 
+	// SETTERS
+	public void setInputController(UserInputController inputController) {
+		this.inputController = inputController;
 	}
-
-	private void parseColor(){
-
+	public void setNetMap(NetMap map){
+		netMap = map;
 	}
-
-	private void parseGod(){
-		//System.out.println(NetGameSetup.player);
+	public void addToQueue(String message){
+		messages.add(new NetObject(message));
 	}
-
 	public void wakeUp(){
 
 	}
 
+	// INPUT PARSING FUNCTIONS
+	private void typeInputPrint() {
+
+	}
+	private boolean parseSyntax(Command command) {
+
+		return false;
+	}
+	private boolean parseCorrect(Command command) {
+
+		return false;
+	}
+	private void parseMessages(){
+
+	}
+	private void parseColor(){
+
+	}
+	private void parseGod(){
+		//System.out.println(NetGameSetup.player);
+	}
+
+	// PRINTING FUNCTIONS
+	private void printError() {
+
+	}
+
+	// DRAWING FUNCTIONS
 	private void drawPossibilities(){
 		drawPoss = true;
 		drawMap();
 	}
-
 	public void drawMap(){
 		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
 		//System.out.println("|" + drawSpaces(0) + "|" + drawSpaces(0) + "|" + drawSpaces(0) + "|" + drawSpaces(0) + "|" + drawSpaces(0) + "|");
@@ -89,8 +140,6 @@ public class CliGame {
 		drawPoss = false;
 		//System.out.println('\u0905');
 	}
-
-
 	public String drawSpaces(int type, NetCell netC){
 		if(drawPoss == true){
 			for(NetMove netM : netMoves){
@@ -131,21 +180,18 @@ public class CliGame {
 		}
 		return "ERROR";
 	}
-
 	public char drawWorker(NetCell netC){
 		if(netC.worker != null){
 			return 'W';
 		}
 		return ' ';
 	}
-
 	public char drawDome(NetCell netC){
 		if (netC.building.dome) {
 			return 'D';
 		}
 		return ' ';
 	}
-
 	public String drawBuilding(NetCell netC){
 		if (netC.building.level == 3) {
 			return "B:3";
