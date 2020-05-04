@@ -1,33 +1,329 @@
 package it.polimi.ingsw.ui.cli.view;
 
 import it.polimi.ingsw.network.objects.NetLobbyPreparation;
+import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.cli.controller.UserInputController;
 import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.exceptions.UserInputTimeoutException;
 
+import javax.management.MBeanRegistration;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
-import java.util.Queue;
 
 public class CliInitial {
-	private final Deque<NetLobbyPreparation> messages;
+	private final Deque<NetLobbyPreparation> messagesLobby;
+	private final Deque<NetSetup> messagesMenu;
 	private Command input;
+	private NetLobbyPreparation netLobbyPreparation;
+	private NetSetup netSetup;
 	private CliInput cliInput;
 	private UserInputController userInputController;
+	private boolean flag;
+	private int menuReturn;
+	private int lobbyReturn;
+	private int parseLobbyValue;
+	private int parseMenuValue;
 
-	public CliInitial() {
-		messages = new ArrayDeque<>();
+	public CliInitial(CliInput cliInput1) {
+		messagesLobby = new ArrayDeque<>();
+		messagesMenu = new ArrayDeque<>();
+		this.cliInput = cliInput1;
+		flag = true;
 	}
 
-	//setters,getters,constructor...
+	//setter
+	public void setUserInputController(UserInputController userInputController) {
+		this.userInputController = userInputController;
+	}
 
 	/**
 	 * This function shows the CLI-logo of the game and the initial menu.
 	 * @return 0 when client insert a valid option and there is a right communication with the server
 	 */
-	public int menu() throws InterruptedException /*throws IOException*/ { //exception or handling the problem???...
-		//logo:
+	public int menu() throws IOException, UserInputTimeoutException {
+		drawMenu();
+		while(flag) {
+			input = cliInput.getInput();
+			if (input.commandType.equals("1")) {
+				userInputController.connect(input);
+				synchronized (messagesMenu) {
+					try {
+						messagesMenu.wait(); //waiting MainCLiController gives here the message from the server. It will notify this
+					} catch (InterruptedException e) {
+						throw new AssertionError(e);
+					}
+					if (parseMenuMessage() != 6 ) flag = false;
+					boolean flag1 = true;
+					while(flag){ //asking ip address
+						System.out.println("Please insert the server ip address:");
+						input = cliInput.getInput(); //TODO handle with a regex if the syntax is correct, else call printError(2);
+						userInputController.getCommand(input);
+						if (parseMenuMessage() != 6 ) flag1 = false;
+						//if ip address is legit, let's ask the nickname:
+						boolean flag2 = true;
+						while (flag1) { //asking number of players
+							System.out.println("Please insert the number of players:");
+							input = cliInput.getInput();
+							if(input.commandType.equals("2") || input.commandType.equals("3")) {
+								userInputController.getCommand(input);
+								if (parseMenuMessage() != 7 ) flag2 = false;
+							} else {
+								printError(4);
+								flag2 = false;
+							}
+							boolean flag3 = true;
+							while (flag2 && flag3) {
+								System.out.println("Please insert your nickname:");
+								input = cliInput.getInput();
+								userInputController.getCommand(input);
+								if (parseMenuMessage() != 4) {
+									if (!checkNickname(input, netLobbyPreparation)) {
+										printError(1);
+										//stay in this while
+									} else { //legit ip address and legit nickname
+										menuReturn = 0;
+										flag = false;
+										flag3 = false;
+										flag1 = false;
+										//expected to enter in the lobby...
+									}
+								}
+							}
+						}
+					}
+
+				}
+			} else if (input.commandType.equals("2")) {
+				userInputController.connect(input);
+				synchronized (messagesMenu) {
+					try {
+						messagesMenu.wait();
+					} catch (InterruptedException e) {
+						throw new AssertionError(e);
+					}
+					if(parseMenuMessage() == 8) {
+						menuReturn = -1;
+						flag = false;
+					} else {
+						printError(3);
+					}
+				}
+			} else {
+				printError(0); //Insert a valid number
+
+			}
+		}
+
+		return menuReturn; //if it is '0' client choose "1" option; if it is '-1' client choose "2" option.
+	}
+
+	/**
+	 *
+	 * @return 0 if the game can start; else -1
+	 */
+	public int lobbyCli() throws IOException, UserInputTimeoutException {
+		//TODO: cliLobby graphic: I'll handle it when the others "TODO" will be fixed.
+		boolean lob = true;
+		while (lob) {
+			input = cliInput.getInput();  //if a player wanted to disconnect...
+			userInputController.getCommand(input);
+			if (input.commandType.toLowerCase().equals("quit")) {
+				if (parseLobbyMessage() == 2) {
+					lobbyReturn = -1;
+					lob = false;
+				} else {
+					printError(3);
+				}
+			} else {
+				if(parseLobbyMessage() == 0 || parseLobbyMessage() == 3){
+					printError(3);
+				} else if(parseLobbyMessage() == 1){
+					printGameStarting();
+					lobbyReturn = 0;
+				}
+			}
+		}
+
+		return lobbyReturn;
+	}
+
+	public void queueMessageLobby(NetLobbyPreparation msg){
+		synchronized (messagesLobby) {
+			messagesLobby.add(msg);
+		}
+	}
+
+	public void queueMessageMenu(NetSetup msg){
+		synchronized (messagesMenu){
+			messagesMenu.add(msg);
+		}
+	}
+
+	/**
+	 *
+	 * @return false if there is an error message, else returns true.
+	 */
+	private int parseLobbyMessage() {
+		netLobbyPreparation = messagesLobby.pop();
+		switch (netLobbyPreparation.message){
+			case Constants.LOBBY_ERROR :
+				//System.out.println(Constants.LOBBY_ERROR);
+				parseLobbyValue = 0;
+				break;
+
+			case Constants.LOBBY_TURN :
+				//System.out.println(Constants.LOBBY_TURN);
+				parseLobbyValue = 1;
+				break;
+
+			case Constants.GENERAL_PLAYER_DISCONNECTED :
+				//System.out.println(Constants.GENERAL_PLAYER_DISCONNECTED);
+				parseLobbyValue = 2;
+				break;
+
+			case Constants.GENERAL_FATAL_ERROR :
+				//System.out.println(Constants.GENERAL_FATAL_ERROR);
+				parseLobbyValue = 3;
+				break;
+
+			default:
+				printError(3);
+				break;
+		}
+		return parseLobbyValue;
+	}
+
+	/**
+	 *
+	 * @return false if there is an error message, else return true.
+	 */
+	private int parseMenuMessage(){
+		netSetup = messagesMenu.pop();
+		switch (netSetup.message){
+			case Constants.SETUP_CREATE :
+				//System.out.println(Constants.SETUP_CREATE);
+				parseMenuValue = 0;
+				break;
+
+			case Constants.SETUP_CREATE_WORKED :
+				//System.out.println(Constants.SETUP_CREATE_WORKED);
+				parseMenuValue = 1;
+				break;
+
+			case Constants.SETUP_ERROR :
+				//System.out.println(Constants.SETUP_ERROR);
+				parseMenuValue = 2;
+				break;
+
+			case Constants.SETUP_OUT_CONNWORKED :
+				//System.out.println(Constants.SETUP_OUT_CONNWORKED);
+				parseMenuValue = 3;
+				break;
+
+			case Constants.SETUP_OUT_CONNFAILED :
+				//System.out.println(Constants.SETUP_OUT_CONNFAILED);
+				parseMenuValue = 4;
+				break;
+
+			case Constants.SETUP_OUT_CONNFINISH :
+				//System.out.println(Constants.SETUP_OUT_CONNFINISH);
+				parseMenuValue = 5;
+				break;
+
+			case Constants.SETUP_IN_PARTICIPATE :
+				//System.out.println(Constants.SETUP_IN_PARTICIPATE);
+				parseMenuValue = 6;
+				break;
+
+			case Constants.SETUP_IN_SETUPNUM :
+				//System.out.println(Constants.SETUP_OUT_CONNFINISH);
+				parseMenuValue = 7;
+				break;
+
+			case Constants.GENERAL_SETUP_DISCONNECT :
+				//System.out.println(Constants.GENERAL_SETUP_DISCONNECT);
+				parseMenuValue = 8;
+				break;
+
+
+			default:
+				printError(3);
+				break;
+		}
+
+		return parseMenuValue;
+	}
+
+	private void printPlayers(NetLobbyPreparation netLobby){ //inside printGame...
+		System.out.println("Players and their order turn:");
+		while(netLobby != null){
+			System.out.println(" " + netLobby.player + " - " + netLobby.order);
+			netLobby = netLobby.next;
+		}
+	}
+
+	private void printGameStarting(){
+		System.out.println("The game is starting...");
+		printPlayers(netLobbyPreparation);
+	}
+
+	/**
+	 *
+	 * @param value indicates a certain error: depending on it, it will print a certain error message.
+	 */
+	private void printError(int value){
+		switch (value){
+			case '0' :
+				System.out.println("Please insert a valid number:");
+				break;
+
+			case '1' :
+				System.out.println("Another player online has this nickname: please change it.");
+				break;
+
+			case '2' :
+				System.out.println("Invalid IP address.");
+				break;
+
+			case '3' :
+				System.out.println("Unexpected server message.");
+				break;
+
+			case '4' :
+				System.out.println("Invalid number of players.");
+				break;
+
+			default:
+				System.out.println("Undefined error");
+				break;
+		}
+	}
+
+	/**
+	 *
+	 * @param inp nickname just inserted
+	 * @param netL to check players' nickname already connected
+	 * @return true if there isn't already a player with the same nickname just inserted
+	 */
+	private boolean checkNickname(Command inp, NetLobbyPreparation netL ){ //TODO check if parameter netL is useful
+		boolean value = true;
+		while(netL != null && value){
+			if(inp.commandType.equals(netL.player)){
+				value = false;
+			}
+			netL = netL.next;
+		}
+		return value;
+	}
+
+	public void notifyCliMenu(){
+		synchronized (messagesMenu){
+			messagesMenu.notify();
+		}
+	}
+
+	private void drawMenu(){
 		System.out.println("\n\n\n\n");
 		System.out.println("                     /hmd-            :                                /MMN-              .-::///-        :s+.              mmho:.                smmddddh.`.:.                .   .hmdddddy ");
 		System.out.println("                  `/dNMMd.           sNs                               oMMM-  `..-:/+osydmmNNNMMMy      :hNMMd/`           .MMMMMmho:.            hNMMMMMm. :Nmo.            .dmd. .mMMMMMNd ");
@@ -52,75 +348,6 @@ public class CliInitial {
 		System.out.println(" \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(2) EXIT\n");
 		System.out.println("\t\tINSERT A NUMBER:\n");
 
-
-		int value = cliInput.getInput().getNumParameters(); //TODO: the call of getNumParameters() is temporary: waiting for a getInput() implementation (probably an access to "otherValues" of CliInput)
-		int flag = 0;
-		int ret = 1;
-		while(flag == 0) {
-			if (value == 1) {
-				synchronized (messages) {
-					wait(); //waiting MainCLiController gives here the message from the server. It will notify this thread
-					//when it's awake, it has to parse the NetLobby message sent from the server:
-					parseLobbyMessage();
-					if(input.commandType == Constants.SETUP_OUT_CONNWORKED){
-						ret = 0;
-						flag = 1;
-					} else if(input.commandType == Constants.SETUP_OUT_CONNFAILED){//TODO: temporary implementation: if connection failed, it will be asked again client to insert a valid number
-						flag = 0;
-					}
-				}
-			} else if (flag == 2) {
-				synchronized (messages) {
-					wait();
-					parseLobbyMessage();
-					if(input.commandType == Constants.SETUP_OUT_CONNFINISH){ //TODO: temporary implementation.
-						ret = -1;
-						flag = 1;
-					} else if(input.commandType == Constants.SETUP_OUT_CONNFAILED){//TODO: temporary implementation: if connection failed, it will be asked again client to insert a valid number
-						flag = 0;
-					}
-				}
-			} else {
-				System.out.println("Please insert a valid number:");
-				value = cliInput.getInput().getNumParameters();
-			}
-		}
-
-		return ret; //if ret == 0 client choose "1" option; if ret == -1 client choose "2" option.
-	}
-
-	public void queueMessage(NetLobbyPreparation msg){
-		messages.add(msg);
-	}
-
-	private void parseLobbyMessage() { //TODO: probably the aim of this function was something else; this should work though.
-		input.commandType = messages.getLast().message;
-	}
-
-	public int lobbyCli() {
-		//TODO: cliLobby graphic: I'll handle it when the others "TODO" will be fixed.
-		int value = 1;
-		if(messages.getLast().message == Constants.SETUP_OUT_CONNFINISH){
-			printPlayers();
-			if(userInputController.getCommand(input) == true) { //if the server received the command //TODO: parameter of getCommand...
-				printGameStarting();
-				value = 0;            //the game starts
-			}
-		} else {
-			//TODO...
-			return value; //==1, means nothing at this moment
-		}
-
-		return value;
-	}
-
-	private void printPlayers(){ //TODO: probably I should iterate the first element of "messages", not all messages... there isn't yet a useful constant...
-		for(NetLobbyPreparation n : messages){
-			System.out.println(" " + messages.getLast().player);
-		}
-	}
-	private void printGameStarting(){
-		System.out.println("The game is starting...");
 	}
 
 }
