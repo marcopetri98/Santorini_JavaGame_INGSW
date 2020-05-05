@@ -1,6 +1,5 @@
 package it.polimi.ingsw.network;
 
-import com.sun.source.tree.NewArrayTree;
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.ui.GraphicInterface;
 import it.polimi.ingsw.util.Constants;
