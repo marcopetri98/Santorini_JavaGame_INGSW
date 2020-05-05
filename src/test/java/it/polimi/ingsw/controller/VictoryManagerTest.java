@@ -5,7 +5,7 @@ import it.polimi.ingsw.core.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.Color;
+import it.polimi.ingsw.util.Color;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;

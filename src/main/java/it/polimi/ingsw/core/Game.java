@@ -12,7 +12,7 @@ import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 // necessary imports of Java SE
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ package it.polimi.ingsw.core;
 import it.polimi.ingsw.core.gods.Athena;
 import it.polimi.ingsw.core.gods.GodCard;
 
-import java.awt.Color;
+import it.polimi.ingsw.util.Color;
 
 public class Player {
 	public final int playerID;

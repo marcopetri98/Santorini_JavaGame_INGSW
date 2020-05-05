@@ -5,7 +5,7 @@ import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.state.Turn;
 
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -18,7 +18,7 @@ import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -4,7 +4,7 @@ import it.polimi.ingsw.util.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.util.ArrayList;
 import java.util.List;
 

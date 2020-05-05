@@ -3,7 +3,7 @@ package it.polimi.ingsw.core;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 
 import static org.junit.Assert.*;
 

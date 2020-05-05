@@ -1,6 +1,6 @@
 package it.polimi.ingsw.core;
 
-import java.awt.Color;
+import it.polimi.ingsw.util.Color;
 import java.util.Observable;
 import java.util.Queue;
 import java.util.ArrayDeque;

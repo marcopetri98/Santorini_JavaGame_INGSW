@@ -5,7 +5,7 @@ import it.polimi.ingsw.core.Worker;
 import it.polimi.ingsw.util.Constants;
 
 // necessary imports of Java SE
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.io.Serializable;
 
 /**

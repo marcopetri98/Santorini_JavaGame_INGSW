@@ -14,7 +14,7 @@ import it.polimi.ingsw.util.exceptions.BadRequestException;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 // necessary imports of Java SE
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

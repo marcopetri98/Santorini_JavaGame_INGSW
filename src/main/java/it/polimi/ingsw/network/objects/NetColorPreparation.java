@@ -4,7 +4,7 @@ package it.polimi.ingsw.network.objects;
 import it.polimi.ingsw.util.Constants;
 
 // necessary imports of Java SE
-import java.awt.Color;
+import it.polimi.ingsw.util.Color;
 
 public class NetColorPreparation extends NetObject {
 	public final String player;

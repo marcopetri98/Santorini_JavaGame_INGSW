@@ -14,7 +14,7 @@ import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
 import javax.print.DocFlavor;
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;

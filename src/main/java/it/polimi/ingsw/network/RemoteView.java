@@ -16,7 +16,7 @@ import it.polimi.ingsw.util.observers.ObservableRemoteView;
 import it.polimi.ingsw.util.observers.ObserverRemoteView;
 
 // necessary imports of Java SE
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -6,7 +6,7 @@ import it.polimi.ingsw.network.game.NetBuild;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;

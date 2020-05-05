@@ -1,9 +1,6 @@
 package it.polimi.ingsw.util;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
+import it.polimi.ingsw.util.Color;
 import java.util.*;
 
 /**

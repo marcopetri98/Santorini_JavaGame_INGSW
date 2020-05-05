@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import java.util.List;
 
-import java.awt.*;
+import it.polimi.ingsw.util.Color;
 
 import static org.junit.Assert.*;
 
