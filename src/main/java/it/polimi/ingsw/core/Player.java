@@ -27,7 +27,7 @@ public class Player {
 	}
 
 	// STATE CHANGER METHODS
-	void chooseWorker(int chosen) throws IllegalArgumentException {
+	public void chooseWorker(int chosen) throws IllegalArgumentException {
 		if (chosen == 1) {
 			this.activeWorker = worker1;
 			workerLocked = true;
@@ -38,7 +38,7 @@ public class Player {
 			throw new IllegalArgumentException();
 		}
 	}
-	void setGodCard(GodCard card1) throws NullPointerException {
+	public void setGodCard(GodCard card1) throws NullPointerException {
 		if (card1 == null) {
 			throw new NullPointerException();
 		}
@@ -49,11 +49,11 @@ public class Player {
 			worker2.addObserver((Athena) card);
 		}
 	}
-	void setPlayerColor(Color color) {
+	public void setPlayerColor(Color color) {
 		worker1 = new Worker(color,this,1);
 		worker2 = new Worker(color,this,2);
 	}
-	void resetLocking() {
+	public void resetLocking() {
 		workerLocked = false;
 	}
 

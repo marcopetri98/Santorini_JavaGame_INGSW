@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.cli.view;
 
+import it.polimi.ingsw.core.Move;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
@@ -24,7 +25,7 @@ public class CliGame {
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
 	boolean challenger;
-	private Turn phase;
+	public Turn phase;
 	private List<String> players;
 	private List<Color> playerColors;
 	private List<String> gods;
@@ -46,6 +47,7 @@ public class CliGame {
 		challenger = false;
 		inputGetter = new CliInput(); //TODO: necessary??
 		phase = new Turn();
+		netMoves = new ArrayList<>();
 	}
 
 	// start method which is the core of game cli class
@@ -79,6 +81,10 @@ public class CliGame {
 			}
 		}
 	}
+	//GETTERS
+	public Turn getPhase(){
+		return phase;
+	}
 
 	// SETTERS
 	public void setInputController(UserInputController inputController) {
@@ -86,6 +92,9 @@ public class CliGame {
 	}
 	public void setNetMap(NetMap map){
 		netMap = map;
+	}
+	public void addNetMove(Move m){
+		netMoves.add(new NetMove(m));
 	}
 	public void addToQueue(String message){
 		messages.add(new NetObject(message));
@@ -389,7 +398,7 @@ public class CliGame {
 	}
 
 	// DRAWING FUNCTIONS
-	private void drawPossibilities(){
+	public void drawPossibilities(){
 		drawPoss = true;
 		drawMap();
 	}
@@ -423,57 +432,59 @@ public class CliGame {
 	public String drawSpaces(int type, NetCell netC){
 		if(drawPoss){
 			if(phase.getGamePhase() == GamePhase.MOVE){
-				for(NetMove netM : netMoves){
-					if(netM.cellX == netMap.getX(netC) && netM.cellY == netMap.getX(netC)){
-						if (type == 0) {
-							return "@@@@@@@@@@@@@";
-						}
-						else if (type == 1) {
-							return "@@@@@@";
-						}
-						else if (type == 2) {
-							return "@@@@@";
-						}
-					}
-					else{
-						if (type == 0) {
-							return "             ";
-						}
-						else if (type == 1) {
-							return "      ";
-						}
-						else if (type == 2) {
-							return "     ";
+				if(netMoves != null){
+					for(NetMove netM : netMoves){
+						if(netM.cellX == netMap.getX(netC) && netM.cellY == netMap.getY(netC)){
+							if (type == 0) {
+								return "@@@@@@@@@@@@@";
+							}
+							else if (type == 1) {
+								return "@@@@@@";
+							}
+							else if (type == 2) {
+								return "@@@@@";
+							}
 						}
 					}
 				}
+				if (type == 0) {
+					return "             ";
+				}
+				else if (type == 1) {
+					return "      ";
+				}
+				else if (type == 2) {
+					return "     ";
+				}
+
 			}
 			else if(phase.getGamePhase() == GamePhase.BEFOREMOVE || phase.getGamePhase() == GamePhase.BUILD){
-				for(NetBuild netB : netBuilds){
-					if(netB.cellX == netMap.getX(netC) && netB.cellY == netMap.getX(netC)){
-						if (type == 0) {
-							return "@@@@@@@@@@@@@";
-						}
-						else if (type == 1) {
-							return "@@@@@@";
-						}
-						else if (type == 2) {
-							return "@@@@@";
-						}
-					}
-					else{
-						if (type == 0) {
-							return "             ";
-						}
-						else if (type == 1) {
-							return "      ";
-						}
-						else if (type == 2) {
-							return "     ";
+				if(netBuilds != null){
+					for(NetBuild netB : netBuilds){
+						if(netB.cellX == netMap.getX(netC) && netB.cellY == netMap.getY(netC)){
+							if (type == 0) {
+								return "@@@@@@@@@@@@@";
+							}
+							else if (type == 1) {
+								return "@@@@@@";
+							}
+							else if (type == 2) {
+								return "@@@@@";
+							}
 						}
 					}
 				}
+				if (type == 0) {
+					return "             ";
+				}
+				else if (type == 1) {
+					return "      ";
+				}
+				else if (type == 2) {
+					return "     ";
+				}
 			}
+
 		}
 		else{
 			if (type == 0) {

@@ -11,7 +11,12 @@ public class NetCell implements Serializable {
 
 	public NetCell(Cell cell) {
 		building = new NetBuilding(cell.getBuilding());
-		worker = new NetWorker(cell.getWorker(), this);
+		if(cell.getWorker() != null){
+			worker = new NetWorker(cell.getWorker(), this);
+		}
+		else{
+			worker = null;
+		}
 	}
 
 	// TODO: is this really necessary?
