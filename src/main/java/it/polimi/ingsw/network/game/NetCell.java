@@ -13,8 +13,7 @@ public class NetCell implements Serializable {
 		building = new NetBuilding(cell.getBuilding());
 		if(cell.getWorker() != null){
 			worker = new NetWorker(cell.getWorker(), this);
-		}
-		else{
+		} else {
 			worker = null;
 		}
 	}

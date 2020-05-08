@@ -25,10 +25,11 @@ public class CliGame {
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
 	boolean challenger;
-	public Turn phase;
+	private Turn phase;
 	private List<String> players;
 	private List<Color> playerColors;
 	private List<String> gods;
+	private String activePlayer;
 	private NetMap netMap;
 	private List<NetMove> netMoves;
 	private List<NetBuild> netBuilds;
@@ -45,9 +46,8 @@ public class CliGame {
 		playerColors = new ArrayList<>();
 		gods = new ArrayList<>();
 		challenger = false;
-		inputGetter = new CliInput(); //TODO: necessary??
 		phase = new Turn();
-		netMoves = new ArrayList<>();
+		activePlayer = null;
 	}
 
 	// start method which is the core of game cli class
@@ -81,11 +81,29 @@ public class CliGame {
 			}
 		}
 	}
-	//GETTERS
+
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *			GETTERS OF THIS CLASS				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	public Turn getPhase(){
 		return phase;
 	}
 
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *			SETTERS OF THIS CLASS				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	// SETTERS
 	public void setInputController(UserInputController inputController) {
 		this.inputController = inputController;
@@ -103,90 +121,99 @@ public class CliGame {
 		inputLock.notifyAll();
 	}
 
-	// INPUT PARSING FUNCTIONS
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *				PARSING FUNCTIONS				*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	/*private void typeInputPrint() {
 
 	}*/
 	private boolean parseSyntax(Command command) {
-		switch (phase.getPhase()){
-			case COLORS :	//syntax: color colorname
-				if(command.commandType.equals("colore") && command.getNumParameters() == 1 && (command.getParameter(0).equals("blu") || command.getParameter(0).equals("rosso") || command.getParameter(0).equals("verde"))){
+		switch (phase.getPhase()) {
+			//syntax: color colorname
+			case COLORS -> {
+				if (command.commandType.equals(Constants.COMMAND_COLOR_CHOICE) && command.getNumParameters() == 1 && Constants.COMMAND_COLOR_COLORS.contains(command.getParameter(0))) {
 					return true;
 				}
-				break;
+			}
 
-			case GODS :	//syntax: gods god1 god2 god3 OR god mygod
-				if(phase.getGodsPhase().equals(GodsPhase.CHALLENGER_CHOICE) && challenger){
-					if(command.commandType.equals("gods") && (command.getNumParameters() == 2 || command.getNumParameters() == 3)){
+			//syntax: gods god1 god2 god3 OR god mygod
+			case GODS -> {
+				if (phase.getGodsPhase().equals(GodsPhase.CHALLENGER_CHOICE) && challenger) {
+					if (command.commandType.equals(Constants.COMMAND_GODS_CHOICES) && (command.getNumParameters() == 2 || command.getNumParameters() == 3)) {
 						int j = 0;
-						for(int x = 0; x < 3; x++){
-							if( command.getParameter(x).equals("apollo") || command.getParameter(x).equals("artemis") || command.getParameter(x).equals("athena") || command.getParameter(x).equals("atlas") || command.getParameter(x).equals("demeter") || command.getParameter(x).equals("hephestus") || command.getParameter(x).equals("minotaur") || command.getParameter(x).equals("pan") || command.getParameter(x).equals("prometheus") ){
+						for (int x = 0; x < 3; x++) {
+							if (Constants.GODS_GOD_NAMES.contains(command.getParameter(x).toUpperCase())) {
 								j++;
 							}
 						}
-						if(j == 3){
+						if (j == 3) {
 							return true;
 						}
 					}
-				}
-				else if(phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE) || phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)){
-					if(command.commandType.equals("god") && command.getNumParameters() == 1 && (command.getParameter(0).equals("apollo") || command.getParameter(0).equals("artemis") || command.getParameter(0).equals("athena") || command.getParameter(0).equals("atlas") || command.getParameter(0).equals("demeter") || command.getParameter(0).equals("hephestus") || command.getParameter(0).equals("minotaur") || command.getParameter(0).equals("pan") || command.getParameter(0).equals("prometheus"))){
+				} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE) || phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
+					if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
 						return true;
 					}
-				}
-				else if(command.commandType.equals("player") && command.getNumParameters() == 1){
+				} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
 					return true;
 				}
+			}
 
-				break;
-
-			case SETUP :	//syntax check and something more: worker worker 1 x_coord1 y_coord1 worker2 x_coord2 y_coord2
-				if(command.commandType.equals("worker") && command.getNumParameters() == 6 && command.getParameter(0).equals("worker1") && command.getParameter(3).equals("worker2") ){
-					boolean flag = true;
-					for(int x = 1; x < 6; x++){
-						if(x != 3){
-							if(!(0 <= Integer.parseInt(command.getParameter(x)) && Integer.parseInt(command.getParameter(x)) <= 4) || netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null){
-								//checks for an already present worker, but the netMap always has to be up to date!
-								flag = false;
+			//syntax check and something more: worker worker1 x_coord1 y_coord1 worker2 x_coord2 y_coord2
+			case SETUP -> {
+				if (command.commandType.equals(Constants.COMMAND_GAMESETUP_POSITION) && command.getNumParameters() == 6 && command.getParameter(0).equals("worker1") && command.getParameter(3).equals("worker2")) {
+					for (int i = 2; i < 6; i++) {
+						if (i != 3) {
+							if (0 < Integer.parseInt(command.getParameter(i)) || Integer.parseInt(command.getParameter(i)) > 4) {
+								return false;
 							}
 						}
 					}
-					return flag;
+					if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
+						return false;
+					}
 				}
-				break;
+			}
 
-			case PLAYERTURN :	//TODO: where does the player change turn??
-				switch (phase.getGamePhase()){
-					case BEFOREMOVE :	//only syntax: beforebuild workerX dome/building x_coord y_coord
-						if(command.commandType.equals("beforebuild")){
-							if(command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))){
-								if(0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 ){
+			case PLAYERTURN -> {
+				switch (phase.getGamePhase()) {
+					//only syntax: build workerX dome/building x_coord y_coord
+					case BEFOREMOVE, BUILD -> {
+						if (command.commandType.equals(Constants.COMMAND_BUILD)) {
+							// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
+							// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
+							if (command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
+								if (0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4) {
 									return true;
 								}
 							}
 						}
-						break;
+					}
 
-					case MOVE :		//only syntax: move workerX x_coord y_coord
-						if(command.commandType.equals("move")){
-							if(command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))){
-								if(0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 ){
+					//only syntax: move workerX x_coord y_coord
+					case MOVE -> {
+						if (command.commandType.equals(Constants.COMMAND_MOVE)) {
+							if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
+								if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
 									return true;
 								}
 							}
 						}
-						break;
-
-					case BUILD :	//only syntax: build workerX dome/building x_coord y_coord
-						if(command.commandType.equals("build")){
-							if(command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))){
-								if(0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 ){
-									return true;
-								}
-							}
-						}
-						break;
+					}
 				}
+			}
+
+			default -> {
+				if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -199,11 +226,13 @@ public class CliGame {
 			parseMessage(messages.pop());
 		}
 	}
+	// TODO: too long method, it need to be split in multiple methods
+	// FIXME: this is a parsing function, this isn't a drawing or printing function, it should only parse the message
 	private void parseMessage(NetObject obj){
 		NetColorPreparation ncp;
 		NetDivinityChoice ndc;
 		NetGaming ng;
-		switch (obj.message){
+		switch (obj.message) {
 			//COLORS
 			case Constants.COLOR_OTHER :
 				System.out.println("Other players are now chosing the colors. Hang on.");
@@ -249,6 +278,7 @@ public class CliGame {
 
 			case Constants.GODS_STARTER :
 				ndc = (NetDivinityChoice) obj;
+				activePlayer = players.get(players.indexOf(ndc.player));
 				phase.advance();
 				System.out.println("Questo è il giocatore che inizierà il turno: " + ndc.player);
 				break;
@@ -386,12 +416,24 @@ public class CliGame {
 				break;
 
 			case Constants.GENERAL_PHASE_UPDATE :
+				if (phase.getGamePhase() == GamePhase.BUILD) {
+					activePlayer = players.get(players.indexOf(activePlayer) == players.size()-1 ? 0 : players.indexOf(activePlayer)+1);
+				}
 				phase.advance();
 				System.out.println("The game phase just changed!");
 				break;
 		}
 	}
 
+	/* **********************************************
+	 *												*
+	 *												*
+	 *												*
+	 *		PRINTING/DRAWING OF THIS CLASS			*
+	 * 												*
+	 * 												*
+	 * 												*
+	 ************************************************/
 	// PRINTING FUNCTIONS
 	private void printError() {
 

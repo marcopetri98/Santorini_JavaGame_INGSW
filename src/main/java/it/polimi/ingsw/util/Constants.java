@@ -61,7 +61,7 @@ public final class Constants {
 	public static final String GODS_IN_GAME_GODS = "gods-game-gods";					// sent to the server by the challenger to indicate the gods chosen
 	public static final String GODS_IN_CHOICE = "gods-choice";							// sent to the server to indicate the god choice
 	public static final String GODS_IN_START_PLAYER = "gods-starter";					// sent to the server by the challenger to indicate the starter chosen
-	public static final List<String> GODS_GOD_NAMES = List.of("Apollo","Artemis","Athena","Atlas","Demeter","Hephaestus","Minotaur","Pan","Prometheus");
+	public static final List<String> GODS_GOD_NAMES = List.of("APOLLO","ARTEMIS","ATHENA","ATLAS","DEMETER","HEPHAESTUS","MINOTAUR","PAN","PROMETHEUS");
 	/* Game setup messages between client and server */
 	public static final String GAMESETUP_PLACE = "gamestup-place";						// sent to the user to indicate that he must place workers on the board
 	public static final String GAMESETUP_ERROR = "gamesetup-error";						// sent to the user to indicate that its message was wrong
@@ -76,6 +76,21 @@ public final class Constants {
 	/* Other player's turn messages between client and server */
 	public static final String OTHERS_TURN = "others-turn";								// sent to the user to indicate that the active player has finished its turn
 	public static final String OTHERS_ERROR = "others-error";							// sent to the user to indicate that the message sent was wrong
+
+	/* Commands given from the player to do a specific command */
+	public static final String COMMAND_DISCONNECT = "disconnect";
+	/* Commands given on color phase */
+	public static final String COMMAND_COLOR_CHOICE = "color";
+	public static final List<String> COMMAND_COLOR_COLORS = List.of("blue","green","red");
+	/* Commands given on gods phase */
+	public static final String COMMAND_GODS_CHOICES = "gods";
+	public static final String COMMAND_GODS_CHOOSE = "god";
+	public static final String COMMAND_GODS_STARTER = "starter";
+	/* Commands given on game setup phase */
+	public static final String COMMAND_GAMESETUP_POSITION = "position";
+	/* Commands given on gaming phase */
+	public static final String COMMAND_MOVE = "move";
+	public static final String COMMAND_BUILD = "build";
 
 	/* General connection messages */
 	public static final String CHECK = "ping";

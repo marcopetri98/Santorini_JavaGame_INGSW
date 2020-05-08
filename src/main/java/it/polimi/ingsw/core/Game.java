@@ -335,7 +335,7 @@ public class Game extends ObservableGame {
 	public synchronized void setPlayerGod(String playerName, String god) throws IllegalArgumentException, WrongPhaseException {
 		GodCard playerGod = null;
 
-		if (playerName == null || god == null || !Constants.GODS_GOD_NAMES.contains(god)) {
+		if (playerName == null || god == null || !Constants.GODS_GOD_NAMES.contains(god.toUpperCase())) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.GODS) {
 			throw new WrongPhaseException();
@@ -382,7 +382,7 @@ public class Game extends ObservableGame {
 			throw new WrongPhaseException();
 		} else {
 			for (String godName : godNames) {
-				if (!Constants.GODS_GOD_NAMES.contains(godName)) {
+				if (!Constants.GODS_GOD_NAMES.contains(godName.toUpperCase())) {
 					throw new IllegalArgumentException();
 				}
 			}
