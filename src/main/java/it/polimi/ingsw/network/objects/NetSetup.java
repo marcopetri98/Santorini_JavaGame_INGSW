@@ -17,9 +17,9 @@ public class NetSetup extends NetObject {
 		player = name;
 		number = 0;
 	}
-	public NetSetup(String msg, int number) throws NullPointerException {
+	public NetSetup(String msg, String name, int number) throws NullPointerException {
 		super(msg);
-		player = null;
+		player = name;
 		this.number = number;
 	}
 

@@ -28,6 +28,14 @@ public class NetBuild implements Serializable {
 		this.dome = dome;
 		other = null;
 	}
+	public NetBuild(int worker, int x, int y, int level, boolean dome) {
+		this.workerID = worker;
+		this.cellX = x;
+		this.cellY = y;
+		this.level = level;
+		this.dome = dome;
+		other = null;
+	}
 	public NetBuild(NetWorker worker, NetCell cell, NetMap map, int level, boolean dome, NetBuild other) throws NullPointerException {
 		if (worker == null || cell == null || map == null || other == null) {
 			throw new NullPointerException();

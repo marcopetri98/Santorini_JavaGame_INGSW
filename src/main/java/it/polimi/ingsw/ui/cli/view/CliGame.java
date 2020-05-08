@@ -20,7 +20,7 @@ import java.util.List;
 
 public class CliGame {
 	// other view object and attributes relative to the connection with server
-	private Deque<NetObject> messages;
+	private final Deque<NetObject> messages;
 	private CliInput inputGetter;
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
@@ -63,21 +63,15 @@ public class CliGame {
 				currentCommand = inputGetter.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
-					inputController.getCommand(currentCommand);
-					synchronized (inputLock) {
-						try {
-							inputLock.wait();
-						} catch (InterruptedException e){
-							throw new AssertionError(e);
-						}
-					}
-					//parseMessages();
+					inputController.getCommand(currentCommand,phase.clone());
 				} else {
 					printError();
 				}
 			} catch (IOException | UserInputTimeoutException e) {
 				// the user input read has been interrupted because server has sent a message to the player, this message must be handled
 				parseMessages();
+			} catch (IllegalStateException e) {
+				throw new AssertionError("Fatal error: design problem, the get command is called with a command that does not match game phase");
 			}
 		}
 	}
@@ -92,7 +86,10 @@ public class CliGame {
 	 * 												*
 	 ************************************************/
 	public Turn getPhase(){
-		return phase;
+		return phase.clone();
+	}
+	public List<String> getPlayers() {
+		return new ArrayList<>(players);
 	}
 
 	/* **********************************************
@@ -114,11 +111,10 @@ public class CliGame {
 	public void addNetMove(Move m){
 		netMoves.add(new NetMove(m));
 	}
-	public void addToQueue(String message){
-		messages.add(new NetObject(message));
-	}
-	public void wakeUp(){
-		inputLock.notifyAll();
+	public void addToQueue(NetObject message) {
+		synchronized (messages) {
+			messages.add(message);
+		}
 	}
 
 	/* **********************************************
@@ -183,7 +179,7 @@ public class CliGame {
 
 			case PLAYERTURN -> {
 				switch (phase.getGamePhase()) {
-					//only syntax: build workerX dome/building x_coord y_coord
+					//only syntax: build workerX dome/building level x_coord y_coord
 					case BEFOREMOVE, BUILD -> {
 						if (command.commandType.equals(Constants.COMMAND_BUILD)) {
 							// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
@@ -234,10 +230,6 @@ public class CliGame {
 		NetGaming ng;
 		switch (obj.message) {
 			//COLORS
-			case Constants.COLOR_OTHER :
-				System.out.println("Other players are now chosing the colors. Hang on.");
-				break;
-
 			case Constants.COLOR_YOU :
 				while (phase.getPhase() != Phase.COLORS) {
 					phase.advance();

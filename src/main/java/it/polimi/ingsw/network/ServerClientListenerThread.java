@@ -274,7 +274,7 @@ public class ServerClientListenerThread extends Thread {
 
 		if (currentPhase == NetworkPhase.PLAYERTURN) {
 			if (gamingMsg.message.equals(Constants.PLAYER_IN_MOVE) && gamingMsg.player.equals(playerName)) {
-				if (gamingMsg.move != null && gamingMsg.build.isWellFormed()) {
+				if (gamingMsg.move != null && gamingMsg.move.isWellFormed()) {
 					gameServer.handleMoveRequest(gamingMsg, false);
 				} else {
 					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);

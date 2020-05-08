@@ -60,6 +60,22 @@ public class NetDivinityChoice extends NetObject {
 		player = null;
 		challenger = null;
 	}
+	public NetDivinityChoice(String msg, String player, List<String> divinities) throws NullPointerException {
+		super(msg);
+		if (divinities == null) {
+			throw new NullPointerException();
+		} else {
+			divinity = divinities.get(0);
+			divinities.remove(0);
+			if (divinities.size() >= 1) {
+				next = new NetDivinityChoice(msg,divinities);
+			} else {
+				next = null;
+			}
+		}
+		this.player = player;
+		challenger = null;
+	}
 
 	// getters
 	public String getDivinity() {

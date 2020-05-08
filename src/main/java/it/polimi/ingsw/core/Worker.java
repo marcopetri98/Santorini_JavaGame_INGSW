@@ -27,7 +27,7 @@ public class Worker extends Observable {
 	}
 
 	//SETTERS OF POSITION [Implements the observable object specifically for Athena]
-	public void setPos(Cell c) {
+	void setPos(Cell c) {
 		if (this.position != null) {
 			previousPositions.add(this.position);
 		}

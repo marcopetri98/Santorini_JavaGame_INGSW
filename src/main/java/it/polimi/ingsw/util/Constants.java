@@ -44,7 +44,6 @@ public final class Constants {
 	public static final String LOBBY_TURN = "lobby-info";								// sent to the user to indicate information about the lobby (has the order of players)
 	/* Color messages between client and server */
 	public static final String COLOR_YOU = "color-go";									// sent to the user to indicate that he must choose a color
-	public static final String COLOR_OTHER = "color-wait";								// sent to the user to indicate that others are choosing the color
 	public static final String COLOR_ERROR = "color-error";								// sent to the user to indicate that the message he inserted was wrong
 	public static final String COLOR_CHOICES = "color-other-choice";					// sent to the user to indicate other players' color choices
 	public static final String COLOR_IN_CHOICE = "color-choice";						// sent to the server to indicate the chosen color by the player
@@ -92,6 +91,9 @@ public final class Constants {
 	/* Commands given on gaming phase */
 	public static final String COMMAND_MOVE = "move";
 	public static final String COMMAND_BUILD = "build";
+	public static final String COMMAND_BUILD_DOME = "dome";
+	public static final String COMMAND_BUILD_BUILDING = "building";
+	public static final String COMMAND_PASS = "pass";
 
 	/* General connection messages */
 	public static final String CHECK = "ping";

@@ -1,5 +1,8 @@
 package it.polimi.ingsw.ui.cli.view;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Command {
 	public String commandType;
 	private String[] otherValues;
@@ -31,5 +34,8 @@ public class Command {
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
+	}
+	public List<String> getParameterList() {
+		return Arrays.asList(otherValues);
 	}
 }

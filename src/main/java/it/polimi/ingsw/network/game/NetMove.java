@@ -32,6 +32,12 @@ public class NetMove implements Serializable {
 			other = new NetMove(move.getOther());
 		}
 	}
+	public NetMove(int workerID, int x, int y) {
+		this.workerID = workerID;
+		cellX = x;
+		cellY = y;
+		other = null;
+	}
 
 	public boolean isWellFormed() {
 		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID > 0) {

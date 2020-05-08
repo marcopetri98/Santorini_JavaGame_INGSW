@@ -15,6 +15,26 @@ public class Color {
 		this.g = g;
 		this.b = b;
 	}
+	public Color(String colorName) throws IllegalArgumentException {
+		switch (colorName.toUpperCase()) {
+			case "BLACK" -> {
+				r = 0; g = 0; b = 0;
+			}
+			case "WHITE" -> {
+				r = 255; g = 255; b = 255;
+			}
+			case "RED" -> {
+				r = 255; g = 0; b = 0;
+			}
+			case "GREEN" -> {
+				r = 0; g = 255; b = 0;
+			}
+			case "BLUE" -> {
+				r = 0; g = 0; b = 255;
+			}
+			default -> throw new IllegalArgumentException();
+		}
+	}
 
 	@Override
 	public boolean equals(Object obj) {

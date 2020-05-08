@@ -54,42 +54,46 @@ public class ClientMessageListener extends Thread {
 				}
 
 				if (ingoingObject != null) {
-					switch (currentPhase) {
-						case PRELOBBY:
-							if (ingoingObject instanceof NetSetup) {
-								parseSetupInput((NetSetup) ingoingObject);
-							}
-							break;
+					if (ingoingObject.message.equals(Constants.GENERAL_FATAL_ERROR)) {
+						viewController.retrieveError();
+					} else {
+						switch (currentPhase) {
+							case PRELOBBY:
+								if (ingoingObject instanceof NetSetup) {
+									parseSetupInput((NetSetup) ingoingObject);
+								}
+								break;
 
-						case LOBBY:
-							if (ingoingObject instanceof NetLobbyPreparation) {
-								parseLobbyInput((NetLobbyPreparation)ingoingObject);
-							}
-							break;
+							case LOBBY:
+								if (ingoingObject instanceof NetLobbyPreparation) {
+									parseLobbyInput((NetLobbyPreparation) ingoingObject);
+								}
+								break;
 
-						case COLORS:
-							if (ingoingObject instanceof NetColorPreparation) {
-								parseColorInput((NetColorPreparation)ingoingObject);
-							}
-							break;
+							case COLORS:
+								if (ingoingObject instanceof NetColorPreparation) {
+									parseColorInput((NetColorPreparation) ingoingObject);
+								}
+								break;
 
-						case GODS:
-							if (ingoingObject instanceof NetDivinityChoice) {
-								parseDivinityInput((NetDivinityChoice)ingoingObject);
-							}
-							break;
+							case GODS:
+								if (ingoingObject instanceof NetDivinityChoice) {
+									parseDivinityInput((NetDivinityChoice) ingoingObject);
+								}
+								break;
 
-						case SETUP:
-							if (ingoingObject instanceof NetGameSetup) {
-								parseGameSetupInput((NetGameSetup)ingoingObject);
-							}
-							break;
+							case SETUP:
+								if (ingoingObject instanceof NetGameSetup) {
+									parseGameSetupInput((NetGameSetup) ingoingObject);
+								}
+								break;
 
-						default:
-							if (ingoingObject instanceof NetGaming) {
-								parseGamingInput((NetGaming)ingoingObject);
-							}
-							break;
+							default:
+								if (ingoingObject instanceof NetGaming) {
+									parseGamingInput((NetGaming) ingoingObject);
+								}
+								break;
+						}
 					}
 				}
 			}
@@ -109,19 +113,19 @@ public class ClientMessageListener extends Thread {
 		viewController.retrieveConnectionMsg(msg);
 	}
 	public void parseLobbyInput(NetLobbyPreparation msg) {
-
+		viewController.retrieveLobbyMsg(msg);
 	}
 	public void parseColorInput(NetColorPreparation msg) {
-
+		viewController.retrieveColorMsg(msg);
 	}
 	public void parseDivinityInput(NetDivinityChoice msg) {
-
+		viewController.retrieveGodsMsg(msg);
 	}
 	public void parseGameSetupInput(NetGameSetup msg) {
-
+		viewController.retrieveGameSetupMsg(msg);
 	}
 	public void parseGamingInput(NetGaming msg) {
-
+		viewController.retrieveGamingMsg(msg);
 	}
 
 	/* **********************************************
@@ -133,14 +137,16 @@ public class ClientMessageListener extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
-	public void connectToServer(String address) {
+	public boolean connectToServer(String address) {
 		try {
 			serverSocket = new Socket(address,21005);
 			input = new ObjectInputStream(serverSocket.getInputStream());
 			output = new ObjectOutputStream(serverSocket.getOutputStream());
 			currentPhase = NetworkPhase.PRELOBBY;
+			return true;
 		} catch (IOException e) {
 			viewController.retrieveConnectionError();
+			return false;
 		}
 	}
 	public void sendMessage(NetObject message) {
@@ -149,6 +155,8 @@ public class ClientMessageListener extends Thread {
 				output.writeObject(message);
 				output.flush();
 			} catch (IOException e) {
+				// server has crashed and it stops to send messages
+				viewController.retrieveError();
 				setActive(false);
 			}
 		}

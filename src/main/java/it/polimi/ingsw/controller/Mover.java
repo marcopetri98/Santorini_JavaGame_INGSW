@@ -41,7 +41,7 @@ public class Mover {
 	}
 
 	// TODO: maybe necessary to be used?
-	private List<Move> filterMoves(List<Move> possibilities) {
+	/*private List<Move> filterMoves(List<Move> possibilities) {
 		List<Move> newList = new ArrayList<>(possibilities);
 		for (int i = 0; i < possibilities.size(); i++) {
 			for (int j = 0; j < possibilities.size(); j++) {
@@ -53,5 +53,5 @@ public class Mover {
 			}
 		}
 		return newList;
-	}
+	}*/
 }

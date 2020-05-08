@@ -1,16 +1,14 @@
 package it.polimi.ingsw.ui.cli.controller;
 
 import it.polimi.ingsw.network.ClientMessageListener;
-import it.polimi.ingsw.network.NetworkPhase;
 import it.polimi.ingsw.network.game.NetMap;
-import it.polimi.ingsw.network.objects.NetSetup;
+import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.ui.GraphicInterface;
 import it.polimi.ingsw.ui.cli.view.CliGame;
 import it.polimi.ingsw.ui.cli.view.CliInitial;
 import it.polimi.ingsw.ui.cli.view.CliInput;
 import it.polimi.ingsw.util.Constants;
 
-import java.net.Socket;
 import java.util.List;
 
 public class MainCliController implements GraphicInterface {
@@ -19,15 +17,9 @@ public class MainCliController implements GraphicInterface {
 	private CliInput inputHandler;
 	private ClientMessageListener listener;
 	private UserInputController inputController;
-	private NetworkPhase currentPhase;
-	private NetMap currentMap;
-	private List<String> players;
 
 	public MainCliController(CliInitial pregameView) {
 		this.pregameView = pregameView;
-		currentPhase = NetworkPhase.PRELOBBY;
-		inputController = new UserInputController(listener);
-		pregameView.setUserInputController(inputController);
 	}
 
 	/* **********************************************
@@ -45,6 +37,7 @@ public class MainCliController implements GraphicInterface {
 		}
 		gameView = game;
 		pregameView = null;
+		inputController.setGameView(game);
 	}
 	public void setPregameView(CliInitial pregame) throws NullPointerException {
 		if (pregame == null) {
@@ -61,18 +54,9 @@ public class MainCliController implements GraphicInterface {
 	}
 	public void setListener(ClientMessageListener listener) throws NullPointerException {
 		this.listener = listener;
+		inputController = new UserInputController(listener);
+		pregameView.setUserInputController(inputController);
 	}
-
-	/* **********************************************
-	 *												*
-	 *												*
-	 *												*
-	 *	GETTERS OF THIS CLASS USED TO GAIN INFO		*
-	 * 												*
-	 * 												*
-	 * 												*
-	 ************************************************/
-
 
 	/* **********************************************
 	 *												*
@@ -86,7 +70,7 @@ public class MainCliController implements GraphicInterface {
 	 ************************************************/
 	@Override
 	public void retrieveError() {
-
+		// TODO: implement a way to inform the user that the server crashed
 	}
 	@Override
 	public void retrieveConnectionError() {
@@ -94,9 +78,12 @@ public class MainCliController implements GraphicInterface {
 		inputHandler.setTimeout();
 		// pregameView.printError();
 	}
+	/**
+	 * It receives asynchronous or synchronous messages from the network component a message that is during the connection to a lobby to participate to a game
+	 * @param connMsg
+	 */
 	@Override
 	public void retrieveConnectionMsg(NetSetup connMsg) {
-		// TODO: insert after cli push when parameters are known
 		switch (connMsg.message) {
 			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR -> {
 				pregameView.queueMessageMenu(connMsg);
@@ -108,60 +95,63 @@ public class MainCliController implements GraphicInterface {
 			}
 		}
 	}
+	/**
+	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about lobby end and list of players
+	 * @param lobbyMsg
+	 */
 	@Override
-	public void retrieveClientTurn() {
-
+	public void retrieveLobbyMsg(NetLobbyPreparation lobbyMsg) {
+		switch (lobbyMsg.message) {
+			case Constants.LOBBY_ERROR -> {
+				pregameView.queueMessageLobby(lobbyMsg);
+				pregameView.notifyCliLobby();
+			}
+			case Constants.LOBBY_TURN -> {
+				inputHandler.setTimeout();
+				pregameView.queueMessageLobby(lobbyMsg);
+			}
+		}
 	}
+	/**
+	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or a message about
+	 * @param colorMsg
+	 */
 	@Override
-	public void retrievePhaseChange() {
-
+	public void retrieveColorMsg(NetColorPreparation colorMsg) {
+		inputHandler.setTimeout();
+		gameView.addToQueue(colorMsg);
 	}
+	/**
+	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about
+	 * @param godsMsg
+	 */
 	@Override
-	public void retrieveGameStart() {
-
+	public void retrieveGodsMsg(NetDivinityChoice godsMsg) {
+		inputHandler.setTimeout();
+		gameView.addToQueue(godsMsg);
 	}
+	/**
+	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about
+	 * @param gameSetupMsg
+	 */
 	@Override
-	public void retrieveOtherColor() {
-
+	public void retrieveGameSetupMsg(NetGameSetup gameSetupMsg) {
+		if (gameSetupMsg.message.equals(Constants.GENERAL_GAMEMAP_UPDATE)) {
+			inputController.setMap(gameSetupMsg.gameMap);
+		}
+		inputHandler.setTimeout();
+		gameView.addToQueue(gameSetupMsg);
 	}
+	/**
+	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about
+	 * @param gamingMsg
+	 */
 	@Override
-	public void retrieveChallenger() {
-
-	}
-	@Override
-	public void retrieveGodsSelection() {
-
-	}
-	@Override
-	public void retrieveOtherGods() {
-
-	}
-	@Override
-	public void retrieveStarter() {
-
-	}
-	@Override
-	public void retrieveOtherWorkers(NetMap map) {
-
-	}
-	@Override
-	public void retrieveAction() {
-
-	}
-	@Override
-	public void retrieveOtherAction() {
-
-	}
-	@Override
-	public void retrieveWinner() {
-
-	}
-	@Override
-	public void retrieveDefeated() {
-
-	}
-	@Override
-	public void retrieveDisconnection() {
-
+	public void retrieveGamingMsg(NetGaming gamingMsg) {
+		if (gamingMsg.message.equals(Constants.GENERAL_GAMEMAP_UPDATE)) {
+			inputController.setMap(gamingMsg.gameMap);
+		}
+		inputHandler.setTimeout();
+		gameView.addToQueue(gamingMsg);
 	}
 }
