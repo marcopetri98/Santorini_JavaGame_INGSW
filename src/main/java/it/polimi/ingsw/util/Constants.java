@@ -68,11 +68,13 @@ public final class Constants {
 	public static final String GAMESETUP_IN_PLACE = "gamesetup-player-positions";		// sent to the server to indicate the position chosen by the player for its workers
 	/* Player's turn messages between client and server */
 	public static final String PLAYER_ERROR = "player-error";							// sent to the user to indicate that its message was wrong
+	public static final String PLAYER_MOVE = "player-move";								// sent to the user to indicate that it is a turn where he must move
+	public static final String PLAYER_BUILD = "player-build";							// sent to the user to indicate that it is a turn where he must build (not if he has prometheus and is before move)
 	public static final String PLAYER_FINISHED_TURN = "player-finished";				// sent to the user to indicate that its turn is finished
 	public static final String PLAYER_IN_MOVE = "player-move";							// sent to the server to indicate the move it wants to perform
 	public static final String PLAYER_IN_BUILD = "player-build";						// sent to the server to indicate the build it wants to perform
 	/* Other player's turn messages between client and server */
-	public static final String OTHERS_TURN = "others-turn";						// sent to the user to indicate that the active player has finished its turn
+	public static final String OTHERS_TURN = "others-turn";								// sent to the user to indicate that the active player has finished its turn
 	public static final String OTHERS_ERROR = "others-error";							// sent to the user to indicate that the message sent was wrong
 
 	/* General connection messages */
