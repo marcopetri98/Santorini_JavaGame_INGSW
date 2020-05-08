@@ -227,6 +227,20 @@ public class ServerController implements ObserverController {
 		}
 	}
 	/**
+	 * The player can pass the turn if he doesn't want to use the power in the before move phase, this happens when he has prometheus and he doesn't want to build before moving
+	 * @param observed
+	 */
+	@Override
+	public void updatePass(ObservableRemoteView observed, String playerName) {
+		RemoteView caller = (RemoteView) observed;
+		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
+		if (observedModel.isFinished() || !activePlayer.equals(playerName) || observedModel.getPhase().getGamePhase() != GamePhase.BEFOREMOVE) {
+			caller.communicateError();
+		} else {
+			observedModel.changeTurn();
+		}
+	}
+	/**
 	 * This function is called when a player can move and want to perform a certain move, if it can't move this function will never be called
 	 * @param observed
 	 * @param moveMessage
@@ -384,6 +398,10 @@ public class ServerController implements ObserverController {
 	}
 
 	@Override
+	public Turn givePhase() {
+		return observedModel.getPhase();
+	}
+	@Override
 	public NetAvailablePositions giveAvailablePositions() {
 		NetAvailablePositions possibleMoves;
 		List<Move> generatedMoves;
@@ -405,6 +423,9 @@ public class ServerController implements ObserverController {
 		NetAvailableBuildings possibleBuilds;
 		List<Build> builds = new ArrayList<>();
 
+		if (observedModel.getPhase().getGamePhase() == GamePhase.BUILD) {
+			buildDefeat();
+		}
 		if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
 			try {
 				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getWorker1(),observedModel.getPhase()));

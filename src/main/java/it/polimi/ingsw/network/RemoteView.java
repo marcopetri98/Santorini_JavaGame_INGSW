@@ -4,9 +4,12 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.gods.GodCard;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
+import it.polimi.ingsw.network.game.NetAvailableBuildings;
+import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.network.game.NetMap;
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.util.Constants;
@@ -97,6 +100,17 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
+	 * It receives a request of passing the turn, if the player is in the correct phase (BEFORE MOVE phase) he can and the request is sent to the controller
+	 * @param req
+	 */
+	public void handlePassRequest(NetGaming req) {
+		if (askPhase().getGamePhase() != GamePhase.BEFOREMOVE) {
+			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
+		} else {
+			notifyPass(clientHandler.getPlayerName());
+		}
+	}
+	/**
 	 * It receives a well formed request of a move, well formed means that the cell is inside the map, it is needed to check worker and if is possible to move there. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
 	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
@@ -120,6 +134,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
 		}
 	}
+	/**
+	 *
+	 */
 	public void handleObserverQuit() {
 		if (clientHandler.getGamePhase() != NetworkPhase.OBSERVER) {
 			notifyObserverQuit();
@@ -186,15 +203,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			// it communicated to the client the play order
 			clientHandler.sendMessage(sendOrder);
 			clientHandler.setGamePhase(NetworkPhase.COLORS);
-
-			// it says to the player if it has to choose the color or if it has to wait the others choice
-			NetColorPreparation colorMessage;
-			if (order[0].equals(clientHandler.getPlayerName())) {
-				colorMessage = new NetColorPreparation(Constants.COLOR_YOU);
-			} else {
-				colorMessage = new NetColorPreparation(Constants.COLOR_OTHER);
-			}
-			clientHandler.sendMessage(colorMessage);
 		}
 	}
 	/**
@@ -343,7 +351,11 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		if (observed == null || turn == null) {
 			clientHandler.fatalError("It has been called the update phase with wrong parameters");
 		} else {
+			Game observedGame = (Game) observed;
 			switch (clientHandler.getGamePhase()) {
+				case LOBBY -> {
+
+				}
 				case COLORS -> {
 					clientHandler.setGamePhase(NetworkPhase.GODS);
 					clientHandler.sendMessage(new NetColorPreparation(Constants.GENERAL_PHASE_UPDATE));
@@ -381,6 +393,32 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 				case PLAYERTURN ->  {
 					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
 					clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));
+
+					// checks what the player can do
+					NetAvailablePositions possibleMoves;
+					NetAvailableBuildings possibleBuildings;
+					switch (observedGame.getPhase().getGamePhase()) {
+						case BEFOREMOVE -> {
+							possibleBuildings = askBuildings();
+							if (possibleBuildings == null || possibleBuildings.builds.size() == 0) {
+								notifyPass(clientHandler.getPlayerName());
+							} else {
+								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_BUILD,possibleBuildings));
+							}
+						}
+						case MOVE -> {
+							possibleMoves = askPositions();
+							if (possibleMoves != null && possibleMoves.moves.size() > 0) {
+								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_MOVE,possibleMoves));
+							}
+						}
+						case BUILD -> {
+							possibleBuildings = askBuildings();
+							if (possibleBuildings != null && possibleBuildings.builds.size() > 0) {
+								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_BUILD,possibleBuildings));
+							}
+						}
+					}
 				}
 			}
 		}
@@ -414,8 +452,10 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 						clientHandler.fatalError("It became the player's turn and the handler thinks it is the same as before");
 					}
 					case OTHERTURN -> {
-						NetGaming otherPlayersTurn = new NetGaming(Constants.OTHERS_TURN);
-						clientHandler.sendMessage(otherPlayersTurn);
+						// TODO: check if the change of the turn is handled correctly
+						clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
+						NetGaming othersEndTurn = new NetGaming(Constants.OTHERS_TURN);
+						clientHandler.sendMessage(othersEndTurn);
 					}
 				}
 			} else {

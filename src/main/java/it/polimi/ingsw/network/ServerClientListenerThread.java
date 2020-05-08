@@ -287,6 +287,8 @@ public class ServerClientListenerThread extends Thread {
 					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);
 					sendMessage(gamingMsg);
 				}
+			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_PASS)) {
+				gameServer.handlePassRequest(gamingMsg);
 			} else if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {
 				// it disconnects the user from the lobby
 				disconnect();

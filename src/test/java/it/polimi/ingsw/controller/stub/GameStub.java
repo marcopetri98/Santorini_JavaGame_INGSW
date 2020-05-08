@@ -292,6 +292,7 @@ public class GameStub extends Game {
 				} catch (IllegalStateException e) {
 					godCards.add(GodCardFactory.createGodCard(Constants.GODS_GOD_NAMES.get(i)));
 					playerGod.invoke(players.get(i),godCards.get(godCards.size()-1));
+					i = 100;
 				}
 			}
 		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

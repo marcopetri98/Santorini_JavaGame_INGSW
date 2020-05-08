@@ -9,31 +9,31 @@ public class GodCardFactory {
 			throw new IllegalArgumentException();
 		}
 		switch (godName) {
-			case "Apollo":
+			case "APOLLO":
 				return new Apollo();
 
-			case "Artemis":
+			case "ARTEMIS":
 				return new Artemis();
 
-			case "Athena":
+			case "ATHENA":
 				return new Athena();
 
-			case "Atlas":
+			case "ATLAS":
 				return new Atlas();
 
-			case "Demeter":
+			case "DEMETER":
 				return new Demeter();
 
-			case "Hephaestus":
+			case "HEPHAESTUS":
 				return new Hephaestus();
 
-			case "Minotaur":
+			case "MINOTAUR":
 				return new Minotaur();
 
-			case "Pan":
+			case "PAN":
 				return new Pan();
 
-			case "Prometheus":
+			case "PROMETHEUS":
 				return new Prometheus();
 
 			default:

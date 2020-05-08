@@ -54,6 +54,7 @@ public class SetupManager {
 		}
 		try {
 			observedModel.setOrder(gamers);
+			observedModel.changeTurn();
 		} catch (IllegalArgumentException | WrongPhaseException e) {
 			throw new AssertionError("Generate order called in a phase different from the setup");
 		}
@@ -106,7 +107,7 @@ public class SetupManager {
 			}
 		} else if (Constants.GODS_IN_CHOICE.equals(request.message)) {
 			// if the god is already chosen it throws an exception, if not it sets the god
-			List<String> cardsChosen = observedModel.getPlayers().stream().filter((player) -> { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map((player) -> player.getCard().getName()).collect(Collectors.toList());
+			List<String> cardsChosen = observedModel.getPlayers().stream().filter((player) -> { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map((player) -> player.getCard().getName().toUpperCase()).collect(Collectors.toList());
 			if (cardsChosen.contains(request.divinity) || observedModel.getPhase().getGodsPhase() != GodsPhase.GODS_CHOICE) {
 				throw new BadRequestException();
 			} else {

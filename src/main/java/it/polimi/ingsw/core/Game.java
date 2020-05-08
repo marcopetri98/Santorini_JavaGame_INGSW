@@ -149,7 +149,10 @@ public class Game extends ObservableGame {
 	 * This function handles the advancing of the turn, it means that it checks if it is needed only to advance the subphase (for god setup: challenger choice, gods choice and starter choice, for game turn: before move (which is also the start of the turn), move, before build, build, end turn) of the current phase or if is needed also to change the active player.
 	 */
 	public synchronized void changeTurn() {  //active Player become the next one
-		if (turn.getPhase() == Phase.COLORS) {
+		if (turn.getPhase() == Phase.LOBBY) {
+			turn.advance();
+			notifyPhaseChange(turn.clone());
+		} else if (turn.getPhase() == Phase.COLORS) {
 			if (players.indexOf(activePlayer) != players.size()-1) {
 				turn.advance();
 				notifyPhaseChange(turn.clone());
@@ -292,8 +295,6 @@ public class Game extends ObservableGame {
 		activePlayer = players.get(0);
 		// notifies the remote view of a change
 		notifyOrder((String[])playerOrder.toArray());
-		// once all clients are notified the phase advance to color selection
-		turn.advance();
 	}
 	/**
 	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap<String,Color> with player names and color chosen

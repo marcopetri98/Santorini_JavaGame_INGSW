@@ -1,5 +1,6 @@
 package it.polimi.ingsw.util.observers;
 
+import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.game.NetAvailableBuildings;
 import it.polimi.ingsw.network.game.NetAvailablePositions;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
@@ -53,6 +54,14 @@ public class ObservableRemoteView extends ObservableObject {
 			ctrObs.updateGods(this,playerGods);
 		}
 	}
+	public void notifyPass(String playerName) throws NullPointerException {
+		if (playerName == null) {
+			throw new NullPointerException();
+		}
+		if (ctrObs != null) {
+			ctrObs.updatePass(this,playerName);
+		}
+	}
 	public void notifyMove(NetGaming netMap) throws NullPointerException {
 		if (netMap == null) {
 			throw new NullPointerException();
@@ -75,10 +84,9 @@ public class ObservableRemoteView extends ObservableObject {
 		}
 	}
 
-	// TODO: maybe askPhase isn't necessary
-	/*public Turn askPhase() {
+	public Turn askPhase() {
 		return ctrObs.givePhase();
-	}*/
+	}
 	public NetAvailablePositions askPositions() {
 		if (ctrObs != null) {
 			return ctrObs.giveAvailablePositions();
