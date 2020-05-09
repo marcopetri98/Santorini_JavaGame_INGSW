@@ -294,7 +294,7 @@ public class Game extends ObservableGame {
 		players = temp;
 		activePlayer = players.get(0);
 		// notifies the remote view of a change
-		notifyOrder((String[])playerOrder.toArray());
+		notifyOrder((String[])playerOrder.toArray(new String[0]));
 	}
 	/**
 	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap<String,Color> with player names and color chosen

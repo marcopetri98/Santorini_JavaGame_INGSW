@@ -24,9 +24,11 @@ public class ClientCLI implements Runnable {
 		while (functioning) {
 			CliInput inputGetter = new CliInput();
 			pregame = new CliInitial(inputGetter);
+			game = new CliGame(inputGetter);
 			controller = new MainCliController(pregame);
 			serverListener = new ClientMessageListener(controller);
 			controller.setListener(serverListener);
+			controller.setGameView(game);
 			controller.setInputHandler(inputGetter);
 			serverListener.setDaemon(true);
 			serverListener.start();
@@ -34,8 +36,6 @@ public class ClientCLI implements Runnable {
 			if (pregame.menu() == 0) {
 				lobbyResult = pregame.lobbyCli();
 				if (lobbyResult == 0) {
-					game = new CliGame();
-					controller.setGameView(game);
 					game.start();
 				}
 			} else {

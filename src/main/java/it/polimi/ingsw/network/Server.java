@@ -15,18 +15,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 /**
  * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby
  */
 public class Server implements Runnable {
 	private final HashMap<ServerClientListenerThread, String> lobbyClients;
+	private final List<ServerClientListenerThread> preparedListeners;
+	private HashMap<ServerClientListenerThread, String> previousLobby;
+	private ServerClientListenerThread creator;
+	boolean starting;
 	private int lobbyDimension;
 	// TODO: implement a queue to define the order of arrive
 
 	public Server() {
-		lobbyDimension = 0;
+		lobbyDimension = -1;
+		previousLobby = new HashMap<>();
+		preparedListeners = new ArrayList<>();
 		lobbyClients = new HashMap<>();
+		creator = null;
+		starting = false;
 	}
 
 	@Override
@@ -68,7 +77,7 @@ public class Server implements Runnable {
 			if (name == null) {
 				return  0;
 			}
-			while (lobbyDimension == 1) {
+			while (lobbyDimension == 1 || lobbyClients.size() == lobbyDimension) {
 				try {
 					lobbyClients.wait();
 				} catch (InterruptedException e) {
@@ -78,9 +87,10 @@ public class Server implements Runnable {
 			}
 
 			// if there aren't player it creates the lobby, otherwise it add the player to the lobby
-			if (lobbyDimension == 0) {
+			if (lobbyDimension == -1) {
 				lobbyClients.put(handler,name);
 				lobbyDimension = 1;
+				creator = handler;
 				throw new FirstPlayerException();
 			} else {
 				if (lobbyClients.containsValue(name)) {
@@ -93,9 +103,31 @@ public class Server implements Runnable {
 					return 1;
 				} else {
 					lobbyClients.put(handler,name);
-					createGame();
+					starting = true;
+					new Thread(this::createGame).start();
 					return 2;
 				}
+			}
+		}
+	}
+	/**
+	 * It saves in a list that this handler of a client is now prepared for the game creation
+	 * @param handler an handler of a client that is now prepared
+	 * @throws IllegalCallerException if the handler is not an handler of a player of the game
+	 * @throws IllegalStateException if the handler is already saved in the preparedListeners list
+	 */
+	public void isNowPrepared(ServerClientListenerThread handler) throws IllegalCallerException, IllegalStateException {
+		synchronized (lobbyClients) {
+			if (!lobbyClients.containsKey(handler)) {
+				throw new IllegalCallerException();
+			}
+		}
+		synchronized (preparedListeners) {
+			if (preparedListeners.contains(handler)) {
+				throw new IllegalStateException();
+			} else {
+				preparedListeners.add(handler);
+				preparedListeners.notifyAll();
 			}
 		}
 	}
@@ -105,13 +137,33 @@ public class Server implements Runnable {
 	 * @param handler it is the client messages handler
 	 * @throws AlreadyStartedException if the match is already started this exception is thrown
 	 */
-	public void removePlayer(String name, ServerClientListenerThread handler) throws AlreadyStartedException {
+	public void removePlayer(String name, ServerClientListenerThread handler) throws AlreadyStartedException, IllegalArgumentException {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsValue(name)) {
-				throw new AlreadyStartedException();
+				if (previousLobby.containsKey(handler)) {
+					throw new AlreadyStartedException();
+				} else {
+					throw new IllegalArgumentException();
+				}
 			} else {
+				if (starting) {
+					try {
+						lobbyClients.wait();
+					} catch (InterruptedException e) {
+						//TODO: see every interrupted exception and implement a more elegant way to handle them
+						throw new AssertionError("Thread was interrupted and the code never interrupts it");
+					}
+					throw new AlreadyStartedException();
+				}
 				if (lobbyDimension == 1) {
-					lobbyDimension--;
+					if (creator == handler) {
+						creator = null;
+					}
+					synchronized (preparedListeners) {
+						preparedListeners.remove(handler);
+						preparedListeners.notifyAll();
+					}
+					lobbyDimension = -1;
 					lobbyClients.notifyAll();
 				}
 				lobbyClients.remove(handler);
@@ -125,17 +177,21 @@ public class Server implements Runnable {
 	 * @throws IllegalCallerException The thread that called this method isn't the one that hold the connection for the first player
 	 * @throws IllegalArgumentException The dimension passed is different from 2 or 3
 	 */
-	public void setPlayerNumber(int dimension, ServerClientListenerThread handler) throws IllegalCallerException, IllegalArgumentException {
+	public void setPlayerNumber(int dimension, ServerClientListenerThread handler) throws IllegalCallerException, IllegalArgumentException, IllegalStateException {
 		synchronized (lobbyClients) {
-			if (!lobbyClients.containsKey(handler)) {
+			if (!lobbyClients.containsKey(handler) || creator != handler) {
 				throw new IllegalCallerException();
+			} else if (lobbyDimension == 2 || lobbyDimension == 3) {
+				throw new IllegalStateException();
 			} else {
 				if (dimension == 2 || dimension == 3) {
 					lobbyDimension = dimension;
 					lobbyClients.notifyAll();
 				} else {
-					lobbyDimension = 0;
+					preparedListeners.clear();
 					lobbyClients.clear();
+					lobbyDimension = -1;
+					creator = null;
 					throw new IllegalArgumentException();
 				}
 			}
@@ -168,28 +224,59 @@ public class Server implements Runnable {
 	 * This method create a game where player are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
 	 */
 	private void createGame() {
+		int lobbySize;
+		synchronized (lobbyClients) {
+			lobbySize = lobbyClients.size();
+		}
+		synchronized (preparedListeners) {
+			while (preparedListeners.size() != lobbySize) {
+				try {
+					preparedListeners.wait();
+				} catch (InterruptedException e) {
+					//TODO: see every interrupted exception and implement a more elegant way to handle them
+					throw new AssertionError("Thread was interrupted while waiting for all threads to be ready");
+				}
+			}
+		}
+
 		synchronized (lobbyClients) {
 			if (lobbyDimension == lobbyClients.size()) {
 				try {
-					Game game = new Game((String[]) lobbyClients.values().toArray());
+					Game game = new Game(lobbyClients.values().toArray(new String[0]));
 					ServerController controller = new ServerController(game);
 					List<ServerClientListenerThread> keys = new ArrayList<>(lobbyClients.keySet());
 					for (int i = 0; i < lobbyClients.size(); i++) {
 						RemoteView remoteView = new RemoteView(keys.get(i));
-						keys.get(i).setGamePhase(NetworkPhase.COLORS);
+						keys.get(i).setGamePhase(NetworkPhase.LOBBY);
 						keys.get(i).setGameServer(remoteView);
 						remoteView.addObserver(controller);
 						game.addObserver(remoteView);
 					}
-					new Thread(controller::generateOrder).start();
+					controller.generateOrder();
+					previousLobby = lobbyClients;
 					lobbyClients.clear();
-					lobbyDimension = 0;
+					lobbyDimension = -1;
+					creator = null;
+					starting = false;
+					synchronized (preparedListeners) {
+						preparedListeners.clear();
+						preparedListeners.notifyAll();
+					}
+					lobbyClients.notifyAll();
 				} catch (NullPointerException e) {
+					// it needs a thread making al thread finish to execute because if not, if a thread terminate itself stops before terminating the others
 					for (ServerClientListenerThread handler : lobbyClients.keySet()) {
 						handler.fatalError("During game creation the game was created null and passed to server controller");
 					}
 					lobbyClients.clear();
-					lobbyDimension = 0;
+					lobbyDimension = -1;
+					creator = null;
+					starting = false;
+					synchronized (preparedListeners) {
+						preparedListeners.clear();
+						preparedListeners.notifyAll();
+					}
+					lobbyClients.notifyAll();
 					throw new AssertionError("Something's gone wrong and the server tried to create a gaming server with null game");
 				}
 			}

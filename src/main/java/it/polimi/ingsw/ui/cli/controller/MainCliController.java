@@ -36,7 +36,6 @@ public class MainCliController implements GraphicInterface {
 			throw new NullPointerException();
 		}
 		gameView = game;
-		pregameView = null;
 		inputController.setGameView(game);
 	}
 	public void setPregameView(CliInitial pregame) throws NullPointerException {
@@ -85,7 +84,7 @@ public class MainCliController implements GraphicInterface {
 	@Override
 	public void retrieveConnectionMsg(NetSetup connMsg) {
 		switch (connMsg.message) {
-			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR, Constants.SETUP_CREATE -> {
+			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR, Constants.SETUP_CREATE, Constants.SETUP_OUT_CONNFINISH -> {
 				pregameView.queueMessageMenu(connMsg);
 				pregameView.notifyCliMenu();
 			}

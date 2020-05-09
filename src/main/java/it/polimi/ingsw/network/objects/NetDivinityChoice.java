@@ -9,6 +9,7 @@ public class NetDivinityChoice extends NetObject {
 	public final String challenger;
 	public final String player;
 	public final NetDivinityChoice next;
+	public final boolean godsEnd;
 
 	public NetDivinityChoice(String msg) throws NullPointerException {
 		super(msg);
@@ -16,6 +17,15 @@ public class NetDivinityChoice extends NetObject {
 		challenger = null;
 		player = null;
 		next = null;
+		godsEnd = false;
+	}
+	public NetDivinityChoice(String msg, boolean godsEnd) throws NullPointerException {
+		super(msg);
+		divinity = null;
+		challenger = null;
+		player = null;
+		next = null;
+		this.godsEnd = godsEnd;
 	}
 	public NetDivinityChoice(String msg, String starter) throws NullPointerException {
 		super(msg);
@@ -23,6 +33,7 @@ public class NetDivinityChoice extends NetObject {
 		player = starter;
 		next = null;
 		divinity = null;
+		godsEnd = false;
 	}
 	public NetDivinityChoice(String msg, String player, String other, boolean start) throws NullPointerException {
 		super(msg);
@@ -33,6 +44,7 @@ public class NetDivinityChoice extends NetObject {
 		this.player = start ? other : player;
 		next = null;
 		divinity = start ? null : other;
+		godsEnd = false;
 	}
 	public NetDivinityChoice(String msg, String name, String god, NetDivinityChoice next) throws NullPointerException {
 		super(msg);
@@ -43,6 +55,7 @@ public class NetDivinityChoice extends NetObject {
 		divinity = god;
 		player = name;
 		this.next = next;
+		godsEnd = false;
 	}
 	public NetDivinityChoice(String msg, List<String> divinities) throws NullPointerException {
 		super(msg);
@@ -59,6 +72,7 @@ public class NetDivinityChoice extends NetObject {
 		}
 		player = null;
 		challenger = null;
+		godsEnd = false;
 	}
 	public NetDivinityChoice(String msg, String player, List<String> divinities) throws NullPointerException {
 		super(msg);
@@ -75,6 +89,7 @@ public class NetDivinityChoice extends NetObject {
 		}
 		this.player = player;
 		challenger = null;
+		godsEnd = false;
 	}
 
 	// getters

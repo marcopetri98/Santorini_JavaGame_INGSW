@@ -28,6 +28,7 @@ public class ClientMessageListener extends Thread {
 		stateLock = new Object();
 		inputLock = new Object();
 		outputLock = new Object();
+		currentPhase = NetworkPhase.PRELOBBY;
 	}
 
 	@Override
@@ -114,18 +115,33 @@ public class ClientMessageListener extends Thread {
 	 * 												*
 	 ************************************************/
 	public void parseSetupInput(NetSetup msg) {
+		if (msg.message.equals(Constants.SETUP_CREATE_WORKED) || msg.message.equals(Constants.SETUP_OUT_CONNWORKED) || msg.message.equals(Constants.SETUP_OUT_CONNFINISH)) {
+			currentPhase = NetworkPhase.LOBBY;
+		}
 		viewController.retrieveConnectionMsg(msg);
 	}
 	public void parseLobbyInput(NetLobbyPreparation msg) {
+		if (msg.message.equals(Constants.LOBBY_TURN)) {
+			currentPhase = NetworkPhase.COLORS;
+		}
 		viewController.retrieveLobbyMsg(msg);
 	}
 	public void parseColorInput(NetColorPreparation msg) {
+		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {
+			currentPhase = NetworkPhase.GODS;
+		}
 		viewController.retrieveColorMsg(msg);
 	}
 	public void parseDivinityInput(NetDivinityChoice msg) {
+		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE) && msg.godsEnd) {
+			currentPhase = NetworkPhase.SETUP;
+		}
 		viewController.retrieveGodsMsg(msg);
 	}
 	public void parseGameSetupInput(NetGameSetup msg) {
+		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {
+			currentPhase = NetworkPhase.PLAYERTURN;
+		}
 		viewController.retrieveGameSetupMsg(msg);
 	}
 	public void parseGamingInput(NetGaming msg) {
@@ -171,7 +187,7 @@ public class ClientMessageListener extends Thread {
 	 *												*
 	 *												*
 	 *												*
-	 *	SETTERS OF THIS CLASS USED TO CHANGE STATE	*
+	 * MODIFIERS OF THIS CLASS USED TO CHANGE STATE	*
 	 * 												*
 	 * 												*
 	 * 												*
@@ -189,6 +205,13 @@ public class ClientMessageListener extends Thread {
 	public void setWantsToPlay(boolean value) {
 		synchronized (startLock) {
 			wantsToPlay = value;
+			startLock.notifyAll();
+		}
+	}
+	public void resetListening() {
+		synchronized (startLock) {
+			wantsToPlay = false;
+			currentPhase = NetworkPhase.PRELOBBY;
 			startLock.notifyAll();
 		}
 	}

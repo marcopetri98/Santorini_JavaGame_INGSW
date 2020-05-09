@@ -195,9 +195,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			// builds the sequence object of players to send to player
 			for (int i = 0; i < order.length; i++) {
 				if (i == 0) {
-					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[i], i + 1);
+					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[order.length-1-i], order.length-i);
 				} else {
-					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[i], i + 1, sendOrder);
+					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[order.length-1-i], order.length-i, sendOrder);
 				}
 			}
 			// it communicated to the client the play order
@@ -383,7 +383,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 						clientHandler.sendMessage(divinityChoice);
 					} else if (turn.getPhase() == Phase.SETUP) {
 						clientHandler.setGamePhase(NetworkPhase.SETUP);
-						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE));
+						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,true));
 					}
 				}
 				case SETUP ->  {

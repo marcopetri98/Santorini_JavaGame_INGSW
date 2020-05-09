@@ -43,6 +43,20 @@ public class ServerClientListenerThread extends Thread {
 		output = new ObjectOutputStream(clientSocket.getOutputStream());
 		input = new ObjectInputStream(clientSocket.getInputStream());
 	}
+	protected ServerClientListenerThread() {
+		super("ServerClientListenerThread");
+		gamePhase = NetworkPhase.PRELOBBY;
+		active = true;
+		lobbyServer = null;
+		gameServer = null;
+		this.clientSocket = null;
+		playerName = null;
+		scopeLock = new Object();
+		stateLock = new Object();
+		playerNameLock = new Object();
+		output = null;
+		input = null;
+	}
 
 	@Override
 	public void run() {
@@ -141,27 +155,33 @@ public class ServerClientListenerThread extends Thread {
 	 */
 	private void parseSetupInput(NetSetup setupMessage) {
 		NetSetup setupOutput;
-		String nameReceived = null;
+		String nameReceived;
 		int serverResponse;
 
 		try {
 			nameReceived = setupMessage.getPlayer();
 			// if the player wants to participate to a lobby and it has inserted a name it process it
-			if (setupMessage.message.equals(Constants.SETUP_IN_PARTICIPATE) && nameReceived != null) {
+			if (setupMessage.message.equals(Constants.SETUP_IN_PARTICIPATE) && setupMessage.getPlayer() != null) {
+				setPlayerName(nameReceived);
 				serverResponse = lobbyServer.addPlayer(setupMessage.getPlayer(),this);
 				// it sends an error to the client because there is a player with such name
 				if (serverResponse == 0) {
+					playerName = null;
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFAILED);
+					sendMessage(setupOutput);
 				// it says the client it is inside the lobby
 				} else if (serverResponse == 1) {
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED);
 					setGamePhase(NetworkPhase.LOBBY);
-					setPlayerName(nameReceived);
+					sendMessage(setupOutput);
+					lobbyServer.isNowPrepared(this);
 				// it says to the client that the game is starting
 				} else {
 					// the game phase is updated by the createGame of the server class
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH);
-					setPlayerName(nameReceived);
+					setGamePhase(NetworkPhase.LOBBY);
+					sendMessage(setupOutput);
+					lobbyServer.isNowPrepared(this);
 				}
 			// if the player is trying to setup the number of player inside the lobby it controls that is can do that
 			} else if (setupMessage.message.equals(Constants.SETUP_IN_SETUPNUM)) {
@@ -169,25 +189,36 @@ public class ServerClientListenerThread extends Thread {
 				if (lobbyServer.getToBeCreated() && lobbyServer.getClientPosition(this) == 0) {
 					// it controls that the number is valid
 					if (setupMessage.getNumber() < 4 && setupMessage.getNumber() > 1) {
+						setGamePhase(NetworkPhase.LOBBY);
 						lobbyServer.setPlayerNumber(setupMessage.getNumber(), this);
 						setupOutput = new NetSetup(Constants.SETUP_CREATE_WORKED);
+						sendMessage(setupOutput);
+						lobbyServer.isNowPrepared(this);
 					// it sets an error message to send to the client
 					} else {
 						setupOutput = new NetSetup(Constants.SETUP_ERROR);
+						sendMessage(setupOutput);
 					}
 				// it sets an error message to send to the client
 				} else {
 					setupOutput = new NetSetup(Constants.SETUP_ERROR);
+					sendMessage(setupOutput);
 				}
 			// it sets an error message to send to the client
+			} else if (setupMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
+				if (playerName != null) {
+					disconnect();
+				} else {
+					setupOutput = new NetSetup(Constants.SETUP_ERROR);
+					sendMessage(setupOutput);
+				}
 			} else {
 				setupOutput = new NetSetup(Constants.SETUP_ERROR);
+				sendMessage(setupOutput);
 			}
-			sendMessage(setupOutput);
 		} catch (FirstPlayerException e) {
 			// it asks to the player to specify the player number
-			setGamePhase(NetworkPhase.LOBBY);
-			setPlayerName(nameReceived);
+			setPlayerName(setupMessage.getPlayer());
 			setupOutput = new NetSetup(Constants.SETUP_CREATE);
 			sendMessage(setupOutput);
 		} catch (IllegalCallerException ex) {
@@ -340,7 +371,6 @@ public class ServerClientListenerThread extends Thread {
 	public void setGameServer(RemoteView gameServer) {
 		synchronized (scopeLock) {
 			this.gameServer = gameServer;
-			this.lobbyServer = null;
 			scopeLock.notifyAll();
 		}
 	}

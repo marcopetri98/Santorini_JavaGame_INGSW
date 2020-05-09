@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.cli.view;
 
+import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.objects.NetLobbyPreparation;
 import it.polimi.ingsw.network.objects.NetSetup;
@@ -81,12 +82,15 @@ public class CliInitial {
 
 		while (active) {
 			try {
-				printLobbyQuestion();
-				command = cliInput.getInput();
-				parseLobbyCommands(command);
-				if (stage == MenuPhase.QUITTING) {
-					returnValue = 1;
-					active = false;
+				parseLobbyMessages();
+				if (active) {
+					printLobbyQuestion();
+					command = cliInput.getInput();
+					parseLobbyCommands(command);
+					if (stage == MenuPhase.QUITTING) {
+						returnValue = 1;
+						active = false;
+					}
 				}
 			} catch (IOException e) {
 				active = false;
@@ -120,7 +124,7 @@ public class CliInitial {
 			messagesLobby.add(msg);
 		}
 	}
-	public void queueMessageMenu(NetSetup msg){
+	public void queueMessageMenu(NetSetup msg) {
 		synchronized (messagesMenu) {
 			messagesMenu.add(msg);
 		}
@@ -162,6 +166,7 @@ public class CliInitial {
 				} else {
 					// if the user is trying another name because there is already a player with that name, it immediately tries to connect
 					if (serverAddress != null) {
+						nameChosen = command.commandType;
 						userInputController.connect(nameChosen,serverAddress);
 						synchronized (messagesMenu) {
 							try {
@@ -225,6 +230,9 @@ public class CliInitial {
 						}
 					}
 					parseMenuMessages();
+				} else if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
+					userInputController.disconnect();
+					stage = MenuPhase.QUITTING;
 				} else {
 					printError(4);
 				}
@@ -237,7 +245,7 @@ public class CliInitial {
 			case Constants.SETUP_CREATE -> {
 				stage = MenuPhase.PLAYERNUMBER;
 			}
-			case Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED -> {
+			case Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_OUT_CONNFINISH -> {
 				printMenuMessage(1);
 				active = false;
 			}
@@ -273,6 +281,7 @@ public class CliInitial {
 						active = false;
 					}
 					case Constants.LOBBY_TURN -> {
+						active = false;
 						printGameStarting();
 						printPlayers(netLobbyPreparation);
 					}
@@ -302,7 +311,19 @@ public class CliInitial {
 	}
 	private void printMenuMessage(int i) {
 		switch (i) {
-			case 1 -> System.out.println("You successfully entered in a lobby!");
+			case 1 -> {
+				System.out.print("\n\n");
+				System.out.print("\t\t--------------------------------------------------------------------------\n" +
+						 		 "\t\t|                                                                        |\n" +
+								 "\t\t|      _____          __  __ ______   _      ____  ____  ______     __   |\n" +
+								 "\t\t|     / ____|   /\\   |  \\/  |  ____| | |    / __ \\|  _ \\|  _ \\ \\   / /   |\n" +
+								 "\t\t|    | |  __   /  \\  | \\  / | |__    | |   | |  | | |_) | |_) \\ \\_/ /    |\n" +
+								 "\t\t|    | | |_ | / /\\ \\ | |\\/| |  __|   | |   | |  | |  _ <|  _ < \\   /     |\n" +
+								 "\t\t|    | |__| |/ ____ \\| |  | | |____  | |___| |__| | |_) | |_) | | |      |\n" +
+								 "\t\t|     \\_____/_/    \\_\\_|  |_|______| |______\\____/|____/|____/  |_|      |\n" +
+								 "\t\t|                                                                        |\n" +
+								 "\t\t--------------------------------------------------------------------------\n\n\n");
+			}
 		}
 	}
 	private void printMenuQuestion() {

@@ -21,7 +21,7 @@ import java.util.List;
 public class CliGame {
 	// other view object and attributes relative to the connection with server
 	private final Deque<NetObject> messages;
-	private CliInput inputGetter;
+	private CliInput cliInput;
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
 	boolean challenger;
@@ -38,29 +38,37 @@ public class CliGame {
 	private boolean functioning;
 	private final Object inputLock;
 
-	public CliGame() {
+	public CliGame(CliInput inputGetter) {
 		messages = new ArrayDeque<>();
-		functioning = true;
-		inputLock = new Object();
+		cliInput = inputGetter;
+		inputController = null;
+		// game attributes
+		challenger = false;
+		phase = new Turn();
 		players = new ArrayList<>();
 		playerColors = new ArrayList<>();
 		gods = new ArrayList<>();
-		challenger = false;
-		phase = new Turn();
 		activePlayer = null;
+		netMap = null;
+		netMoves = null;
+		netBuilds = null;
+		// functioning attributes
+		functioning = true;
+		inputLock = new Object();
 	}
 
 	// start method which is the core of game cli class
 	public void start() {
 		Command currentCommand;
 
+		printInitialPhase();
 		// functioning is set to false by parseSyntax if the user wants to quit the game
 		while (functioning) {
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
 				//typeInputPrint(); //directly done in parseMessages
-				currentCommand = inputGetter.getInput();
+				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
 					inputController.getCommand(currentCommand,phase.clone());
@@ -235,9 +243,10 @@ public class CliGame {
 		switch (obj.message) {
 			//COLORS
 			case Constants.COLOR_YOU :
-				while (phase.getPhase() != Phase.COLORS) {
+				// FIXME: This is wrong
+				/*while (phase.getPhase() != Phase.COLORS) {
 					phase.advance();
-				}
+				}*/
 				System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
 				System.out.print("Insert the color: ");	//check color's ok in parsesyntax
 				break;
@@ -430,6 +439,24 @@ public class CliGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	private void printInitialPhase() {
+		switch (phase.getPhase()) {
+			case COLORS -> {
+				System.out.print("\n\n");
+				System.out.print("\t\t--------------------------------------------------------------------------\n" +
+						"\t\t|                                                                        |\n" +
+						"\t\t|      _____ ____  _      ____  _____     _____ ______ _      ______ _____ _______ _____ ____  _   _    |\n" +
+						"\t\t|     / ____/ __ \\| |    / __ \\|  __ \\   / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |   |\n" +
+						"\t\t|    | |   | |  | | |   | |  | | |__) | | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |   |\n" +
+						"\t\t|    | |   | |  | | |   | |  | |  _  /   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |   |\n" +
+						"\t\t|    | |___| |__| | |___| |__| | | \\ \\   ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |   |\n" +
+						"\t\t|     \\_____\\____/|______\\____/|_|  \\_\\ |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|   |\n" +
+						"\t\t|                                                                        |\n" +
+						"\t\t--------------------------------------------------------------------------\n\n\n");
+			}
+		}
+	}
+
 	// PRINTING FUNCTIONS
 	private void printError() {
 

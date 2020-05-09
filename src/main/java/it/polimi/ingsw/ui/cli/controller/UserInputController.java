@@ -45,11 +45,26 @@ public class UserInputController {
 		switch (command.commandType) {
 			case Constants.COMMAND_DISCONNECT -> {
 				switch (turn.getPhase()) {
-					case LOBBY -> listener.sendMessage(new NetLobbyPreparation(Constants.GENERAL_DISCONNECT));
-					case COLORS -> listener.sendMessage(new NetColorPreparation(Constants.GENERAL_DISCONNECT));
-					case GODS -> listener.sendMessage(new NetDivinityChoice(Constants.GENERAL_DISCONNECT));
-					case SETUP -> listener.sendMessage(new NetGameSetup(Constants.GENERAL_DISCONNECT));
-					case PLAYERTURN -> listener.sendMessage(new NetGaming(Constants.GENERAL_DISCONNECT));
+					case LOBBY -> {
+						listener.resetListening();
+						listener.sendMessage(new NetLobbyPreparation(Constants.GENERAL_DISCONNECT));
+					}
+					case COLORS -> {
+						listener.resetListening();
+						listener.sendMessage(new NetColorPreparation(Constants.GENERAL_DISCONNECT));
+					}
+					case GODS -> {
+						listener.resetListening();
+						listener.sendMessage(new NetDivinityChoice(Constants.GENERAL_DISCONNECT));
+					}
+					case SETUP -> {
+						listener.resetListening();
+						listener.sendMessage(new NetGameSetup(Constants.GENERAL_DISCONNECT));
+					}
+					case PLAYERTURN -> {
+						listener.resetListening();
+						listener.sendMessage(new NetGaming(Constants.GENERAL_DISCONNECT));
+					}
 					default -> throw new IllegalStateException();
 				}
 			}
@@ -149,6 +164,10 @@ public class UserInputController {
 				}
 			}
 		}
+	}
+	public void disconnect() {
+		listener.resetListening();
+		listener.sendMessage(new NetSetup(Constants.GENERAL_DISCONNECT));
 	}
 	public void getCommand(int num) throws IllegalArgumentException {
 		if (num != 2 && num != 3) {

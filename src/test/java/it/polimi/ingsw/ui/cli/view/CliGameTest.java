@@ -1,4 +1,4 @@
-package it.polimi.ingsw.ui.cli.view;
+/*package it.polimi.ingsw.ui.cli.view;
 
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.Move;
@@ -117,4 +117,4 @@ public class CliGameTest {
 	}
 
 
-}
+}*/
