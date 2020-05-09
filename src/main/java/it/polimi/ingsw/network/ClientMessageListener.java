@@ -20,6 +20,7 @@ public class ClientMessageListener extends Thread {
 	private final Object startLock, stateLock, inputLock, outputLock;
 
 	public ClientMessageListener(GraphicInterface controller) {
+		super("ClientMessageListener");
 		viewController = controller;
 		active = true;
 		wantsToPlay = false;
@@ -49,8 +50,11 @@ public class ClientMessageListener extends Thread {
 			if (active) {
 				try {
 					ingoingObject = (NetObject) input.readObject();
-				} catch (IOException | ClassNotFoundException e) {
+				} catch (ClassNotFoundException e) {
 					setActive(false);
+				} catch (IOException e) {
+					setActive(false);
+					viewController.retrieveConnectionError();
 				}
 
 				if (ingoingObject != null) {
@@ -140,12 +144,13 @@ public class ClientMessageListener extends Thread {
 	public boolean connectToServer(String address) {
 		try {
 			serverSocket = new Socket(address,21005);
-			input = new ObjectInputStream(serverSocket.getInputStream());
 			output = new ObjectOutputStream(serverSocket.getOutputStream());
+			input = new ObjectInputStream(serverSocket.getInputStream());
 			currentPhase = NetworkPhase.PRELOBBY;
 			return true;
 		} catch (IOException e) {
 			viewController.retrieveConnectionError();
+			setActive(false);
 			return false;
 		}
 	}
@@ -179,6 +184,12 @@ public class ClientMessageListener extends Thread {
 					stateLock.notifyAll();
 				}
 			}
+		}
+	}
+	public void setWantsToPlay(boolean value) {
+		synchronized (startLock) {
+			wantsToPlay = value;
+			startLock.notifyAll();
 		}
 	}
 

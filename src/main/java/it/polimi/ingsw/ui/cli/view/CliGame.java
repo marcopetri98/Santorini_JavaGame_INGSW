@@ -38,7 +38,7 @@ public class CliGame {
 	private boolean functioning;
 	private final Object inputLock;
 
-	public CliGame(){
+	public CliGame() {
 		messages = new ArrayDeque<>();
 		functioning = true;
 		inputLock = new Object();
@@ -107,6 +107,10 @@ public class CliGame {
 	}
 	public void setNetMap(NetMap map){
 		netMap = map;
+	}
+	public void setPlayers(List<String> players) {
+		this.players = new ArrayList<>(players);
+		activePlayer = this.players.get(0);
 	}
 	public void addNetMove(Move m){
 		netMoves.add(new NetMove(m));

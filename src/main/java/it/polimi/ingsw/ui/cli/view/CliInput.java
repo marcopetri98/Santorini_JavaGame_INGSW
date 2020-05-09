@@ -35,6 +35,7 @@ public class CliInput {
 		String userInput = null;
 		boolean foundSomething = false;
 		resetInsertedInput();
+		dropTimeout();
 
 		// waits until the user hasn't wrote something
 		while (timePassed < 1000 && !foundSomething) {

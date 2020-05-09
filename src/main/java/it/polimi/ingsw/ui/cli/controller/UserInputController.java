@@ -15,10 +15,7 @@ import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
 
-import java.util.List;
-
 public class UserInputController {
-	private static final List<Character> number_chars = List.of('0','1','2','3','4','5','6','7','8','9');
 	private CliGame gameView;
 	private ClientMessageListener listener;
 	private NetMap gameMap;
@@ -110,7 +107,7 @@ public class UserInputController {
 					throw new IllegalStateException();
 				} else if (command.getNumParameters() != 6) {
 					throw new IllegalArgumentException();
-				} else if (!isNumber(command.getParameter(1)) || !isNumber(command.getParameter(2)) || !isNumber(command.getParameter(4)) || !isNumber(command.getParameter(5))) {
+				} else if (!Constants.isNumber(command.getParameter(1)) || !Constants.isNumber(command.getParameter(2)) || !Constants.isNumber(command.getParameter(4)) || !Constants.isNumber(command.getParameter(5))) {
 					throw new IllegalArgumentException();
 				} else if (Integer.parseInt(command.getParameter(1)) < 0 || Integer.parseInt(command.getParameter(1)) > 4 || Integer.parseInt(command.getParameter(2)) < 0  || Integer.parseInt(command.getParameter(2)) > 4 || Integer.parseInt(command.getParameter(4)) < 0 || Integer.parseInt(command.getParameter(4)) > 4 || Integer.parseInt(command.getParameter(5)) < 0  || Integer.parseInt(command.getParameter(5)) > 4) {
 					throw new IllegalArgumentException();
@@ -130,7 +127,7 @@ public class UserInputController {
 					throw new IllegalStateException();
 				} else if (command.getNumParameters() != 3) {
 					throw new IllegalArgumentException();
-				} else if (!isNumber(command.getParameter(1)) || !isNumber(command.getParameter(2))) {
+				} else if (!Constants.isNumber(command.getParameter(1)) || !Constants.isNumber(command.getParameter(2))) {
 					throw new IllegalArgumentException();
 				} else {
 					// TODO: "worker1" should be changed with a constant as well as in the CliGame
@@ -143,7 +140,7 @@ public class UserInputController {
 					throw new IllegalStateException();
 				} else if (command.getNumParameters() != 5) {
 					throw new IllegalArgumentException();
-				} else if (!isNumber(command.getParameter(2)) || !isNumber(command.getParameter(3)) || !isNumber(command.getParameter(4)) || (!command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME) && !command.getParameter(1).equals(Constants.COMMAND_BUILD_BUILDING))) {
+				} else if (!Constants.isNumber(command.getParameter(2)) || !Constants.isNumber(command.getParameter(3)) || !Constants.isNumber(command.getParameter(4)) || (!command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME) && !command.getParameter(1).equals(Constants.COMMAND_BUILD_BUILDING))) {
 					throw new IllegalArgumentException();
 				} else {
 					// TODO: "worker1" should be changed with a constant as well as in the CliGame
@@ -161,23 +158,19 @@ public class UserInputController {
 	}
 	/**
 	 *
-	 * @param command
+	 * @param playerName
+	 * @param serverAddress
+	 * @throws NullPointerException
+	 * @throws IllegalArgumentException
 	 */
-	public void connect(Command command) throws IllegalArgumentException {
-		if (command.getNumParameters() != 2) {
+	public void connect(String playerName, String serverAddress) throws IllegalArgumentException {
+		if (playerName == null || serverAddress == null) {
 			throw new IllegalArgumentException();
 		}
-		if (listener.connectToServer(command.getParameter(1))) {
+		if (listener.connectToServer(serverAddress)) {
+			this.playerName = playerName;
+			listener.setWantsToPlay(true);
 			listener.sendMessage(new NetSetup(Constants.SETUP_IN_PARTICIPATE,playerName));
 		}
-	}
-
-	private boolean isNumber(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			if (!number_chars.contains(string.charAt(i))) {
-				return false;
-			}
-		}
-		return true;
 	}
 }

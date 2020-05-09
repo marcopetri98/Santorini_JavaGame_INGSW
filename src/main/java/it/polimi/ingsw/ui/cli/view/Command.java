@@ -26,7 +26,11 @@ public class Command {
 
 	//eventually setters and getters; constructor...
 	public int getNumParameters() {
-		return otherValues.length;
+		if (otherValues == null) {
+			return 0;
+		} else {
+			return otherValues.length;
+		}
 	}
 	public String getParameter(int i) {
 		if (i < otherValues.length) {

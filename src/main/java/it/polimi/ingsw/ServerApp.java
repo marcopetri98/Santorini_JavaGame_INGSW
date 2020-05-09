@@ -9,6 +9,6 @@ import it.polimi.ingsw.network.Server;
  */
 public class ServerApp {
 	public static void main(String[] args) {
-		new Thread(new Server()).start();
+		new Thread(new Server(),"ServerMainThread").start();
 	}
 }

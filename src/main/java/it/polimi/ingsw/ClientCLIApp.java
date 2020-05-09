@@ -9,6 +9,6 @@ import it.polimi.ingsw.network.ClientCLI;
  */
 public class ClientCLIApp {
 	public static void main(String[] args) {
-		new Thread(new ClientCLI()).start();
+		new Thread(new ClientCLI(),"ClientCliMainThread").start();
 	}
 }

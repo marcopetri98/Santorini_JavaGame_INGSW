@@ -30,6 +30,7 @@ public class ServerClientListenerThread extends Thread {
 	 * @param clientSocket This parameter is the client's socket which this object listen
 	 */
 	public ServerClientListenerThread(Socket clientSocket, Server server) throws IOException {
+		super("ServerClientListenerThread");
 		gamePhase = NetworkPhase.PRELOBBY;
 		active = true;
 		lobbyServer = server;
@@ -39,8 +40,8 @@ public class ServerClientListenerThread extends Thread {
 		scopeLock = new Object();
 		stateLock = new Object();
 		playerNameLock = new Object();
-		input = new ObjectInputStream(clientSocket.getInputStream());
 		output = new ObjectOutputStream(clientSocket.getOutputStream());
+		input = new ObjectInputStream(clientSocket.getInputStream());
 	}
 
 	@Override
@@ -51,9 +52,13 @@ public class ServerClientListenerThread extends Thread {
 			// it tries to read an object, if it doesn't succeed it sends the user an error, if he has disconnected it flags the variable active to false to terminate the thread and calls the method disconnect
 			try {
 				ingoingObject = (NetObject)input.readObject();
-			} catch(IOException | ClassNotFoundException e) {
+			} catch(ClassNotFoundException e) {
 				ingoingObject = null;
 				sendGeneralError();
+			} catch (IOException e) {
+				ingoingObject = null;
+				disconnect();
+				active = false;
 			}
 
 			if (ingoingObject != null) {
@@ -136,13 +141,13 @@ public class ServerClientListenerThread extends Thread {
 	 */
 	private void parseSetupInput(NetSetup setupMessage) {
 		NetSetup setupOutput;
-		String name = null;
+		String nameReceived = null;
 		int serverResponse;
 
 		try {
-			name = setupMessage.getPlayer();
+			nameReceived = setupMessage.getPlayer();
 			// if the player wants to participate to a lobby and it has inserted a name it process it
-			if (setupMessage.message.equals(Constants.SETUP_IN_PARTICIPATE) && name != null) {
+			if (setupMessage.message.equals(Constants.SETUP_IN_PARTICIPATE) && nameReceived != null) {
 				serverResponse = lobbyServer.addPlayer(setupMessage.getPlayer(),this);
 				// it sends an error to the client because there is a player with such name
 				if (serverResponse == 0) {
@@ -151,12 +156,12 @@ public class ServerClientListenerThread extends Thread {
 				} else if (serverResponse == 1) {
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED);
 					setGamePhase(NetworkPhase.LOBBY);
-					setPlayerName(name);
+					setPlayerName(nameReceived);
 				// it says to the client that the game is starting
 				} else {
 					// the game phase is updated by the createGame of the server class
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH);
-					setPlayerName(name);
+					setPlayerName(nameReceived);
 				}
 			// if the player is trying to setup the number of player inside the lobby it controls that is can do that
 			} else if (setupMessage.message.equals(Constants.SETUP_IN_SETUPNUM)) {
@@ -182,6 +187,7 @@ public class ServerClientListenerThread extends Thread {
 		} catch (FirstPlayerException e) {
 			// it asks to the player to specify the player number
 			setGamePhase(NetworkPhase.LOBBY);
+			setPlayerName(nameReceived);
 			setupOutput = new NetSetup(Constants.SETUP_CREATE);
 			sendMessage(setupOutput);
 		} catch (IllegalCallerException ex) {
@@ -425,7 +431,7 @@ public class ServerClientListenerThread extends Thread {
 	 * This method disconnects the user and set the active flag to false to terminate the thread
 	 */
 	public void disconnect() {
-		if (gamePhase == NetworkPhase.LOBBY) {
+		if (gamePhase == NetworkPhase.LOBBY || gamePhase == NetworkPhase.PRELOBBY) {
 			try {
 				lobbyServer.removePlayer(playerName,this);
 				closeSocketAndTerminate();

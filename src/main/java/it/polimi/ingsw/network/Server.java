@@ -11,18 +11,22 @@ import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby
  */
 public class Server implements Runnable {
-	private final MultipleList<ServerClientListenerThread, String> lobbyClients;
+	private final HashMap<ServerClientListenerThread, String> lobbyClients;
 	private int lobbyDimension;
 	// TODO: implement a queue to define the order of arrive
 
 	public Server() {
 		lobbyDimension = 0;
-		lobbyClients = new MultipleList<>();
+		lobbyClients = new HashMap<>();
 	}
 
 	@Override
@@ -75,7 +79,7 @@ public class Server implements Runnable {
 
 			// if there aren't player it creates the lobby, otherwise it add the player to the lobby
 			if (lobbyDimension == 0) {
-				lobbyClients.add(handler,name);
+				lobbyClients.put(handler,name);
 				lobbyDimension = 1;
 				throw new FirstPlayerException();
 			} else {
@@ -85,10 +89,10 @@ public class Server implements Runnable {
 
 				// the player doesn't exist already and it is going to be added to the lobby
 				if (lobbyClients.size() < lobbyDimension-1) {
-					lobbyClients.add(handler,name);
+					lobbyClients.put(handler,name);
 					return 1;
 				} else {
-					lobbyClients.add(handler,name);
+					lobbyClients.put(handler,name);
 					createGame();
 					return 2;
 				}
@@ -110,7 +114,7 @@ public class Server implements Runnable {
 					lobbyDimension--;
 					lobbyClients.notifyAll();
 				}
-				lobbyClients.removeByValue(name);
+				lobbyClients.remove(handler);
 			}
 		}
 	}
@@ -148,7 +152,7 @@ public class Server implements Runnable {
 			if (!lobbyClients.containsKey(handler)) {
 				throw new IllegalCallerException();
 			}
-			return lobbyClients.getIndexByKey(handler);
+			return new ArrayList<>(lobbyClients.keySet()).indexOf(handler);
 		}
 	}
 	/**
@@ -167,12 +171,13 @@ public class Server implements Runnable {
 		synchronized (lobbyClients) {
 			if (lobbyDimension == lobbyClients.size()) {
 				try {
-					Game game = new Game((String[]) lobbyClients.getValueList().toArray());
+					Game game = new Game((String[]) lobbyClients.values().toArray());
 					ServerController controller = new ServerController(game);
+					List<ServerClientListenerThread> keys = new ArrayList<>(lobbyClients.keySet());
 					for (int i = 0; i < lobbyClients.size(); i++) {
-						RemoteView remoteView = new RemoteView(lobbyClients.getKey(i));
-						lobbyClients.getKey(i).setGamePhase(NetworkPhase.COLORS);
-						lobbyClients.getKey(i).setGameServer(remoteView);
+						RemoteView remoteView = new RemoteView(keys.get(i));
+						keys.get(i).setGamePhase(NetworkPhase.COLORS);
+						keys.get(i).setGameServer(remoteView);
 						remoteView.addObserver(controller);
 						game.addObserver(remoteView);
 					}
@@ -180,7 +185,7 @@ public class Server implements Runnable {
 					lobbyClients.clear();
 					lobbyDimension = 0;
 				} catch (NullPointerException e) {
-					for (ServerClientListenerThread handler : lobbyClients.getKeyList()) {
+					for (ServerClientListenerThread handler : lobbyClients.keySet()) {
 						handler.fatalError("During game creation the game was created null and passed to server controller");
 					}
 					lobbyClients.clear();

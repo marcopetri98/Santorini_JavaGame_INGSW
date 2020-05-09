@@ -97,4 +97,17 @@ public final class Constants {
 
 	/* General connection messages */
 	public static final String CHECK = "ping";
+
+	/* Constants used by static methods */
+	private static final List<Character> number_chars = List.of('0','1','2','3','4','5','6','7','8','9');
+
+	/* Useful methods */
+	public static boolean isNumber(String string) {
+		for (int i = 0; i < string.length(); i++) {
+			if (!number_chars.contains(string.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

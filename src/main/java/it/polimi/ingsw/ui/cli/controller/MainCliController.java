@@ -85,13 +85,9 @@ public class MainCliController implements GraphicInterface {
 	@Override
 	public void retrieveConnectionMsg(NetSetup connMsg) {
 		switch (connMsg.message) {
-			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR -> {
+			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR, Constants.SETUP_CREATE -> {
 				pregameView.queueMessageMenu(connMsg);
 				pregameView.notifyCliMenu();
-			}
-			case Constants.SETUP_OUT_CONNFINISH, Constants.SETUP_CREATE -> {
-				inputHandler.setTimeout();
-				pregameView.queueMessageMenu(connMsg);
 			}
 		}
 	}
@@ -102,11 +98,7 @@ public class MainCliController implements GraphicInterface {
 	@Override
 	public void retrieveLobbyMsg(NetLobbyPreparation lobbyMsg) {
 		switch (lobbyMsg.message) {
-			case Constants.LOBBY_ERROR -> {
-				pregameView.queueMessageLobby(lobbyMsg);
-				pregameView.notifyCliLobby();
-			}
-			case Constants.LOBBY_TURN -> {
+			case Constants.LOBBY_TURN, Constants.LOBBY_ERROR -> {
 				inputHandler.setTimeout();
 				pregameView.queueMessageLobby(lobbyMsg);
 			}
