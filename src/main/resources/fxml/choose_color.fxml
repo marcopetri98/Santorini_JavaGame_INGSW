@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.ChooseColorSceneController">
+   <children>
+      <ImageView fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/choose_color_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_red" fitHeight="164.0" fitWidth="273.0" layoutX="187.0" layoutY="293.0" onMousePressed="#mousePressedRed" onMouseReleased="#mouseReleasedRed" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/color_red_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_green" fitHeight="164.0" fitWidth="328.0" layoutX="503.0" layoutY="294.0" onMousePressed="#mousePressedGreen" onMouseReleased="#mouseReleasedGreen" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/color_green_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_blue" fitHeight="164.0" fitWidth="351.0" layoutX="819.0" layoutY="292.0" onMousePressed="#mousePressedBlue" onMouseReleased="#mouseReleasedBlue" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/color_blue_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_next" fitHeight="115.0" fitWidth="187.0" layoutX="548.0" layoutY="498.0" onMousePressed="#mousePressedNext" onMouseReleased="#mouseReleasedNext" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_next_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_exit" fitHeight="74.0" fitWidth="122.0" layoutX="172.0" layoutY="582.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

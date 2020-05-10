@@ -1,0 +1,19 @@
+@font-face {
+    src: url("../fonts/LillyBelle.ttf");
+}
+
+.textField_nickname{
+
+    -fx-font-family: "LillyBelle";
+    -fx-font-size: 23px;
+    -fx-text-fill: black;
+
+}
+
+.textField_address{
+
+    -fx-font-family: "LillyBelle";
+    -fx-font-size: 23px;
+    -fx-text-fill: black;
+
+}

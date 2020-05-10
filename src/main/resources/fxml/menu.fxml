@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.MenuSceneController">
+   <children>
+      <ImageView fx:id="menu_background" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/home_background2.png" />
+         </image></ImageView>
+      <ImageView fx:id="button_play" fitHeight="160.0" fitWidth="266.0" layoutX="512.0" layoutY="332.0" onMousePressed="#mousePressedPlay" onMouseReleased="#mouseReleasedPlay" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_play_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_exit" fitHeight="115.0" fitWidth="188.0" layoutX="550.0" layoutY="506.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="logo_santorini" fitHeight="252.0" fitWidth="695.0" layoutX="304.0" layoutY="49.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/santorini_logo.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
