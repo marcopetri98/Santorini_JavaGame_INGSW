@@ -121,7 +121,7 @@ public class ClientMessageListener extends Thread {
 		viewController.retrieveConnectionMsg(msg);
 	}
 	public void parseLobbyInput(NetLobbyPreparation msg) {
-		if (msg.message.equals(Constants.LOBBY_TURN)) {
+		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {
 			currentPhase = NetworkPhase.COLORS;
 		}
 		viewController.retrieveLobbyMsg(msg);

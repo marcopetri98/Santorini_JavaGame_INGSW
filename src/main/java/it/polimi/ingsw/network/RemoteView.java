@@ -202,7 +202,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			}
 			// it communicated to the client the play order
 			clientHandler.sendMessage(sendOrder);
-			clientHandler.setGamePhase(NetworkPhase.COLORS);
 		}
 	}
 	/**
@@ -283,7 +282,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		} else {
 			NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_STARTER,godsInfo);
 			clientHandler.sendMessage(godsMessage);
-			clientHandler.setGamePhase(NetworkPhase.SETUP);
 		}
 	}
 	/**
@@ -354,7 +352,19 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			Game observedGame = (Game) observed;
 			switch (clientHandler.getGamePhase()) {
 				case LOBBY -> {
+					clientHandler.setGamePhase(NetworkPhase.COLORS);
+					clientHandler.sendMessage(new NetLobbyPreparation(Constants.GENERAL_PHASE_UPDATE));
 
+					Game caller = (Game) observed;
+					NetColorPreparation colorTurn = null;
+					if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
+						// the player is the first and for this reason he should choose the color
+						colorTurn = new NetColorPreparation(Constants.COLOR_YOU);
+					} else {
+						// the player isn't the first and for this reason he should not choose the color and should wait
+						colorTurn = new NetColorPreparation(Constants.OTHERS_TURN);
+					}
+					clientHandler.sendMessage(colorTurn);
 				}
 				case COLORS -> {
 					clientHandler.setGamePhase(NetworkPhase.GODS);
