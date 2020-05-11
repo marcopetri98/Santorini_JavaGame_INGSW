@@ -36,6 +36,7 @@ public class MainCliController implements GraphicInterface {
 			throw new NullPointerException();
 		}
 		gameView = game;
+		gameView.setInputController(inputController);
 		inputController.setGameView(game);
 	}
 	public void setPregameView(CliInitial pregame) throws NullPointerException {
