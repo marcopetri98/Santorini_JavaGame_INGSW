@@ -30,11 +30,13 @@ public class CliGame {
 	private List<Color> playerColors;
 	private List<String> gods;
 	private String activePlayer;
+	private String starterPlayer;
 	private NetMap netMap;
 	private List<NetMove> netMoves;
 	private List<NetBuild> netBuilds;
 	private boolean drawPoss = false;
-	private boolean askInputFlag = false;
+	private String code = "null";
+	private String others;
 	// attributes used for functioning
 	private boolean functioning;
 	private final Object inputLock;
@@ -68,15 +70,13 @@ public class CliGame {
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
-				//typeInputPrint(); //directly done in parseMessages
-				if(askInputFlag){	//ask input only if necessary!!!
-					currentCommand = cliInput.getInput();
-					if (parseSyntax(currentCommand)) {
-						// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
-						inputController.getCommand(currentCommand,phase.clone());
-					} else {
-						printError();
-					}
+				typeInputPrint();
+				currentCommand = cliInput.getInput();
+				if (parseSyntax(currentCommand)) {
+					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
+					inputController.getCommand(currentCommand,phase.clone());
+				} else {
+					printError();
 				}
 
 			} catch (IOException | UserInputTimeoutException e) {
@@ -85,7 +85,6 @@ public class CliGame {
 			} catch (IllegalStateException e) {
 				throw new AssertionError("Fatal error: design problem, the get command is called with a command that does not match game phase");
 			}
-			askInputFlag = false;
 		}
 	}
 
@@ -146,9 +145,7 @@ public class CliGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
-	/*private void typeInputPrint() {
 
-	}*/
 	private boolean parseSyntax(Command command) {
 		switch (phase.getPhase()) {
 			//syntax: color colorname
@@ -245,10 +242,7 @@ public class CliGame {
 		}
 		return false;
 	}
-	/*private boolean parseCorrect(Command command) {
 
-		return false;
-	}*/
 	private void parseMessages(){
 		if(messages.size() != 0){
 			parseMessage(messages.getFirst());
@@ -289,18 +283,18 @@ public class CliGame {
 		NetColorPreparation ncp;
 		switch (obj.message) {
 			//COLORS
-			case Constants.COLOR_YOU:
-				System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
-				System.out.print("Insert the color: ");    //check color's ok in parsesyntax
-				askInputFlag = true;
+			case Constants.COLOR_YOU :
+				//System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
+				//System.out.print("Insert the color: ");    //check color's ok in parsesyntax
+				code = Constants.COLOR_YOU;
 				break;
 
-			case Constants.COLOR_ERROR:
-				System.out.println("The color is not available or the syntax was wrong.");
-				askInputFlag = false;
+			case Constants.COLOR_ERROR :
+				//System.out.println("The color is not available or the syntax was wrong.");
+				code = Constants.COLOR_ERROR;
 				break;
 
-			case Constants.COLOR_CHOICES:
+			case Constants.COLOR_CHOICES :
 				ncp = (NetColorPreparation) obj;
 				players.add(ncp.player);
 				playerColors.add(ncp.color);
@@ -308,7 +302,6 @@ public class CliGame {
 					players.add(ncp.next.player);
 					playerColors.add(ncp.next.color);
 				}
-				askInputFlag = false;
 				break;
 		}
 
@@ -320,50 +313,49 @@ public class CliGame {
 			//GODS
 			case Constants.GODS_CHALLENGER:
 				challenger = true;
-				System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-				System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
-				askInputFlag = true;
+				//System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+				//System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
+				code = Constants.GODS_CHALLENGER;
 				break;
 
 			case Constants.GODS_CHOOSE_STARTER:
-				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: player playername");
+				/*System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: player playername");
 				for (String p : players) {
 					System.out.print(p + "\n");
 				}
-				System.out.print("Insert the player name: ");    //check name is ok in parsesyntax
-				askInputFlag = true;
+				System.out.print("Insert the player name: ");*/    //check name is ok in parsesyntax
+				code = Constants.GODS_CHOOSE_STARTER;
 				break;
 
-			case Constants.GODS_STARTER:
+			case Constants.GODS_STARTER :
 				ndc = (NetDivinityChoice) obj;
 				activePlayer = players.get(players.indexOf(ndc.player));
-				System.out.println("This is the player who is going to start the game: " + ndc.player);
-				askInputFlag = false;
+				//System.out.println("This is the player who is going to start the game: " + ndc.player);
+				code = Constants.GODS_STARTER;
 				break;
 
-			case Constants.GODS_YOU:
-				System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-				System.out.print("Insert the god: ");    //check god is ok in parsesyntax
-				askInputFlag = true;
+			case Constants.GODS_YOU :
+				//System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+				//System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+				code = Constants.GODS_YOU;
 				break;
 
-			case Constants.GODS_OTHER:
-				System.out.println("Other players are now chosing the god. Hang on.");
-				askInputFlag = false;
+			case Constants.GODS_OTHER :
+				//System.out.println("Other players are now chosing the god. Hang on.");
+				code = Constants.GODS_OTHER;
 				break;
 
-			case Constants.GODS_ERROR:
-				System.out.println("An error occurred while choosing the god.");
-				askInputFlag = false;
+			case Constants.GODS_ERROR :
+				//System.out.println("An error occurred while choosing the god.");
+				code = Constants.GODS_ERROR;
 				break;
 
-			case Constants.GODS_CHOICES:
+			case Constants.GODS_CHOICES :
 				ndc = (NetDivinityChoice) obj;
 				gods.add(ndc.divinity);
 				if (ndc.next != null) {
 					gods.add(ndc.next.divinity);
 				}
-				askInputFlag = false;
 				break;
 		}
 
@@ -375,14 +367,14 @@ public class CliGame {
 			case Constants.GAMESETUP_PLACE:
 				NetGameSetup ntg = (NetGameSetup) obj;
 				this.netMap = ntg.gameMap;
-				System.out.println("Place the workers with the following syntax: worker worker1 x_coord y_coord worker2 x_coord y_coord");
-				System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
-				askInputFlag = true;
+				//System.out.println("Place the workers with the following syntax: worker worker1 x_coord y_coord worker2 x_coord y_coord");
+				//System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
+				code = Constants.GAMESETUP_PLACE;
 				break;
 
 			case Constants.GAMESETUP_ERROR:
-				System.out.println("An error occurred while positioning the workers.");
-				askInputFlag = false;
+				//System.out.println("An error occurred while positioning the workers.");
+				code = Constants.GAMESETUP_ERROR;
 				break;
 		}
 	}
@@ -391,49 +383,50 @@ public class CliGame {
 		NetGaming ng;
 		switch (obj.message) {
 			//ACTUAL GAME
-			case Constants.PLAYER_ERROR:
-				System.out.println("The message sent is not correct.");
-				askInputFlag = false;
+			case Constants.PLAYER_ERROR :
+				//System.out.println("The message sent is not correct.");
+				code = Constants.PLAYER_ERROR;
 				break;
 
-			case Constants.PLAYER_MOVE:
-				System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
-				System.out.println("Here is the map with the positions where you can move, marked with @:");
+			case Constants.PLAYER_MOVE :
+				//System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
+				//System.out.println("Here is the map with the positions where you can move, marked with @:");
 				ng = (NetGaming) obj;
 				netMoves = ng.availablePositions.moves; //TODO: check - as well as case PLAYER_BUILD
-				drawPossibilities();
-				System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
-				askInputFlag = true;
+				//drawPossibilities();
+				//System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
+				code = Constants.PLAYER_MOVE;
 				break;
 
-			case Constants.PLAYER_BUILD:
-				System.out.println("Now you have to build a buildingor a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
-				System.out.println("Here is the map with the position where you can build:");
+			case Constants.PLAYER_BUILD :
+				//System.out.println("Now you have to build a building or a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
+				//System.out.println("Here is the map with the position where you can build:");
 				ng = (NetGaming) obj;
 				netBuilds = ng.availableBuildings.builds;
-				drawPossibilities();
-				System.out.print("Now build: ");    //check the build is correct in parsesyntax
-				askInputFlag = true;
+				//drawPossibilities();
+				//System.out.print("Now build: ");    //check the build is correct in parsesyntax
+				code = Constants.PLAYER_BUILD;
 				break;
 
-			case Constants.PLAYER_FINISHED_TURN:
+			case Constants.PLAYER_FINISHED_TURN :
 				ng = (NetGaming) obj;
-				System.out.println(ng.player + " has just finished the turn.");
-				askInputFlag = false;
+				others = ng.player;
+				//System.out.println(ng.player + " has just finished the turn.");
+				code = Constants.PLAYER_FINISHED_TURN;
 				break;
 
-			case Constants.OTHERS_TURN:
-				System.out.println("A player has just finished his turn.");
+			case Constants.OTHERS_TURN :
+				//System.out.println("A player has just finished his turn.");
 				ng = (NetGaming) obj;
 				netMap = ng.gameMap;
-				System.out.println("This is the new map:");
-				drawMap();
-				askInputFlag = false;
+				//System.out.println("This is the new map:");
+				//drawMap();
+				code = Constants.OTHERS_TURN;
 				break;
 
-			case Constants.OTHERS_ERROR:
-				System.out.println("An error occurred while running another player's turn.");
-				askInputFlag = false;
+			case Constants.OTHERS_ERROR :
+				//System.out.println("An error occurred while running another player's turn.");
+				code = Constants.OTHERS_ERROR;
 				break;
 		}
 	}
@@ -443,40 +436,47 @@ public class CliGame {
 		switch (obj.message) {
 			//SUPPORT
 			case Constants.CHECK :	//TODO: check if the ping sending to the server is indeed correct!!! It may not be!
-				System.out.println("The server just pinged this client. Responding to the ping...");
 				messages.push(new NetObject(Constants.CHECK));
-				System.out.println("Ping is now queued.");
+				//System.out.println("The server just pinged this client. Responding to the ping.");
 				messages.remove();
+				code = Constants.CHECK;
 				break;
 
 			//GENERAL SIGNALS
 			case Constants.GENERAL_ERROR :
-				System.out.println("An error occurred while inserting the data.");
+				//System.out.println("An error occurred while inserting the data.");
 				messages.remove();
+				code = Constants.GENERAL_ERROR;
 				break;
 
 			case Constants.GENERAL_SETUP_DISCONNECT :
 				NetGameSetup ngs = (NetGameSetup) obj;
-				System.out.println(ngs.player + " just disconnected. The game is shutting off.");
+				others = ngs.player;
+				//System.out.println(ngs.player + " just disconnected. The game is shutting off.");
 				messages.remove();
+				code = Constants.GENERAL_SETUP_DISCONNECT;
 				break;
 
 			case Constants.GENERAL_FATAL_ERROR :
-				System.out.println("Sorry, a fatal error has occurred and the server shut down.");
+				//System.out.println("Sorry, a fatal error has occurred and the server shut down.");
 				messages.remove();
+				code = Constants.GENERAL_FATAL_ERROR;
 				break;
 
 			case Constants.GENERAL_PLAYER_DISCONNECTED :
 				ng = (NetGaming) obj;
-				System.out.println(ng.player + " just disconnected.");
+				others = ng.player;
+				//System.out.println(ng.player + " just disconnected.");
 				messages.remove();
+				code = Constants.GENERAL_PLAYER_DISCONNECTED;
 				break;
 
 			case Constants.GENERAL_WINNER :
 				ng = (NetGaming) obj;
 				for(String p : players) {
 					if(ng.player != null && ng.player.equals(p)){
-						System.out.println(ng.player + " just won the game!");
+						others = ng.player;
+						//System.out.println(ng.player + " just won the game!");
 						break;
 					}
 				}
@@ -488,18 +488,22 @@ public class CliGame {
 				ng = (NetGaming) obj;
 				for(String p : players) {
 					if(ng.player != null && ng.player.equals(p)){
-						System.out.println(ng.player + " just lost.");
+						others = ng.player;
+						//System.out.println(ng.player + " just lost.");
 						break;
 					}
 				}
-				System.out.println("You lost the game.");
+				others = "You";
+				//System.out.println("You lost the game.");
 				messages.remove();
+				code = Constants.GENERAL_DEFEATED;
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE :
-				System.out.println("The map has changed, take a look:");
-				drawMap();
+				//System.out.println("The map has changed, take a look:");
+				//drawMap();
 				messages.remove();
+				code = Constants.GENERAL_GAMEMAP_UPDATE;
 				break;
 
 			case Constants.GENERAL_PHASE_UPDATE :
@@ -507,12 +511,13 @@ public class CliGame {
 					activePlayer = players.get(players.indexOf(activePlayer) == players.size()-1 ? 0 : players.indexOf(activePlayer)+1);
 				}
 				phase.advance();
-				System.out.println("The game phase just changed! New phase: " + phase.getPhase());
+				//System.out.println("The game phase just changed! New phase: " + phase.getPhase());
 				messages.remove();
+				code = Constants.GENERAL_PHASE_UPDATE;
 				break;
 		}
-		askInputFlag = false;
 	}
+
 
 	/* **********************************************
 	 *												*
@@ -544,6 +549,170 @@ public class CliGame {
 	// PRINTING FUNCTIONS
 	private void printError() {
 
+	}
+
+	private void typeInputPrint() {
+		switch (phase.getPhase()) {
+			case COLORS:
+				typeColorsPrint();
+				break;
+
+			case GODS:
+				typeGodsPrint();
+				break;
+
+			case SETUP:
+				typeSetupPrint();
+				break;
+
+			case PLAYERTURN:
+				typePlayerTurnPrint();
+				break;
+		}
+
+		typeOtherPrint();
+	}
+
+	private void typeColorsPrint(){
+		switch(code){
+			case Constants.COLOR_YOU :
+				System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
+				System.out.print("Insert the color: ");    //check color's ok in parsesyntax
+				break;
+
+			case Constants.COLOR_ERROR :
+				System.out.println("The color is not available or the syntax was wrong.");
+				break;
+
+		}
+
+	}
+
+	private void typeGodsPrint(){
+		switch(code){
+			case Constants.GODS_CHALLENGER :
+				System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+				System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
+				break;
+
+			case Constants.GODS_CHOOSE_STARTER :
+				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: player playername");
+				for (String p : players) {
+					System.out.print(p + "\n");
+				}
+				System.out.print("Insert the player name: ");    //check name is ok in parsesyntax
+				break;
+
+			case Constants.GODS_STARTER :
+				System.out.println("This is the player who is going to start the game: " + activePlayer); //TODO : May choose the wrong player to print?
+				break;
+
+			case Constants.GODS_YOU :
+				System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+				System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+				break;
+
+			case Constants.GODS_OTHER :
+				System.out.println("Other players are now chosing the god. Hang on.");
+				break;
+
+			case Constants.GODS_ERROR :
+				System.out.println("An error occurred while choosing the god.");
+				break;
+		}
+	}
+
+	private void typeSetupPrint(){
+		switch(code){
+			case Constants.GAMESETUP_PLACE :
+				System.out.println("Place the workers with the following syntax: worker worker1 x_coord y_coord worker2 x_coord y_coord");
+				System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
+				break;
+
+			case Constants.GAMESETUP_ERROR :
+				System.out.println("An error occurred while positioning the workers.");
+				break;
+
+		}
+	}
+
+	private void typePlayerTurnPrint(){
+		switch(code){
+			case Constants.PLAYER_ERROR :
+				System.out.println("The message sent is not correct.");
+				break;
+
+			case Constants.PLAYER_MOVE :
+				System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
+				System.out.println("Here is the map with the positions where you can move, marked with @:");
+				drawPossibilities();
+				System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
+				break;
+
+			case Constants.PLAYER_BUILD :
+				System.out.println("Now you have to build a building or a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
+				System.out.println("Here is the map with the position where you can build:");
+				drawPossibilities();
+				System.out.print("Now build: ");    //check the build is correct in parsesyntax
+				break;
+
+			case Constants.PLAYER_FINISHED_TURN :
+				System.out.println(others + " has just finished the turn.");
+				break;
+
+			case Constants.OTHERS_TURN :
+				System.out.println("A player has just finished his turn.");
+				System.out.println("This is the new map:");
+				drawMap();
+				break;
+
+			case Constants.OTHERS_ERROR :
+				System.out.println("An error occurred while running another player's turn.");
+				break;
+
+		}
+	}
+
+	private void typeOtherPrint(){
+		switch(code){
+			case Constants.CHECK :
+				System.out.println("The server just pinged this client. Responding to the ping.");
+				break;
+
+			case Constants.GENERAL_ERROR :
+				System.out.println("An error occurred while inserting the data.");
+				break;
+
+			case Constants.GENERAL_SETUP_DISCONNECT :
+				System.out.println(others + " just disconnected. The game is shutting off.");
+				break;
+
+			case Constants.GENERAL_FATAL_ERROR :
+				System.out.println("Sorry, a fatal error has occurred and the server shut down.");
+				break;
+
+			case Constants.GENERAL_PLAYER_DISCONNECTED :
+				System.out.println(others + " just disconnected.");
+				break;
+
+			case Constants.GENERAL_WINNER :
+				System.out.println(others + " just won the game!");
+				break;
+
+			case Constants.GENERAL_DEFEATED :
+				System.out.println(others + " just lost.");
+				break;
+
+			case Constants.GENERAL_GAMEMAP_UPDATE :
+				System.out.println("The map has changed, take a look:");
+				drawMap();
+				break;
+
+			case Constants.GENERAL_PHASE_UPDATE :
+				System.out.println("The game phase just changed! New phase: " + phase.getPhase());
+				break;
+
+		}
 	}
 
 	// DRAWING FUNCTIONS
