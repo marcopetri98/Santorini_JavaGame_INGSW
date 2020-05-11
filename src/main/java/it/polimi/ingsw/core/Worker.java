@@ -10,13 +10,15 @@ import java.util.ArrayDeque;
  * This class also implements part of the Observer pattern used for the Athena class.
  */
 public class Worker extends Observable {
+	// support variables
 	private ArrayDeque<Cell> previousPositions;
-	private Cell position;
 	private Cell lastBuild;
 	private boolean hasBuilt; // always false apart during the turn (at the end of the turn this is set to false)
+	public final Player owner;
+	// state variables
+	private Cell position;
 	public final Color color;
 	public final int workerID;
-	public final Player owner;
 
 	public Worker(Color color, Player owner, int num){
 		this.color = color;
@@ -65,7 +67,7 @@ public class Worker extends Observable {
 	public boolean equals(Object obj) {
 		if (obj instanceof Worker) {
 			Worker other = (Worker) obj;
-			return color.equals(other.color) && workerID == other.workerID && position == other.position; //TODO: may not check everything
+			return color.equals(other.color) && workerID == other.workerID && ((position == null && other.position == null) || (position != null && other.position != null && position.equals(other.position)));
 		}
 		return false;
 	}

@@ -8,40 +8,80 @@ import it.polimi.ingsw.util.Color;
 import static org.junit.Assert.*;
 
 public class BuildingTest {
-	private Map map;
-	private Player player1;
-	private TypeBuild typeBuild;
-	private Build build1;
+	private Building building;
 
 	@Before
 	public void testSetup(){
-		map = new Map();
-		player1 = new Player("Pippo");
-		player1.setPlayerColor(Color.RED);
-		typeBuild = TypeBuild.SIMPLE_BUILD;
-		build1 = new Build(player1.getWorker1(), map.getCell(0,0), false, typeBuild);
-
+		building = new Building();
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void incrementLevelTest() throws Exception {
-		assertEquals(0, map.getCell(0,0).getBuilding().getLevel());
+	@Test
+	public void incrementLevelTest() {
+		building.incrementLevel();
+		assertEquals(1,building.getLevel());
 
-		map.getCell(0,0).getBuilding().incrementLevel();
-		map.getCell(0,0).getBuilding().incrementLevel();
-		map.getCell(0,0).getBuilding().incrementLevel();
-		assertEquals(3, map.getCell(0,0).getBuilding().getLevel());
+		building.incrementLevel();
+		assertEquals(2,building.getLevel());
 
-		map.getCell(0,0).getBuilding().incrementLevel(); //should throw the exception
+		building.incrementLevel();
+		assertEquals(3,building.getLevel());
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void setDomeTest() throws Exception {
-		assertEquals(false,map.getCell(0,0).getBuilding().getDome());
+	@Test (expected = IllegalStateException.class)
+	public void illegalIncrement() {
+		building.incrementLevel();
+		building.incrementLevel();
+		building.incrementLevel();
+		building.incrementLevel();
+	}
 
-		map.getCell(0,0).getBuilding().setDome();
-		assertEquals(true, map.getCell(0,0).getBuilding().getDome());
+	@Test
+	public void setDomeTest() {
+		building.setDome();
 
-		map.getCell(0,0).getBuilding().setDome(); //should throw the exception
+		assertTrue(building.getDome());
+	}
+
+	@Test (expected = IllegalStateException.class)
+	public void illegalSetDome() {
+		building.setDome();
+		building.setDome();
+	}
+
+	@Test
+	public void equalsCorrect() {
+		Building b1 = new Building();
+		Building b2 = new Building();
+		Building b3 = new Building();
+
+		// reflexive property
+		assertTrue(b1.equals(b1));
+		// symmetric property
+		assertTrue(b1.equals(b2));
+		assertTrue(b2.equals(b1));
+		// transitive property
+		assertTrue(b2.equals(b3));
+		assertTrue(b1.equals(b3));
+		// compare with null return false
+		assertFalse(b1.equals(null));
+
+		b1.incrementLevel();
+		assertFalse(b1.equals(b2));
+
+		b2.incrementLevel();
+		assertTrue(b1.equals(b2));
+
+		b1.setDome();
+		assertFalse(b1.equals(b2));
+
+		b2.setDome();
+		assertTrue(b1.equals(b2));
+	}
+
+	@Test
+	public void cloneCorrect() {
+		Building copy = building.clone();
+
+		assertEquals(copy,building);
 	}
 }

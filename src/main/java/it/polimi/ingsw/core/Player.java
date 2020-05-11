@@ -95,17 +95,14 @@ public class Player {
 	// OVERRIDDEN METHODS
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Player)) {
-			return false;
-		} else {
+		if (obj instanceof Player) {
 			Player other = (Player)obj;
-			if (playerID == other.playerID && playerName.equals(other.playerName) && ((worker1 == null && other.worker1 == null) || (worker1 != null && other.worker1 != null && worker1.equals(other.worker1) && worker2.equals(other.worker2))) && ((card == null && other.card == null) || (card != null && other.card != null && card.equals(other.card)))) {
-				return true;
-			} else {
-				return false;
-			}
+			return playerID == other.playerID && playerName.equals(other.playerName) && ((worker1 == null && other.worker1 == null) || (worker1 != null && other.worker1 != null && worker1.color.equals(other.worker1.color) && worker2.color.equals(other.worker2.color))) && ((card == null && other.card == null) || (card != null && other.card != null && card.getName().equals(other.card.getName())));
 		}
+		return false;
 	}
+
+	// TODO: eliminate if possible
 	@Override
 	public Player clone() {	//TODO: doesn't make the previuos positions the same!! Should not be a problem though
 		Player newPlayer = new Player(playerName);

@@ -26,16 +26,20 @@ public class Map {
 	}
 	public int getX(Cell c) throws IllegalArgumentException {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
-			if (cells.get(i).contains(c)) {
-				return i;
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if (c == cells.get(i).get(j)) {
+					return i;
+				}
 			}
 		}
 		throw new IllegalArgumentException();
 	}
 	public int getY(Cell c) throws IllegalArgumentException  {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
-			if (cells.get(i).contains(c)) {
-				return cells.get(i).indexOf(c);
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if (c == cells.get(i).get(j)) {
+					return j;
+				}
 			}
 		}
 		throw new IllegalArgumentException();

@@ -153,7 +153,7 @@ public class Game extends ObservableGame {
 			turn.advance();
 			notifyPhaseChange(turn.clone());
 		} else if (turn.getPhase() == Phase.COLORS) {
-			if (players.indexOf(activePlayer) != players.size()-1) {
+			if (players.indexOf(activePlayer) == players.size()-1) {
 				turn.advance();
 				notifyPhaseChange(turn.clone());
 			}
@@ -261,7 +261,7 @@ public class Game extends ObservableGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
-	// TODO: in all methods call the notify active player when the active player change and REFACTOR the communication of the active players on the RemoteView
+	// TODO: [maybe done? change turn is present in controller?] in all methods call the notify active player when the active player change and REFACTOR the communication of the active players on the RemoteView
 	/**
 	 * This method receives a list of player's names and set the order sorting the players arrayList
 	 * @param playerOrder is the ordered list of players turn sequence
@@ -316,13 +316,17 @@ public class Game extends ObservableGame {
 				found = true;
 			}
 		}
-		if (i == players.size() || players.get(i) != activePlayer) {
+		if (!found) {
 			throw new IllegalArgumentException();
 		}
 
+		// now that I'm sure that the player is present it sets the color
+		activePlayer.setPlayerColor(color);
+
+		// it builds an hashmap to send to the clients
 		HashMap<String,Color> colorInfo = new HashMap<>();
-		for (int j = 0; j < i; j++) {
-			colorInfo.put(players.get(i).getPlayerName(),players.get(i).getWorker1().color);
+		for (int j = 0; j <= players.indexOf(activePlayer); j++) {
+			colorInfo.put(players.get(j).getPlayerName(),players.get(j).getWorker1().color);
 		}
 		notifyColors(colorInfo);
 	}
