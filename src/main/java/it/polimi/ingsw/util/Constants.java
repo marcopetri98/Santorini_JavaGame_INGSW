@@ -81,7 +81,7 @@ public final class Constants {
 	public static final String COMMAND_DISCONNECT = "disconnect";
 	/* Commands given on color phase */
 	public static final String COMMAND_COLOR_CHOICE = "color";
-	public static final List<String> COMMAND_COLOR_COLORS = List.of("blue","green","red");
+	public static final List<String> COMMAND_COLOR_COLORS = List.of("BLUE","GREEN","RED");
 	/* Commands given on gods phase */
 	public static final String COMMAND_GODS_CHOICES = "gods";
 	public static final String COMMAND_GODS_CHOOSE = "god";

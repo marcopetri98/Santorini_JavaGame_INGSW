@@ -190,6 +190,7 @@ public class UserInputController {
 			throw new IllegalArgumentException();
 		}
 		if (listener.connectToServer(serverAddress)) {
+			gameView.setPlayerName(playerName);
 			this.playerName = playerName;
 			listener.setWantsToPlay(true);
 			listener.sendMessage(new NetSetup(Constants.SETUP_IN_PARTICIPATE,playerName));

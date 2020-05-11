@@ -98,6 +98,9 @@ public class MainCliController implements GraphicInterface {
 			case Constants.LOBBY_TURN, Constants.LOBBY_ERROR -> {
 				inputHandler.setTimeout();
 				pregameView.queueMessageLobby(lobbyMsg);
+				if (lobbyMsg.message.equals(Constants.LOBBY_TURN)) {
+					gameView.setPlayers(lobbyMsg);
+				}
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {
 				gameView.addToQueue(lobbyMsg);

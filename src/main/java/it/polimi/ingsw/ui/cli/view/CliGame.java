@@ -29,6 +29,7 @@ public class CliGame {
 	private List<String> players;
 	private List<Color> playerColors;
 	private List<String> gods;
+	private String player;
 	private String activePlayer;
 	private String starterPlayer;
 	private NetMap netMap;
@@ -51,6 +52,7 @@ public class CliGame {
 		players = new ArrayList<>();
 		playerColors = new ArrayList<>();
 		gods = new ArrayList<>();
+		player = null;
 		activePlayer = null;
 		netMap = null;
 		netMoves = null;
@@ -70,7 +72,7 @@ public class CliGame {
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
-				//typeInputPrint();
+				typeInputPrint();
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -123,9 +125,18 @@ public class CliGame {
 	public void setNetMap(NetMap map){
 		netMap = map;
 	}
-	public void setPlayers(List<String> players) {
-		this.players = new ArrayList<>(players);
-		activePlayer = this.players.get(0);
+	public void setPlayers(NetLobbyPreparation lobbyMsg) {
+		players = new ArrayList<>(players);
+		while (lobbyMsg != null) {
+			players.add(lobbyMsg.player);
+			lobbyMsg = lobbyMsg.next;
+		}
+	}
+	public void setPlayerName(String name) throws NullPointerException {
+		if (name == null) {
+			throw new NullPointerException();
+		}
+		player = name;
 	}
 	public void addNetMove(Move m){
 		netMoves.add(new NetMove(m));
@@ -147,97 +158,86 @@ public class CliGame {
 	 ************************************************/
 
 	private boolean parseSyntax(Command command) {
-		switch (phase.getPhase()) {
-			//syntax: color colorname
-			case COLORS -> {
-				if (command.commandType.equals(Constants.COMMAND_COLOR_CHOICE) && command.getNumParameters() == 1 && Constants.COMMAND_COLOR_COLORS.contains(command.getParameter(0))) {
-					return true;
+		if (player.equals(activePlayer)) {
+			switch (phase.getPhase()) {
+				//syntax: color colorname
+				case COLORS -> {
+					if (command.commandType.equals(Constants.COMMAND_COLOR_CHOICE) && command.getNumParameters() == 1 && Constants.COMMAND_COLOR_COLORS.contains(command.getParameter(0).toUpperCase())) {
+						return true;
+					}
 				}
-			}
 
-			//syntax: gods god1 god2 god3 OR god mygod
-			case GODS -> {
-				if (phase.getGodsPhase().equals(GodsPhase.CHALLENGER_CHOICE) && challenger) {
-					if (command.commandType.equals(Constants.COMMAND_GODS_CHOICES) && (command.getNumParameters() == 2 || command.getNumParameters() == 3)) {
-						int j = 0;
-						if(command.getNumParameters() == 2){
-							for (int x = 0; x < 2; x++) {
-								if (Constants.GODS_GOD_NAMES.contains(command.getParameter(x).toUpperCase())) {
-									j++;
-								}
-							}
-							if (j == 2) {
-								return true;
-							}
-						}
-						else if(command.getNumParameters() == 3){
+				//syntax: gods god1 god2 god3 OR god mygod
+				case GODS -> {
+					if (phase.getGodsPhase().equals(GodsPhase.CHALLENGER_CHOICE) && challenger) {
+						if (command.commandType.equals(Constants.COMMAND_GODS_CHOICES) && (command.getNumParameters() == 2 || command.getNumParameters() == 3)) {
+							int j = 0;
 							for (int x = 0; x < 3; x++) {
 								if (Constants.GODS_GOD_NAMES.contains(command.getParameter(x).toUpperCase())) {
 									j++;
 								}
 							}
-							if (j == 3) {
+							if (j == command.getNumParameters()) {
 								return true;
 							}
 						}
-					}
-				} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE) || phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
-					if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
+					} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE) || phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
+						// TODO: implement the state of gods chosen locally
+						if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
+							return true;
+						}
+					} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
 						return true;
 					}
-				} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
-					return true;
 				}
-			}
 
-			//syntax check and something more: worker worker1 x_coord1 y_coord1 worker2 x_coord2 y_coord2
-			case SETUP -> {
-				if (command.commandType.equals(Constants.COMMAND_GAMESETUP_POSITION) && command.getNumParameters() == 6 && command.getParameter(0).equals("worker1") && command.getParameter(3).equals("worker2")) {
-					for (int i = 2; i < 6; i++) {
-						if (i != 3) {
-							if (0 < Integer.parseInt(command.getParameter(i)) || Integer.parseInt(command.getParameter(i)) > 4) {
-								return false;
+				//syntax check and something more: worker worker1 x_coord1 y_coord1 worker2 x_coord2 y_coord2
+				case SETUP -> {
+					if (command.commandType.equals(Constants.COMMAND_GAMESETUP_POSITION) && command.getNumParameters() == 6 && command.getParameter(0).equals("worker1") && command.getParameter(3).equals("worker2")) {
+						for (int i = 2; i < 6; i++) {
+							if (i != 3) {
+								if (0 < Integer.parseInt(command.getParameter(i)) || Integer.parseInt(command.getParameter(i)) > 4) {
+									return false;
+								}
 							}
 						}
-					}
-					if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
-						return false;
+						if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
+							return false;
+						}
 					}
 				}
-			}
 
-			case PLAYERTURN -> {
-				switch (phase.getGamePhase()) {
-					//only syntax: build workerX dome/building level x_coord y_coord
-					case BEFOREMOVE, BUILD -> {
-						if (command.commandType.equals(Constants.COMMAND_BUILD)) {
-							// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
-							// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
-							if (command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
-								if (0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4) {
-									return true;
+				case PLAYERTURN -> {
+					switch (phase.getGamePhase()) {
+						//only syntax: build workerX dome/building level x_coord y_coord
+						case BEFOREMOVE, BUILD -> {
+							if (command.commandType.equals(Constants.COMMAND_BUILD)) {
+								// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
+								// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
+								if (command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
+									if (0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4) {
+										return true;
+									}
+								}
+							}
+						}
+
+						//only syntax: move workerX x_coord y_coord
+						case MOVE -> {
+							if (command.commandType.equals(Constants.COMMAND_MOVE)) {
+								if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
+									if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+										return true;
+									}
 								}
 							}
 						}
 					}
-
-					//only syntax: move workerX x_coord y_coord
-					case MOVE -> {
-						if (command.commandType.equals(Constants.COMMAND_MOVE)) {
-							if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
-								if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
-									return true;
-								}
-							}
-						}
-					}
 				}
 			}
-
-			default -> {
-				if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
-					return true;
-				}
+		} else {
+			if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
+				return true;
 			}
 		}
 		return false;
@@ -274,18 +274,20 @@ public class CliGame {
 				parsePlayerTurn(obj);
 				messages.remove();
 				break;
+
+			default:
+				parseOther(obj);
+				messages.remove();
+				break;
 		}
-
-		parseOther(obj);
 	}
-
 	private void parseColors(NetObject obj) {
 		NetColorPreparation ncp;
 		switch (obj.message) {
 			//COLORS
 			case Constants.COLOR_YOU :
+				activePlayer = player;
 				System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
-				System.out.print("Insert the color: ");    //check color's ok in parsesyntax
 				code = Constants.COLOR_YOU;
 				break;
 
@@ -306,7 +308,6 @@ public class CliGame {
 		}
 
 	}
-
 	private void parseGods(NetObject obj){
 		NetDivinityChoice ndc;
 		switch (obj.message) {
@@ -360,7 +361,6 @@ public class CliGame {
 		}
 
 	}
-
 	private void parseSetup(NetObject obj){
 		switch (obj.message) {
 			//SETUP [WORKERS ON MAP]
@@ -378,7 +378,6 @@ public class CliGame {
 				break;
 		}
 	}
-
 	private void parsePlayerTurn(NetObject obj){
 		NetGaming ng;
 		switch (obj.message) {
@@ -430,7 +429,6 @@ public class CliGame {
 				break;
 		}
 	}
-
 	private void parseOther(NetObject obj){
 		NetGaming ng;
 		switch (obj.message) {
@@ -438,14 +436,12 @@ public class CliGame {
 			case Constants.CHECK :	//TODO: check if the ping sending to the server is indeed correct!!! It may not be!
 				messages.push(new NetObject(Constants.CHECK));
 				System.out.println("The server just pinged this client. Responding to the ping.");
-				messages.remove();
 				code = Constants.CHECK;
 				break;
 
 			//GENERAL SIGNALS
 			case Constants.GENERAL_ERROR :
 				System.out.println("An error occurred while inserting the data.");
-				messages.remove();
 				code = Constants.GENERAL_ERROR;
 				break;
 
@@ -453,13 +449,11 @@ public class CliGame {
 				NetGameSetup ngs = (NetGameSetup) obj;
 				others = ngs.player;
 				System.out.println(ngs.player + " just disconnected. The game is shutting off.");
-				messages.remove();
 				code = Constants.GENERAL_SETUP_DISCONNECT;
 				break;
 
 			case Constants.GENERAL_FATAL_ERROR :
 				System.out.println("Sorry, a fatal error has occurred and the server shut down.");
-				messages.remove();
 				code = Constants.GENERAL_FATAL_ERROR;
 				break;
 
@@ -467,7 +461,6 @@ public class CliGame {
 				ng = (NetGaming) obj;
 				others = ng.player;
 				System.out.println(ng.player + " just disconnected.");
-				messages.remove();
 				code = Constants.GENERAL_PLAYER_DISCONNECTED;
 				break;
 
@@ -481,7 +474,6 @@ public class CliGame {
 					}
 				}
 				System.out.println("You won! Good job!");
-				messages.remove();
 				break;
 
 			case Constants.GENERAL_DEFEATED :
@@ -495,14 +487,12 @@ public class CliGame {
 				}
 				others = "You";
 				System.out.println("You lost the game.");
-				messages.remove();
 				code = Constants.GENERAL_DEFEATED;
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE :
 				System.out.println("The map has changed, take a look:");
 				drawMap();
-				messages.remove();
 				code = Constants.GENERAL_GAMEMAP_UPDATE;
 				break;
 
@@ -511,8 +501,7 @@ public class CliGame {
 					activePlayer = players.get(players.indexOf(activePlayer) == players.size()-1 ? 0 : players.indexOf(activePlayer)+1);
 				}
 				phase.advance();
-				System.out.println("The game phase just changed! New phase: " + phase.getPhase());
-				messages.remove();
+				printInitialPhase();
 				code = Constants.GENERAL_PHASE_UPDATE;
 				break;
 		}
@@ -532,188 +521,75 @@ public class CliGame {
 		switch (phase.getPhase()) {
 			case COLORS -> {
 				System.out.print("\n\n");
-				System.out.print("\t\t--------------------------------------------------------------------------\n" +
-						"\t\t|                                                                        |\n" +
+				System.out.print("\t\t---------------------------------------------------------------------------------------------------------\n" +
+						"\t\t|                                                                                                       |\n" +
 						"\t\t|      _____ ____  _      ____  _____     _____ ______ _      ______ _____ _______ _____ ____  _   _    |\n" +
 						"\t\t|     / ____/ __ \\| |    / __ \\|  __ \\   / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |   |\n" +
 						"\t\t|    | |   | |  | | |   | |  | | |__) | | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |   |\n" +
 						"\t\t|    | |   | |  | | |   | |  | |  _  /   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |   |\n" +
 						"\t\t|    | |___| |__| | |___| |__| | | \\ \\   ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |   |\n" +
 						"\t\t|     \\_____\\____/|______\\____/|_|  \\_\\ |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|   |\n" +
-						"\t\t|                                                                        |\n" +
-						"\t\t--------------------------------------------------------------------------\n\n\n");
+						"\t\t|                                                                                                       |\n" +
+						"\t\t---------------------------------------------------------------------------------------------------------\n\n\n");
 			}
 		}
 	}
-
-	// PRINTING FUNCTIONS
 	private void printError() {
-
-	}
-/*
-	private void typeInputPrint() {
-		switch (phase.getPhase()) {
-			case COLORS:
-				typeColorsPrint();
-				break;
-
-			case GODS:
-				typeGodsPrint();
-				break;
-
-			case SETUP:
-				typeSetupPrint();
-				break;
-
-			case PLAYERTURN:
-				typePlayerTurnPrint();
-				break;
-		}
-
-		typeOtherPrint();
-	}
-
-	private void typeColorsPrint(){
-		switch(code){
-			case Constants.COLOR_YOU :
-				System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
-				System.out.print("Insert the color: ");    //check color's ok in parsesyntax
-				break;
-
-			case Constants.COLOR_ERROR :
-				System.out.println("The color is not available or the syntax was wrong.");
-				break;
-
-		}
-
-	}
-
-	private void typeGodsPrint(){
-		switch(code){
-			case Constants.GODS_CHALLENGER :
-				System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-				System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
-				break;
-
-			case Constants.GODS_CHOOSE_STARTER :
-				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: player playername");
-				for (String p : players) {
-					System.out.print(p + "\n");
+		if (player.equals(activePlayer)) {
+			switch (phase.getPhase()) {
+				case COLORS -> System.out.println("You must choose a color that is red, blue or green and that is not taken by another player.");
+				case GODS -> {
+					if (player.equals(players.get(0))) {
+						switch (phase.getGodsPhase()) {
+							case CHALLENGER_CHOICE -> System.out.println("You must choose "+players.size()+" gods from the previously showed.");
+							case GODS_CHOICE -> System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player.");
+							case STARTER_CHOICE -> System.out.println("You must choose a player that is inside the game.");
+						}
+					} else {
+						System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player.");
+					}
 				}
-				System.out.print("Insert the player name: ");    //check name is ok in parsesyntax
-				break;
-
-			case Constants.GODS_STARTER :
-				System.out.println("This is the player who is going to start the game: " + activePlayer); //TODO : May choose the wrong player to print?
-				break;
-
-			case Constants.GODS_YOU :
-				System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-				System.out.print("Insert the god: ");    //check god is ok in parsesyntax
-				break;
-
-			case Constants.GODS_OTHER :
-				System.out.println("Other players are now chosing the god. Hang on.");
-				break;
-
-			case Constants.GODS_ERROR :
-				System.out.println("An error occurred while choosing the god.");
-				break;
+				case SETUP -> System.out.println("You must place the worker in a valid cell.");
+				case PLAYERTURN -> {
+					switch (phase.getGamePhase()) {
+						case BEFOREMOVE -> System.out.println("You can build only in the cells showed before.");
+						case MOVE -> System.out.println("You must move in the cells showed before.");
+						case BUILD -> System.out.println("You must build only in one of the cells showed before.");
+					}
+				}
+			}
+		} else {
+			System.out.println("You can only disconnect during turn of other players.");
 		}
 	}
-
-	private void typeSetupPrint(){
-		switch(code){
-			case Constants.GAMESETUP_PLACE :
-				System.out.println("Place the workers with the following syntax: worker worker1 x_coord y_coord worker2 x_coord y_coord");
-				System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
-				break;
-
-			case Constants.GAMESETUP_ERROR :
-				System.out.println("An error occurred while positioning the workers.");
-				break;
-
+	private void typeInputPrint() {
+		if (player.equals(activePlayer)) {
+			switch (phase.getPhase()) {
+				case COLORS -> System.out.print("Type the color you want to use: ");
+				case GODS -> {
+					if (player.equals(players.get(0))) {
+						switch (phase.getGodsPhase()) {
+							case CHALLENGER_CHOICE -> System.out.print("Choose the gods for the game: ");
+							case GODS_CHOICE -> System.out.print("Choose your god for the game: ");
+							case STARTER_CHOICE -> System.out.print("Choose the starter player: ");
+						}
+					} else {
+						System.out.print("Choose your god for the game: ");
+					}
+				}
+				case SETUP -> System.out.print("Place a worker on the map: ");
+				case PLAYERTURN -> {
+					switch (phase.getGamePhase()) {
+						case BEFOREMOVE -> System.out.print("You can build before moving: ");
+						case MOVE -> System.out.print("Move a worker: ");
+						case BUILD -> System.out.print("Build in a place with the worker you used before: ");
+					}
+				}
+			}
+		} else {
+			System.out.print("You can disconnect if you want, otherwise you can wait: ");
 		}
 	}
-
-	private void typePlayerTurnPrint(){
-		switch(code){
-			case Constants.PLAYER_ERROR :
-				System.out.println("The message sent is not correct.");
-				break;
-
-			case Constants.PLAYER_MOVE :
-				System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
-				System.out.println("Here is the map with the positions where you can move, marked with @:");
-				drawPossibilities();
-				System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
-				break;
-
-			case Constants.PLAYER_BUILD :
-				System.out.println("Now you have to build a building or a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
-				System.out.println("Here is the map with the position where you can build:");
-				drawPossibilities();
-				System.out.print("Now build: ");    //check the build is correct in parsesyntax
-				break;
-
-			case Constants.PLAYER_FINISHED_TURN :
-				System.out.println(others + " has just finished the turn.");
-				break;
-
-			case Constants.OTHERS_TURN :
-				System.out.println("A player has just finished his turn.");
-				System.out.println("This is the new map:");
-				drawMap();
-				break;
-
-			case Constants.OTHERS_ERROR :
-				System.out.println("An error occurred while running another player's turn.");
-				break;
-
-		}
-	}
-
-	private void typeOtherPrint(){
-		switch(code){
-			case Constants.CHECK :
-				System.out.println("The server just pinged this client. Responding to the ping.");
-				break;
-
-			case Constants.GENERAL_ERROR :
-				System.out.println("An error occurred while inserting the data.");
-				break;
-
-			case Constants.GENERAL_SETUP_DISCONNECT :
-				System.out.println(others + " just disconnected. The game is shutting off.");
-				break;
-
-			case Constants.GENERAL_FATAL_ERROR :
-				System.out.println("Sorry, a fatal error has occurred and the server shut down.");
-				break;
-
-			case Constants.GENERAL_PLAYER_DISCONNECTED :
-				System.out.println(others + " just disconnected.");
-				break;
-
-			case Constants.GENERAL_WINNER :
-				System.out.println(others + " just won the game!");
-				break;
-
-			case Constants.GENERAL_DEFEATED :
-				System.out.println(others + " just lost.");
-				break;
-
-			case Constants.GENERAL_GAMEMAP_UPDATE :
-				System.out.println("The map has changed, take a look:");
-				drawMap();
-				break;
-
-			case Constants.GENERAL_PHASE_UPDATE :
-				System.out.println("The game phase just changed! New phase: " + phase.getPhase());
-				break;
-
-		}
-	}*/
 
 	// DRAWING FUNCTIONS
 	public void drawPossibilities(){
@@ -854,5 +730,4 @@ public class CliGame {
 			}
 		}
 	}
-
 }
