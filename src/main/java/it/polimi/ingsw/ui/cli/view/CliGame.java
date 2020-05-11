@@ -320,7 +320,7 @@ public class CliGame {
 			//GODS
 			case Constants.GODS_CHALLENGER:
 				challenger = true;
-				System.out.print("Insert the gods you want to use with the following syntax: gods nomedivinità1 nomedivinità2 nomedivinità3\nScegli tra le seguenti divinità: apollo, artemis, athena, atlas, demeter, hephestus, minotaur, pan, prometheus.\n");
+				System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 				System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
 				askInputFlag = true;
 				break;
@@ -337,12 +337,12 @@ public class CliGame {
 			case Constants.GODS_STARTER:
 				ndc = (NetDivinityChoice) obj;
 				activePlayer = players.get(players.indexOf(ndc.player));
-				System.out.println("Questo è il giocatore che inizierà il turno: " + ndc.player);
+				System.out.println("This is the player who is going to start the game: " + ndc.player);
 				askInputFlag = false;
 				break;
 
 			case Constants.GODS_YOU:
-				System.out.print("Insert the god power you want to use with the following syntax: god nomedivinità\nScegli tra le seguenti divinità: apollo, artemis, athena, atlas, demeter, hephestus, minotaur, pan, prometheus.\n");
+				System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 				System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 				askInputFlag = true;
 				break;
@@ -575,6 +575,8 @@ public class CliGame {
 		System.out.println("|" + drawSpaces(2, netMap.getCell(0,4)) + drawBuilding(netMap.getCell(0,4)) + drawSpaces(2, netMap.getCell(0,4)) + "|" + drawSpaces(2, netMap.getCell(1,4)) + drawBuilding(netMap.getCell(1,4)) + drawSpaces(2, netMap.getCell(1,4)) + "|" + drawSpaces(2, netMap.getCell(2,4)) + drawBuilding(netMap.getCell(2,4)) + drawSpaces(2, netMap.getCell(2,4)) + "|" + drawSpaces(2, netMap.getCell(3,4)) + drawBuilding(netMap.getCell(3,4)) + drawSpaces(2, netMap.getCell(3,4)) + "|" + drawSpaces(2, netMap.getCell(4,4)) + drawBuilding(netMap.getCell(4,4)) + drawSpaces(2, netMap.getCell(4,4)) + "|");
 		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
 
+		writeAllInfo();
+
 		drawPoss = false;
 		//System.out.println('\u0905');
 	}
@@ -671,6 +673,17 @@ public class CliGame {
 			return "B:1";
 		}
 		return "   ";
+	}
+
+	public void writeAllInfo(){
+		for (int y = 0; y < 5; y++) {
+			for(int x = 0; x < 5; x++){
+				NetWorker myWorker = netMap.getCell(x,y).worker;
+				if(myWorker != null){
+					System.out.println("Il worker " + myWorker.workerID + " del player " + myWorker.owner + " è in posizione:  x = " + x + "; y = " + y + ".");
+				}
+			}
+		}
 	}
 
 }
