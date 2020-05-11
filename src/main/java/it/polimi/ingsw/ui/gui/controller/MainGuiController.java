@@ -1,26 +1,77 @@
 package it.polimi.ingsw.ui.gui.controller;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
+import it.polimi.ingsw.network.ClientMessageListener;
+import it.polimi.ingsw.network.objects.*;
+import it.polimi.ingsw.ui.GraphicInterface;
 
-public class MainGuiController extends Application {
+/**
+ * This is a class which implements the Singleton pattern
+ */
+public class MainGuiController implements GraphicInterface {
+	private static MainGuiController guiController;
+	private ClientMessageListener listener;
 
-	@Override
-	public void start(Stage stage) throws Exception {
-		Parent root = FXMLLoader.load(getClass().getResource("/fxml/loading.fxml")); //in this moment, I'm using this as a scene tester
-		Scene menu = new Scene(root);
-		stage.setScene(menu);
-		stage.setTitle("Santorini");
-		stage.getIcons().add(new Image("/img/icon_logo.png"));
-		stage.setResizable(false);
-		stage.show();
+	private MainGuiController() {
+		super();
+	}
+	public static MainGuiController getInstance() {
+		if (guiController == null) {
+			guiController = new MainGuiController();
+		}
+		return guiController;
 	}
 
-	public static void main(String[] args){
-		launch(args);
+	/* **********************************************
+	 *												*
+	 *												*
+	 *			SETTERS FOR THIS CLASS				*
+	 * 												*
+	 * 												*
+	 ************************************************/
+	public void setListener(ClientMessageListener listener) throws NullPointerException {
+		if (listener == null) {
+			throw new NullPointerException();
+		}
+		this.listener = listener;
+	}
+
+	/* **********************************************
+	 *												*
+	 *												*
+	 *				OVERRIDDEN METHODS				*
+	 * 												*
+	 * 												*
+	 ************************************************/
+	@Override
+	public void retrieveError() {
+
+	}
+	@Override
+	public void retrieveConnectionError() {
+
+	}
+	@Override
+	public void retrieveConnectionMsg(NetSetup connMsg) {
+
+	}
+	@Override
+	public void retrieveLobbyMsg(NetLobbyPreparation lobbyMsg) {
+
+	}
+	@Override
+	public void retrieveColorMsg(NetColorPreparation colorMsg) {
+
+	}
+	@Override
+	public void retrieveGodsMsg(NetDivinityChoice godsMsg) {
+
+	}
+	@Override
+	public void retrieveGameSetupMsg(NetGameSetup gameSetupMsg) {
+
+	}
+	@Override
+	public void retrieveGamingMsg(NetGaming gamingMsg) {
+
 	}
 }
