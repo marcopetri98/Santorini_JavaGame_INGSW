@@ -1,15 +1,12 @@
 package it.polimi.ingsw.ui.cli.controller;
 
 import it.polimi.ingsw.network.ClientMessageListener;
-import it.polimi.ingsw.network.game.NetMap;
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.ui.GraphicInterface;
 import it.polimi.ingsw.ui.cli.view.CliGame;
 import it.polimi.ingsw.ui.cli.view.CliInitial;
 import it.polimi.ingsw.ui.cli.view.CliInput;
 import it.polimi.ingsw.util.Constants;
-
-import java.util.List;
 
 public class MainCliController implements GraphicInterface {
 	private CliGame gameView;
@@ -101,6 +98,9 @@ public class MainCliController implements GraphicInterface {
 			case Constants.LOBBY_TURN, Constants.LOBBY_ERROR -> {
 				inputHandler.setTimeout();
 				pregameView.queueMessageLobby(lobbyMsg);
+			}
+			case Constants.GENERAL_PHASE_UPDATE -> {
+				gameView.addToQueue(lobbyMsg);
 			}
 		}
 	}
