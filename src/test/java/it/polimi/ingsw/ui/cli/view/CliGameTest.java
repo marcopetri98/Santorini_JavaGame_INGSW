@@ -1,5 +1,9 @@
 /*package it.polimi.ingsw.ui.cli.view;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import it.polimi.ingsw.core.Map;
 import it.polimi.ingsw.core.Move;
 import it.polimi.ingsw.core.Player;
@@ -30,7 +34,7 @@ public class CliGameTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		cligame = new CliGame();
+		cligame = new CliGame(new CliInput());
 	}
 
 	@Test
@@ -48,6 +52,9 @@ public class CliGameTest {
 
 	@Test
 	public void drawMap1() {
+		Class cl = player.getClass();
+		Method setPLAYERCOLOR = cl.getMethod("setPlayerColor", new Class[]{new Color().getClass()});
+
 		player = new Player("Pippo");
 		player.setPlayerColor(Color.RED);
 		Player opponent = new Player("Pluto");
@@ -109,7 +116,7 @@ public class CliGameTest {
 		}
 
 		while(!cligame.getPhase().getGamePhase().equals(GamePhase.MOVE)){
-			cligame.phase.advance();
+			cligame.getPhasePointer().advance();
 		}
 		netMap = new NetMap(map);
 		cligame.setNetMap(netMap);

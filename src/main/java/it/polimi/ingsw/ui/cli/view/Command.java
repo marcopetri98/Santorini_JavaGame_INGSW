@@ -17,8 +17,8 @@ public class Command {
 				otherValues = null;
 			} else {
 				otherValues = new String[words.length-1];
-				for (int i = 1; i < otherValues.length; i++) {
-					otherValues[i] = words[i];
+				for (int i = 0; i < otherValues.length; i++) {
+					otherValues[i] = words[i+1];
 				}
 			}
 		}
