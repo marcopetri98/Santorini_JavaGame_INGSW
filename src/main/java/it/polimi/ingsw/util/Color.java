@@ -1,6 +1,8 @@
 package it.polimi.ingsw.util;
 
-public class Color {
+import java.io.Serializable;
+
+public class Color implements Serializable {
 	public static final Color BLACK = new Color(0,0,0);
 	public static final Color WHITE = new Color(255,255,255);
 	public static final Color RED = new Color(255,0,0);

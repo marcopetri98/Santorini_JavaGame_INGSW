@@ -14,9 +14,11 @@ public class MainCliController implements GraphicInterface {
 	private CliInput inputHandler;
 	private ClientMessageListener listener;
 	private UserInputController inputController;
+	private boolean pregameStage;
 
 	public MainCliController(CliInitial pregameView) {
 		this.pregameView = pregameView;
+		pregameStage = true;
 	}
 
 	/* **********************************************
@@ -54,6 +56,9 @@ public class MainCliController implements GraphicInterface {
 		inputController = new UserInputController(listener);
 		pregameView.setUserInputController(inputController);
 	}
+	public void setPregameStage(boolean value) {
+		pregameStage = value;
+	}
 
 	/* **********************************************
 	 *												*
@@ -67,13 +72,33 @@ public class MainCliController implements GraphicInterface {
 	 ************************************************/
 	@Override
 	public void retrieveError() {
-		// TODO: implement a way to inform the user that the server crashed
+		if (pregameStage) {
+			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
+			pregameView.queueMessage(clientErrorMsg);
+			inputHandler.setTimeout();
+		} else {
+			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
+			gameView.addToQueue(clientErrorMsg);
+			inputHandler.setTimeout();
+		}
 	}
 	@Override
 	public void retrieveConnectionError() {
-		// TODO: insert after cli push when parameters are known
-		inputHandler.setTimeout();
-		// pregameView.printError();
+		if (pregameStage) {
+			if (pregameView.isMenuPhase()) {
+				NetObject clientErrorMsg = new NetObject(Constants.GENERAL_NOT_EXIST_SERVER);
+				pregameView.queueMessage(clientErrorMsg);
+				inputHandler.setTimeout();
+			} else {
+				NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
+				pregameView.queueMessage(clientErrorMsg);
+				inputHandler.setTimeout();
+			}
+		} else {
+			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
+			gameView.addToQueue(clientErrorMsg);
+			inputHandler.setTimeout();
+		}
 	}
 	/**
 	 * It receives asynchronous or synchronous messages from the network component a message that is during the connection to a lobby to participate to a game
@@ -83,8 +108,8 @@ public class MainCliController implements GraphicInterface {
 	public void retrieveConnectionMsg(NetSetup connMsg) {
 		switch (connMsg.message) {
 			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR, Constants.SETUP_CREATE, Constants.SETUP_OUT_CONNFINISH -> {
-				pregameView.queueMessageMenu(connMsg);
-				pregameView.notifyCliMenu();
+				pregameView.queueMessage(connMsg);
+				pregameView.notifyPregameCli();
 			}
 		}
 	}
@@ -97,7 +122,7 @@ public class MainCliController implements GraphicInterface {
 		switch (lobbyMsg.message) {
 			case Constants.LOBBY_TURN, Constants.LOBBY_ERROR -> {
 				inputHandler.setTimeout();
-				pregameView.queueMessageLobby(lobbyMsg);
+				pregameView.queueMessage(lobbyMsg);
 				if (lobbyMsg.message.equals(Constants.LOBBY_TURN)) {
 					gameView.setPlayers(lobbyMsg);
 				}

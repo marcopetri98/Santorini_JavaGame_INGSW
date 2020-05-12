@@ -14,11 +14,61 @@ import java.net.Socket;
  * This class is the base class for Server and client communication, it receives client input and send to the client server output regarding to the match the client's playing.
  */
 public class ServerClientListenerThread extends Thread {
+	/**
+	 * This is a private class which only aim is to check that the client is currently online and is playing the game with ping requests implemented using the NetObject class with a special message to indicate this intention.
+	 */
+	private class ClientConnection implements Runnable {
+		private boolean receivedPing;
+
+		ClientConnection() {
+			receivedPing = false;
+		}
+
+		@Override
+		public void run() {
+			while (verifyClient && output != null) {
+				receivedPing = false;
+				synchronized (output) {
+					NetObject ping = new NetObject(Constants.CHECK);
+					try {
+						output.writeObject(ping);
+						output.flush();
+						output.reset();
+					} catch (IOException e) {
+						destroyListener();
+					}
+				}
+				try {
+					Thread.sleep(5000);
+					if (!receivedPing) {
+						destroyListener();
+					}
+				} catch (InterruptedException e) {
+					throw new AssertionError("Someone tried to interrupt ClientConnection");
+				}
+			}
+		}
+
+		private void destroyListener() {
+			if (playerName != null) {
+				disconnect();
+			}
+			synchronized (stateLock) {
+				verifyClient = false;
+			}
+		}
+		private void setReceivedPing() {
+			receivedPing = true;
+		}
+	}
+
 	private Server lobbyServer;
 	private RemoteView gameServer;
 	private NetworkPhase gamePhase;
 	private boolean active;
+	private boolean verifyClient;
 	private String playerName;
+	private ClientConnection connectionListener;
 	private final Socket clientSocket;
 	private final ObjectInputStream input;
 	private final ObjectOutputStream output;
@@ -33,6 +83,7 @@ public class ServerClientListenerThread extends Thread {
 		super("ServerClientListenerThread");
 		gamePhase = NetworkPhase.PRELOBBY;
 		active = true;
+		verifyClient = true;
 		lobbyServer = server;
 		gameServer = null;
 		this.clientSocket = clientSocket;
@@ -42,11 +93,14 @@ public class ServerClientListenerThread extends Thread {
 		playerNameLock = new Object();
 		output = new ObjectOutputStream(clientSocket.getOutputStream());
 		input = new ObjectInputStream(clientSocket.getInputStream());
+		connectionListener = new ClientConnection();
+		new Thread(connectionListener).start();
 	}
 	protected ServerClientListenerThread() {
 		super("ServerClientListenerThread");
 		gamePhase = NetworkPhase.PRELOBBY;
 		active = true;
+		verifyClient = true;
 		lobbyServer = null;
 		gameServer = null;
 		this.clientSocket = null;
@@ -56,6 +110,7 @@ public class ServerClientListenerThread extends Thread {
 		playerNameLock = new Object();
 		output = null;
 		input = null;
+		connectionListener = new ClientConnection();
 	}
 
 	@Override
@@ -70,6 +125,7 @@ public class ServerClientListenerThread extends Thread {
 				ingoingObject = null;
 				sendGeneralError();
 			} catch (IOException e) {
+				verifyClient = false;
 				ingoingObject = null;
 				disconnect();
 				active = false;
@@ -80,60 +136,63 @@ public class ServerClientListenerThread extends Thread {
 				synchronized (stateLock) {
 					phase = gamePhase;
 				}
-				switch (phase) {
-					case PRELOBBY:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetSetup)) {
-							sendGeneralError();
-						} else {
-							parseSetupInput((NetSetup) ingoingObject);
-						}
-						break;
+				connectionListener.setReceivedPing();
+				if (!ingoingObject.message.equals(Constants.CHECK)) {
+					switch (phase) {
+						case PRELOBBY:
+							// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
+							if (!(ingoingObject instanceof NetSetup)) {
+								sendGeneralError();
+							} else {
+								parseSetupInput((NetSetup) ingoingObject);
+							}
+							break;
 
-					case LOBBY:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetLobbyPreparation)) {
-							sendGeneralError();
-						} else {
-							parseLobbyInput((NetLobbyPreparation)ingoingObject);
-						}
-						break;
+						case LOBBY:
+							// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
+							if (!(ingoingObject instanceof NetLobbyPreparation)) {
+								sendGeneralError();
+							} else {
+								parseLobbyInput((NetLobbyPreparation) ingoingObject);
+							}
+							break;
 
-					case COLORS:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetColorPreparation)) {
-							sendGeneralError();
-						} else {
-							parseColorInput((NetColorPreparation)ingoingObject);
-						}
-						break;
+						case COLORS:
+							// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
+							if (!(ingoingObject instanceof NetColorPreparation)) {
+								sendGeneralError();
+							} else {
+								parseColorInput((NetColorPreparation) ingoingObject);
+							}
+							break;
 
-					case GODS:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetDivinityChoice)) {
-							sendGeneralError();
-						} else {
-							parseDivinityInput((NetDivinityChoice)ingoingObject);
-						}
-						break;
+						case GODS:
+							// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
+							if (!(ingoingObject instanceof NetDivinityChoice)) {
+								sendGeneralError();
+							} else {
+								parseDivinityInput((NetDivinityChoice) ingoingObject);
+							}
+							break;
 
-					case SETUP:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetGameSetup)) {
-							sendGeneralError();
-						} else {
-							parseGameSetupInput((NetGameSetup)ingoingObject);
-						}
-						break;
+						case SETUP:
+							// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
+							if (!(ingoingObject instanceof NetGameSetup)) {
+								sendGeneralError();
+							} else {
+								parseGameSetupInput((NetGameSetup) ingoingObject);
+							}
+							break;
 
-					default:
-						// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
-						if (!(ingoingObject instanceof NetGaming)) {
-							sendGeneralError();
-						} else {
-							parseGamingInput((NetGaming)ingoingObject);
-						}
-						break;
+						default:
+							// if the user is sending messages he cannot send it will receive an error message (this never happen without a malicious user)
+							if (!(ingoingObject instanceof NetGaming)) {
+								sendGeneralError();
+							} else {
+								parseGamingInput((NetGaming) ingoingObject);
+							}
+							break;
+					}
 				}
 			}
 		}
@@ -389,6 +448,7 @@ public class ServerClientListenerThread extends Thread {
 			try {
 				output.writeObject(object);
 				output.flush();
+				output.reset();
 			} catch (IOException e2) {
 				setActive(false);
 				disconnect();
@@ -451,6 +511,7 @@ public class ServerClientListenerThread extends Thread {
 	 * @throws AssertionError always thrown because the server had an error due to incorrect calls to methods
 	 */
 	public void fatalError(String info) {
+		verifyClient = false;
 		NetObject sendError = new NetObject(Constants.GENERAL_FATAL_ERROR);
 		sendMessage(sendError);
 		disconnect();

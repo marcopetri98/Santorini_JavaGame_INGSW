@@ -30,6 +30,7 @@ public final class Constants {
 	public static final String GENERAL_DEFEATED = "player-defeated";					// sent to the user to indicate that there is a loser
 	public static final String GENERAL_GAMEMAP_UPDATE = "gamemap-update";				// sent to the user to indicate that the board situation changed
 	public static final String GENERAL_PHASE_UPDATE = "phase-advanced";					// sent to the user to indicate that the game phase has changed
+	public static final String GENERAL_NOT_EXIST_SERVER = "not-exist-server";			// an error message used by the client for the connection phase
 	/* Setup messages between client and server */
 	public static final String SETUP_IN_PARTICIPATE = "setup-participate";				// sent to the server to indicate that the client want to participate to a match
 	public static final String SETUP_IN_SETUPNUM = "setup-choosing-num";				// sent to the server to indicate that the client has chosen the number of players
@@ -68,7 +69,7 @@ public final class Constants {
 	/* Player's turn messages between client and server */
 	public static final String PLAYER_ERROR = "player-error";							// sent to the user to indicate that its message was wrong
 	public static final String PLAYER_MOVE = "player-move";								// sent to the user to indicate that it is a turn where he must move
-	public static final String PLAYER_BUILD = "player-build";							// sent to the user to indicate that it is a turn where he must build (not if he has prometheus and is before move)
+	public static final String PLAYER_BUILD = "player-build";							// sent to the user to indicate that it is a turn where he must build
 	public static final String PLAYER_FINISHED_TURN = "player-finished";				// sent to the user to indicate that its turn is finished
 	public static final String PLAYER_IN_PASS = "player-pass";							// sent to the server to indicate that a player with prometheus wants to pass turn in before move phase
 	public static final String PLAYER_IN_MOVE = "player-move";							// sent to the server to indicate the move it wants to perform

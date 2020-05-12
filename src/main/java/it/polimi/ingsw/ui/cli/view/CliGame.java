@@ -80,7 +80,6 @@ public class CliGame {
 				} else {
 					printError();
 				}
-
 			} catch (IOException | UserInputTimeoutException e) {
 				// the user input read has been interrupted because server has sent a message to the player, this message must be handled
 				parseMessages();
@@ -158,6 +157,10 @@ public class CliGame {
 	 ************************************************/
 
 	private boolean parseSyntax(Command command) {
+		if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
+			return true;
+		}
+
 		if (player.equals(activePlayer)) {
 			switch (phase.getPhase()) {
 				//syntax: color colorname
@@ -235,10 +238,6 @@ public class CliGame {
 					}
 				}
 			}
-		} else {
-			if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
-				return true;
-			}
 		}
 		return false;
 	}
@@ -254,31 +253,37 @@ public class CliGame {
 	// FIXME: this is a parsing function, this isn't a drawing or printing function, it should only parse the message
 
 	private void parseMessage(NetObject obj){
-		switch (phase.getPhase()) {
-			case COLORS:
-				parseColors(obj);
-				messages.remove();
-				break;
+		if (obj.message.equals(Constants.GENERAL_FATAL_ERROR) || obj.message.equals(Constants.GENERAL_SETUP_DISCONNECT)) {
+			printServerError(obj);
+			functioning = false;
+			messages.remove();
+		} else {
+			switch (phase.getPhase()) {
+				case COLORS:
+					parseColors(obj);
+					messages.remove();
+					break;
 
-			case GODS:
-				parseGods(obj);
-				messages.remove();
-				break;
+				case GODS:
+					parseGods(obj);
+					messages.remove();
+					break;
 
-			case SETUP:
-				parseSetup(obj);
-				messages.remove();
-				break;
+				case SETUP:
+					parseSetup(obj);
+					messages.remove();
+					break;
 
-			case PLAYERTURN:
-				parsePlayerTurn(obj);
-				messages.remove();
-				break;
+				case PLAYERTURN:
+					parsePlayerTurn(obj);
+					messages.remove();
+					break;
 
-			default:
-				parseOther(obj);
-				messages.remove();
-				break;
+				default:
+					parseOther(obj);
+					messages.remove();
+					break;
+			}
 		}
 	}
 	private void parseColors(NetObject obj) {
@@ -304,6 +309,16 @@ public class CliGame {
 					players.add(ncp.next.player);
 					playerColors.add(ncp.next.color);
 				}
+				break;
+
+			case Constants.OTHERS_TURN:
+				activePlayer = players.get(0);
+				System.out.println("The other player "+activePlayer+" is choosing a color");
+				break;
+
+			case Constants.GENERAL_SETUP_DISCONNECT:
+				functioning = false;
+				printServerError(obj);
 				break;
 		}
 
@@ -358,6 +373,11 @@ public class CliGame {
 					gods.add(ndc.next.divinity);
 				}
 				break;
+
+			case Constants.GENERAL_SETUP_DISCONNECT:
+				functioning = false;
+				printServerError(obj);
+				break;
 		}
 
 	}
@@ -375,6 +395,11 @@ public class CliGame {
 			case Constants.GAMESETUP_ERROR:
 				System.out.println("An error occurred while positioning the workers.");
 				code = Constants.GAMESETUP_ERROR;
+				break;
+
+			case Constants.GENERAL_SETUP_DISCONNECT:
+				functioning = false;
+				printServerError(obj);
 				break;
 		}
 	}
@@ -429,45 +454,26 @@ public class CliGame {
 				break;
 		}
 	}
-	private void parseOther(NetObject obj){
+	private void parseOther(NetObject obj) {
 		NetGaming ng;
 		switch (obj.message) {
-			//SUPPORT
-			case Constants.CHECK :	//TODO: check if the ping sending to the server is indeed correct!!! It may not be!
-				messages.push(new NetObject(Constants.CHECK));
-				System.out.println("The server just pinged this client. Responding to the ping.");
-				code = Constants.CHECK;
-				break;
-
 			//GENERAL SIGNALS
-			case Constants.GENERAL_ERROR :
+			case Constants.GENERAL_ERROR:
 				System.out.println("An error occurred while inserting the data.");
 				code = Constants.GENERAL_ERROR;
 				break;
 
-			case Constants.GENERAL_SETUP_DISCONNECT :
-				NetGameSetup ngs = (NetGameSetup) obj;
-				others = ngs.player;
-				System.out.println(ngs.player + " just disconnected. The game is shutting off.");
-				code = Constants.GENERAL_SETUP_DISCONNECT;
-				break;
-
-			case Constants.GENERAL_FATAL_ERROR :
-				System.out.println("Sorry, a fatal error has occurred and the server shut down.");
-				code = Constants.GENERAL_FATAL_ERROR;
-				break;
-
-			case Constants.GENERAL_PLAYER_DISCONNECTED :
+			case Constants.GENERAL_PLAYER_DISCONNECTED:
 				ng = (NetGaming) obj;
 				others = ng.player;
 				System.out.println(ng.player + " just disconnected.");
 				code = Constants.GENERAL_PLAYER_DISCONNECTED;
 				break;
 
-			case Constants.GENERAL_WINNER :
+			case Constants.GENERAL_WINNER:
 				ng = (NetGaming) obj;
-				for(String p : players) {
-					if(ng.player != null && ng.player.equals(p)){
+				for (String p : players) {
+					if (ng.player != null && ng.player.equals(p)) {
 						others = ng.player;
 						System.out.println(ng.player + " just won the game!");
 						break;
@@ -476,10 +482,10 @@ public class CliGame {
 				System.out.println("You won! Good job!");
 				break;
 
-			case Constants.GENERAL_DEFEATED :
+			case Constants.GENERAL_DEFEATED:
 				ng = (NetGaming) obj;
-				for(String p : players) {
-					if(ng.player != null && ng.player.equals(p)){
+				for (String p : players) {
+					if (ng.player != null && ng.player.equals(p)) {
 						others = ng.player;
 						System.out.println(ng.player + " just lost.");
 						break;
@@ -490,15 +496,15 @@ public class CliGame {
 				code = Constants.GENERAL_DEFEATED;
 				break;
 
-			case Constants.GENERAL_GAMEMAP_UPDATE :
+			case Constants.GENERAL_GAMEMAP_UPDATE:
 				System.out.println("The map has changed, take a look:");
 				drawMap();
 				code = Constants.GENERAL_GAMEMAP_UPDATE;
 				break;
 
-			case Constants.GENERAL_PHASE_UPDATE :
+			case Constants.GENERAL_PHASE_UPDATE:
 				if (phase.getGamePhase() == GamePhase.BUILD) {
-					activePlayer = players.get(players.indexOf(activePlayer) == players.size()-1 ? 0 : players.indexOf(activePlayer)+1);
+					activePlayer = players.get(players.indexOf(activePlayer) == players.size() - 1 ? 0 : players.indexOf(activePlayer) + 1);
 				}
 				phase.advance();
 				printInitialPhase();
@@ -560,6 +566,38 @@ public class CliGame {
 			}
 		} else {
 			System.out.println("You can only disconnect during turn of other players.");
+		}
+	}
+	private void printServerError(NetObject obj) {
+		switch (obj.message) {
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
+				System.out.print("\n\n\n---------------------------------------------------------\n" +
+						"-                                                       -\n" +
+						"-                                                       -\n" +
+						"-     SOMEONE HAS DISCONNECTED AND GAME IS FINISHED     -\n" +
+						"-                                                       -\n" +
+						"-                                                       -\n" +
+						"---------------------------------------------------------\n\n\n");
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					System.out.println("There has been an interruption problem");
+				}
+			}
+			case Constants.GENERAL_FATAL_ERROR -> {
+				System.out.print("\n\n\n---------------------------------------------------------\n" +
+						"-                                                       -\n" +
+						"-                                                       -\n" +
+						"-        SERVER HAS GONE OFFLINE FOR SOME REASON        -\n" +
+						"-                                                       -\n" +
+						"-                                                       -\n" +
+						"---------------------------------------------------------\n\n\n");
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					System.out.println("There has been an interruption problem");
+				}
+			}
 		}
 	}
 	private void typeInputPrint() {

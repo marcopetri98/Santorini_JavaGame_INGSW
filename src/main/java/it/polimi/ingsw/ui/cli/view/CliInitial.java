@@ -3,6 +3,7 @@ package it.polimi.ingsw.ui.cli.view;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.objects.NetLobbyPreparation;
+import it.polimi.ingsw.network.objects.NetObject;
 import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.cli.controller.UserInputController;
 import it.polimi.ingsw.util.Constants;
@@ -18,12 +19,11 @@ public class CliInitial {
 	}
 
 	// other view object and attributes relative to the connection with server
-	private final Deque<NetLobbyPreparation> messagesLobby;
-	private final Deque<NetSetup> messagesMenu;
+	private final Deque<NetObject> messages;
 	private final CliInput cliInput;
 	private UserInputController userInputController;
 	// state attributes that are used to represent the view
-	private Command input;
+	private boolean menuPhase;
 	private boolean active;
 	private boolean serverCrashed;
 	private MenuPhase stage;
@@ -31,14 +31,14 @@ public class CliInitial {
 	private String serverAddress;
 
 	public CliInitial(CliInput cliInput) {
-		messagesLobby = new ArrayDeque<>();
-		messagesMenu = new ArrayDeque<>();
+		messages = new ArrayDeque<>();
 		this.cliInput = cliInput;
 		active = true;
 		stage = MenuPhase.START;
 		nameChosen = null;
 		serverAddress = null;
 		serverCrashed = false;
+		menuPhase = true;
 	}
 
 	/**
@@ -63,8 +63,9 @@ public class CliInitial {
 				active = false;
 				returnValue = -1;
 			} catch (UserInputTimeoutException e) {
-				// TODO: implement the support for server disconnection while inserting number of players
-				throw new AssertionError("[CliInput - menu()]: Getting input in the menu should never be interrupted");
+				active = false;
+				returnValue = -1;
+				printError(100);
 			}
 		}
 
@@ -77,6 +78,7 @@ public class CliInitial {
 	public int lobbyCli() {
 		stage = MenuPhase.START;
 		active = true;
+		menuPhase = false;
 		int returnValue = 0;
 		Command command;
 
@@ -111,7 +113,7 @@ public class CliInitial {
 	 *												*
 	 *												*
 	 *												*
-	 *			MODIFIERS OF THIS CLASS				*
+	 *		MODIFIERS/GETTERS OF THIS CLASS			*
 	 * 												*
 	 * 												*
 	 * 												*
@@ -119,25 +121,18 @@ public class CliInitial {
 	public void setUserInputController(UserInputController userInputController) {
 		this.userInputController = userInputController;
 	}
-	public void queueMessageLobby(NetLobbyPreparation msg){
-		synchronized (messagesLobby) {
-			messagesLobby.add(msg);
+	public void queueMessage(NetObject msg) {
+		synchronized (messages) {
+			messages.add(msg);
 		}
 	}
-	public void queueMessageMenu(NetSetup msg) {
-		synchronized (messagesMenu) {
-			messagesMenu.add(msg);
+	public void notifyPregameCli() {
+		synchronized (messages){
+			messages.notifyAll();
 		}
 	}
-	public void notifyCliMenu() {
-		synchronized (messagesMenu){
-			messagesMenu.notifyAll();
-		}
-	}
-	public void notifyCliLobby() {
-		synchronized (messagesLobby){
-			messagesLobby.notify();
-		}
+	public boolean isMenuPhase() {
+		return menuPhase;
 	}
 
 	/* **********************************************
@@ -168,10 +163,10 @@ public class CliInitial {
 					if (serverAddress != null) {
 						nameChosen = command.commandType;
 						userInputController.connect(nameChosen,serverAddress);
-						synchronized (messagesMenu) {
+						synchronized (messages) {
 							try {
-								if (messagesMenu.isEmpty()) {
-									messagesMenu.wait();
+								if (messages.isEmpty()) {
+									messages.wait();
 								}
 							} catch (InterruptedException e) {
 								throw new AssertionError("[CliInitial - parseMenuMessage - 1]: Process has been interrupted and no one interrupts it");
@@ -203,10 +198,10 @@ public class CliInitial {
 						} else {
 							serverAddress = command.commandType;
 							userInputController.connect(nameChosen,serverAddress);
-							synchronized (messagesMenu) {
+							synchronized (messages) {
 								try {
-									if (messagesMenu.isEmpty()) {
-										messagesMenu.wait();
+									if (messages.isEmpty()) {
+										messages.wait();
 									}
 								} catch (InterruptedException e) {
 									throw new AssertionError("[CliInitial - parseMenuMessage - 2]: Process has been interrupted and no one interrupts it");
@@ -220,10 +215,10 @@ public class CliInitial {
 			case PLAYERNUMBER -> {
 				if (command.commandType.equals("2") || command.commandType.equals("3")) {
 					userInputController.getCommand(Integer.parseInt(command.commandType));
-					synchronized (messagesMenu) {
+					synchronized (messages) {
 						try {
-							if (messagesMenu.isEmpty()) {
-								messagesMenu.wait();
+							if (messages.isEmpty()) {
+								messages.wait();
 							}
 						} catch (InterruptedException e) {
 							throw new AssertionError("[CliInitial - parseMenuMessage - 3]: Process has been interrupted and no one interrupts it");
@@ -240,7 +235,7 @@ public class CliInitial {
 		}
 	}
 	private void parseMenuMessages() {
-		NetSetup netSetup = messagesMenu.pop();
+		NetSetup netSetup = (NetSetup) messages.pop();
 		switch (netSetup.message) {
 			case Constants.SETUP_CREATE -> {
 				stage = MenuPhase.PLAYERNUMBER;
@@ -268,9 +263,9 @@ public class CliInitial {
 	}
 	private void parseLobbyMessages() {
 		NetLobbyPreparation netLobbyPreparation;
-		synchronized (messagesLobby) {
-			while (!messagesLobby.isEmpty()) {
-				netLobbyPreparation = messagesLobby.pop();
+		synchronized (messages) {
+			while (!messages.isEmpty()) {
+				netLobbyPreparation = (NetLobbyPreparation) messages.pop();
 				switch (netLobbyPreparation.message) {
 					case Constants.LOBBY_ERROR -> {
 						printError(6);
@@ -372,7 +367,18 @@ public class CliInitial {
 				break;
 
 			case 100:
-				System.out.println("The server had an error and crashed, you're going back to the main menu");
+				System.out.print("\n\n\n---------------------------------------------------------\n" +
+						"-                                                       -\n" +
+						"-                                                       -\n" +
+						"-        SERVER HAS GONE OFFLINE FOR SOME REASON        -\n" +
+						"-                                                       -\n" +
+						"-                                                       -\n" +
+						"---------------------------------------------------------\n\n\n");
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					System.out.println("There has been an interruption problem");
+				}
 				break;
 		}
 	}

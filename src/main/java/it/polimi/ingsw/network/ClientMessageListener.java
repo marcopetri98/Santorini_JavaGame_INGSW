@@ -61,6 +61,8 @@ public class ClientMessageListener extends Thread {
 				if (ingoingObject != null) {
 					if (ingoingObject.message.equals(Constants.GENERAL_FATAL_ERROR)) {
 						viewController.retrieveError();
+					} else if (ingoingObject.message.equals(Constants.CHECK)) {
+						sendMessage(new NetObject(Constants.CHECK));
 					} else {
 						switch (currentPhase) {
 							case PRELOBBY:
@@ -175,6 +177,7 @@ public class ClientMessageListener extends Thread {
 			try {
 				output.writeObject(message);
 				output.flush();
+				output.reset();
 			} catch (IOException e) {
 				// server has crashed and it stops to send messages
 				viewController.retrieveError();

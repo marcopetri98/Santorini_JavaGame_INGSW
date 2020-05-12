@@ -17,6 +17,7 @@ public class ClientCLIApp {
 		CliInitial pregame;
 		CliGame game;
 		boolean functioning;
+		int menuResult;
 		int lobbyResult;
 
 		functioning = true;
@@ -32,12 +33,14 @@ public class ClientCLIApp {
 			serverListener.setDaemon(true);
 			serverListener.start();
 
-			if (pregame.menu() == 0) {
+			menuResult = pregame.menu();
+			if (menuResult == 0) {
 				lobbyResult = pregame.lobbyCli();
 				if (lobbyResult == 0) {
+					controller.setPregameStage(false);
 					game.start();
 				}
-			} else {
+			} else if (menuResult == 1) {
 				functioning = false;
 			}
 		}

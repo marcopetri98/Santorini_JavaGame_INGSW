@@ -37,6 +37,7 @@ public class Game extends ObservableGame {
 		for (String name : names) {
 			players.add(new Player(name));
 		}
+		activePlayer = players.get(0);
 		winner = null;
 		isFinished = false;
 	}
@@ -240,7 +241,10 @@ public class Game extends ObservableGame {
 		throw new IllegalArgumentException();
 	}
 	public synchronized List<Player> getPlayers() {
-		return players;
+		return new ArrayList<>(players);
+	}
+	public synchronized List<GodCard> getGods() {
+		return new ArrayList<>(godCards);
 	}
 	public synchronized Player getPlayerTurn() {
 		return activePlayer;
@@ -338,8 +342,6 @@ public class Game extends ObservableGame {
 	 * @throws WrongPhaseException
 	 */
 	public synchronized void setPlayerGod(String playerName, String god) throws IllegalArgumentException, WrongPhaseException {
-		GodCard playerGod = null;
-
 		if (playerName == null || god == null || !Constants.GODS_GOD_NAMES.contains(god.toUpperCase())) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.GODS) {
@@ -349,11 +351,10 @@ public class Game extends ObservableGame {
 			for (GodCard card : godCards) {
 				if (card.getName().equals(god)) {
 					godFound = true;
-					playerGod = card;
 				}
 			}
 
-			if (!godFound) {
+			if (godFound) {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -371,12 +372,15 @@ public class Game extends ObservableGame {
 			throw new IllegalArgumentException();
 		}
 
-		GodCard newGod = GodCardFactory.createGodCard(playerGod.getName());
-		godCards.set(godCards.indexOf(playerGod),newGod);
-		players.get(i).setGodCard(newGod);
+		GodCard newGod = GodCardFactory.createGodCard(god.toUpperCase());
+		godCards.add(newGod);
+		players.get(i-1).setGodCard(newGod);
 		HashMap<String,GodCard> godsInfo = new HashMap<>();
 		for (Player player : players) {
-			godsInfo.put(player.getPlayerName(),player.getCard());
+			try {
+				GodCard card = player.getCard();
+				godsInfo.put(player.getPlayerName(),card);
+			} catch (IllegalStateException e) {}
 		}
 		notifyGods(godsInfo);
 	}
@@ -394,7 +398,7 @@ public class Game extends ObservableGame {
 		}
 
 		for (String godName : godNames) {
-			GodCard godCreated = GodCardFactory.createGodCard(godName);
+			GodCard godCreated = GodCardFactory.createGodCard(godName.toUpperCase());
 			godCards.add(godCreated);
 		}
 		notifyGods(godCards);
