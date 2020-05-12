@@ -278,13 +278,49 @@ public class ChooseGodsFirstSceneController {
 		transition.play();
 	}
 
-	private void pressingCard(int count, ImageView imageView, Image imagePressed, Image image){ //TODO:fix
-		if(count!=1) {
+	private void pressingCard(int pressed, ImageView imageView, Image imagePressed, Image image){ //TODO:fix
+		if(pressed!=1) {
 			imageView.setImage(imagePressed);
-			count = 1;
+			if(imagePressed.equals(cardApolloPressed)){
+				pressedApollo = 1;
+			} else if(imagePressed.equals(cardArtemisPressed)){
+				pressedArtemis = 1;
+			} else if(imagePressed.equals(cardAthenaPressed)){
+				pressedAthena = 1;
+			} else if(imagePressed.equals(cardAtlasPressed)){
+				pressedAtlas = 1;
+			} else if(imagePressed.equals(cardDemeterPressed)){
+				pressedDemeter = 1;
+			} else if(imagePressed.equals(cardHephaestusPressed)){
+				pressedHephaestus = 1;
+			} else if(imagePressed.equals(cardMinotaurPressed)){
+				pressedMinotaur = 1;
+			} else if(imagePressed.equals(cardPanPressed)){
+				pressedPan = 1;
+			} else if(imagePressed.equals(cardPrometheusPressed)){
+				pressedPrometheus = 1;
+			}
 		} else{
 			imageView.setImage(image);
-			count = 0;
+			if(image.equals(cardApollo)){
+				pressedApollo = 0;
+			} else if(image.equals(cardArtemis)){
+				pressedArtemis = 0;
+			} else if(image.equals(cardAthena)){
+				pressedAthena = 0;
+			} else if(image.equals(cardAtlas)){
+				pressedAtlas = 0;
+			} else if(image.equals(cardDemeter)){
+				pressedDemeter = 0;
+			} else if(image.equals(cardHephaestus)){
+				pressedHephaestus = 0;
+			} else if(image.equals(cardMinotaur)){
+				pressedMinotaur = 0;
+			} else if(image.equals(cardPan)){
+				pressedPan = 0;
+			} else if(image.equals(cardPrometheus)){
+				pressedPrometheus = 0;
+			}
 		}
 	}
 }
