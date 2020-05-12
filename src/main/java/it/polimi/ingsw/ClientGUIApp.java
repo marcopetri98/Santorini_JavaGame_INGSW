@@ -27,7 +27,7 @@ public class ClientGUIApp extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		Parent root = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml")); //in this moment, I'm using this as a scene tester
+		Parent root = FXMLLoader.load(getClass().getResource("/fxml/choose_gods_first.fxml")); //in this moment, I'm using this as a scene tester
 		Scene menu = new Scene(root);
 		stage.setScene(menu);
 		stage.setTitle("Santorini");

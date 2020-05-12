@@ -35,26 +35,32 @@ public class ChooseColorSceneController {
 
 	public void mousePressedRed(MouseEvent mouseEvent) {
 		button_red.setImage(buttonRedPressed);
+		button_green.setImage(buttonGreen);
+		button_blue.setImage(buttonBlue);
 	}
 
 	public void mouseReleasedRed(MouseEvent mouseEvent) {
-		button_red.setImage(buttonRed);
+		button_red.setImage(buttonRedPressed);
 	}
 
 	public void mousePressedGreen(MouseEvent mouseEvent) {
 		button_green.setImage(buttonGreenPressed);
+		button_blue.setImage(buttonBlue);
+		button_red.setImage(buttonRed);
 	}
 
 	public void mouseReleasedGreen(MouseEvent mouseEvent) {
-		button_green.setImage(buttonGreen);
+		button_green.setImage(buttonGreenPressed);
 	}
 
 	public void mousePressedBlue(MouseEvent mouseEvent) {
 		button_blue.setImage(buttonBluePressed);
+		button_red.setImage(buttonRed);
+		button_green.setImage(buttonGreen);
 	}
 
 	public void mouseReleasedBlue(MouseEvent mouseEvent) {
-		button_blue.setImage(buttonBlue);
+		button_blue.setImage(buttonBluePressed);
 	}
 
 	public void mousePressedNext(MouseEvent mouseEvent) {
