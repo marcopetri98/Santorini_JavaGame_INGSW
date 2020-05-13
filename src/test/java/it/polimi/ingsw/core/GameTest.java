@@ -8,7 +8,11 @@ import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.driver.ServerListenerDriver;
+import it.polimi.ingsw.network.objects.NetGameSetup;
+import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.util.Color;
+import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,28 +123,11 @@ public class GameTest {
 	}
 
 	@Test
-	public void setPlayerGod() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
-		setPhase(GodsPhase.GODS_CHOICE);
-
-		try {
-			game.getPlayerByName("Price").getCard();
-			fail("The player already has a god and no one has been set");
-		} catch (IllegalStateException e) {
-			setActivePlayer("Price");
-			game.setPlayerGod("Price", "Apollo");
-			assertNotNull(game.getPlayerByName("Price").getCard());
-			assertEquals(game.getPlayerByName("Price").getCard().getName().toUpperCase(), "APOLLO");
-			assertTrue(remoteViewDriver.isUpdateGodsChoiceCalled());
-			remoteViewDriver.resetCalled();
-		}
-	}
-
-	@Test
 	public void setGameGods() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
 		List<String> gods = new ArrayList<>();
 		gods.add("apollo");
 		gods.add("artemis");
-		gods.add("athena");
+		gods.add("atlas");
 
 		setPhase(GodsPhase.CHALLENGER_CHOICE);
 		setActivePlayer("Price");
@@ -149,9 +136,36 @@ public class GameTest {
 		assertEquals(game.getGods().size(),3);
 		assertEquals(game.getGods().get(0).getName().toUpperCase(),"APOLLO");
 		assertEquals(game.getGods().get(1).getName().toUpperCase(),"ARTEMIS");
-		assertEquals(game.getGods().get(2).getName().toUpperCase(),"ATHENA");
+		assertEquals(game.getGods().get(2).getName().toUpperCase(),"ATLAS");
 		assertTrue(remoteViewDriver.isUpdateGodsChallengerCalled());
 		remoteViewDriver.resetCalled();
+
+		assertEquals(game.getGods().get(0).getName().toUpperCase(),"APOLLO");
+		assertEquals(game.getGods().get(1).getName().toUpperCase(),"ARTEMIS");
+		assertEquals(game.getGods().get(2).getName().toUpperCase(),"ATLAS");
+	}
+
+	@Test
+	public void setPlayerGod() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
+		List<String> gods = new ArrayList<>();
+		gods.add("apollo");
+		gods.add("artemis");
+		gods.add("atlas");
+
+		setPhase(GodsPhase.GODS_CHOICE);
+		try {
+			game.getPlayerByName("Price").getCard();
+			fail("The player already has a god and no one has been set");
+		} catch (IllegalStateException e) {
+			setActivePlayer("Price");
+			game.setGameGods(gods);
+			remoteViewDriver.resetCalled();
+			game.setPlayerGod("Price", "Apollo");
+			assertNotNull(game.getPlayerByName("Price").getCard());
+			assertEquals(game.getPlayerByName("Price").getCard().getName().toUpperCase(), "APOLLO");
+			assertTrue(remoteViewDriver.isUpdateGodsChoiceCalled());
+			remoteViewDriver.resetCalled();
+		}
 	}
 
 	@Test
@@ -177,7 +191,40 @@ public class GameTest {
 	}
 
 	@Test
-	public void setWorkerPositions() {
+	public void setWorkerPositions() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
+		List<String> gods = new ArrayList<>();
+		gods.add("apollo");
+		gods.add("artemis");
+		gods.add("atlas");
+
+		// setting up the game
+		setPhase(Phase.COLORS);
+		setActivePlayer("Price");
+		game.setPlayerColor("Price",new Color(255,0,0));
+		setActivePlayer("Ghost");
+		game.setPlayerColor("Ghost",new Color(0,255,0));
+		setActivePlayer("Soap");
+		game.setPlayerColor("Soap",new Color(0,0,255));
+		setPhase(GodsPhase.CHALLENGER_CHOICE);
+		game.setGameGods(gods);
+		setPhase(GodsPhase.GODS_CHOICE);
+		game.setPlayerGod("Price","APOLLO");
+		game.setPlayerGod("Ghost","ARTEMIS");
+		game.setPlayerGod("Soap","ATLAS");
+
+		// setting up the map
+		setActivePlayer("Price");
+		setPhase(Phase.SETUP);
+		Integer x1 = 0, y1 = 0, x2 = 1, y2 = 1;
+		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(x1,y1),new Pair<Integer,Integer>(x2,y2));
+		remoteViewDriver.resetCalled();
+		game.setWorkerPositions(setupMsg);
+		assertTrue(remoteViewDriver.isUpdatePositionsCalled());
+		assertNotNull(game.getMap().getCell(0,0).getWorker());
+		assertEquals(game.getPlayerByName("Price").getWorker1().getPos(),game.getMap().getCell(0,0));
+		assertEquals(game.getPlayerByName("Price").getWorker2().getPos(),game.getMap().getCell(1,1));
+		assertEquals(game.getMap().getCell(0,0).getWorker(),game.getPlayerByName("Price").getWorker1());
+		assertEquals(game.getMap().getCell(1,1).getWorker(),game.getPlayerByName("Price").getWorker2());
 	}
 
 	@Test
@@ -305,10 +352,97 @@ public class GameTest {
 	}
 
 	@Test
-	public void applyDisconnection() {
+	public void applyDisconnection() throws NoSuchFieldException, IllegalAccessException, IOException, WrongPhaseException {
+		List<String> gods = new ArrayList<>();
+		gods.add("apollo");
+		gods.add("artemis");
+		gods.add("atlas");
+		Player removedPlayer;
+		Worker removedWorker1, removedWorker2;
+		Cell cellWorker1, cellWorker2;
+
+		setPhase(Phase.LOBBY);
+		game.applyDisconnection("Price");
+		assertTrue(game.isFinished());
+		assertTrue(remoteViewDriver.isUpdateGameFinishedCalled());
+
+		reset();
+		setPhase(Phase.COLORS);
+		game.applyDisconnection("Ghost");
+		assertTrue(game.isFinished());
+		assertTrue(remoteViewDriver.isUpdateGameFinishedCalled());
+
+		reset();
+		setPhase(Phase.GODS);
+		game.applyDisconnection("Soap");
+		assertTrue(game.isFinished());
+		assertTrue(remoteViewDriver.isUpdateGameFinishedCalled());
+
+		reset();
+		setPhase(Phase.SETUP);
+		game.applyDisconnection("Price");
+		assertTrue(game.isFinished());
+		assertTrue(remoteViewDriver.isUpdateGameFinishedCalled());
+
+		// setting up the game to delete a player is necessary
+		reset();
+		setPhase(Phase.COLORS);
+		setActivePlayer("Price");
+		game.setPlayerColor("Price",new Color(255,0,0));
+		setActivePlayer("Ghost");
+		game.setPlayerColor("Ghost",new Color(0,255,0));
+		setActivePlayer("Soap");
+		game.setPlayerColor("Soap",new Color(0,0,255));
+		setPhase(GodsPhase.CHALLENGER_CHOICE);
+		game.setGameGods(gods);
+		setPhase(GodsPhase.GODS_CHOICE);
+		game.setPlayerGod("Price","APOLLO");
+		game.setPlayerGod("Ghost","ARTEMIS");
+		game.setPlayerGod("Soap","ATLAS");
+		setPhase(Phase.SETUP);
+		setActivePlayer("Price");
+		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(0,0),new Pair<Integer,Integer>(1,0));
+		game.setWorkerPositions(setupMsg);
+		setActivePlayer("Ghost");
+		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Ghost",new Pair<Integer,Integer>(0,1),new Pair<Integer,Integer>(1,1));
+		game.setWorkerPositions(setupMsg);
+		setActivePlayer("Soap");
+		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Soap",new Pair<Integer,Integer>(0,2),new Pair<Integer,Integer>(1,2));
+		game.setWorkerPositions(setupMsg);
+		setPhase(GamePhase.MOVE);
+		remoteViewDriver.resetCalled();
+
+		// now that if the players are 3 we can continue playing if one has disconnected
+		setPhase(Phase.PLAYERTURN);
+		setActivePlayer("Price");
+		removedPlayer = game.getPlayerByName("Price");
+		removedWorker1 = removedPlayer.getWorker1();
+		removedWorker2 = removedPlayer.getWorker2();
+		cellWorker1 = removedWorker1.getPos();
+		cellWorker2 = removedWorker2.getPos();
+		game.applyDisconnection("Price");
+		assertFalse(game.isFinished());
+		assertEquals(game.getPlayerByName("Ghost"),game.getPlayerTurn());
+		assertEquals(game.getPlayers().size(),2);
+		assertNull(removedWorker1.getPos());
+		assertNull(removedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.updateQuitCalled);
+		assertTrue(remoteViewDriver.updateActivePlayerCalled);
+		remoteViewDriver.resetCalled();
 	}
 
 	@Test
-	public void applyWorkerLock() {
+	public void applyWorkerLock() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
+		setPhase(Phase.COLORS);
+
+		game.setPlayerColor("Price",Color.RED);
+		game.applyWorkerLock(game.getPlayerByName("Price"),1);
+		assertEquals(game.getPlayerByName("Price").getWorker1(), game.getPlayerByName("Price").getActiveWorker());
+
+		game.getPlayerByName("Price").resetLocking();
+		game.applyWorkerLock(game.getPlayerByName("Price"),2);
+		assertEquals(game.getPlayerByName("Price").getWorker2(), game.getPlayerByName("Price").getActiveWorker());
 	}
 }

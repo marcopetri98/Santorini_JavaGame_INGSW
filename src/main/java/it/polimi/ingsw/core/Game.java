@@ -129,10 +129,13 @@ public class Game extends ObservableGame {
 			} else {
 				// distinguish if the disconnecting player is the active player or not because the game isn't finished
 				if (player == activePlayer) {
+					Player beforeActive = activePlayer;
 					activePlayer = players.get(playerIndex == players.size() - 1 ? 0 : playerIndex + 1);
 					removePlayer(player);
 					notifyQuit(playerName);
-					notifyActivePlayer(activePlayer.getPlayerName());
+					if (beforeActive != activePlayer) {
+						notifyActivePlayer(activePlayer.getPlayerName());
+					}
 				} else {
 					removePlayer(player);
 					notifyQuit(playerName);
@@ -308,7 +311,7 @@ public class Game extends ObservableGame {
 	 * @throws WrongPhaseException if the phase isn't the color selection phase
 	 */
 	public synchronized void setPlayerColor(String player, Color color) throws IllegalArgumentException, WrongPhaseException {
-		if (player == null || color == null) {
+		if (player == null || color == null || !activePlayer.equals(getPlayerByName(player))) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.COLORS) {
 			throw new WrongPhaseException();
@@ -342,19 +345,21 @@ public class Game extends ObservableGame {
 	 * @throws WrongPhaseException
 	 */
 	public synchronized void setPlayerGod(String playerName, String god) throws IllegalArgumentException, WrongPhaseException {
+		int x, godIndex = 0;
 		if (playerName == null || god == null || !Constants.GODS_GOD_NAMES.contains(god.toUpperCase())) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.GODS) {
 			throw new WrongPhaseException();
 		} else {
 			boolean godFound = false;
-			for (GodCard card : godCards) {
-				if (card.getName().equals(god)) {
+			for (x = 0; x < godCards.size(); x++) {
+				if (godCards.get(x).getName().toUpperCase().equals(god.toUpperCase())) {
 					godFound = true;
+					godIndex = x;
 				}
 			}
 
-			if (godFound) {
+			if (!godFound) {
 				throw new IllegalArgumentException();
 			}
 		}
@@ -372,9 +377,7 @@ public class Game extends ObservableGame {
 			throw new IllegalArgumentException();
 		}
 
-		GodCard newGod = GodCardFactory.createGodCard(god.toUpperCase());
-		godCards.add(newGod);
-		players.get(i-1).setGodCard(newGod);
+		players.get(i-1).setGodCard(godCards.get(godIndex));
 		HashMap<String,GodCard> godsInfo = new HashMap<>();
 		for (Player player : players) {
 			try {
@@ -397,8 +400,8 @@ public class Game extends ObservableGame {
 			}
 		}
 
-		for (String godName : godNames) {
-			GodCard godCreated = GodCardFactory.createGodCard(godName.toUpperCase());
+		for (int i = 0; i < godNames.size(); i++) {
+			GodCard godCreated = GodCardFactory.createGodCard(godNames.get(i).toUpperCase());
 			godCards.add(godCreated);
 		}
 		notifyGods(godCards);
@@ -455,8 +458,12 @@ public class Game extends ObservableGame {
 		boolean finished = true;
 		player.getWorker1().setPos(map.getCell(req.worker1.getFirst(),req.worker1.getSecond()));
 		player.getWorker2().setPos(map.getCell(req.worker2.getFirst(),req.worker2.getSecond()));
+		map.getCell(req.worker1.getFirst(),req.worker1.getSecond()).setWorker(player.getWorker1());
+		map.getCell(req.worker2.getFirst(),req.worker2.getSecond()).setWorker(player.getWorker2());
 		for (int i = 0; i < players.size() && finished; i++) {
-			if (players.get(i).getWorker1().getPos() == null) {
+			try {
+				players.get(i).getWorker1();
+			} catch (IllegalStateException e) {
 				finished = false;
 			}
 		}
