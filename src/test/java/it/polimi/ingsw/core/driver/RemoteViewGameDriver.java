@@ -116,7 +116,7 @@ public class RemoteViewGameDriver extends RemoteView {
 	}
 	@Override
 	public synchronized void updateMove(ObservableObject observed, Map netMap) {
-		if (observed == null || netMap != null) {
+		if (observed == null || netMap == null) {
 			throw new AssertionError("Wrong parameters from Game");
 		} else {
 			updateMoveCalled = true;
@@ -124,7 +124,7 @@ public class RemoteViewGameDriver extends RemoteView {
 	}
 	@Override
 	public synchronized void updateBuild(ObservableObject observed, Map netMap) {
-		if (observed == null || netMap != null) {
+		if (observed == null || netMap == null) {
 			throw new AssertionError("Wrong parameters from Game");
 		} else {
 			updateBuildCalled = true;

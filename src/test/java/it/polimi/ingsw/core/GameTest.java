@@ -1,7 +1,6 @@
 package it.polimi.ingsw.core;
 
 import it.polimi.ingsw.core.driver.RemoteViewGameDriver;
-import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.gods.GodCardFactory;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
@@ -9,7 +8,6 @@ import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.driver.ServerListenerDriver;
 import it.polimi.ingsw.network.objects.NetGameSetup;
-import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
@@ -68,6 +66,39 @@ public class GameTest {
 		active.setAccessible(true);
 		Player wantedPlayer = game.getPlayerByName(player);
 		active.set(game,wantedPlayer);
+	}
+	private void completeSetup() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException, IOException {
+		List<String> gods = new ArrayList<>();
+		gods.add("apollo");
+		gods.add("artemis");
+		gods.add("atlas");
+
+		reset();
+		setPhase(Phase.COLORS);
+		setActivePlayer("Price");
+		game.setPlayerColor("Price",new Color(255,0,0));
+		setActivePlayer("Ghost");
+		game.setPlayerColor("Ghost",new Color(0,255,0));
+		setActivePlayer("Soap");
+		game.setPlayerColor("Soap",new Color(0,0,255));
+		setPhase(GodsPhase.CHALLENGER_CHOICE);
+		game.setGameGods(gods);
+		setPhase(GodsPhase.GODS_CHOICE);
+		game.setPlayerGod("Price","APOLLO");
+		game.setPlayerGod("Ghost","ARTEMIS");
+		game.setPlayerGod("Soap","ATLAS");
+		setPhase(Phase.SETUP);
+		setActivePlayer("Price");
+		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(0,0),new Pair<Integer,Integer>(1,0));
+		game.setWorkerPositions(setupMsg);
+		setActivePlayer("Ghost");
+		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Ghost",new Pair<Integer,Integer>(0,1),new Pair<Integer,Integer>(1,1));
+		game.setWorkerPositions(setupMsg);
+		setActivePlayer("Soap");
+		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Soap",new Pair<Integer,Integer>(0,2),new Pair<Integer,Integer>(1,2));
+		game.setWorkerPositions(setupMsg);
+		setPhase(GamePhase.MOVE);
+		remoteViewDriver.resetCalled();
 	}
 
 	@Test
@@ -336,27 +367,162 @@ public class GameTest {
 	}
 
 	@Test
-	public void applyMove() {
+	public void applyMove() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		// effectuate a simple move (moves a worker from 1,0 to 2,0)
+		setActivePlayer("Price");
+		Move myMove = new Move(TypeMove.SIMPLE_MOVE,game.getPlayerByName("Price").getWorker2().getPos(),game.getMap().getCell(2,0),game.getPlayerByName("Price").getWorker2());
+		game.applyMove(myMove);
+		assertNull(myMove.getCellPrev().getWorker());
+		assertEquals(game.getMap().getCell(2,0).getWorker(),game.getPlayerByName("Price").getWorker2());
+		assertEquals(game.getPlayerByName("Price").getWorker2().getPos(),game.getMap().getCell(2,0));
+		assertTrue(remoteViewDriver.isUpdateMoveCalled());
+		remoteViewDriver.resetCalled();
+
+		// effectuate a conditioned move (moves a worker from 0,0 to 1,0 when there is another worker on 1,0)
+		setActivePlayer("Price");
+		myMove = new Move(TypeMove.CONDITIONED_MOVE,game.getPlayerByName("Price").getWorker1().getPos(),game.getMap().getCell(0,1),game.getPlayerByName("Price").getWorker1());
+		myMove.setCondition(new Move(TypeMove.SIMPLE_MOVE,game.getPlayerByName("Ghost").getWorker1().getPos(),game.getMap().getCell(0,0),game.getPlayerByName("Ghost").getWorker1()));
+		Worker conditionedWorker = game.getMap().getCell(0,1).getWorker();
+		game.applyMove(myMove);
+		assertEquals(game.getMap().getCell(0,1).getWorker(),game.getPlayerByName("Price").getWorker1());
+		assertEquals(game.getPlayerByName("Price").getWorker1().getPos(),game.getMap().getCell(0,1));
+		assertEquals(game.getMap().getCell(0,0).getWorker(),conditionedWorker);
+		assertEquals(conditionedWorker.getPos(),game.getMap().getCell(0,0));
+		assertTrue(remoteViewDriver.isUpdateMoveCalled());
+		remoteViewDriver.resetCalled();
 	}
 
 	@Test
-	public void applyBuild() {
+	public void applyBuild() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		// effectuate a simple build (simply increase height of the building)
+		setActivePlayer("Price");
+		Build myBuild = new Build(game.getPlayerByName("Price").getWorker2(),game.getMap().getCell(2,0),false,TypeBuild.SIMPLE_BUILD);
+		Building building = game.getMap().getCell(2,0).getBuilding();
+		int levelBefore = building.getLevel();
+		game.applyBuild(myBuild);
+		assertEquals(levelBefore+1,building.getLevel());
+		assertTrue(remoteViewDriver.isUpdateBuildCalled());
+		remoteViewDriver.resetCalled();
+
+		// make the building be a dome
+		game.applyBuild(myBuild);
+		game.applyBuild(myBuild);
+		myBuild = new Build(game.getPlayerByName("Price").getWorker2(),game.getMap().getCell(2,0),true,TypeBuild.SIMPLE_BUILD);
+		building = game.getMap().getCell(2,0).getBuilding();
+		boolean domeBefore = building.getDome();
+		game.applyBuild(myBuild);
+		assertNotEquals(domeBefore,building.getDome());
+		assertTrue(remoteViewDriver.isUpdateBuildCalled());
+		remoteViewDriver.resetCalled();
+
+		// effectuate a conditioned build (builds two times in different places)
+		setActivePlayer("Soap");
+		myBuild = new Build(game.getPlayerByName("Soap").getWorker2(),game.getMap().getCell(2,2),false,TypeBuild.CONDITIONED_BUILD);
+		myBuild.setCondition(new Build(game.getPlayerByName("Soap").getWorker2(),game.getMap().getCell(1,3),false,TypeBuild.SIMPLE_BUILD));
+		Building building1 = game.getMap().getCell(2,2).getBuilding();
+		Building building2 = game.getMap().getCell(1,3).getBuilding();
+		int levelBefore1 = building1.getLevel();
+		int levelBefore2 = building2.getLevel();
+		game.applyBuild(myBuild);
+		assertEquals(levelBefore1+1,building1.getLevel());
+		assertEquals(levelBefore2+1,building2.getLevel());
+		assertTrue(remoteViewDriver.isUpdateBuildCalled());
+		remoteViewDriver.resetCalled();
+
+		// effectuate a conditioned build (two times in the same place)
+		setActivePlayer("Soap");
+		myBuild = new Build(game.getPlayerByName("Soap").getWorker2(),game.getMap().getCell(2,3),false,TypeBuild.CONDITIONED_BUILD);
+		myBuild.setCondition(new Build(game.getPlayerByName("Soap").getWorker2(),game.getMap().getCell(2,3),false,TypeBuild.SIMPLE_BUILD));
+		building = game.getMap().getCell(2,3).getBuilding();
+		levelBefore = building.getLevel();
+		game.applyBuild(myBuild);
+		assertEquals(levelBefore+2,building.getLevel());
+		assertTrue(remoteViewDriver.isUpdateBuildCalled());
+		remoteViewDriver.resetCalled();
 	}
 
 	@Test
-	public void applyWin() {
+	public void applyWin() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		game.applyWin(game.getPlayerByName("Price"));
+		assertTrue(game.isFinished());
+		assertEquals(game.getWinner(),game.getPlayerByName("Price"));
+		assertTrue(remoteViewDriver.isUpdateWinnerCalled());
 	}
 
 	@Test
-	public void applyDefeat() {
+	public void applyDefeat() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		Player defeatedPlayer;
+		Worker defeatedWorker1, defeatedWorker2;
+		Cell cellWorker1, cellWorker2;
+
+		// defeat of a playing player without terminating the game
+		completeSetup();
+		setActivePlayer("Price");
+		defeatedPlayer = game.getPlayerByName("Price");
+		defeatedWorker1 = defeatedPlayer.getWorker1();
+		defeatedWorker2 = defeatedPlayer.getWorker2();
+		cellWorker1 = defeatedWorker1.getPos();
+		cellWorker2 = defeatedWorker2.getPos();
+		game.applyDefeat(game.getPlayerByName("Price"));
+		assertFalse(game.isFinished());
+		assertFalse(game.getPlayers().contains(defeatedPlayer));
+		assertEquals(game.getPlayers().size(),2);
+		assertEquals(game.getPlayerTurn(),game.getPlayerByName("Ghost"));
+		assertNull(defeatedWorker1.getPos());
+		assertNull(defeatedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.updateDefeatCalled);
+		assertTrue(remoteViewDriver.updateActivePlayerCalled);
+		remoteViewDriver.resetCalled();
+
+		// defeat of a waiting player (it isn't its turn) without terminating the game
+		completeSetup();
+		setActivePlayer("Price");
+		defeatedPlayer = game.getPlayerByName("Ghost");
+		defeatedWorker1 = defeatedPlayer.getWorker1();
+		defeatedWorker2 = defeatedPlayer.getWorker2();
+		cellWorker1 = defeatedWorker1.getPos();
+		cellWorker2 = defeatedWorker2.getPos();
+		game.applyDefeat(game.getPlayerByName("Ghost"));
+		assertFalse(game.isFinished());
+		assertFalse(game.getPlayers().contains(defeatedPlayer));
+		assertEquals(game.getPlayers().size(),2);
+		assertEquals(game.getPlayerTurn(),game.getPlayerByName("Price"));
+		assertNull(defeatedWorker1.getPos());
+		assertNull(defeatedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.isUpdateDefeatCalled());
+		remoteViewDriver.resetCalled();
+
+		// someone has been defeated and there is a winner for this reason
+		setActivePlayer("Soap");
+		defeatedPlayer = game.getPlayerByName("Soap");
+		defeatedWorker1 = defeatedPlayer.getWorker1();
+		defeatedWorker2 = defeatedPlayer.getWorker2();
+		cellWorker1 = defeatedWorker1.getPos();
+		cellWorker2 = defeatedWorker2.getPos();
+		game.applyDefeat(game.getPlayerByName("Soap"));
+		assertEquals(game.getWinner().getPlayerName(),"Price");
+		assertTrue(game.isFinished());
+		assertFalse(game.getPlayers().contains(defeatedPlayer));
+		assertNull(defeatedWorker1.getPos());
+		assertNull(defeatedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.updateDefeatCalled);
+		assertTrue(remoteViewDriver.updateWinnerCalled);
+		remoteViewDriver.resetCalled();
 	}
 
 	@Test
 	public void applyDisconnection() throws NoSuchFieldException, IllegalAccessException, IOException, WrongPhaseException {
-		List<String> gods = new ArrayList<>();
-		gods.add("apollo");
-		gods.add("artemis");
-		gods.add("atlas");
 		Player removedPlayer;
 		Worker removedWorker1, removedWorker2;
 		Cell cellWorker1, cellWorker2;
@@ -384,33 +550,8 @@ public class GameTest {
 		assertTrue(game.isFinished());
 		assertTrue(remoteViewDriver.isUpdateGameFinishedCalled());
 
-		// setting up the game to delete a player is necessary
-		reset();
-		setPhase(Phase.COLORS);
-		setActivePlayer("Price");
-		game.setPlayerColor("Price",new Color(255,0,0));
-		setActivePlayer("Ghost");
-		game.setPlayerColor("Ghost",new Color(0,255,0));
-		setActivePlayer("Soap");
-		game.setPlayerColor("Soap",new Color(0,0,255));
-		setPhase(GodsPhase.CHALLENGER_CHOICE);
-		game.setGameGods(gods);
-		setPhase(GodsPhase.GODS_CHOICE);
-		game.setPlayerGod("Price","APOLLO");
-		game.setPlayerGod("Ghost","ARTEMIS");
-		game.setPlayerGod("Soap","ATLAS");
-		setPhase(Phase.SETUP);
-		setActivePlayer("Price");
-		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(0,0),new Pair<Integer,Integer>(1,0));
-		game.setWorkerPositions(setupMsg);
-		setActivePlayer("Ghost");
-		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Ghost",new Pair<Integer,Integer>(0,1),new Pair<Integer,Integer>(1,1));
-		game.setWorkerPositions(setupMsg);
-		setActivePlayer("Soap");
-		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Soap",new Pair<Integer,Integer>(0,2),new Pair<Integer,Integer>(1,2));
-		game.setWorkerPositions(setupMsg);
-		setPhase(GamePhase.MOVE);
-		remoteViewDriver.resetCalled();
+		// call the setup
+		completeSetup();
 
 		// now that if the players are 3 we can continue playing if one has disconnected
 		setPhase(Phase.PLAYERTURN);
@@ -421,6 +562,7 @@ public class GameTest {
 		cellWorker1 = removedWorker1.getPos();
 		cellWorker2 = removedWorker2.getPos();
 		game.applyDisconnection("Price");
+		assertFalse(game.getPlayers().contains(removedPlayer));
 		assertFalse(game.isFinished());
 		assertEquals(game.getPlayerByName("Ghost"),game.getPlayerTurn());
 		assertEquals(game.getPlayers().size(),2);
@@ -430,6 +572,47 @@ public class GameTest {
 		assertNull(cellWorker2.getWorker());
 		assertTrue(remoteViewDriver.updateQuitCalled);
 		assertTrue(remoteViewDriver.updateActivePlayerCalled);
+		remoteViewDriver.resetCalled();
+
+		// call the setup
+		completeSetup();
+
+		// now a player which is not in the active turn disconnect
+		setPhase(Phase.PLAYERTURN);
+		setActivePlayer("Price");
+		removedPlayer = game.getPlayerByName("Ghost");
+		removedWorker1 = removedPlayer.getWorker1();
+		removedWorker2 = removedPlayer.getWorker2();
+		cellWorker1 = removedWorker1.getPos();
+		cellWorker2 = removedWorker2.getPos();
+		game.applyDisconnection("Ghost");
+		assertFalse(game.getPlayers().contains(removedPlayer));
+		assertFalse(game.isFinished());
+		assertEquals(game.getPlayerByName("Price"),game.getPlayerTurn());
+		assertEquals(game.getPlayers().size(),2);
+		assertNull(removedWorker1.getPos());
+		assertNull(removedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.isUpdateQuitCalled());
+		remoteViewDriver.resetCalled();
+
+		// now a player disconnect when there are only 2 players
+		setActivePlayer("Price");
+		removedPlayer = game.getPlayerByName("Soap");
+		removedWorker1 = removedPlayer.getWorker1();
+		removedWorker2 = removedPlayer.getWorker2();
+		cellWorker1 = removedWorker1.getPos();
+		cellWorker2 = removedWorker2.getPos();
+		game.applyDisconnection("Soap");
+		assertFalse(game.getPlayers().contains(removedPlayer));
+		assertTrue(game.isFinished());
+		assertNull(removedWorker1.getPos());
+		assertNull(removedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.updateQuitCalled);
+		assertTrue(remoteViewDriver.updateWinnerCalled);
 		remoteViewDriver.resetCalled();
 	}
 

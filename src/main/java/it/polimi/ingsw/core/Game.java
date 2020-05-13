@@ -57,7 +57,7 @@ public class Game extends ObservableGame {
 			throw new NullPointerException();
 		}
 
-		moveWorkers(move);
+		moveWorkers(move, false);
 		notifyMove(getMap());
 	}
 	/**
@@ -69,11 +69,7 @@ public class Game extends ObservableGame {
 			throw new NullPointerException();
 		}
 
-		if(build.dome) {
-			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.setDome();
-		} else {
-			map.getCell(map.getX(build.cell), map.getY(build.cell)).building.incrementLevel(); //or == "build.level"; should work in this way though.
-		}
+		buildBuildings(build);
 		build.worker.setLastBuildPos(build.cell);
 		notifyBuild(getMap());
 	}
@@ -101,12 +97,17 @@ public class Game extends ObservableGame {
 		}
 
 		// removes the player and his workers
-		removePlayer(player);
-		if(this.players.size() == 1){
-			applyWin(players.get(0));
-		}
-
 		notifyDefeat(player.getPlayerName());
+		if(this.players.size() == 2) {
+			applyWin(players.get(players.indexOf(player) == 1 ? 0 : 1));
+		} else {
+			if (activePlayer == player) {
+				int playerIndex = players.indexOf(player);
+				activePlayer = players.get(playerIndex == players.size() - 1 ? 0 : playerIndex + 1);
+				notifyActivePlayer(activePlayer.getPlayerName());
+			}
+		}
+		removePlayer(player);
 	}
 	public synchronized void applyDisconnection(String playerName) throws IllegalArgumentException {
 		if (playerName == null) {
@@ -124,18 +125,16 @@ public class Game extends ObservableGame {
 			int playerIndex = players.indexOf(player);
 
 			if (players.size() == 2) {
+				removePlayer(player);
 				notifyQuit(playerName);
 				applyWin(players.get(0));
 			} else {
 				// distinguish if the disconnecting player is the active player or not because the game isn't finished
 				if (player == activePlayer) {
-					Player beforeActive = activePlayer;
 					activePlayer = players.get(playerIndex == players.size() - 1 ? 0 : playerIndex + 1);
 					removePlayer(player);
 					notifyQuit(playerName);
-					if (beforeActive != activePlayer) {
-						notifyActivePlayer(activePlayer.getPlayerName());
-					}
+					notifyActivePlayer(activePlayer.getPlayerName());
 				} else {
 					removePlayer(player);
 					notifyQuit(playerName);
@@ -214,12 +213,24 @@ public class Game extends ObservableGame {
 		player.getWorker2().getPos().setWorker(null);
 		player.getWorker2().setPos(null);
 	}
-	private synchronized void moveWorkers(Move move) {
-		move.prev.setWorker(null);
+	private synchronized void moveWorkers(Move move, boolean conditioned) {
+		if (!conditioned) {
+			move.prev.setWorker(null);
+		}
 		move.next.setWorker(move.worker);
 		move.worker.setPos(move.next);
 		if(move.getOther() != null){
-			moveWorkers(move.getOther());
+			moveWorkers(move.getOther(), true);
+		}
+	}
+	private synchronized void buildBuildings(Build build) {
+		if (build.dome) {
+			build.getCell().getBuilding().setDome();
+		} else {
+			build.getCell().getBuilding().incrementLevel();
+		}
+		if (build.getOther() != null && build.getTypeBuild() == TypeBuild.CONDITIONED_BUILD) {
+			buildBuildings(build.getOther());
 		}
 	}
 
