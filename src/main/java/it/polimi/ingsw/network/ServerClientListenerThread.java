@@ -39,7 +39,7 @@ public class ServerClientListenerThread extends Thread {
 					}
 				}
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(5000000);
 					if (!receivedPing) {
 						destroyListener();
 					}

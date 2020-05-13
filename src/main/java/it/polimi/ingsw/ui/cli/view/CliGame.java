@@ -24,7 +24,8 @@ public class CliGame {
 	private CliInput cliInput;
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
-	boolean challenger;
+	private boolean challenger = false;
+	private boolean godsGoAlreadyCalled = false;
 	private Turn phase;
 	private List<String> players;
 	private List<Color> playerColors;
@@ -38,6 +39,7 @@ public class CliGame {
 	private boolean drawPoss = false;
 	private String code = "null";
 	private String others;
+	private boolean sentCorrectMessage = false;
 	// attributes used for functioning
 	private boolean functioning;
 	private final Object inputLock;
@@ -69,20 +71,30 @@ public class CliGame {
 		printInitialPhase();
 		// functioning is set to false by parseSyntax if the user wants to quit the game
 		while (functioning) {
+			if(sentCorrectMessage){
+				synchronized (inputLock){
+					try{
+						inputLock.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace(); //TODO: change action
+					}
+				}
+			}
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
-				typeInputPrint();
+				//typeInputPrint();
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
 					inputController.getCommand(currentCommand,phase.clone());
+					sentCorrectMessage = true;
 				} else {
 					printError();
 				}
 			} catch (IOException | UserInputTimeoutException e) {
 				// the user input read has been interrupted because server has sent a message to the player, this message must be handled
-				parseMessages();
+				//parseMessages();
 			} catch (IllegalStateException e) {
 				throw new AssertionError("Fatal error: design problem, the get command is called with a command that does not match game phase");
 			}
@@ -144,6 +156,10 @@ public class CliGame {
 		synchronized (messages) {
 			messages.add(message);
 		}
+		synchronized (inputLock){
+			inputLock.notifyAll();
+		}
+		sentCorrectMessage = false;
 	}
 
 	/* **********************************************
@@ -248,6 +264,7 @@ public class CliGame {
 		}*/
 		while(messages.size() != 0){
 			parseMessage(messages.getFirst());
+			messages.remove();
 		}
 	}
 	// FIXME: this is a parsing function, this isn't a drawing or printing function, it should only parse the message
@@ -261,30 +278,32 @@ public class CliGame {
 			switch (phase.getPhase()) {
 				case COLORS:
 					parseColors(obj);
-					messages.remove();
+					//messages.remove();
 					break;
 
 				case GODS:
 					parseGods(obj);
-					messages.remove();
+					//messages.remove();
 					break;
 
 				case SETUP:
 					parseSetup(obj);
-					messages.remove();
+					//messages.remove();
 					break;
 
 				case PLAYERTURN:
 					parsePlayerTurn(obj);
-					messages.remove();
+					//messages.remove();
 					break;
 
-				default:
+				/*default:
 					parseOther(obj);
 					messages.remove();
-					break;
+					break;*/
 			}
 		}
+
+		parseOther(obj);
 	}
 	private void parseColors(NetObject obj) {
 		NetColorPreparation ncp;
@@ -312,7 +331,7 @@ public class CliGame {
 				break;
 
 			case Constants.OTHERS_TURN:
-				activePlayer = players.get(0);
+				activePlayer = players.get(players.indexOf(activePlayer) == players.size() ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("The other player "+activePlayer+" is choosing a color");
 				break;
 
@@ -329,8 +348,6 @@ public class CliGame {
 			//GODS
 			case Constants.GODS_CHALLENGER:
 				challenger = true;
-				System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-				System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
 				code = Constants.GODS_CHALLENGER;
 				break;
 
@@ -351,9 +368,22 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_YOU :
-				System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-				System.out.print("Insert the god: ");    //check god is ok in parsesyntax
-				code = Constants.GODS_YOU;
+				if(challenger) {
+					if(godsGoAlreadyCalled) {
+						System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+					}
+					else {
+						System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+						System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
+						godsGoAlreadyCalled = true;
+					}
+				}
+				else {
+					System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+					System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+					code = Constants.GODS_YOU;
+				}
 				break;
 
 			case Constants.GODS_OTHER :
