@@ -3,13 +3,17 @@ package it.polimi.ingsw.core;
 public class Cell {
 	// FIXME: the map isn't part of the cell state
 	public final Map map;
+	private final int x;
+	private final int y;
 	public final Building building;
 	// worker isn't part of the state of a cell, it only
 	private Worker worker;
 
-	public Cell(Map m) {
+	public Cell(Map m, int x, int y) {
 		this.building = new Building();
 		this.map = m;
+		this.x = x;
+		this.y = y;
 	}
 
 	// SETTERS

@@ -113,6 +113,7 @@ public class Game extends ObservableGame {
 		if (playerName == null) {
 			throw new IllegalArgumentException();
 		}
+		Player player = getPlayerByName(playerName);
 
 		// if someone disconnects during the setup the game finished
 		if (turn.getPhase() != Phase.PLAYERTURN) {
@@ -121,7 +122,6 @@ public class Game extends ObservableGame {
 			removeAllObservers();
 		} else {
 			// applies the disconnection, if the player doesn't exist this line throws IllegalArgumentException
-			Player player = getPlayerByName(playerName);
 			int playerIndex = players.indexOf(player);
 
 			if (players.size() == 2) {

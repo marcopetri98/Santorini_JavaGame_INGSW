@@ -1,18 +1,18 @@
 package it.polimi.ingsw.controller;
 
-import com.sun.source.tree.AssertTree;
 import it.polimi.ingsw.controller.driver.RemoteViewDriver;
 import it.polimi.ingsw.controller.stub.*;
-import it.polimi.ingsw.core.Build;
 import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
-import it.polimi.ingsw.network.ServerClientListenerThread;
 import it.polimi.ingsw.network.driver.ServerListenerDriver;
-import it.polimi.ingsw.network.game.NetAvailablePositions;
+import it.polimi.ingsw.network.game.NetBuild;
+import it.polimi.ingsw.network.game.NetMove;
 import it.polimi.ingsw.network.objects.NetColorPreparation;
 import it.polimi.ingsw.network.objects.NetDivinityChoice;
 import it.polimi.ingsw.network.objects.NetGameSetup;
+import it.polimi.ingsw.network.objects.NetGaming;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
@@ -46,54 +46,17 @@ public class ServerControllerTest {
 	private void resetTest(boolean colorPhase, boolean godsPhase) throws NoSuchFieldException, IllegalAccessException {
 		gameStub = new GameStub(playerNames,colorPhase,godsPhase);
 		serverController = new ServerController(gameStub);
-		setupStub = new SetupStub(gameStub);
-		builderStub = new BuilderStub(gameStub);
-		defeatStub = new DefeatStub(gameStub);
-		moverStub = new MoverStub(gameStub);
-		victoryStub = new VictoryStub(gameStub);
 		remoteViewDriver = new RemoteViewDriver(new ServerListenerDriver());
 
-		Field serverControllerField = ServerController.class.getDeclaredField("moveController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,moverStub);
-		serverControllerField = ServerController.class.getDeclaredField("buildController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,builderStub);
-		serverControllerField = ServerController.class.getDeclaredField("defeatController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,defeatStub);
-		serverControllerField = ServerController.class.getDeclaredField("victoryController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,victoryStub);
-		serverControllerField = ServerController.class.getDeclaredField("setupController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,setupStub);
+		setControllerStubs();
 	}
-	private void resetWithRealGame(boolean prometheus) throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
+	private void resetWithRealGame(boolean prometheus, boolean completelyTrue) throws NoSuchFieldException, IllegalAccessException, WrongPhaseException {
 		game = new Game(playerNames);
 		serverController = new ServerController(game);
-		setupStub = new SetupStub(gameStub);
-		builderStub = new BuilderStub(gameStub);
-		defeatStub = new DefeatStub(gameStub);
-		moverStub = new MoverStub(gameStub);
-		victoryStub = new VictoryStub(gameStub);
 		remoteViewDriver = new RemoteViewDriver(new ServerListenerDriver());
-
-		Field serverControllerField = ServerController.class.getDeclaredField("moveController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,moverStub);
-		serverControllerField = ServerController.class.getDeclaredField("buildController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,builderStub);
-		serverControllerField = ServerController.class.getDeclaredField("defeatController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,defeatStub);
-		serverControllerField = ServerController.class.getDeclaredField("victoryController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,victoryStub);
-		serverControllerField = ServerController.class.getDeclaredField("setupController");
-		serverControllerField.setAccessible(true);
-		serverControllerField.set(serverController,setupStub);
+		if (!completelyTrue) {
+			setControllerStubs();
+		}
 
 		// lobby phase
 		game.changeTurn();
@@ -108,7 +71,7 @@ public class ServerControllerTest {
 		// challenger chooses
 		List<String> godNames = new ArrayList<>();
 		godNames.add("APOLLO");
-		godNames.add("ARTEMIS");
+		godNames.add("ATLAS");
 		if (!prometheus) {
 			godNames.add("ATHENA");
 		} else {
@@ -138,6 +101,29 @@ public class ServerControllerTest {
 		game.setWorkerPositions(gameSetupMsg);
 		game.changeTurn();
 		// now the starter is in the before move phase
+	}
+	private void setControllerStubs() throws NoSuchFieldException, IllegalAccessException {
+		setupStub = new SetupStub(gameStub);
+		builderStub = new BuilderStub(gameStub);
+		defeatStub = new DefeatStub(gameStub);
+		moverStub = new MoverStub(gameStub);
+		victoryStub = new VictoryStub(gameStub);
+
+		Field serverControllerField = ServerController.class.getDeclaredField("moveController");
+		serverControllerField.setAccessible(true);
+		serverControllerField.set(serverController,moverStub);
+		serverControllerField = ServerController.class.getDeclaredField("buildController");
+		serverControllerField.setAccessible(true);
+		serverControllerField.set(serverController,builderStub);
+		serverControllerField = ServerController.class.getDeclaredField("defeatController");
+		serverControllerField.setAccessible(true);
+		serverControllerField.set(serverController,defeatStub);
+		serverControllerField = ServerController.class.getDeclaredField("victoryController");
+		serverControllerField.setAccessible(true);
+		serverControllerField.set(serverController,victoryStub);
+		serverControllerField = ServerController.class.getDeclaredField("setupController");
+		serverControllerField.setAccessible(true);
+		serverControllerField.set(serverController,setupStub);
 	}
 
 	@Test
@@ -263,18 +249,234 @@ public class ServerControllerTest {
 
 	@Test
 	public void updatePass() {
+		gameStub.setPhase(GamePhase.BEFOREMOVE);
+		gameStub.setActivePlayer("Ezio Auditore");
+
+		serverController.updatePass(remoteViewDriver,"Ezio Auditore");
+		assertTrue(gameStub.isChangeTurnCalled());
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
+
+		serverController.updatePass(remoteViewDriver,"Connor");
+		assertFalse(gameStub.isChangeTurnCalled());
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
 	}
 
 	@Test
-	public void updateMove() {
+	public void updateMove() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
+		NetGaming gamingMsg;
+		NetMove move;
+
+		resetWithRealGame(false, true);
+
+		// send the player to move phase
+		game.changeTurn();
+		// for first it test that a player can send a move only if is its turn
+		// it is Ezio Auditore's turn
+		move = new NetMove(game.getPlayerByName("Connor").getWorker1().workerID,2,4);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Connor",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.MOVE);
+		remoteViewDriver.resetCalls();
+
+		// arrives a wrong request
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,2,4);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Connor",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.MOVE);
+		remoteViewDriver.resetCalls();
+
+		// test if the player try to do an impossible move
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,4,4);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Ezio Auditore",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.MOVE);
+		remoteViewDriver.resetCalls();
+
+		// tests if a player can move on the same cell where he is
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,0,1);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Ezio Auditore",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.MOVE);
+		remoteViewDriver.resetCalls();
+
+		// tests if a possible move can be done
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,0,2);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Ezio Auditore",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
+
+		// tests if a player can move in the build phase
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,0,0);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Ezio Auditore",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
 	}
 
 	@Test
-	public void updateBuild() {
+	public void updateMoveWithBuildingGod() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
+		NetGaming gamingMsg;
+		NetMove move;
+
+		resetWithRealGame(false, true);
+
+		// goes to Connor's turn
+		game.changeTurn();
+		game.changeTurn();
+		game.changeTurn();
+		// goes to Connor's move phase
+		game.changeTurn();
+
+		// try to move in a correct place
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,3,1);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Connor",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
+	}
+
+	@Test
+	public void updateBuild() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
+		NetGaming gamingMsg;
+		NetBuild build;
+
+		resetWithRealGame(false,true);
+
+		// send the player to build phase
+		game.changeTurn();
+		game.changeTurn();
+		// test if a player can build when it's not its turn with a valid build for its god (now is Ezio Auditore's turn)
+		build = new NetBuild(game.getPlayerByName("Connor").getWorker1().workerID,1,3,1,true);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_BUILD,"Connor",build);
+		serverController.updateBuild(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
+
+		// tests if a wrong request is canceled
+		build = new NetBuild(game.getPlayerTurn().getWorker1().workerID,1,3,1,true);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_BUILD,"Connor",build);
+		serverController.updateBuild(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
+
+		// tests if the player tries to do an impossible build
+		build = new NetBuild(game.getPlayerTurn().getWorker1().workerID,3,4,3,true);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_BUILD,"Ezio Auditore",build);
+		serverController.updateBuild(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
+
+		// tests if a player can build correctly in the build phase
+		build = new NetBuild(game.getPlayerTurn().getWorker1().workerID,1,1,1,false);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_BUILD,"Ezio Auditore",build);
+		serverController.updateBuild(remoteViewDriver,gamingMsg);
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BEFOREMOVE);
+		assertEquals(game.getPlayerTurn().getPlayerName(),"Connor");
+		remoteViewDriver.resetCalls();
+	}
+
+	@Test
+	public void updateMoveAfterPrometheusBuildBeforeMove() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
+		NetGaming gamingMsg;
+		NetMove move;
+		NetBuild build;
+
+		resetWithRealGame(true, true);
+
+		// goes to prometheus player owner turn
+		game.changeTurn();
+		game.changeTurn();
+		game.changeTurn();
+		game.changeTurn();
+		game.changeTurn();
+		game.changeTurn();
+
+		// effectuate a build before moving
+		build = new NetBuild(game.getPlayerTurn().getWorker1().workerID,4,0,1,false);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_BUILD,"Altair",build);
+		serverController.updateBuild(remoteViewDriver,gamingMsg);
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.MOVE);
+		assertEquals(game.getPlayerTurn().getPlayerName(),"Altair");
+		remoteViewDriver.resetCalls();
+
+		// try to move up after building (is impossible for prometheus)
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,4,0);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Altair",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.MOVE);
+		remoteViewDriver.resetCalls();
+
+		// effectuate a valid move
+		move = new NetMove(game.getPlayerTurn().getWorker1().workerID,3,1);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_MOVE,"Altair",move);
+		serverController.updateMove(remoteViewDriver,gamingMsg);
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BUILD);
+		remoteViewDriver.resetCalls();
+
+		// effectuate the second build
+		build = new NetBuild(game.getPlayerTurn().getWorker1().workerID,4,0,1,false);
+		gamingMsg = new NetGaming(Constants.PLAYER_IN_BUILD,"Altair",build);
+		serverController.updateBuild(remoteViewDriver,gamingMsg);
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		assertEquals(game.getPhase().getGamePhase(),GamePhase.BEFOREMOVE);
+		assertEquals(game.getPlayerTurn().getPlayerName(),"Ezio Auditore");
+		remoteViewDriver.resetCalls();
 	}
 
 	@Test
 	public void updateQuit() {
+		gameStub.setPhase(Phase.COLORS);
+		serverController.updateQuit(remoteViewDriver,"Ezio Auditore");
+		assertTrue(gameStub.isApplyDisconnectionCalled());
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
+
+		serverController.updateQuit(remoteViewDriver,"Non existing player");
+		assertFalse(gameStub.isApplyDisconnectionCalled());
+		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
+
+		gameStub.setPhase(Phase.GODS);
+		serverController.updateQuit(remoteViewDriver,"Ezio Auditore");
+		assertTrue(gameStub.isApplyDisconnectionCalled());
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
+
+		gameStub.setPhase(Phase.SETUP);
+		serverController.updateQuit(remoteViewDriver,"Ezio Auditore");
+		assertTrue(gameStub.isApplyDisconnectionCalled());
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
+
+		gameStub.setPhase(Phase.PLAYERTURN);
+		serverController.updateQuit(remoteViewDriver,"Ezio Auditore");
+		assertTrue(gameStub.isApplyDisconnectionCalled());
+		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
+		gameStub.resetCounters();
+		remoteViewDriver.resetCalls();
 	}
 
 	@Test
@@ -287,7 +489,7 @@ public class ServerControllerTest {
 
 	@Test
 	public void giveAvailablePositionsFlow() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
-		resetWithRealGame(false);
+		resetWithRealGame(false, false);
 
 		// asks in before move builds which are not possible and asks for moves after it entered in move phase
 		assertNull(serverController.giveAvailableBuildings());
@@ -309,8 +511,8 @@ public class ServerControllerTest {
 	}
 
 	@Test
-	public void giveAvailableBuildings() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
-		resetWithRealGame(true);
+	public void giveAvailableBuildingsFlow() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
+		resetWithRealGame(true, false);
 
 		// advance to the Connor turn
 		game.changeTurn();

@@ -104,8 +104,8 @@ public class Prometheus implements GodCard {
 		// if the player has built before moving it should not move up
 		List<Move> moves = new ArrayList<>();
 		if (w.itHasBuilt()) {
-			int y = m.getX(w.getPos());
-			int x = m.getY(w.getPos());
+			int x = m.getX(w.getPos());
+			int y = m.getY(w.getPos());
 
 			for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY move
 				int x1 = x + i;
@@ -117,7 +117,7 @@ public class Prometheus implements GodCard {
 							if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() <= 0) { // it can't move up because has built
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 									if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-										moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
+										moves.add(new Move(TypeMove.SIMPLE_MOVE, w.getPos(), m.getCell(x1, y1), w));
 									}
 								}
 							}
@@ -127,8 +127,8 @@ public class Prometheus implements GodCard {
 			}
 		} else {
 			// the player hasn't built before moving and can move up
-			int y = m.getX(w.getPos());
-			int x = m.getY(w.getPos());
+			int x = m.getX(w.getPos());
+			int y = m.getY(w.getPos());
 
 			for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY move
 				int x1 = x + i;

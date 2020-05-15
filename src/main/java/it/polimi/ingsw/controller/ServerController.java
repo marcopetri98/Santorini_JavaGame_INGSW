@@ -53,8 +53,8 @@ public class ServerController implements ObserverController {
 	}
 	private List<Move> generateStandardMoves(Worker w) {
 		Map gameMap = observedModel.getMap();
-		int y = gameMap.getX(w.getPos());
-		int x = gameMap.getY(w.getPos());
+		int x = gameMap.getX(w.getPos());
+		int y = gameMap.getY(w.getPos());
 
 		List<Move> moves = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY move
@@ -79,8 +79,8 @@ public class ServerController implements ObserverController {
 	}
 	private List<Build> generateStandardBuilds(Worker w) {
 		Map gameMap = observedModel.getMap();
-		int y = gameMap.getX(w.getPos());
-		int x = gameMap.getY(w.getPos());
+		int x = gameMap.getX(w.getPos());
+		int y = gameMap.getY(w.getPos());
 
 		List<Build> builds = new ArrayList<>();
 		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
@@ -259,14 +259,14 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (observedModel.isFinished() || !activePlayer.equals(moveMessage.player) || !isMovablePhase()) {
+		if (observedModel.isFinished() || !activePlayer.equals(moveMessage.player) || !isMovablePhase() || moveMessage.move == null) {
 			caller.communicateError();
 		} else {
 			List<Move> possibleMoves = new ArrayList<>();
 			Player movingPlayer = observedModel.getPlayerByName(moveMessage.player);
 			Worker selectedWorker;
 			Turn turn = observedModel.getPhase();
-			List<GodCard> playersCards = observedModel.getPlayers().stream().filter((player) -> { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map((player) -> player.getCard()).collect(Collectors.toList());
+			List<GodCard> playersCards = observedModel.getPlayers().stream().filter((player) -> { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map(Player::getCard).collect(Collectors.toList());
 			boolean hasMoves = false;
 
 			if (moveMessage.move.workerID == movingPlayer.getPlayerID()+1) {
@@ -285,8 +285,13 @@ public class ServerController implements ObserverController {
 			}
 
 			try {
-				possibleMoves.addAll(movingPlayer.getCard().checkMove(observedModel.getMap(),selectedWorker,turn));
-				hasMoves = true;
+				// if a player has a god that acts on other players turn it doesn't generate moves for him
+				if (movingPlayer.getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
+					possibleMoves.addAll(movingPlayer.getCard().checkMove(observedModel.getMap(), selectedWorker, turn));
+					hasMoves = true;
+				} else {
+					throw new NoMoveException();
+				}
 			} catch (NoMoveException e) {
 				// if it is the move phase and none of the gods change the standard way of moving it will be called the standard method
 				if (turn.getGamePhase() == GamePhase.MOVE) {
@@ -336,7 +341,7 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (observedModel.isFinished() || !activePlayer.equals(buildMessage.player) || !isBuildablePhase()) {
+		if (observedModel.isFinished() || !activePlayer.equals(buildMessage.player) || !isBuildablePhase() || buildMessage.build == null) {
 			caller.communicateError();
 		} else {
 			List<Build> possibleBuilds = new ArrayList<>();
@@ -344,7 +349,7 @@ public class ServerController implements ObserverController {
 			Worker selectedWorker;
 			Turn turn = observedModel.getPhase();
 
-			if (buildMessage.move.workerID == buildingPlayer.getPlayerID()+1) {
+			if (buildMessage.build.workerID == buildingPlayer.getPlayerID()+1) {
 				selectedWorker = buildingPlayer.getWorker1();
 			} else {
 				selectedWorker = buildingPlayer.getWorker2();
@@ -364,7 +369,7 @@ public class ServerController implements ObserverController {
 
 			if (possibleBuilds.size() != 0) {
 				if (buildingPlayer.isWorkerLocked()) {
-					if (buildingPlayer.getActiveWorker().workerID == buildMessage.move.workerID) {
+					if (buildingPlayer.getActiveWorker().workerID == buildMessage.build.workerID) {
 						// the phase is the building phase, for this reason i need to check if
 						defeatController.buildDefeat(possibleBuilds);
 						if (!buildController.build(buildMessage.build, possibleBuilds)) {

@@ -80,8 +80,13 @@ public class Pan implements GodCard {
 						if(-1 <= (x1-x) && (x1-x) <= 1 && -1 <= (y1-y) && (y1-y) <=1){  //Check that distance from original is cell <= 1: useless?
 							if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 								if (m.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-									if(m.getCell(x, y).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() >= 2) moves.add(new Move(TypeMove.VICTORY_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));	//Check height difference is at least 2 levels (moving down) and adds type 3 move
-									else moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));	//else adds type 0 [simple] move, still doable
+									if (m.getCell(x, y).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() >= 2) {
+										//Check height difference is at least 2 levels (moving down) and adds type 3 move
+										moves.add(new Move(TypeMove.VICTORY_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
+									} else {
+										//else adds type 0 [simple] move, still doable
+										moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
+									}
 								}
 							}
 						}

@@ -15,7 +15,7 @@ public class Map {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
 			cells.add(new ArrayList<Cell>());
 			for (int j = 0; j < Constants.MAP_SIDE; j++) {
-				cells.get(i).add(new Cell(this));
+				cells.get(i).add(new Cell(this,i,j));
 			}
 		}
 	}
