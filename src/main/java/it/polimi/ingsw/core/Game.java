@@ -374,21 +374,11 @@ public class Game extends ObservableGame {
 				throw new IllegalArgumentException();
 			}
 		}
+		Player playerTurn;
+		playerTurn = getPlayerByName(playerName);
 
-		// it search for the player inside the list of players
-		int i;
-		boolean found = false;
-		for (i = 0; i < players.size() && !found; i++) {
-			if (players.get(i).getPlayerName().equals(playerName)) {
-				found = true;
-			}
-		}
-		// if present it sets the godCard, if not it throws the exception
-		if (!found) {
-			throw new IllegalArgumentException();
-		}
-
-		players.get(i-1).setGodCard(godCards.get(godIndex));
+		godCards.set(godIndex,GodCardFactory.createGodCard(god.toUpperCase(),playerTurn));
+		playerTurn.setGodCard(godCards.get(godIndex));
 		HashMap<String,GodCard> godsInfo = new HashMap<>();
 		for (Player player : players) {
 			try {

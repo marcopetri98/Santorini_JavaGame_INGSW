@@ -18,10 +18,12 @@ public class DefeatStub extends DefeatManager {
 	}
 
 	// stub methods
+	@Override
 	public boolean moveDefeat(List<Move> worker1_possible_moves, List<Move> worker2_possible_moves) {
 		moveDefeatCalled = true;
 		return true;
 	}
+	@Override
 	public boolean buildDefeat(List<Build> worker_possible_builds) {
 		buildDefeatCalled = true;
 		return true;

@@ -16,6 +16,7 @@ public class VictoryStub extends VictoryManager {
 	}
 
 	// stub methods
+	@Override
 	public void checkVictory(Cell before, Cell after, List<Move> possibleCells) {
 		checkVictoryCalled = true;
 	}

@@ -18,6 +18,7 @@ public class MoverStub extends Mover {
 	}
 
 	// stub methods
+	@Override
 	public boolean move(NetMove netmove, List<Move> possibilities) {
 		moveCalled = true;
 		return toMove;

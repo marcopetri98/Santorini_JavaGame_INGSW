@@ -25,6 +25,7 @@ public class GameStub extends Game {
 	private boolean applyBuildCalled;
 	private boolean applyWinCalled;
 	private boolean applyDefeatCalled;
+	private boolean changeTurnCalled;
 	private boolean setOrderCalledCorrectly;
 	private boolean setPlayerColorCalled;
 	private boolean setGameGodsCalled;
@@ -45,6 +46,7 @@ public class GameStub extends Game {
 		applyBuildCalled = false;
 		applyWinCalled = false;
 		applyDefeatCalled = false;
+		changeTurnCalled = false;
 		setOrderCalledCorrectly = false;
 		setPlayerColorCalled = false;
 		setGameGodsCalled = false;
@@ -88,6 +90,9 @@ public class GameStub extends Game {
 	}
 	public void applyDefeat(Player player) {
 		applyDefeatCalled = true;
+	}
+	public void changeTurn() {
+		changeTurnCalled = true;
 	}
 	public void setOrder(List<String> playerOrder) throws IllegalArgumentException, WrongPhaseException {
 		if (playerOrder == null || playerOrder.size() != players.size()) {
@@ -239,6 +244,7 @@ public class GameStub extends Game {
 		applyBuildCalled = false;
 		applyWinCalled = false;
 		applyDefeatCalled = false;
+		changeTurnCalled = false;
 		setOrderCalledCorrectly = false;
 		setPlayerColorCalled = false;
 		setGameGodsCalled = false;
@@ -252,11 +258,13 @@ public class GameStub extends Game {
 		}
 	}
 	public void setPhase(GodsPhase ph) {
+		setPhase(Phase.GODS);
 		while (turn.getGodsPhase() != ph) {
 			turn.advance();
 		}
 	}
 	public void setPhase(GamePhase ph) {
+		setPhase(Phase.PLAYERTURN);
 		while (turn.getGamePhase() != ph) {
 			turn.advance();
 		}
@@ -299,6 +307,24 @@ public class GameStub extends Game {
 			throw new AssertionError("Design error");
 		}
 	}
+	public void setAGod(String godName) {
+		try {
+			Method playerGod = Player.class.getDeclaredMethod("setGodCard", GodCard.class);
+			playerGod.setAccessible(true);
+			for (int i = 0; i < players.size(); i++) {
+				try {
+					players.get(i).getCard();
+				} catch (IllegalStateException e) {
+					godCards.add(GodCardFactory.createGodCard(godName.toUpperCase()));
+					playerGod.invoke(players.get(i),godCards.get(godCards.size()-1));
+					i = 100;
+				}
+			}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
+		}
+	}
+
 	public boolean isApplyMoveCalled() {
 		return applyMoveCalled;
 	}
@@ -310,6 +336,9 @@ public class GameStub extends Game {
 	}
 	public boolean isApplyDefeatCalled() {
 		return applyDefeatCalled;
+	}
+	public boolean isChangeTurnCalled() {
+		return changeTurnCalled;
 	}
 	public boolean isSetOrderCalledCorrectly() {
 		return setOrderCalledCorrectly;

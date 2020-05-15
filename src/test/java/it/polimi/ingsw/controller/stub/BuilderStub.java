@@ -18,6 +18,7 @@ public class BuilderStub extends Builder {
 	}
 
 	// stub methods
+	@Override
 	public boolean build(NetBuild netBuild, List<Build> possibilities) {
 		buildCalled = true;
 		return toBuild;

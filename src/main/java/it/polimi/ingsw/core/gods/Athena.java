@@ -61,8 +61,11 @@ public class Athena implements GodCard, Observer {
 		Worker modifiedWorker = (Worker) obs;
 		Cell[] positions = (Cell[]) arg;
 		if(modifiedWorker == owner.getWorker1() || modifiedWorker == owner.getWorker2()){	//Then the worker returned as argument of the update method is held by the owner of Athena
-			if(positions[1].getBuilding().getLevel() - positions[0].getBuilding().getLevel() >= 1) wentUp = true;
-			else wentUp = false;
+			if ((positions[1].getBuilding().getLevel() >= 1 && positions[0] == null) || (positions[0] != null && positions[1].getBuilding().getLevel() - positions[0].getBuilding().getLevel() >= 1)) {
+				wentUp = true;
+			} else {
+				wentUp = false;
+			}
 		}
 	}
 

@@ -6,6 +6,7 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.core.*;
 import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.state.GamePhase;
+import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.RemoteView;
 import it.polimi.ingsw.network.game.NetAvailableBuildings;
@@ -50,7 +51,7 @@ public class ServerController implements ObserverController {
 	public void generateOrder() {
 		setupController.generateOrder();
 	}
-	public List<Move> generateStandardMoves(Worker w) {
+	private List<Move> generateStandardMoves(Worker w) {
 		Map gameMap = observedModel.getMap();
 		int y = gameMap.getX(w.getPos());
 		int x = gameMap.getY(w.getPos());
@@ -76,7 +77,7 @@ public class ServerController implements ObserverController {
 		}
 		return moves;
 	}
-	public List<Build> generateStandardBuilds(Worker w) {
+	private List<Build> generateStandardBuilds(Worker w) {
 		Map gameMap = observedModel.getMap();
 		int y = gameMap.getX(w.getPos());
 		int x = gameMap.getY(w.getPos());
@@ -147,7 +148,11 @@ public class ServerController implements ObserverController {
 		Turn activeTurn = observedModel.getPhase();
 		if (worker == 1) {
 			try {
-				moves.addAll(player.getCard().checkMove(observedModel.getMap(),player.getWorker1(),activeTurn));
+				if (player.getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
+					moves.addAll(player.getCard().checkMove(observedModel.getMap(),player.getWorker1(),activeTurn));
+				} else {
+					moves.addAll(generateStandardMoves(player.getWorker1()));
+				}
 			} catch (NoMoveException e) {
 				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
 					moves.addAll(generateStandardMoves(player.getWorker1()));
@@ -155,7 +160,11 @@ public class ServerController implements ObserverController {
 			}
 		} else {
 			try {
-				moves.addAll(player.getCard().checkMove(observedModel.getMap(), player.getWorker2(),activeTurn));
+				if (player.getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
+					moves.addAll(player.getCard().checkMove(observedModel.getMap(), player.getWorker2(),activeTurn));
+				} else {
+					moves.addAll(generateStandardMoves(player.getWorker1()));
+				}
 			} catch (NoMoveException e) {
 				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
 					moves.addAll(generateStandardMoves(player.getWorker2()));
@@ -182,7 +191,7 @@ public class ServerController implements ObserverController {
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
 		// if the player is trying to choose a color already chosen or isn't its turn it returns an error
-		if (observedModel.isFinished() || !activePlayer.equals(playerColors.player)) {
+		if (observedModel.isFinished() || !activePlayer.equals(playerColors.player) || observedModel.getPhase().getPhase() != Phase.COLORS) {
 			caller.communicateError();
 		} else {
 			// the player can choose this color
@@ -199,7 +208,7 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (observedModel.isFinished() || !activePlayer.equals(playerGods.player)) {
+		if (observedModel.isFinished() || (playerGods.challenger == null && !activePlayer.equals(playerGods.player)) || (playerGods.challenger != null && !activePlayer.equals(playerGods.challenger)) || observedModel.getPhase().getPhase() != Phase.GODS) {
 			caller.communicateError();
 		} else {
 			try {
@@ -215,7 +224,7 @@ public class ServerController implements ObserverController {
 		// it controls if the player which sent the request is in its turn and can choose a color
 		RemoteView caller = (RemoteView) observed;
 		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (observedModel.isFinished() || !activePlayer.equals(netObject.player)) {
+		if (observedModel.isFinished() || !activePlayer.equals(netObject.player) || observedModel.getPhase().getPhase() != Phase.SETUP) {
 			caller.communicateError();
 		} else {
 			try {
@@ -432,6 +441,7 @@ public class ServerController implements ObserverController {
 				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getWorker2(),observedModel.getPhase()));
 				possibleBuilds = new NetAvailableBuildings(builds);
 			} catch (NoBuildException e) {
+				builds = null;
 				possibleBuilds = null;
 				observedModel.changeTurn();
 			}
@@ -443,7 +453,7 @@ public class ServerController implements ObserverController {
 			}
 			possibleBuilds = new NetAvailableBuildings(builds);
 		}
-		if (builds.size() == 0) {
+		if (builds != null && builds.size() == 0) {
 			throw new AssertionError("The function has been called by the remote view when the player cannot build because has loose");
 		}
 		return possibleBuilds;
