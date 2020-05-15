@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.cli.view;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +41,10 @@ public class Command {
 		}
 	}
 	public List<String> getParameterList() {
-		return Arrays.asList(otherValues);
+		List<String> returnList = new ArrayList<>();
+		for (int i = 0; i < otherValues.length; i++) {
+			returnList.add(otherValues[i]);
+		}
+		return returnList;
 	}
 }
