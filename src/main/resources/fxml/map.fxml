@@ -1,14 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="it.polimi.ingsw.ui.gui.controller.MapSceneController"
-            prefHeight="720.0" prefWidth="1280.0">
-
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.MapSceneController">
+   <children>
+      <ImageView fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/map/map_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="box_turn" fitHeight="439.0" fitWidth="341.0" layoutX="50.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/box_turn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="column_left" fitHeight="720.0" fitWidth="220.0" layoutX="1.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/column_left.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="box_build" fitHeight="401.0" fitWidth="259.0" layoutX="975.0" layoutY="319.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/box_build.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="box_workers" fitHeight="246.0" fitWidth="319.0" layoutX="961.0" layoutY="95.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/box_workers.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="box_exit" fitHeight="100.0" fitWidth="257.0" layoutX="1023.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/box_exit.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_exit" fitHeight="48.0" fitWidth="96.0" layoutX="1074.0" layoutY="11.0" onMousePressed="#mousePressedExit" onMouseReleased="#MouseReleasedExit" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="column_right" fitHeight="809.0" fitWidth="125.0" layoutX="1155.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/column_right.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_exit" fitHeight="36.0" fitWidth="65.0" layoutX="1233.0" layoutY="11.0" onMousePressed="#mousePressedIconExit" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/exit_icon.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="card_god" fitHeight="106.0" fitWidth="93.0" layoutX="132.0" layoutY="252.0" onMouseEntered="#mouseEnteredGodCard" onMouseExited="#mouseExitedGodCard" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/gods/card_apollo.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_build" fitHeight="86.0" fitWidth="114.0" layoutX="1041.0" layoutY="474.0" onMousePressed="#mousePressedBuild" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/button_build.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_dome" fitHeight="94.0" fitWidth="137.0" layoutX="1041.0" layoutY="596.0" onMousePressed="#mousePressedDome" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/button_dome.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="description_god" fitHeight="249.0" fitWidth="266.0" layoutX="42.0" layoutY="471.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/gods/description_apollo.png" />
+         </image>
+      </ImageView>
+      <GridPane fx:id="gridPane_cells" layoutX="330.0" layoutY="48.0" prefHeight="622.0" prefWidth="618.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="122.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="130.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="125.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="130.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="110.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="124.0" minHeight="10.0" prefHeight="112.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="170.0" minHeight="10.0" prefHeight="129.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="225.0" minHeight="10.0" prefHeight="135.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="186.0" minHeight="10.0" prefHeight="126.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="134.0" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <ImageView fx:id="cell_00" fitHeight="104.0" fitWidth="108.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true"></ImageView>
+            <ImageView fx:id="cell_10" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
+            <ImageView fx:id="cell_20" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" />
+            <ImageView fx:id="cell_30" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" />
+            <ImageView fx:id="cell_40" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" />
+            <ImageView fx:id="cell_01" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1" />
+            <ImageView fx:id="cell_11" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ImageView fx:id="cell_21" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <ImageView fx:id="cell_31" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <ImageView fx:id="cell_41" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <ImageView fx:id="cell_02" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2" />
+            <ImageView fx:id="cell_12" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ImageView fx:id="cell_22" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <ImageView fx:id="cell_32" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <ImageView fx:id="cell_42" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <ImageView fx:id="cell_03" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3" />
+            <ImageView fx:id="cell_13" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ImageView fx:id="cell_23" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+            <ImageView fx:id="cell_33" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <ImageView fx:id="cell_43" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+            <ImageView fx:id="cell_04" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="4" />
+            <ImageView fx:id="cell_14" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ImageView fx:id="cell_24" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <ImageView fx:id="cell_34" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+            <ImageView fx:id="cell_44" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+         </children>
+      </GridPane>
+      <ImageView fx:id="worker1" fitHeight="113.0" fitWidth="114.0" layoutX="1005.0" layoutY="200.0" onMousePressed="#mousePressedSetWorker" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/worker_red.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="worker2" fitHeight="113.0" fitWidth="113.0" layoutX="1115.0" layoutY="200.0" onMousePressed="#mousePressedSetWorker" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/worker_red.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="clouds_left" fitHeight="789.0" fitWidth="943.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/clouds_left.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="clouds_right" fitHeight="756.0" fitWidth="802.0" layoutX="478.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/clouds_right.png" />
+         </image>
+      </ImageView>
+   </children>
 </AnchorPane>

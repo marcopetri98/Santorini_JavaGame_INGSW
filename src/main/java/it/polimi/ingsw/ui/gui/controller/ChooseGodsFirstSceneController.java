@@ -47,15 +47,15 @@ public class ChooseGodsFirstSceneController {
 	@FXML
 	private ImageView card_atlas;
 
-	private int pressedApollo = 0;
-	private int pressedArtemis = 0;
-	private int pressedAthena = 0;
-	private int pressedAtlas = 0;
-	private int pressedDemeter = 0;
-	private int pressedHephaestus = 0;
-	private int pressedMinotaur = 0;
-	private int pressedPan = 0;
-	private int pressedPrometheus = 0;
+	private boolean pressedApollo = false;
+	private boolean pressedArtemis = false;
+	private boolean pressedAthena = false;
+	private boolean pressedAtlas = false;
+	private boolean pressedDemeter = false;
+	private boolean pressedHephaestus = false;
+	private boolean pressedMinotaur = false;
+	private boolean pressedPan = false;
+	private boolean pressedPrometheus = false;
 
 	Image cardApollo = new Image("/img/gods/card_apollo.png");
 	Image cardApolloPressed = new Image("/img/gods/card_apollo_pressed.png");
@@ -278,48 +278,48 @@ public class ChooseGodsFirstSceneController {
 		transition.play();
 	}
 
-	private void pressingCard(int pressed, ImageView imageView, Image imagePressed, Image image){ //TODO:fix
-		if(pressed!=1) {
+	private void pressingCard(boolean pressed, ImageView imageView, Image imagePressed, Image image){
+		if(!pressed) {
 			imageView.setImage(imagePressed);
 			if(imagePressed.equals(cardApolloPressed)){
-				pressedApollo = 1;
+				pressedApollo = true;
 			} else if(imagePressed.equals(cardArtemisPressed)){
-				pressedArtemis = 1;
+				pressedArtemis = true;
 			} else if(imagePressed.equals(cardAthenaPressed)){
-				pressedAthena = 1;
+				pressedAthena = true;
 			} else if(imagePressed.equals(cardAtlasPressed)){
-				pressedAtlas = 1;
+				pressedAtlas = true;
 			} else if(imagePressed.equals(cardDemeterPressed)){
-				pressedDemeter = 1;
+				pressedDemeter = true;
 			} else if(imagePressed.equals(cardHephaestusPressed)){
-				pressedHephaestus = 1;
+				pressedHephaestus = true;
 			} else if(imagePressed.equals(cardMinotaurPressed)){
-				pressedMinotaur = 1;
+				pressedMinotaur = true;
 			} else if(imagePressed.equals(cardPanPressed)){
-				pressedPan = 1;
+				pressedPan = true;
 			} else if(imagePressed.equals(cardPrometheusPressed)){
-				pressedPrometheus = 1;
+				pressedPrometheus = true;
 			}
 		} else{
 			imageView.setImage(image);
 			if(image.equals(cardApollo)){
-				pressedApollo = 0;
+				pressedApollo = false;
 			} else if(image.equals(cardArtemis)){
-				pressedArtemis = 0;
+				pressedArtemis = false;
 			} else if(image.equals(cardAthena)){
-				pressedAthena = 0;
+				pressedAthena = false;
 			} else if(image.equals(cardAtlas)){
-				pressedAtlas = 0;
+				pressedAtlas = false;
 			} else if(image.equals(cardDemeter)){
-				pressedDemeter = 0;
+				pressedDemeter = false;
 			} else if(image.equals(cardHephaestus)){
-				pressedHephaestus = 0;
+				pressedHephaestus = false;
 			} else if(image.equals(cardMinotaur)){
-				pressedMinotaur = 0;
+				pressedMinotaur = false;
 			} else if(image.equals(cardPan)){
-				pressedPan = 0;
+				pressedPan = false;
 			} else if(image.equals(cardPrometheus)){
-				pressedPrometheus = 0;
+				pressedPrometheus = false;
 			}
 		}
 	}

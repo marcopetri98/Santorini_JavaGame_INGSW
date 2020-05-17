@@ -74,6 +74,8 @@ public class MenuSceneController {
 		System.exit(0);
 	}
 
+
+
 	//TODO: (optional) background movement
 
 //	TODO: (optional) change cursor when: & changing button color (?)

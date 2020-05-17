@@ -4,6 +4,7 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.network.ClientMessageListener;
 import it.polimi.ingsw.ui.gui.controller.MainGuiController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -27,12 +28,16 @@ public class ClientGUIApp extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		Parent root = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml")); //in this moment, I'm using this as a scene tester
+		Parent root = FXMLLoader.load(getClass().getResource("/fxml/map.fxml")); //in this moment, I'm using this as a scene tester
 		Scene menu = new Scene(root);
 		stage.setScene(menu);
 		stage.setTitle("Santorini");
 		stage.getIcons().add(new Image("/img/icon_logo.png"));
 		stage.setResizable(false);
 		stage.show();
+		stage.setOnCloseRequest(windowEvent -> {
+			Platform.exit();
+			System.exit(0);
+		});
 	}
 }
