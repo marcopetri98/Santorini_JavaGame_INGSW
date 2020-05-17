@@ -108,7 +108,7 @@ public class ServerController implements ObserverController {
 
 	// support methods
 	private boolean isMovablePhase() {
-		return observedModel.getPhase().getGamePhase() == GamePhase.MOVE;
+		return observedModel.getPhase().getGamePhase() == GamePhase.MOVE || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE;
 	}
 	private boolean isBuildablePhase() {
 		if (observedModel.getPhase().getGamePhase() == GamePhase.BUILD || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
@@ -324,6 +324,10 @@ public class ServerController implements ObserverController {
 						victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
 						observedModel.applyWorkerLock(movingPlayer,selectedWorker.workerID-movingPlayer.getPlayerID());
 						if (!buildDefeat()) {
+							// if a player with prometheus moved without building before the game must go from before move phase to build phase (2 step on phase advance)
+							if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
+								observedModel.changeTurn();
+							}
 							observedModel.changeTurn();
 						}
 					}
