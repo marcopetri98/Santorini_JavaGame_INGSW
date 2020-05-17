@@ -4,6 +4,9 @@ import it.polimi.ingsw.network.NetworkPhase;
 import it.polimi.ingsw.network.ServerClientListenerThread;
 import it.polimi.ingsw.network.objects.NetObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ServerListenerStub extends ServerClientListenerThread {
 	private boolean fatalErrorCalled;
 	private boolean closeSocketCalled;
@@ -11,7 +14,7 @@ public class ServerListenerStub extends ServerClientListenerThread {
 	private boolean setPhaseCalled;
 	private String playerName;
 	private NetworkPhase netPhase;
-	private NetObject messageReceived;
+	private List<NetObject> messagesReceived;
 
 	public ServerListenerStub() {
 		super();
@@ -19,6 +22,7 @@ public class ServerListenerStub extends ServerClientListenerThread {
 		closeSocketCalled = false;
 		sendMessageCalled = false;
 		setPhaseCalled = false;
+		messagesReceived = new ArrayList<>();
 	}
 
 	public void setPlayerName(String name) {
@@ -29,6 +33,7 @@ public class ServerListenerStub extends ServerClientListenerThread {
 		closeSocketCalled = false;
 		sendMessageCalled = false;
 		setPhaseCalled = false;
+		messagesReceived = new ArrayList<>();
 	}
 	public boolean isFatalErrorCalled() {
 		return fatalErrorCalled;
@@ -42,8 +47,16 @@ public class ServerListenerStub extends ServerClientListenerThread {
 	public boolean isSetPhaseCalled() {
 		return setPhaseCalled;
 	}
-	public NetObject getMessageReceived() {
-		return messageReceived;
+	public NetObject pickMessageReceived() {
+		return messagesReceived.get(0);
+	}
+	public NetObject extractMessageReceived() {
+		NetObject picked = messagesReceived.get(0);
+		messagesReceived.remove(0);
+		return picked;
+	}
+	public int getRemainingMessages() {
+		return messagesReceived.size();
 	}
 
 	@Override
@@ -54,7 +67,7 @@ public class ServerListenerStub extends ServerClientListenerThread {
 	@Override
 	public void sendMessage(NetObject object) {
 		sendMessageCalled = true;
-		messageReceived = object;
+		messagesReceived.add(object);
 	}
 	@Override
 	public void closeSocketAndTerminate() {

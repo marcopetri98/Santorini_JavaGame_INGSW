@@ -3,6 +3,7 @@ package it.polimi.ingsw.network;
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.core.Map;
+import it.polimi.ingsw.core.TypeGod;
 import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
@@ -30,12 +31,15 @@ import java.util.List;
 public class RemoteView extends ObservableRemoteView implements ObserverRemoteView {
 	private final ServerClientListenerThread clientHandler;
 	private int playersNum;
+	// TODO: can be implemented without repetition of information? Maybe inspecting the game?
+	private boolean hasBuilt;
 
 	public RemoteView(ServerClientListenerThread handler) throws NullPointerException {
 		if (handler == null) {
 			throw new NullPointerException();
 		}
 		clientHandler = handler;
+		hasBuilt = false;
 		playersNum = 1;
 	}
 
@@ -51,6 +55,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			case PLAYERTURN -> clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
 			case OTHERTURN -> clientHandler.sendMessage(new NetGaming(Constants.OTHERS_ERROR));
 		}
+		hasBuilt = false;
 	}
 
 	/* **********************************************
@@ -129,6 +134,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 */
 	public void handleBuildRequest(NetGaming req, boolean error) {
 		if (!error) {
+			hasBuilt = true;
 			notifyBuild(req);
 		} else {
 			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
@@ -390,12 +396,16 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					Game caller = (Game) observed;
 					// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
 					if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE) {
+						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,false));
+
 						NetDivinityChoice divinityChoice = null;
 						if (caller.getPlayers().get(0).getPlayerName().equals(clientHandler.getPlayerName())) {
 							// the player is the challenger and it is informed about that
 							divinityChoice = new NetDivinityChoice(Constants.GODS_CHOOSE_STARTER);
+							clientHandler.sendMessage(divinityChoice);
 						}
-						clientHandler.sendMessage(divinityChoice);
+					} else if (turn.getPhase() == Phase.GODS && turn.getGodsPhase() == GodsPhase.GODS_CHOICE) {
+						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,false));
 					} else if (turn.getPhase() == Phase.SETUP) {
 						clientHandler.setGamePhase(NetworkPhase.SETUP);
 						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,true));
@@ -406,23 +416,35 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_PHASE_UPDATE));
 				}
 				case PLAYERTURN ->  {
-					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
-					clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));
+					// if it is the before move phase it doesn't say that to the client because it knows that its turn start with a before move phase
+					if (observedGame.getPhase().getGamePhase() != GamePhase.BEFOREMOVE) {
+						if (observedGame.getPhase().getGamePhase() == GamePhase.BUILD) {
+							clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));
+						} else if ((hasBuilt && observedGame.getPlayerByName(clientHandler.getPlayerName()).getCard().getTypeGod() == TypeGod.CHANGE_FLOW_GOD) || (!hasBuilt && observedGame.getPlayerByName(clientHandler.getPlayerName()).getCard().getTypeGod() != TypeGod.CHANGE_FLOW_GOD)) {
+							clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));
+						}
+					}
 
 					// checks what the player can do
 					NetAvailablePositions possibleMoves;
 					NetAvailableBuildings possibleBuildings;
 					switch (observedGame.getPhase().getGamePhase()) {
 						case BEFOREMOVE -> {
+							// in the before move phase the player is notified that a player can either move or build (if builds are possible), if it move immediately passes to build phase
 							possibleBuildings = askBuildings();
+							possibleMoves = askPositions();
 							if (possibleBuildings == null || possibleBuildings.builds.size() == 0) {
 								notifyPass(clientHandler.getPlayerName());
 							} else {
-								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_BUILD,possibleBuildings));
+								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ACTIONS,possibleBuildings,possibleMoves));
 							}
 						}
 						case MOVE -> {
-							possibleMoves = askPositions();
+							possibleMoves = null;
+							// if it has prometheus and has built before now it has to move, instead he has moved and must go directly to build phase
+							if ((hasBuilt && observedGame.getPlayerByName(clientHandler.getPlayerName()).getCard().getTypeGod() == TypeGod.CHANGE_FLOW_GOD) || (!hasBuilt && observedGame.getPlayerByName(clientHandler.getPlayerName()).getCard().getTypeGod() != TypeGod.CHANGE_FLOW_GOD)) {
+								possibleMoves = askPositions();
+							}
 							if (possibleMoves != null && possibleMoves.moves.size() > 0) {
 								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_MOVE,possibleMoves));
 							}
@@ -432,6 +454,8 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 							if (possibleBuildings != null && possibleBuildings.builds.size() > 0) {
 								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_BUILD,possibleBuildings));
 							}
+							// if the player is now in build phase there is no interest in know if it has built before moving
+							hasBuilt = false;
 						}
 					}
 				}
@@ -467,7 +491,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 						clientHandler.fatalError("It became the player's turn and the handler thinks it is the same as before");
 					}
 					case OTHERTURN -> {
-						// TODO: check if the change of the turn is handled correctly
 						clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
 						NetGaming othersEndTurn = new NetGaming(Constants.OTHERS_TURN);
 						clientHandler.sendMessage(othersEndTurn);
@@ -476,6 +499,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			} else {
 				if (clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN) {
 					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
+					clientHandler.sendMessage(new NetGaming(Constants.PLAYER_FINISHED_TURN));
 				} else {
 					switch (clientHandler.getGamePhase()) {
 						case COLORS -> {

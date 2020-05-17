@@ -334,6 +334,18 @@ public class GameStub extends Game {
 			throw new AssertionError("Design error");
 		}
 	}
+	public void changeAGod(String player, String godName) {
+		try {
+			Method playerGod = Player.class.getDeclaredMethod("setGodCard", GodCard.class);
+			playerGod.setAccessible(true);
+			godCards.remove(getPlayerByName(player).getCard());
+			GodCard card = GodCardFactory.createGodCard(godName.toUpperCase(),getPlayerByName(player));
+			godCards.add(card);
+			playerGod.invoke(getPlayerByName(player),card);
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new AssertionError("Design error");
+		}
+	}
 
 	public boolean isApplyMoveCalled() {
 		return applyMoveCalled;
