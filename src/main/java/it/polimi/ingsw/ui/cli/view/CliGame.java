@@ -83,7 +83,7 @@ public class CliGame {
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
-				//typeInputPrint();
+				typeInputPrint();
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {	//Con gods apollo artemis ->restituisce false!!!!!!!!!
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -361,7 +361,7 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_CHOOSE_STARTER:
-				phase.advance();
+				//phase.advance();
 				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: starter playername");
 				for (String p : players) {
 					System.out.print(p + "\n");
@@ -381,7 +381,7 @@ public class CliGame {
 				activePlayer = player;
 				if(challenger) {
 					if(godsGoAlreadyCalled) {
-						phase.advance();
+						//phase.advance();
 						System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					}
@@ -392,7 +392,7 @@ public class CliGame {
 					}
 				}
 				else {
-					phase.advance();
+					//phase.advance();
 					System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 					System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					code = Constants.GODS_YOU;
