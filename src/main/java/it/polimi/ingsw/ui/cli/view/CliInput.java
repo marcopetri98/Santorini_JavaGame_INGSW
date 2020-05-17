@@ -31,6 +31,7 @@ public class CliInput {
 	 * @return
 	 */
 	public Command getInput() throws UserInputTimeoutException, IOException {
+
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = null;
 		boolean foundSomething = false;

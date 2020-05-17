@@ -85,7 +85,7 @@ public class CliGame {
 				parseMessages();
 				//typeInputPrint();
 				currentCommand = cliInput.getInput();
-				if (parseSyntax(currentCommand)) {
+				if (parseSyntax(currentCommand)) {	//Con gods apollo artemis ->restituisce false!!!!!!!!!
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
 					inputController.getCommand(currentCommand,phase.clone());
 					sentCorrectMessage = true;
@@ -191,9 +191,18 @@ public class CliGame {
 					if (phase.getGodsPhase().equals(GodsPhase.CHALLENGER_CHOICE) && challenger) {
 						if (command.commandType.equals(Constants.COMMAND_GODS_CHOICES) && (command.getNumParameters() == 2 || command.getNumParameters() == 3)) {
 							int j = 0;
-							for (int x = 0; x < 3; x++) {
-								if (Constants.GODS_GOD_NAMES.contains(command.getParameter(x).toUpperCase())) {
-									j++;
+							if(command.getNumParameters() == 3) {
+								for (int x = 0; x < 3; x++) {
+									if (Constants.GODS_GOD_NAMES.contains(command.getParameter(x).toUpperCase())) {
+										j++;
+									}
+								}
+							}
+							else if(command.getNumParameters() == 2) {
+								for (int x = 0; x < 2; x++) {
+									if (Constants.GODS_GOD_NAMES.contains(command.getParameter(x).toUpperCase())) {
+										j++;
+									}
 								}
 							}
 							if (j == command.getNumParameters()) {
@@ -204,9 +213,9 @@ public class CliGame {
 						// TODO: implement the state of gods chosen locally
 						if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
 							return true;
+						} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
+							return true;
 						}
-					} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
-						return true;
 					}
 				}
 
@@ -322,10 +331,10 @@ public class CliGame {
 
 			case Constants.COLOR_CHOICES :
 				ncp = (NetColorPreparation) obj;
-				players.add(ncp.player);
+				//players.add(ncp.player);
 				playerColors.add(ncp.color);
 				if (ncp.next != null) {
-					players.add(ncp.next.player);
+					//players.add(ncp.next.player);
 					playerColors.add(ncp.next.color);
 				}
 				break;
@@ -352,7 +361,8 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_CHOOSE_STARTER:
-				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: player playername");
+				phase.advance();
+				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: starter playername");
 				for (String p : players) {
 					System.out.print(p + "\n");
 				}
@@ -368,8 +378,10 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_YOU :
+				activePlayer = player;
 				if(challenger) {
 					if(godsGoAlreadyCalled) {
+						phase.advance();
 						System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					}
@@ -380,10 +392,17 @@ public class CliGame {
 					}
 				}
 				else {
+					phase.advance();
 					System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 					System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					code = Constants.GODS_YOU;
 				}
+				break;
+
+			case Constants.GODS_GODS :
+				ndc = (NetDivinityChoice) obj;
+				gods.addAll(ndc.getDivinities());
+				System.out.println("Just added players' divinities.");
 				break;
 
 			case Constants.GODS_OTHER :
@@ -397,12 +416,17 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_CHOICES :
-				ndc = (NetDivinityChoice) obj;
+				/*ndc = (NetDivinityChoice) obj;
 				gods.add(ndc.divinity);
 				if (ndc.next != null) {
 					gods.add(ndc.next.divinity);
-				}
+				}*/
 				break;
+
+			/*case Constants.OTHERS_TURN:
+				activePlayer = players.get(players.indexOf(activePlayer) == players.size() ? 0 : players.indexOf(activePlayer) + 1);
+				System.out.println("The other player "+activePlayer+" is choosing a god");
+				break;*/
 
 			case Constants.GENERAL_SETUP_DISCONNECT:
 				functioning = false;

@@ -101,7 +101,7 @@ public class NetDivinityChoice extends NetObject {
 	public String getPlayer() {
 		return player;
 	}
-	public List<String> getDivinities() {
+	/*public List<String> getDivinities() {
 		if (divinity == null) {
 			return null;
 		} else {
@@ -113,6 +113,22 @@ public class NetDivinityChoice extends NetObject {
 				divinityNames.add(divinity);
 			}
 
+			return divinityNames;
+		}
+	}*/
+
+	public List<String> getDivinities() {
+		if (divinity == null) {
+			return null;
+		} else {
+			List<String> divinityNames = new ArrayList<>();
+			divinityNames.add(divinity);
+			NetDivinityChoice x;
+			x = next;
+			while(x != null){
+				divinityNames.add(x.divinity);
+				x = x.next;
+			}
 			return divinityNames;
 		}
 	}
