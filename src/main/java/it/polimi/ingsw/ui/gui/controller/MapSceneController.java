@@ -392,7 +392,51 @@ public class MapSceneController {
 	}
 
 	public void mousePressedSetWorker(MouseEvent mouseEvent) {
-		
+		button_dome.setDisable(true);
+		button_build.setDisable(true);
+		if(colorPlayer().equals(workerRed)) {
+			if (((ImageView)mouseEvent.getTarget()).getImage().equals(workerRed)) {
+				workerSelected = ((ImageView)mouseEvent.getTarget());
+				workerSelected.setImage(workerRedPressed);
+				if (((ImageView)mouseEvent.getTarget()).getId().equals("worker1")) {
+					pressedWorker1 = true;
+					//((ImageView)(((ImageView) mouseEvent.getTarget()).getScene().lookup("#worker2"))).setImage(workerRed);
+					worker2.setImage(workerRed);
+					pressedWorker2 = false;
+				} else {
+					pressedWorker2 = true;
+					//((ImageView)(((ImageView) mouseEvent.getTarget()).getScene().lookup("#worker1"))).setImage(workerRed);
+					worker1.setImage(workerRed);
+					pressedWorker1 = false;
+				}
+			} else {
+				workerSelected = null; //deseleziona
+				((ImageView)mouseEvent.getTarget()).setImage(workerRed);
+				if (((ImageView)mouseEvent.getTarget()).getId().equals("worker1")) {
+					pressedWorker1 = false;
+					pressedWorker2 = false;
+				} else {
+					pressedWorker2 = false;
+					pressedWorker1 = false;
+				}
+			}
+		} else if(colorPlayer().equals(workerGreen)){
+			if(!pressedSetWorker1) {
+				worker1.setImage(workerGreenPressed);
+				pressedSetWorker1 = true;
+			} else {
+				worker1.setImage(workerGreen);
+				pressedSetWorker1 = false;
+			}
+		} else if(colorPlayer().equals(workerBlue)){
+			if(!pressedSetWorker1) {
+				worker1.setImage(workerBluePressed);
+				pressedSetWorker1 = true;
+			} else {
+				worker1.setImage(workerBlue);
+				pressedSetWorker1 = false;
+			}
+		}
 	}
 
 	private void setupWorkers(ImageView cell){
@@ -423,8 +467,6 @@ public class MapSceneController {
 			setupWorkers = true;
 		}
 	} //OK
-
-
 	private Boolean cellWorkerPressed(ImageView cell){
 		if(cell.equals(cell_00)){
 			return cellContainingWorkerPressed[0][0];
@@ -478,8 +520,6 @@ public class MapSceneController {
 			return cellContainingWorkerPressed[4][4];
 		} else return null;
 	}
-
-
 	private void pressingWorker(ImageView cell){
 		if(cell.getImage().equals(build1Red) && !cellWorkerPressed(cell)){ //dovrei fare anche l'unpress..
 			cell.setImage(build1RedPressed);
@@ -509,8 +549,6 @@ public class MapSceneController {
 			pressedBuild3Blue = true;
 		}
 	}
-
-
 	public void moveWorker(ImageView cell){
 		if(setupWorkers) {
 			if (pressedWorker1 && !pressedWorker2) {
@@ -594,12 +632,44 @@ public class MapSceneController {
 	} //OK
 
 	public void mousePressedCell(MouseEvent mouseEvent) {
+		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
 
-//		selectWorker1(cell_00);
-//		selectWorker2(cell_00);
-		//moveWorker(cell_00);
-		//pressingBuildWorker(cell_00); //only if there is already a build w/ worker...
-		pressingCell(cell_00, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
+		if (pressedCell.getImage().equals(workerRed)) {
+			if (setWorkers == 2) {
+				if (workerSelected != null) {
+					workerSelected.setImage(workerRed);
+					workerSelected = pressedCell;
+					workerSelected.setImage(workerRedPressed);
+				} else {
+					workerSelected = pressedCell;
+					workerSelected.setImage(workerRedPressed);
+				}
+			}
+		} else {
+			if (pressedCell.getImage().equals(blank)) {
+				if (workerSelected != null) {
+					// TODO: controlli su possibilità
+					pressedCell.setImage(workerRed);
+					if (workerSelected.getId().equals("worker1") || workerSelected.getId().equals("worker2")) {
+						((AnchorPane)workerSelected.getParent()).getChildren().remove(workerSelected);
+						++setWorkers;
+						if(setWorkers == 2) {
+							slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
+							button_build.setDisable(false);
+							button_dome.setDisable(false);
+						}
+						workerSelected = null;
+					} else {
+						workerSelected.setImage(blank);
+						workerSelected = null;
+					}
+				}
+			} else if (pressedCell.getImage().equals(workerRedPressed)) {
+				workerSelected = null;
+				pressedCell.setImage(workerRed);
+			}
+		}
+		pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
 	}
 
 	public void mousePressedCell10(MouseEvent mouseEvent) {
