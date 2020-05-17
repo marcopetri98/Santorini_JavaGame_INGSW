@@ -5,6 +5,9 @@ package it.polimi.ingsw.network.objects;
 // necessary imports of Java SE
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NetLobbyPreparation extends NetObject {
 	public final String player;
 	public final int order;
@@ -43,5 +46,15 @@ public class NetLobbyPreparation extends NetObject {
 	}
 	public NetLobbyPreparation getNext() {
 		return next;
+	}
+	public List<String> getPlayersList() {
+		List<String> list = new ArrayList<>();
+		if (player != null) {
+			list.add(player);
+			if (next != null) {
+				list.addAll(next.getPlayersList());
+			}
+		}
+		return list;
 	}
 }

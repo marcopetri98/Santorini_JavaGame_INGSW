@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.network.objects.NetObject;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -13,7 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class NicknameServerAddressSceneController {
+public class NicknameServerAddressSceneController implements SceneController {
 
 	@FXML
 	private TextField textField_nickname;
@@ -35,6 +36,10 @@ public class NicknameServerAddressSceneController {
 	Stage nextStage;
 	Scene previousScene;
 
+	public void initialize() throws IOException {
+		MainGuiController.getInstance().setSceneController(this);
+	}
+
 	public void mousePressedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNextPressed);
 	}
@@ -52,7 +57,13 @@ public class NicknameServerAddressSceneController {
 		nextStage.setScene(previousScene);
 	}
 
-	//String name = texField_nickname.getText(); //after "Next" is clicked, i suppose...
+	@Override
+	public void fatalError() {
+		// TODO: what to do here?
+	}
 
+	@Override
+	public void deposeMessage(NetObject message) {
 
+	}
 }

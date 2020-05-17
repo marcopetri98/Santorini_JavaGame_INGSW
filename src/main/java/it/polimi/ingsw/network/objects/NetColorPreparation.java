@@ -6,6 +6,9 @@ import it.polimi.ingsw.util.Constants;
 // necessary imports of Java SE
 import it.polimi.ingsw.util.Color;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NetColorPreparation extends NetObject {
 	public final String player;
 	public final Color color;
@@ -44,5 +47,15 @@ public class NetColorPreparation extends NetObject {
 	}
 	public NetColorPreparation getNext() {
 		return next;
+	}
+	public Map<String,Color> getPlayerColorsMap() {
+		Map<String,Color> list = new HashMap<>();
+		if (player != null && color != null) {
+			list.put(player,color);
+			if (next != null) {
+				list.putAll(next.getPlayerColorsMap());
+			}
+		}
+		return list;
 	}
 }

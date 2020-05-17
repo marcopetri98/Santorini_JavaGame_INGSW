@@ -24,4 +24,20 @@ public enum Phase {
 				throw new IllegalStateException();
 		}
 	}
+
+	public boolean lessThan(Phase other) {
+		if (this == PRELOBBY && (other.equals(LOBBY) || other.equals(COLORS) || other.equals(GODS) || other.equals(SETUP) || other.equals(PLAYERTURN))) {
+			return true;
+		} else if (this == LOBBY && (other.equals(COLORS) || other.equals(GODS) || other.equals(SETUP) || other.equals(PLAYERTURN))) {
+			return true;
+		} else if (this == COLORS && (other.equals(GODS) || other.equals(SETUP) || other.equals(PLAYERTURN))) {
+			return true;
+		} else if (this == GODS && (other.equals(SETUP) || other.equals(PLAYERTURN))) {
+			return true;
+		} else if (this == SETUP && (other.equals(PLAYERTURN))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
