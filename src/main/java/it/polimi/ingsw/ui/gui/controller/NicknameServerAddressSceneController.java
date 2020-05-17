@@ -41,7 +41,6 @@ public class NicknameServerAddressSceneController {
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
 	}
-
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		nextStage = (Stage) ((Node)mouseEvent.getTarget()).getScene().getWindow();

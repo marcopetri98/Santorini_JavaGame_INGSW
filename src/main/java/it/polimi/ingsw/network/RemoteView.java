@@ -162,6 +162,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			clientHandler.fatalError("");
 		} else {
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_DEFEATED, playerDefeated);
+			clientHandler.sendMessage(yourMessage);
 			playersNum--;
 
 			if (clientHandler.getPlayerName().equals(playerDefeated)) {
@@ -176,6 +177,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		} else {
 			clientHandler.setGamePhase(NetworkPhase.END);
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_WINNER, playerWinner);
+			clientHandler.sendMessage(yourMessage);
 			clientHandler.closeSocketAndTerminate();
 			observed.removeObserver(this);
 		}
@@ -306,10 +308,11 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 */
 	@Override
 	public synchronized void updateMove(ObservableObject observed, Map netMap) {
-		if (observed == null || netMap != null) {
+		if (observed == null || netMap == null) {
 			clientHandler.fatalError("It is called the move update with wrong or null parameters");
 		} else {
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
+			clientHandler.sendMessage(yourMessage);
 		}
 	}
 	/**
@@ -319,10 +322,11 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 */
 	@Override
 	public synchronized void updateBuild(ObservableObject observed, Map netMap) {
-		if (observed == null || netMap != null) {
+		if (observed == null || netMap == null) {
 			clientHandler.fatalError("It is called the move update with wrong or null parameters");
 		} else {
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));
+			clientHandler.sendMessage(yourMessage);
 		}
 	}
 	/**
@@ -336,6 +340,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			clientHandler.fatalError("It is called the quit of a player with a null parameter");
 		} else {
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_PLAYER_DISCONNECTED, playerName);
+			clientHandler.sendMessage(yourMessage);
 			playersNum--;
 		}
 	}

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network.objects;
 
 // necessary imports of Java SE
+import it.polimi.ingsw.core.gods.GodCard;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class NetDivinityChoice extends NetObject {
 		challenger = start ? player : null;
 		this.player = start ? other : player;
 		next = null;
-		divinity = start ? null : other;
+		divinity = start ? null : other.toUpperCase();
 		godsEnd = false;
 	}
 	public NetDivinityChoice(String msg, String name, String god, NetDivinityChoice next) throws NullPointerException {
@@ -52,7 +54,7 @@ public class NetDivinityChoice extends NetObject {
 			throw new NullPointerException();
 		}
 		challenger = null;
-		divinity = god;
+		divinity = god.toUpperCase();
 		player = name;
 		this.next = next;
 		godsEnd = false;
@@ -62,7 +64,7 @@ public class NetDivinityChoice extends NetObject {
 		if (divinities == null) {
 			throw new NullPointerException();
 		} else {
-			divinity = divinities.get(0);
+			divinity = divinities.get(0).toUpperCase();
 			divinities.remove(0);
 			if (divinities.size() >= 1) {
 				next = new NetDivinityChoice(msg,divinities);
@@ -79,7 +81,7 @@ public class NetDivinityChoice extends NetObject {
 		if (divinities == null) {
 			throw new NullPointerException();
 		} else {
-			divinity = divinities.get(0);
+			divinity = divinities.get(0).toUpperCase();
 			divinities.remove(0);
 			if (divinities.size() >= 1) {
 				next = new NetDivinityChoice(msg,divinities);
