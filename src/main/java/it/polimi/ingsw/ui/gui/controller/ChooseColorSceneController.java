@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+
 
 public class ChooseColorSceneController {
 
@@ -22,6 +25,11 @@ public class ChooseColorSceneController {
 	@FXML
 	private ImageView button_exit;
 
+	@FXML
+	private Text text_player;
+
+	private String namePlayer = "Pippo"; //only as example.
+
 	Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
 	Image buttonNext = new Image("/img/home_next_btn.png");
 	Image buttonExitPressed = new Image("/img/home_exit_btn_pressed.png");
@@ -32,6 +40,17 @@ public class ChooseColorSceneController {
 	Image buttonGreen = new Image("/img/color_green_btn.png");
 	Image buttonBluePressed = new Image("/img/color_btn_blue_pressed.png");
 	Image buttonBlue = new Image("/img/color_blue_btn.png");
+
+	public void initialize(){
+		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
+		text_player.setText(namePlayer);
+	}
+
+	private String setNamePlayer() {
+		//TODO:...
+		return namePlayer;
+	}
+
 
 	public void mousePressedRed(MouseEvent mouseEvent) {
 		button_red.setImage(buttonRedPressed);

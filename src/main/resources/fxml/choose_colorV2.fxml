@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -39,5 +40,10 @@
             <Image url="@../img/home_exit_btn.png" />
          </image>
       </ImageView>
+      <Text fx:id="text_player" layoutX="482.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="293.826171875">
+         <font>
+            <Font name="Agency FB" size="35.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>
