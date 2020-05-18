@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="it.polimi.ingsw.ui.gui.controller.LobbySceneController"
-            prefHeight="720.0" prefWidth="1280.0">
-
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.LobbySceneController">
+   <children>
+      <ImageView fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/lobby_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_exit" fitHeight="75.0" fitWidth="116.0" layoutX="174.0" layoutY="584.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="player_3rd" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/lobby_3rdPlayer.png" />
+         </image>
+      </ImageView>
+      <Text fx:id="text_1" layoutX="478.0" layoutY="302.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="342.826171875">
+         <font>
+            <Font size="35.0" />
+         </font>
+      </Text>
+      <Text fx:id="text_2" layoutX="478.0" layoutY="432.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="342.826171875">
+         <font>
+            <Font size="35.0" />
+         </font>
+      </Text>
+      <Text fx:id="text_3" layoutX="478.0" layoutY="567.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="342.826171875">
+         <font>
+            <Font size="35.0" />
+         </font>
+      </Text>
+   </children>
 </AnchorPane>

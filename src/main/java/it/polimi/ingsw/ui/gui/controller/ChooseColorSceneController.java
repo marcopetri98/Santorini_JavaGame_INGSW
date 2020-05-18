@@ -28,7 +28,7 @@ public class ChooseColorSceneController {
 	@FXML
 	private Text text_player;
 
-	private String namePlayer = "Pippo"; //only as example.
+	private String namePlayer = "sdfhjsjdflksdflksdf"; //only as example. //max 19
 
 	Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
 	Image buttonNext = new Image("/img/home_next_btn.png");
