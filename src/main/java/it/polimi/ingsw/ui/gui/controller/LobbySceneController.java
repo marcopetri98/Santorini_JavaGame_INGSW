@@ -24,7 +24,7 @@ public class LobbySceneController {
 	@FXML
 	private Text text_3;
 
-	private int numPlayer = 3; //TODO:.........
+	private int numPlayer = 2; //TODO:.........
 	private String player1 = "Pippo";
 	private String player2 = "Pluto";
 	private String player3 = "Paperino";

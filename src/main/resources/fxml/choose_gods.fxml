@@ -1,14 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="it.polimi.ingsw.ui.gui.controller.ChooseGodsSceneController"
-            prefHeight="720.0" prefWidth="1280.0">
-
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.ChooseGodsSceneController">
+   <children>
+      <ImageView fitHeight="720.0" fitWidth="1280.0" layoutX="-9.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/choose_god_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="card_1" fitHeight="168.0" fitWidth="126.0" layoutX="433.0" layoutY="302.0" onMouseEntered="#mouseEnteredCard1" onMouseExited="#mouseExitedCard1" onMousePressed="#mousePressedCard1" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/gods/card_minotaur.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="card_3" fitHeight="168.0" fitWidth="126.0" layoutX="578.0" layoutY="302.0" onMouseEntered="#mouseEnteredCard3" onMouseExited="#mouseExitedCard3" onMousePressed="#mousePressedCard3" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/gods/card_pan.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="card_2" fitHeight="168.0" fitWidth="135.0" layoutX="723.0" layoutY="302.0" onMouseEntered="#mouseEnteredCard2" onMouseExited="#mouseExitedCard2" onMousePressed="#mousePressedCard2" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/gods/card_prometheus.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_exit" fitHeight="74.0" fitWidth="181.0" layoutX="174.0" layoutY="584.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_next" fitHeight="113.0" fitWidth="184.0" layoutX="551.0" layoutY="544.0" onMousePressed="#mousePressedNext" onMouseReleased="#mouseReleasedNext" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_next_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="description" fitHeight="346.0" fitWidth="369.0" layoutX="852.0" layoutY="374.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/gods/description_apollo.png" />
+         </image>
+      </ImageView>
+      <Text fx:id="text_player" layoutX="478.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="339.826171875">
+         <font>
+            <Font size="30.0" />
+         </font>
+      </Text>
+   </children>
 </AnchorPane>
