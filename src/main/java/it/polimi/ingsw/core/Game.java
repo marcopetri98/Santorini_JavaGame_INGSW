@@ -162,11 +162,16 @@ public class Game extends ObservableGame {
 			}
 			changeActivePlayer();
 		} else if (turn.getPhase() == Phase.GODS) {
+			GodsPhase beforePhase = turn.getGodsPhase();
 			if (turn.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE || (turn.getGodsPhase() == GodsPhase.GODS_CHOICE && players.indexOf(activePlayer) == 0) || (turn.getGodsPhase() == GodsPhase.STARTER_CHOICE)) {
 				turn.advance();
 				notifyPhaseChange(turn.clone());
 			}
-			changeActivePlayer();
+			if (beforePhase == GodsPhase.GODS_CHOICE && turn.getGodsPhase() == GodsPhase.STARTER_CHOICE) {
+				notifyActivePlayer(activePlayer.getPlayerName());
+			} else {
+				changeActivePlayer();
+			}
 		} else if (turn.getPhase() == Phase.SETUP) {
 			if (players.indexOf(activePlayer) == players.size()-1) {
 				turn.advance();

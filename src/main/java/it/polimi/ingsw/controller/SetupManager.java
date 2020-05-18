@@ -115,7 +115,7 @@ public class SetupManager {
 			}
 		} else {
 			// if the player is the challenger it chooses the starter player
-			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.player) || observedModel.getPhase().getGodsPhase() != GodsPhase.STARTER_CHOICE) {
+			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.challenger) || observedModel.getPhase().getGodsPhase() != GodsPhase.STARTER_CHOICE) {
 				throw new BadRequestException();
 			} else {
 				try {

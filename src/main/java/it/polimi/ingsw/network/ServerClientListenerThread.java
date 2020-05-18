@@ -39,6 +39,8 @@ public class ServerClientListenerThread extends Thread {
 					}
 				}
 				try {
+					// TODO: this MUST MUST MUST MUST MUST MUST be 5000
+					// FIXME: this MUST MUST MUST MUST MUST MUST be 5000
 					Thread.sleep(5000000);
 					if (!receivedPing) {
 						destroyListener();
