@@ -94,7 +94,7 @@ public class CliGame {
 				}
 			} catch (IOException | UserInputTimeoutException e) {
 				// the user input read has been interrupted because server has sent a message to the player, this message must be handled
-				//parseMessages();
+				parseMessages();
 			} catch (IllegalStateException e) {
 				throw new AssertionError("Fatal error: design problem, the get command is called with a command that does not match game phase");
 			}
@@ -340,7 +340,7 @@ public class CliGame {
 				break;
 
 			case Constants.OTHERS_TURN:
-				activePlayer = players.get(players.indexOf(activePlayer) == players.size() ? 0 : players.indexOf(activePlayer) + 1);
+				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("The other player "+activePlayer+" is choosing a color");
 				break;
 
@@ -406,6 +406,7 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_OTHER :
+				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("Other players are now chosing the god. Hang on.");
 				code = Constants.GODS_OTHER;
 				break;
@@ -486,6 +487,16 @@ public class CliGame {
 				code = Constants.PLAYER_BUILD;
 				break;
 
+			case Constants.PLAYER_ACTIONS :
+				System.out.println("Now you have to first build a building and then move. Or you can just move. Use this syntax: beforebuild workerX x_coord y_coord, and then: move workerX x_coord y_coord");
+				ng = (NetGaming) obj;
+				netBuilds = ng.availableBuildings.builds;
+				netMoves = ng.availablePositions.moves;
+				drawPossibilities();
+				System.out.print("Now it's your turn: ");
+				break;
+
+
 			case Constants.PLAYER_FINISHED_TURN :
 				ng = (NetGaming) obj;
 				others = ng.player;
@@ -494,6 +505,7 @@ public class CliGame {
 				break;
 
 			case Constants.OTHERS_TURN :
+				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("A player has just finished his turn.");
 				ng = (NetGaming) obj;
 				netMap = ng.gameMap;
