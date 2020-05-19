@@ -243,7 +243,7 @@ public class MapSceneController implements SceneController {
 	public Image colorPlayer(/*...*/) {
 		//TODO:
 		//like: if(players.color == red) then return the image of the red worker, obviously
-		return workerRed;
+		return workerBlue;
 	}
 	public Image godPlayer() {
 		//TODO: same logic as colorPlayer...
@@ -307,23 +307,33 @@ public class MapSceneController implements SceneController {
 	public void mouseExitedGodCard(MouseEvent mouseEvent) {
 		slidingImage(description_god, descriptionGodCard(), 129, 125, 129, 400, 450);
 	}
-	public void mousePressedCell(MouseEvent mouseEvent) {
-		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
-		//if(colorPlayer().equals(workerRed))
-		if (pressedCell.getImage().equals(workerRed) || pressedCell.getImage().equals(build1Red) || pressedCell.getImage().equals(build2Red) || pressedCell.getImage().equals(build3Red)) {
+
+	private void movingWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build2Worker, Image build3Worker, Image build1WorkerPressed, Image build2WorkerPressed, Image build3WorkerPressed){
+		if (cellPressed.getImage().equals(worker) || cellPressed.getImage().equals(build1Worker) || cellPressed.getImage().equals(build2Worker) || cellPressed.getImage().equals(build3Worker)) {
 			if (!pressedButtonBuild && !pressedButtonDome) {
 				if (setWorkers == 2) {
-					if (workerSelected != null && (pressedCell.getImage().equals(workerRed) || pressedCell.getImage().equals(build1Red) || pressedCell.getImage().equals(build2Red) || pressedCell.getImage().equals(build3Red))) {
-						swapWorkers(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
+					if (workerSelected != null && (cellPressed.getImage().equals(worker) || cellPressed.getImage().equals(build1Worker) || cellPressed.getImage().equals(build2Worker) || cellPressed.getImage().equals(build3Worker))) {
+						swapWorkers(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
 					} else {
-						pressWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
+						pressWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
 					}
 				}
 			}
-		} else if (pressedCell.getImage().equals(workerRedPressed) || pressedCell.getImage().equals(build1RedPressed) || pressedCell.getImage().equals(build2RedPressed) || pressedCell.getImage().equals(build3RedPressed)) {
-			unPressWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
-		} else if (!pressedCell.getImage().equals(buildDome)) {
-			placeWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
+		} else if (cellPressed.getImage().equals(workerPressed) || cellPressed.getImage().equals(build1WorkerPressed) || cellPressed.getImage().equals(build2WorkerPressed) || cellPressed.getImage().equals(build3WorkerPressed)) {
+			unPressWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
+		} else if (!cellPressed.getImage().equals(buildDome)) {
+			placeWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
+		}
+	}
+
+	public void mousePressedCell(MouseEvent mouseEvent) {
+		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
+		if(colorPlayer().equals(workerRed)){
+			movingWorker(pressedCell, workerRed, workerRedPressed, build1Red, build2Red, build3Red, build1RedPressed, build2RedPressed, build3RedPressed);
+		} else if(colorPlayer().equals(workerGreen)){
+			movingWorker(pressedCell, workerGreen, workerGreenPressed, build1Green, build2Green, build3Green, build1GreenPressed, build2GreenPressed, build3GreenPressed);
+		} else if(colorPlayer().equals(workerBlue)){
+			movingWorker(pressedCell, workerBlue, workerBluePressed, build1Blue, build2Blue, build3Blue, build1BluePressed, build2BluePressed, build3BluePressed);
 		}
 		pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
 	}
