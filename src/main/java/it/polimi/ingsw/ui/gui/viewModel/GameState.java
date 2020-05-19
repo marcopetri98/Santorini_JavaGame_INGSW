@@ -34,8 +34,8 @@ public class GameState {
 		activePlayer = null;
 		playerNumber = 0;
 		players = new ArrayList<>();
-		gods = new HashMap<>();
-		colors = new HashMap<>();
+		gods = new LinkedHashMap<>();
+		colors = new LinkedHashMap<>();
 		turn = new Turn();
 		map = null;
 		possibleMoves = new ArrayList<>();
@@ -60,10 +60,10 @@ public class GameState {
 		return new ArrayList<>(players);
 	}
 	public Map<String, String> getGods() {
-		return new HashMap<>(gods);
+		return new LinkedHashMap<>(gods);
 	}
 	public Map<String, Color> getColors() {
-		return new HashMap<>(colors);
+		return new LinkedHashMap<>(colors);
 	}
 	public Turn getTurn() {
 		return turn.clone();
@@ -133,25 +133,25 @@ public class GameState {
 		if (mapping == null) {
 			throw new IllegalArgumentException();
 		}
-		gods = new HashMap<>(mapping);
+		gods = new LinkedHashMap<>(mapping);
 	}
 	public void setGods(NetDivinityChoice divinityMessage) throws IllegalArgumentException {
 		if (divinityMessage == null) {
 			throw new IllegalArgumentException();
 		}
-		gods = new HashMap<>(divinityMessage.getPlayerGodMap());
+		gods = new LinkedHashMap<>(divinityMessage.getPlayerGodMap());
 	}
 	public void setColors(Map<String,String> mapping) throws IllegalArgumentException {
 		if (mapping == null) {
 			throw new IllegalArgumentException();
 		}
-		gods = new HashMap<>(mapping);
+		gods = new LinkedHashMap<>(mapping);
 	}
 	public void setColors(NetColorPreparation colorMessage) throws IllegalArgumentException {
 		if (colorMessage == null) {
 			throw new IllegalArgumentException();
 		}
-		colors = new HashMap<>(colorMessage.getPlayerColorsMap());
+		colors = new LinkedHashMap<>(colorMessage.getPlayerColorsMap());
 	}
 	public void setMap(NetMap map) throws IllegalArgumentException {
 		if (map == null) {

@@ -1,7 +1,13 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.network.objects.NetObject;
+import it.polimi.ingsw.network.objects.NetSetup;
+import it.polimi.ingsw.util.Constants;
 import javafx.animation.PathTransition;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -10,135 +16,96 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class MapSceneController {
+import java.io.IOException;
+
+public class MapSceneController implements SceneController {
 	@FXML
 	private ImageView box_workers;
-
 	@FXML
 	private ImageView box_build;
-
 	@FXML
 	private ImageView column_right;
-
 	@FXML
 	private ImageView box_exit;
-
 	@FXML
 	private ImageView column_left;
-
 	@FXML
 	private ImageView worker1;
-
 	@FXML
 	private ImageView box_turn;
-
 	@FXML
 	private ImageView worker2;
-
 	@FXML
 	private ImageView icon_exit;
-
 	@FXML
 	private ImageView card_god;
-
 	@FXML
 	private ImageView clouds_left;
-
 	@FXML
 	private ImageView clouds_right;
-
 	@FXML
 	private ImageView button_exit;
-
 	@FXML
 	private ImageView button_dome;
-
 	@FXML
 	private ImageView button_build;
-
 	@FXML
 	private ImageView description_god;
-
 	@FXML
 	private ImageView cell_00;
-
 	@FXML
 	private ImageView cell_01;
-
 	@FXML
 	private ImageView cell_02;
-
 	@FXML
 	private ImageView cell_03;
-
 	@FXML
 	private ImageView cell_04;
-
 	@FXML
 	private ImageView cell_10;
-
 	@FXML
 	private ImageView cell_11;
-
 	@FXML
 	private ImageView cell_12;
-
 	@FXML
 	private ImageView cell_13;
-
 	@FXML
 	private ImageView cell_14;
-
 	@FXML
 	private ImageView cell_20;
-
 	@FXML
 	private ImageView cell_21;
-
 	@FXML
 	private ImageView cell_22;
-
 	@FXML
 	private ImageView cell_23;
-
 	@FXML
 	private ImageView cell_24;
-
 	@FXML
 	private ImageView cell_30;
-
 	@FXML
 	private ImageView cell_31;
-
 	@FXML
 	private ImageView cell_32;
-
 	@FXML
 	private ImageView cell_33;
-
 	@FXML
 	private ImageView cell_34;
-
 	@FXML
 	private ImageView cell_40;
-
 	@FXML
 	private ImageView cell_41;
-
 	@FXML
 	private ImageView cell_42;
-
 	@FXML
 	private ImageView cell_43;
-
 	@FXML
 	private ImageView cell_44;
-
 	@FXML
 	private GridPane gridPane_cells;
-
 	@FXML
 	private Text text_player;
 
@@ -213,6 +180,7 @@ public class MapSceneController {
 
 
 	public void initialize() {
+		// MainGuiController.getInstance().getGameState().getColors().get(MainGuiController.getInstance().getGameState().getPlayer());
 		description_god.setImage(null);
 		initializeCells();
 		initializeAnimations();
@@ -221,12 +189,6 @@ public class MapSceneController {
 		button_build.setDisable(true);
 		button_dome.setDisable(true);
 	}
-
-	private String setNamePlayer() {
-		//TODO:...
-		return namePlayer;
-	}
-
 	private void initializeAnimations() {
 		slidingImage(box_exit, boxExit, 300, 47, 300, 47, 500);
 		slidingImage(button_exit, buttonExit, 200, 24, 200, 24, 500);
@@ -245,7 +207,6 @@ public class MapSceneController {
 		slidingImage(clouds_left, cloudsLeft, 350, 359, -600, 359, 3200);
 		slidingImage(clouds_right, cloudsRight, 400, 359, 1200, 359, 3200);
 	}
-
 	private void initializeCells() {
 		cell_00.setImage(blank);
 		cell_10.setImage(blank);
@@ -274,62 +235,30 @@ public class MapSceneController {
 		cell_44.setImage(blank);
 	}
 
+	// TODO: methods to be deleted
+	private String setNamePlayer() {
+		//TODO:...
+		return namePlayer;
+	}
 	public Image colorPlayer(/*...*/) {
 		//TODO:
 		//like: if(players.color == red) then return the image of the red worker, obviously
 		return workerRed;
 	}
-
 	public Image godPlayer() {
 		//TODO: same logic as colorPlayer...
 		return new Image("/img/gods/card_apollo.png");
 	}
-
 	public Image descriptionGodCard() {
 		//TODO:....
 		return new Image("/img/gods/description_apollo.png");
 	}
 
-	/**
-	 * This function moves through a line path an image.
-	 *
-	 * @param imageView the imageView I want to move
-	 * @param image     the png of the imageView
-	 * @param x1        the x coordinate at the beginning
-	 * @param y1        the y coordinate at the beginning
-	 * @param x2        the x coordinate at the end
-	 * @param y2        the y coordinate at the end
-	 * @param duration  time of the transition, in milliseconds
-	 */
-	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
-		imageView.setImage(image);
-		Line line = new Line();
-		line.setStartX(x1);
-		line.setStartY(y1);
-		line.setEndX(x2);
-		line.setEndY(y2);
-		PathTransition transition = new PathTransition();
-		transition.setNode(imageView);
-		transition.setDuration(Duration.millis(duration));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
-	}
-
-	private void slidingText(Text text, int x1, int y1, int x2, int y2, int duration) {
-		Line line = new Line();
-		line.setStartX(x1);
-		line.setStartY(y1);
-		line.setEndX(x2);
-		line.setEndY(y2);
-		PathTransition transition = new PathTransition();
-		transition.setNode(text);
-		transition.setDuration(Duration.millis(duration));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
-	}
-
+	/* **********************************************
+	 *												*
+	 *			HANDLERS OF USER INTERACTION		*
+	 * 												*
+	 ************************************************/
 	public void mousePressedIconExit(MouseEvent mouseEvent) {
 		if (!pressedIconExit) {
 			icon_exit.setImage(iconExitPressed);
@@ -343,15 +272,12 @@ public class MapSceneController {
 			pressedIconExit = false;
 		}
 	}
-
 	public void mousePressedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExitPressed);
 	}
-
 	public void MouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 	}
-
 	public void mousePressedBuild(MouseEvent mouseEvent) {
 		if (!pressedButtonBuild) {
 			button_build.setImage(buttonBuildPressed);
@@ -364,7 +290,6 @@ public class MapSceneController {
 			pressedButtonBuild = false;
 		}
 	}
-
 	public void mousePressedDome(MouseEvent mouseEvent) {
 		if (!pressedButtonDome) {
 			button_dome.setImage(buttonDomePressed);
@@ -376,56 +301,32 @@ public class MapSceneController {
 			button_build.setDisable(false);
 		}
 	}
-
 	public void mouseEnteredGodCard(MouseEvent mouseEvent) {
 		slidingImage(description_god, descriptionGodCard(), 129, 400, 129, 125, 450);
 	}
-
 	public void mouseExitedGodCard(MouseEvent mouseEvent) {
 		slidingImage(description_god, descriptionGodCard(), 129, 125, 129, 400, 450);
 	}
-
-	private void pressingCell(ImageView cell, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
-		if (pressedButtonBuild) {
-			if (cell.getImage().equals(blank)) {
-				cell.setImage(build1);
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			} else if (cell.getImage().equals(build1)) {
-				cell.setImage(build2);
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			} else if (cell.getImage().equals(build2)) {
-				cell.setImage(build3);
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			} else {
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
+	public void mousePressedCell(MouseEvent mouseEvent) {
+		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
+		//if(colorPlayer().equals(workerRed))
+		if (pressedCell.getImage().equals(workerRed) || pressedCell.getImage().equals(build1Red) || pressedCell.getImage().equals(build2Red) || pressedCell.getImage().equals(build3Red)) {
+			if (!pressedButtonBuild && !pressedButtonDome) {
+				if (setWorkers == 2) {
+					if (workerSelected != null && (pressedCell.getImage().equals(workerRed) || pressedCell.getImage().equals(build1Red) || pressedCell.getImage().equals(build2Red) || pressedCell.getImage().equals(build3Red))) {
+						swapWorkers(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
+					} else {
+						pressWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
+					}
+				}
 			}
-			button_dome.setImage(buttonDome);
-			pressedButtonDome = false;
-			button_build.setDisable(false);
+		} else if (pressedCell.getImage().equals(workerRedPressed) || pressedCell.getImage().equals(build1RedPressed) || pressedCell.getImage().equals(build2RedPressed) || pressedCell.getImage().equals(build3RedPressed)) {
+			unPressWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
+		} else if (!pressedCell.getImage().equals(buildDome)) {
+			placeWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
 		}
-
-		if (pressedButtonDome) {
-			if (cell.getImage().equals(build3)) { //TODO: remember atlas...
-				cell.setImage(buildDome);
-				button_dome.setImage(buttonDome);
-				pressedButtonDome = false;
-				button_build.setDisable(false);
-			} else {
-				button_dome.setImage(buttonDome);
-				pressedButtonDome = false;
-				button_build.setDisable(false);
-			}
-		}
+		pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
 	}
-
 	public void mousePressedSetWorker(MouseEvent mouseEvent) {
 		button_dome.setDisable(true);
 		button_build.setDisable(true);
@@ -504,55 +405,149 @@ public class MapSceneController {
 		}
 	}
 
-	private void swapWorkers(Image worker, Image workerPressed, ImageView cellPressed) {
-		workerSelected.setImage(worker);
-		workerSelected = cellPressed;
-		workerSelected.setImage(workerPressed);
+	/* **********************************************
+	 *												*
+	 *			METHODS FOR USER INTERACTION		*
+	 * 												*
+	 ************************************************/
+	/**
+	 * This function moves through a line path an image.
+	 *
+	 * @param imageView the imageView I want to move
+	 * @param image     the png of the imageView
+	 * @param x1        the x coordinate at the beginning
+	 * @param y1        the y coordinate at the beginning
+	 * @param x2        the x coordinate at the end
+	 * @param y2        the y coordinate at the end
+	 * @param duration  time of the transition, in milliseconds
+	 */
+	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
+		imageView.setImage(image);
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
 	}
+	private void slidingText(Text text, int x1, int y1, int x2, int y2, int duration) {
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(text);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
+	private void pressingCell(ImageView cell, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
+		if (pressedButtonBuild) {
+			if (cell.getImage().equals(blank)) {
+				cell.setImage(build1);
+				button_build.setImage(buttonBuild);
+				button_dome.setDisable(false);
+				pressedButtonBuild = false;
+			} else if (cell.getImage().equals(build1)) {
+				cell.setImage(build2);
+				button_build.setImage(buttonBuild);
+				button_dome.setDisable(false);
+				pressedButtonBuild = false;
+			} else if (cell.getImage().equals(build2)) {
+				cell.setImage(build3);
+				button_build.setImage(buttonBuild);
+				button_dome.setDisable(false);
+				pressedButtonBuild = false;
+			} else {
+				button_build.setImage(buttonBuild);
+				button_dome.setDisable(false);
+				pressedButtonBuild = false;
+			}
+			button_dome.setImage(buttonDome);
+			pressedButtonDome = false;
+			button_build.setDisable(false);
+		}
 
+		if (pressedButtonDome) {
+			if (cell.getImage().equals(build3)) { //TODO: remember atlas...
+				cell.setImage(buildDome);
+				button_dome.setImage(buttonDome);
+				pressedButtonDome = false;
+				button_build.setDisable(false);
+			} else {
+				button_dome.setImage(buttonDome);
+				pressedButtonDome = false;
+				button_build.setDisable(false);
+			}
+		}
+	}
+	private void swapWorkers(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
+		if (workerSelected.getImage().equals(workerPressed)) {
+			workerSelected.setImage(worker);
+		} else if (workerSelected.getImage().equals(build1WorkerPressed)) {
+			workerSelected.setImage(build1Worker);
+		} else if (workerSelected.getImage().equals(build2WorkerPressed)) {
+			workerSelected.setImage(build2Worker);
+		} else if (workerSelected.getImage().equals(build3WorkerPressed)) {
+			workerSelected.setImage(build3Worker);
+		}
+
+		workerSelected = cellPressed;
+		if (workerSelected.getImage().equals(worker)) {
+			workerSelected.setImage(workerPressed);
+		} else if (workerSelected.getImage().equals(build1Worker)) {
+			workerSelected.setImage(build1WorkerPressed);
+		} else if (workerSelected.getImage().equals(build2Worker)) {
+			workerSelected.setImage(build2WorkerPressed);
+		} else if (workerSelected.getImage().equals(build3Worker)) {
+			workerSelected.setImage(build3WorkerPressed);
+		}
+	}
 	private void pressWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		if (cellPressed.getImage().equals(worker)) {
 			workerSelected = cellPressed;
 			workerSelected.setImage(workerPressed);
 		} else if (cellPressed.getImage().equals(build1Worker)) {
-//			if(workerSelected.getImage().equals(workerPressed)){
-//				workerSelected.setImage(workerRed);
-//			}
 			workerSelected = cellPressed;
 			workerSelected.setImage(build1WorkerPressed);
 		} else if (cellPressed.getImage().equals(build2Worker)) {
-//			if(workerSelected.getImage().equals(workerPressed)){
-//				workerSelected.setImage(workerRed);
-//			}
 			workerSelected = cellPressed;
 			workerSelected.setImage(build2WorkerPressed);
 		} else if (cellPressed.getImage().equals(build3Worker)) {
-//			if(workerSelected.getImage().equals(workerPressed)){
-//				workerSelected.setImage(workerRed);
-//			}
 			workerSelected = cellPressed;
 			workerSelected.setImage(build3WorkerPressed);
 		}
 	}
-
+	private void unPressWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
+		if (cellPressed.getImage().equals(workerPressed)) {
+			workerSelected = cellPressed;
+			workerSelected.setImage(worker);
+			workerSelected = null;
+		} else if (cellPressed.getImage().equals(build1WorkerPressed)) {
+			workerSelected = cellPressed;
+			workerSelected.setImage(build1Worker);
+			workerSelected = null;
+		} else if (cellPressed.getImage().equals(build2WorkerPressed)) {
+			workerSelected = cellPressed;
+			workerSelected.setImage(build2Worker);
+			workerSelected = null;
+		} else if (cellPressed.getImage().equals(build3WorkerPressed)) {
+			workerSelected = cellPressed;
+			workerSelected.setImage(build3Worker);
+			workerSelected = null;
+		}
+	}
 	private void placeWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		if (workerSelected != null) { //if you are placing a worker
 			// TODO: controlling checkmove...
-			if (cellPressed.getImage().equals(workerPressed) || cellPressed.getImage().equals(build1WorkerPressed) || cellPressed.getImage().equals(build2WorkerPressed) && cellPressed.getImage().equals(build3WorkerPressed)) {
-				if (cellPressed.getImage().equals(workerPressed)) {
-					workerSelected = null;
-					cellPressed.setImage(worker);
-				} else if (cellPressed.getImage().equals(build1WorkerPressed)) {
-					workerSelected = null;
-					cellPressed.setImage(build1Worker);
-				} else if (cellPressed.getImage().equals(build2WorkerPressed)) {
-					workerSelected = null;
-					cellPressed.setImage(build2Worker);
-				} else if (cellPressed.getImage().equals(build3WorkerPressed)) {
-					workerSelected = null;
-					cellPressed.setImage(build3Worker);
-				}
-			} else if (cellPressed.getImage().equals(blank)) {
+			if (cellPressed.getImage().equals(blank)) {
 				cellPressed.setImage(worker);
 				if (workerSelected.getId().equals("worker1") || workerSelected.getId().equals("worker2")) {
 					((AnchorPane) workerSelected.getParent()).getChildren().remove(workerSelected);
@@ -627,21 +622,23 @@ public class MapSceneController {
 		}
 	}
 
-	public void mousePressedCell(MouseEvent mouseEvent) {
-		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
-		//if(colorPlayer().equals(workerRed))
-		if ((pressedCell.getImage().equals(workerRed) || pressedCell.getImage().equals(build1Red) || pressedCell.getImage().equals(build2Red) || pressedCell.getImage().equals(build3Red)) && !pressedButtonBuild && !pressedButtonDome) {
-			if (setWorkers == 2) {
-				if (workerSelected != null && pressedCell.getImage().equals(workerRed)) {
-					swapWorkers(workerRed, workerRedPressed, pressedCell);
-				} else {
-					pressWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
-				}
-			}
-		} else if (pressedCell.getImage().equals(blank) || pressedCell.getImage().equals(build1) || pressedCell.getImage().equals(build2) || pressedCell.getImage().equals(build3) || pressedCell.getImage().equals(workerRedPressed) || pressedCell.getImage().equals(build1RedPressed) || pressedCell.getImage().equals(build2RedPressed) || pressedCell.getImage().equals(build3RedPressed)) {
-			placeWorker(pressedCell, workerRed, workerRedPressed, build1Red, build1RedPressed, build2Red, build2RedPressed, build3Red, build3RedPressed);
-		}
-		pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
-	}
+	/* **********************************************
+	 *												*
+	 *		EVENTS AFTER SERVER MESSAGE				*
+	 * 												*
+	 ************************************************/
 
+	/* **********************************************
+	 *												*
+	 *		METHODS CALLED BY MAIN CONTROLLER		*
+	 * 												*
+	 ************************************************/
+	@Override
+	public void fatalError() {
+		// TODO: what to do here?
+	}
+	@Override
+	public void deposeMessage(NetObject message) throws IOException {
+		// TODO: implement
+	}
 }
