@@ -283,6 +283,7 @@ public class ServerClientListenerThread extends Thread {
 			setupOutput = new NetSetup(Constants.SETUP_CREATE);
 			sendMessage(setupOutput);
 		} catch (IllegalCallerException ex) {
+			// TODO: this has been thrown while creating a lobby with a gui client, exiting with x during color phase and after joining with needed players and make them quit
 			throw new AssertionError("A thread called getClientPosition() or setPlayerNumber() without representing a client");
 		} catch (IllegalArgumentException ex) {
 			throw new AssertionError("Dimension of the game passed to the server was wrong");

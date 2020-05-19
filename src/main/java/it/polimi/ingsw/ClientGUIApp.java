@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import jdk.dynalink.linker.GuardedInvocationTransformer;
 
 /**
  * This class is the base App class for GUI clients, it starts the GUI client, the client lives until the player doesn't close the game.
@@ -37,6 +38,12 @@ public class ClientGUIApp extends Application {
 		stage.show();
 		stage.setOnCloseRequest(windowEvent -> {
 			Platform.exit();
+
+			if (MainGuiController.getInstance().getGameState().getPlayer() != null) {
+				MainGuiController.getInstance().closeDisconnect();
+			}
+			MainGuiController.getInstance().getListener().setActive(false);
+
 			System.exit(0);
 		});
 	}

@@ -15,6 +15,7 @@ public class ClientMessageListener extends Thread {
 	private ObjectInputStream input;
 	private ObjectOutputStream output;
 	private NetworkPhase currentPhase;
+	private boolean disconnected;
 	private boolean active;
 	private boolean wantsToPlay;
 	private final Object startLock, stateLock, inputLock, outputLock;
@@ -24,6 +25,7 @@ public class ClientMessageListener extends Thread {
 		viewController = controller;
 		active = true;
 		wantsToPlay = false;
+		disconnected = false;
 		startLock = new Object();
 		stateLock = new Object();
 		inputLock = new Object();
@@ -55,7 +57,9 @@ public class ClientMessageListener extends Thread {
 					setActive(false);
 				} catch (IOException e) {
 					setActive(false);
-					viewController.retrieveConnectionError();
+					if (!disconnected) {
+						viewController.retrieveConnectionError();
+					}
 				}
 
 				if (ingoingObject != null && active) {
@@ -175,6 +179,9 @@ public class ClientMessageListener extends Thread {
 	public void sendMessage(NetObject message) {
 		synchronized (outputLock) {
 			try {
+				if (message.message.equals(Constants.GENERAL_DISCONNECT)) {
+					disconnected = true;
+				}
 				output.writeObject(message);
 				output.flush();
 				output.reset();

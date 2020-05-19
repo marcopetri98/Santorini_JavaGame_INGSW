@@ -58,6 +58,9 @@ public class MainGuiController implements GraphicInterface {
 	public SceneController getSceneController() {
 		return sceneController;
 	}
+	public ClientMessageListener getListener() {
+		return listener;
+	}
 
 	/* **********************************************
 	 *												*
@@ -68,6 +71,9 @@ public class MainGuiController implements GraphicInterface {
 		gameState.refresh();
 		open = true;
 		listener.setWantsToPlay(false);
+		listener.setActive(false);
+		listener = new ClientMessageListener(guiController);
+		listener.start();
 	}
 	public void sendMessage(NetObject msg) {
 		listener.sendMessage(msg);

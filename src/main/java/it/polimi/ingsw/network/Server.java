@@ -156,6 +156,7 @@ public class Server implements Runnable {
 					}
 					throw new AlreadyStartedException();
 				}
+				// TODO: also if dimension is greater than 1 and the lobby is now empty
 				if (lobbyDimension == 1) {
 					if (creator == handler) {
 						creator = null;

@@ -39,6 +39,7 @@ public class ClientCLIApp {
 				if (lobbyResult == 0) {
 					controller.setPregameStage(false);
 					game.start();
+					serverListener.setActive(false);
 				}
 			} else if (menuResult == 1) {
 				functioning = false;
