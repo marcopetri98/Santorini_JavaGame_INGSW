@@ -8,7 +8,7 @@ import it.polimi.ingsw.util.exceptions.NoMoveException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Minotaur implements GodCard {
+public class Minotaur extends GodCard {
 
 	//CODICE MINOTAUR
 	private Player owner;
@@ -50,17 +50,11 @@ public class Minotaur implements GodCard {
 
 	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
-	 * @throws NoBuildException so that controller knows it must use the default action
-	 */
-	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
-		throw new NoBuildException();
-	}
-
-	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
+	@Override
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {   //worker->activeworker
 		// if the phase isn't the move phase it throws a move exception
 		if (turn.getGamePhase() != GamePhase.MOVE) {

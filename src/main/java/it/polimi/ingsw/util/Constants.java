@@ -42,43 +42,36 @@ public final class Constants {
 	public static final String SETUP_OUT_CONNFINISH = "setup-connection-finished";		// sent to the user to indicate to the user that lobby is finished and game is starting
 	/* Lobby messages between client and server */
 	public static final String LOBBY_ERROR = "lobby-error";								// sent to the user that the message sent was wrong
-	public static final String LOBBY_TURN = "lobby-info";								// sent to the user to indicate information about the lobby (has the order of players)
+	public static final String LOBBY_INFO = "lobby-info";								// sent to the user to indicate information about the lobby (has players names)
+	public static final String LOBBY_TURN = "lobby-turn-order";							// sent to the user to indicate information about the lobby (has the order of players)
 	/* Color messages between client and server */
-	public static final String COLOR_YOU = "color-go";									// sent to the user to indicate that he must choose a color
 	public static final String COLOR_ERROR = "color-error";								// sent to the user to indicate that the message he inserted was wrong
 	public static final String COLOR_CHOICES = "color-other-choice";					// sent to the user to indicate other players' color choices
 	public static final String COLOR_IN_CHOICE = "color-choice";						// sent to the server to indicate the chosen color by the player
 	public static final List<Color> COLOR_COLORS = List.of(new Color(0, 0, 255), new Color(255, 0, 0), new Color(0, 255, 0));
 	/* Divinity choice messages between client and server */
+	public static final String GODS_ERROR = "gods-error";								// sent to the user to indicate that its message was wrong
 	public static final String GODS_CHALLENGER = "gods-challenger";						// sent to the user to indicate that he must choose gods for the current game
 	public static final String GODS_GODS = "gods-gods";									// sent to the user to indicate that
-	public static final String GODS_CHOOSE_STARTER = "gods-choose-starter";				// sent to the user challenger to indicate that he must choose a starting player
 	public static final String GODS_STARTER = "gods-starter";							// sent to the user to indicate which player will start placing workers and will start playing
-	public static final String GODS_YOU = "gods-go";									// sent to the user to indicate that he must choose a god
-	public static final String GODS_OTHER = "gods-wait";								// sent to the user to indicate that others are choosing gods
-	public static final String GODS_ERROR = "gods-error";								// sent to the user to indicate that its message was wrong
 	public static final String GODS_CHOICES = "gods-choices";							// sent to the user to indicate other players' god choices
 	public static final String GODS_IN_GAME_GODS = "gods-game-gods";					// sent to the server by the challenger to indicate the gods chosen
 	public static final String GODS_IN_CHOICE = "gods-choice";							// sent to the server to indicate the god choice
 	public static final String GODS_IN_START_PLAYER = "gods-starter";					// sent to the server by the challenger to indicate the starter chosen
 	public static final List<String> GODS_GOD_NAMES = List.of("APOLLO","ARTEMIS","ATHENA","ATLAS","DEMETER","HEPHAESTUS","MINOTAUR","PAN","PROMETHEUS");
 	/* Game setup messages between client and server */
-	public static final String GAMESETUP_PLACE = "gamesetup-place";						// sent to the user to indicate that he must place workers on the board
 	public static final String GAMESETUP_ERROR = "gamesetup-error";						// sent to the user to indicate that its message was wrong
 	public static final String GAMESETUP_IN_PLACE = "gamesetup-player-positions";		// sent to the server to indicate the position chosen by the player for its workers
 	/* Player's turn messages between client and server */
 	public static final String PLAYER_ERROR = "player-error";							// sent to the user to indicate that its message was wrong
-	public static final String PLAYER_MOVE = "player-move";								// sent to the user to indicate that it is a turn where he must move
-	public static final String PLAYER_BUILD = "player-build";							// sent to the user to indicate that it is a turn where he must build
 	public static final String PLAYER_ACTIONS = "player-actions";						// sent to the user to indicate what he can do in this turn phase
-	public static final String PLAYER_TURN = "player-turn";								//
-	public static final String PLAYER_FINISHED_TURN = "player-finished";				// sent to the user to indicate that its turn is finished
 	public static final String PLAYER_IN_PASS = "player-pass";							// sent to the server to indicate that a player with prometheus wants to pass turn in before move phase
 	public static final String PLAYER_IN_MOVE = "player-move";							// sent to the server to indicate the move it wants to perform
 	public static final String PLAYER_IN_BUILD = "player-build";						// sent to the server to indicate the build it wants to perform
 	/* Other player's turn messages between client and server */
-	public static final String OTHERS_TURN = "others-turn";								// sent to the user to indicate that the active player has finished its turn
 	public static final String OTHERS_ERROR = "others-error";							// sent to the user to indicate that the message sent was wrong
+	/* General messages about the turn */
+	public static final String TURN_PLAYERTURN = "turn-of";								// sent to the user to indicate the current player turn
 
 	/* Commands given from the player to do a specific command */
 	public static final String COMMAND_DISCONNECT = "disconnect";

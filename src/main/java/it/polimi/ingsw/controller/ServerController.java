@@ -51,60 +51,6 @@ public class ServerController implements ObserverController {
 	public void generateOrder() {
 		setupController.generateOrder();
 	}
-	private List<Move> generateStandardMoves(Worker w) {
-		Map gameMap = observedModel.getMap();
-		int x = gameMap.getX(w.getPos());
-		int y = gameMap.getY(w.getPos());
-
-		List<Move> moves = new ArrayList<>();
-		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY move
-			int x1 = x + i;
-			for(int j = -1; j <= 1; j++){
-				int y1 = y + j;
-
-				if(x != x1 || y != y1){ //I shall not move where I am already
-					if(0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4){   //Check that I am inside the map
-						if(gameMap.getCell(x1, y1).getBuilding().getLevel() - gameMap.getCell(x, y).getBuilding().getLevel() <= 1){
-							if(!gameMap.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
-								if (gameMap.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-									moves.add(new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(x, y), gameMap.getCell(x1, y1), w));
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return moves;
-	}
-	private List<Build> generateStandardBuilds(Worker w) {
-		Map gameMap = observedModel.getMap();
-		int x = gameMap.getX(w.getPos());
-		int y = gameMap.getY(w.getPos());
-
-		List<Build> builds = new ArrayList<>();
-		for(int i = -1; i <= 1; i++) {   //i->x   j->y     x1, y1 all the cells where I MAY build
-			int x1 = x + i;
-			for (int j = -1; j <= 1; j++) {
-				int y1 = y + j;
-
-				if (x != x1 || y != y1) { //I shall not build where I am
-					if (0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4) {   //Check that I am inside the map
-						if (gameMap.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
-							if (!gameMap.getCell(x1, y1).getBuilding().getDome()) {   //Check there is NO dome
-								if(gameMap.getCell(x1, y1).getBuilding().getLevel() <= 2) {
-									builds.add(new Build(w, gameMap.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD)); // simple increment level
-								} else if(gameMap.getCell(x1, y1).getBuilding().getLevel() == 3) {
-									builds.add(new Build(w, gameMap.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD)); // dome on a 3 level building
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return builds;
-	}
 
 	// support methods
 	private boolean isMovablePhase() {
@@ -115,73 +61,6 @@ public class ServerController implements ObserverController {
 			return true;
 		}
 		return false;
-	}
-	private boolean moveDefeat(Player player) {
-		List<Move> worker1Moves = new ArrayList<>();
-		List<Move> worker2Moves = new ArrayList<>();
-		worker1Moves.addAll(generateWorkerMoves(player,1));
-		worker2Moves.addAll(generateWorkerMoves(player,2));
-		return defeatController.moveDefeat(worker1Moves,worker2Moves);
-	}
-	private boolean buildDefeat() {
-		Player buildingPlayer = observedModel.getPlayerTurn();
-		Worker activeWorker = buildingPlayer.getActiveWorker();
-		Turn nextTurn = observedModel.getPhase();
-		nextTurn.advance();
-		List<Build> builds = new ArrayList<>();
-		try {
-			builds.addAll(buildingPlayer.getCard().checkBuild(observedModel.getMap(),activeWorker,nextTurn));
-		} catch (NoBuildException e) {
-			builds.addAll(generateStandardBuilds(activeWorker));
-		}
-		return defeatController.buildDefeat(builds);
-	}
-	/**
-	 * This function returns possible moves of a worker only if it is the phase move part of the turn, if not it doesn't return
-	 * @param player
-	 * @param worker
-	 * @return
-	 * @throws NoMoveException
-	 */
-	private List<Move> generateWorkerMoves(Player player, int worker) {
-		List<Move> moves = new ArrayList<>();
-		Turn activeTurn = observedModel.getPhase();
-		if (worker == 1) {
-			try {
-				if (player.getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
-					moves.addAll(player.getCard().checkMove(observedModel.getMap(),player.getWorker1(),activeTurn));
-				} else {
-					moves.addAll(generateStandardMoves(player.getWorker1()));
-				}
-			} catch (NoMoveException e) {
-				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
-					moves.addAll(generateStandardMoves(player.getWorker1()));
-				}
-			}
-		} else {
-			try {
-				if (player.getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
-					moves.addAll(player.getCard().checkMove(observedModel.getMap(), player.getWorker2(),activeTurn));
-				} else {
-					moves.addAll(generateStandardMoves(player.getWorker1()));
-				}
-			} catch (NoMoveException e) {
-				if (activeTurn.getGamePhase() == GamePhase.MOVE) {
-					moves.addAll(generateStandardMoves(player.getWorker2()));
-				}
-			}
-		}
-		for (Player otherPlayer : observedModel.getPlayers()) {
-			if (otherPlayer != observedModel.getPlayerTurn() && otherPlayer.getCard().getTypeGod() == TypeGod.OTHER_TURN_GOD && activeTurn.getGamePhase() == GamePhase.MOVE) {
-				try {
-					moves.addAll(otherPlayer.getCard().checkMove(observedModel.getMap(),player.getWorker1(),activeTurn));
-					moves.addAll(otherPlayer.getCard().checkMove(observedModel.getMap(),player.getWorker2(),activeTurn));
-				} catch (NoMoveException e) {
-					throw new AssertionError("Controller called a check move on a god that isn't an other turn god for moves");
-				}
-			}
-		}
-		return moves;
 	}
 
 	// OVERRIDDEN METHODS FROM THE OBSERVER
@@ -239,6 +118,7 @@ public class ServerController implements ObserverController {
 	 * The player can pass the turn if he doesn't want to use the power in the before move phase, this happens when he has prometheus and he doesn't want to build before moving
 	 * @param observed
 	 */
+	// TODO: maybe unnecessary with the last refactoring
 	@Override
 	public void updatePass(ObservableRemoteView observed, String playerName) {
 		RemoteView caller = (RemoteView) observed;
@@ -295,11 +175,8 @@ public class ServerController implements ObserverController {
 			} catch (NoMoveException e) {
 				// if it is the move phase and none of the gods change the standard way of moving it will be called the standard method
 				if (turn.getGamePhase() == GamePhase.MOVE) {
-					possibleMoves.addAll(generateStandardMoves(selectedWorker));
+					possibleMoves.addAll(GodCard.standardMoves(selectedWorker.getPos().map,selectedWorker,turn));
 					hasMoves = true;
-				} else {
-					// it can't move and it isn't in the move phase
-					caller.communicateError();
 				}
 			}
 
@@ -310,9 +187,9 @@ public class ServerController implements ObserverController {
 							caller.communicateError();
 						} else {
 							victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
-							if (!buildDefeat()) {
-								observedModel.changeTurn();
-							}
+							observedModel.changeTurn();
+							observedModel.computeActions();
+							defeatController.buildDefeat(observedModel.getPlayerPossibleBuilds());
 						}
 					} else {
 						caller.communicateError();
@@ -323,13 +200,14 @@ public class ServerController implements ObserverController {
 					} else {
 						victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
 						observedModel.applyWorkerLock(movingPlayer,selectedWorker.workerID-movingPlayer.getPlayerID());
-						if (!buildDefeat()) {
-							// if a player with prometheus moved without building before the game must go from before move phase to build phase (2 step on phase advance)
-							if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
-								observedModel.changeTurn();
-							}
+
+						// if a player with prometheus moved without building before the game must go from before move phase to build phase (2 step on phase advance)
+						if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
 							observedModel.changeTurn();
 						}
+						observedModel.changeTurn();
+						observedModel.computeActions();
+						defeatController.buildDefeat(observedModel.getPlayerPossibleBuilds());
 					}
 				}
 			}
@@ -364,7 +242,7 @@ public class ServerController implements ObserverController {
 			} catch (NoBuildException e) {
 				// if it is the move phase and none of the gods change the standard way of moving it will be called the standard method
 				if (turn.getGamePhase() == GamePhase.BUILD) {
-					possibleBuilds = generateStandardBuilds(selectedWorker);
+					possibleBuilds = GodCard.standardBuilds(selectedWorker.getPos().map,selectedWorker,turn);
 				} else {
 					// it can't move and it isn't in the move phase
 					caller.communicateError();
@@ -380,6 +258,11 @@ public class ServerController implements ObserverController {
 							caller.communicateError();
 						} else {
 							observedModel.changeTurn();
+							if (!observedModel.computeActions()) {
+								observedModel.changeTurn();
+								observedModel.computeActions();
+								defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());
+							}
 						}
 					} else {
 						caller.communicateError();
@@ -390,6 +273,8 @@ public class ServerController implements ObserverController {
 					} else {
 						observedModel.applyWorkerLock(buildingPlayer,selectedWorker.workerID-buildingPlayer.getPlayerID());
 						observedModel.changeTurn();
+						observedModel.computeActions();
+						defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());
 					}
 				}
 			}
@@ -418,53 +303,5 @@ public class ServerController implements ObserverController {
 	@Override
 	public Turn givePhase() {
 		return observedModel.getPhase();
-	}
-	@Override
-	public NetAvailablePositions giveAvailablePositions() {
-		NetAvailablePositions possibleMoves;
-		List<Move> generatedMoves;
-
-		if (observedModel.getPhase().getGamePhase() == GamePhase.MOVE) {
-			moveDefeat(observedModel.getPlayerTurn());
-		}
-		generatedMoves = generateWorkerMoves(observedModel.getPlayerTurn(),1);
-		generatedMoves.addAll(generateWorkerMoves(observedModel.getPlayerTurn(),2));
-		generatedMoves = DefeatManager.filterMoves(generatedMoves);
-		possibleMoves = new NetAvailablePositions(generatedMoves);
-		if (generatedMoves.size() == 0) {
-			return null;
-		}
-		return possibleMoves;
-	}
-	@Override
-	public NetAvailableBuildings giveAvailableBuildings() {
-		NetAvailableBuildings possibleBuilds;
-		List<Build> builds = new ArrayList<>();
-
-		if (observedModel.getPhase().getGamePhase() == GamePhase.BUILD) {
-			buildDefeat();
-		}
-		if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
-			try {
-				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getWorker1(),observedModel.getPhase()));
-				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getWorker2(),observedModel.getPhase()));
-				possibleBuilds = new NetAvailableBuildings(builds);
-			} catch (NoBuildException e) {
-				builds = null;
-				possibleBuilds = null;
-				observedModel.changeTurn();
-			}
-		} else {
-			try {
-				builds.addAll(observedModel.getPlayerTurn().getCard().checkBuild(observedModel.getMap(),observedModel.getPlayerTurn().getActiveWorker(),observedModel.getPhase()));
-			} catch (NoBuildException e) {
-				builds.addAll(generateStandardBuilds(observedModel.getPlayerTurn().getActiveWorker()));
-			}
-			possibleBuilds = new NetAvailableBuildings(builds);
-		}
-		if (builds != null && builds.size() == 0) {
-			throw new AssertionError("The function has been called by the remote view when the player cannot build because has loose");
-		}
-		return possibleBuilds;
 	}
 }

@@ -63,7 +63,7 @@ public class DefeatManager {
 			if (list.get(i).typeMove == TypeMove.SIMPLE_MOVE || list.get(i).typeMove == TypeMove.CONDITIONED_MOVE || list.get(i).typeMove == TypeMove.VICTORY_MOVE) {
 				toAdd = true;
 				for (int j = 0; j < list.size(); j++) {
-					if (list.get(j).typeMove == TypeMove.FORBIDDEN_MOVE && list.get(i).getCellNext() == list.get(j).getCellNext() && list.get(i).getCellPrev() == list.get(j).getCellPrev() && list.get(i).getWorker() == list.get(j).getWorker()) {
+					if (list.get(j).typeMove == TypeMove.FORBIDDEN_MOVE && list.get(i).getCellNext().equals(list.get(j).getCellNext()) && list.get(i).getCellPrev().equals(list.get(j).getCellPrev()) && list.get(i).getWorker().equals(list.get(j).getWorker())) {
 						toAdd = false;
 					}
 				}

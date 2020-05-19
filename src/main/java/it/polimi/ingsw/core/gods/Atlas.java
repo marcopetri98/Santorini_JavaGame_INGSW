@@ -8,7 +8,7 @@ import it.polimi.ingsw.util.exceptions.NoMoveException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Atlas implements GodCard {
+public class Atlas extends GodCard {
 
 	//CODICE ATLAS
 	private Player owner;
@@ -54,6 +54,7 @@ public class Atlas implements GodCard {
 	 * @param w represents the worker moved by the player during this turn
 	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
+	@Override
 	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
 		// if it isn't during the building phase this god has no power and throws an exception
 		if (turn.getGamePhase() != GamePhase.BUILD) {
@@ -86,12 +87,5 @@ public class Atlas implements GodCard {
 			}
 		}
 		return builds;
-	}
-
-	/**
-	 * @throws NoMoveException so that controller knows it must use the default action
-	 */
-	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {
-		throw new NoMoveException();
 	}
 }

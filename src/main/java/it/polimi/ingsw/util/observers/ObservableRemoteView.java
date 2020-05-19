@@ -87,16 +87,4 @@ public class ObservableRemoteView extends ObservableObject {
 	public Turn askPhase() {
 		return ctrObs.givePhase();
 	}
-	public NetAvailablePositions askPositions() {
-		if (ctrObs != null) {
-			return ctrObs.giveAvailablePositions();
-		}
-		return null;
-	}
-	public NetAvailableBuildings askBuildings() {
-		if (ctrObs != null) {
-			return ctrObs.giveAvailableBuildings();
-		}
-		return null;
-	}
 }

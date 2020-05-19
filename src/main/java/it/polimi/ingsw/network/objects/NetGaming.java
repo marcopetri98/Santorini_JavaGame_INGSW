@@ -93,14 +93,14 @@ public class NetGaming extends NetObject {
 		availablePositions = null;
 		availableBuildings = buildings;
 	}
-	public NetGaming(String msg, NetAvailableBuildings buildings, NetAvailablePositions positions) throws NullPointerException {
+	public NetGaming(String msg, String player, NetAvailableBuildings buildings, NetAvailablePositions positions) throws NullPointerException {
 		super(msg);
 		if (buildings == null) {
 			throw new NullPointerException();
 		}
 		move = null;
 		build = null;
-		player = null;
+		this.player = player;
 		gameMap = null;
 		availablePositions = positions;
 		availableBuildings = buildings;

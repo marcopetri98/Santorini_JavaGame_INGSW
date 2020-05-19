@@ -20,6 +20,12 @@ public class NetColorPreparation extends NetObject {
 		color = null;
 		next = null;
 	}
+	public NetColorPreparation(String msg, String player) throws NullPointerException {
+		super(msg);
+		this.player = player;
+		color = null;
+		next = null;
+	}
 	public NetColorPreparation(String msg, String player, Color c) throws NullPointerException {
 		super(msg);
 		if (player == null || c == null) {

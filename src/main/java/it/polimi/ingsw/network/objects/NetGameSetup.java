@@ -18,6 +18,13 @@ public class NetGameSetup extends NetObject {
 		worker1 = null;
 		worker2 = null;
 	}
+	public NetGameSetup(String msg, String player) {
+		super(msg);
+		this.player = player;
+		gameMap = null;
+		worker1 = null;
+		worker2 = null;
+	}
 	public NetGameSetup(String msg, NetMap map) throws NullPointerException {
 		super(msg);
 		if (map == null) {

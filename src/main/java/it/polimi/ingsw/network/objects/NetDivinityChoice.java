@@ -31,10 +31,10 @@ public class NetDivinityChoice extends NetObject {
 		next = null;
 		this.godsEnd = godsEnd;
 	}
-	public NetDivinityChoice(String msg, String starter) throws NullPointerException {
+	public NetDivinityChoice(String msg, String value) throws NullPointerException {
 		super(msg);
 		challenger = null;
-		player = starter;
+		player = value;
 		next = null;
 		divinity = null;
 		godsEnd = false;

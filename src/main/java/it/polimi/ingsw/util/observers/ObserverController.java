@@ -18,6 +18,4 @@ public interface ObserverController extends ObserverObject {
 	void observerQuit(ObservableRemoteView observed);
 
 	Turn givePhase();
-	NetAvailablePositions giveAvailablePositions();
-	NetAvailableBuildings giveAvailableBuildings();
 }

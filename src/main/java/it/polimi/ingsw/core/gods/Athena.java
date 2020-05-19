@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Athena implements GodCard, Observer {
+public class Athena extends GodCard implements Observer {
 
 	//CODICE ATHENA
 	private Player owner;
@@ -71,17 +71,11 @@ public class Athena implements GodCard, Observer {
 
 	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
-	 * @throws NoBuildException so that controller knows it must use the default action
-	 */
-	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
-		throw new NoBuildException();
-	}
-
-	/**
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
 	 * @return the cells where the Player's Worker can't move up
 	 */
+	@Override
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {
 		// if the phase isn't the move phase it throws a move exception
 		if (turn.getGamePhase() != GamePhase.MOVE) {

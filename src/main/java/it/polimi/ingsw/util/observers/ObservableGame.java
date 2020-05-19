@@ -1,7 +1,9 @@
 package it.polimi.ingsw.util.observers;
 
 // necessary imports of Java SE
+import it.polimi.ingsw.core.Build;
 import it.polimi.ingsw.core.Map;
+import it.polimi.ingsw.core.Move;
 import it.polimi.ingsw.core.gods.GodCard;
 import it.polimi.ingsw.core.state.Turn;
 
@@ -102,6 +104,14 @@ public class ObservableGame extends ObservableObject {
 		}
 		for (ObserverRemoteView obs : rvObs) {
 			obs.updateBuild(this,netMap);
+		}
+	}
+	public void notifyPossibleActions(List<Move> moves, List<Build> builds) throws NullPointerException {
+		if (moves == null || builds == null) {
+			throw new NullPointerException();
+		}
+		for (ObserverRemoteView obs : rvObs) {
+			obs.updatePossibleActions(this,moves,builds);
 		}
 	}
 	public void notifyPhaseChange(Turn turn) throws NullPointerException {

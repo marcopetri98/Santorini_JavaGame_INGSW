@@ -8,7 +8,7 @@ import it.polimi.ingsw.util.exceptions.NoMoveException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Prometheus implements GodCard {
+public class Prometheus extends GodCard {
 
 	//CODICE PROMETHEUS
 	private Player owner;
@@ -55,9 +55,10 @@ public class Prometheus implements GodCard {
 	 * @return the cells where the Player's Worker may build according to general game rules and his GodCard power
 	 */
 	//This is the "default" building option
+	@Override
 	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException{
 		// if it isn't before the moving phase this god has no power on building and throws an exception
-		if (turn.getGamePhase() != GamePhase.BEFOREMOVE) {
+		if (turn.getGamePhase() != GamePhase.BEFOREMOVE || turn.getGamePhase() != GamePhase.BUILD) {
 			throw new NoBuildException();
 		}
 
@@ -95,6 +96,7 @@ public class Prometheus implements GodCard {
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
 	 */
 	//This is the "default" movement option
+	@Override
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {   //worker->activeworker
 		// if the phase isn't the move phase it throws a move exception
 		if (turn.getGamePhase() != GamePhase.MOVE) {

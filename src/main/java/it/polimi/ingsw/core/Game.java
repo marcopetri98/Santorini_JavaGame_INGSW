@@ -1,6 +1,7 @@
 package it.polimi.ingsw.core;
 
 // necessary imports from other packages of the project
+import it.polimi.ingsw.controller.DefeatManager;
 import it.polimi.ingsw.core.gods.*;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
@@ -8,6 +9,8 @@ import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.objects.NetGameSetup;
 import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.exceptions.NoBuildException;
+import it.polimi.ingsw.util.exceptions.NoMoveException;
 import it.polimi.ingsw.util.observers.ObservableGame;
 import it.polimi.ingsw.util.exceptions.WrongPhaseException;
 
@@ -27,6 +30,8 @@ public class Game extends ObservableGame {
 	private final List<Player> defeatedPlayers;
 	private Player winner;
 	private boolean isFinished;
+	private List<Move> playerPossibleMoves;
+	private List<Build> playerPossibleBuilds;
 
 	public Game(String[] names) {
 		players = new ArrayList<>();
@@ -155,6 +160,7 @@ public class Game extends ObservableGame {
 		if (turn.getPhase() == Phase.LOBBY) {
 			turn.advance();
 			notifyPhaseChange(turn.clone());
+			notifyActivePlayer(players.get(0).getPlayerName());
 		} else if (turn.getPhase() == Phase.COLORS) {
 			if (players.indexOf(activePlayer) == players.size()-1) {
 				turn.advance();
@@ -243,6 +249,74 @@ public class Game extends ObservableGame {
 			buildBuildings(build.getOther());
 		}
 	}
+	/**
+	 * This function computes only the moves and the builds which the player can perform in its turn, if the player can perform a move or a build it returns true, otherwise false
+	 * @return true if player can perform an action, false instead
+	 */
+	public synchronized boolean computeActions() {
+		playerPossibleMoves = new ArrayList<>();
+		playerPossibleBuilds = new ArrayList<>();
+
+		if (turn.getGamePhase() == GamePhase.BEFOREMOVE) {
+			computeMoves(getPlayerTurn().getWorker1(),false);
+			computeMoves(getPlayerTurn().getWorker2(),false);
+			computeBuilds(getPlayerTurn().getWorker1());
+			computeBuilds(getPlayerTurn().getWorker2());
+		} else if (turn.getGamePhase() == GamePhase.MOVE) {
+			computeMoves(getPlayerTurn().getWorker1(),true);
+			computeMoves(getPlayerTurn().getWorker2(),true);
+		} else {
+			computeBuilds(getPlayerTurn().getWorker1());
+			computeBuilds(getPlayerTurn().getWorker2());
+		}
+		notifyPossibleActions(playerPossibleMoves,playerPossibleBuilds);
+		return true;
+	}
+	private synchronized void computeMoves(Worker w, boolean move) {
+		try {
+			if (getPlayerTurn().getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
+				playerPossibleMoves.addAll(getPlayerTurn().getCard().checkMove(map,w,turn));
+			} else {
+				if (move) {
+					playerPossibleMoves.addAll(GodCard.standardMoves(map,w,turn));
+				} else {
+					Turn moveTurn = turn.clone();
+					moveTurn.advance();
+					playerPossibleMoves.addAll(GodCard.standardMoves(map,w,moveTurn));
+				}
+			}
+		} catch (NoMoveException e) {
+			if (move) {
+				playerPossibleMoves.addAll(GodCard.standardMoves(map,w,turn));
+			} else {
+				Turn moveTurn = turn.clone();
+				moveTurn.advance();
+				playerPossibleMoves.addAll(GodCard.standardMoves(map,w,moveTurn));
+			}
+		}
+
+		try {
+			for (Player player : players) {
+				if (player != getPlayerTurn() && player.getCard().getTypeGod() == TypeGod.OTHER_TURN_GOD) {
+					if (move) {
+						playerPossibleMoves.addAll(player.getCard().checkMove(map, w, turn));
+					} else {
+						Turn moveTurn = turn.clone();
+						moveTurn.advance();
+						playerPossibleMoves.addAll(player.getCard().checkMove(map, w, moveTurn));
+					}
+				}
+			}
+		} catch (NoMoveException e) {
+			throw new AssertionError("Fatal error: Athena has been called with check move in a phase different from move");
+		}
+		playerPossibleMoves = DefeatManager.filterMoves(playerPossibleMoves);
+	}
+	private synchronized void computeBuilds(Worker w) {
+		try {
+			playerPossibleBuilds.addAll(getPlayerTurn().getCard().checkBuild(map,w,turn));
+		} catch (NoBuildException ignore) {}
+	}
 
 	/* **********************************************
 	 *												*
@@ -278,6 +352,32 @@ public class Game extends ObservableGame {
 	}
 	public synchronized boolean isFinished() {
 		return isFinished;
+	}
+	public synchronized List<Move> getPlayerPossibleMoves() {
+		return new ArrayList<>(playerPossibleMoves);
+	}
+	public synchronized List<Build> getPlayerPossibleBuilds() {
+		return new ArrayList<>(playerPossibleBuilds);
+	}
+	public synchronized List<Move> getPlayerPossibleMovesWorker1() {
+		List<Move> worker1Moves = new ArrayList<>();
+
+		for (int i = 0; i < playerPossibleMoves.size(); i++) {
+			if (playerPossibleMoves.get(i).worker.workerID == getPlayerTurn().getWorker1().workerID) {
+				worker1Moves.add(playerPossibleMoves.get(i));
+			}
+		}
+		return worker1Moves;
+	}
+	public synchronized List<Move> getPlayerPossibleMovesWorker2() {
+		List<Move> worker2Moves = new ArrayList<>();
+
+		for (int i = 0; i < playerPossibleMoves.size(); i++) {
+			if (playerPossibleMoves.get(i).worker.workerID == getPlayerTurn().getWorker2().workerID) {
+				worker2Moves.add(playerPossibleMoves.get(i));
+			}
+		}
+		return worker2Moves;
 	}
 
 	/* **********************************************

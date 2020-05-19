@@ -37,6 +37,15 @@ public class NetLobbyPreparation extends NetObject {
 		this.order = order;
 		this.next = next;
 	}
+	public NetLobbyPreparation(String msg, String player, NetLobbyPreparation next) throws NullPointerException {
+		super(msg);
+		if (player == null) {
+			throw new NullPointerException();
+		}
+		this.player = player;
+		this.order = 0;
+		this.next = next;
+	}
 
 	public String getPlayer() {
 		return player;
