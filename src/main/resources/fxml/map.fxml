@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.image.*?>
 <?import java.lang.*?>
@@ -91,7 +92,7 @@
             <RowConstraints maxHeight="134.0" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <ImageView fx:id="cell_00" fitHeight="104.0" fitWidth="108.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true"></ImageView>
+            <ImageView fx:id="cell_00" fitHeight="104.0" fitWidth="108.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="cell_10" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
             <ImageView fx:id="cell_20" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" />
             <ImageView fx:id="cell_30" fitHeight="104.0" fitWidth="108.0" layoutX="10.0" layoutY="13.0" onMousePressed="#mousePressedCell" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" />
@@ -128,6 +129,7 @@
             <Image url="@../img/map/worker_red.png" />
          </image>
       </ImageView>
+      <Text fx:id="text_player" layoutX="94.0" layoutY="184.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="155.826171875" />
       <ImageView fx:id="clouds_left" fitHeight="789.0" fitWidth="943.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/map/clouds_left.png" />
