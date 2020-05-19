@@ -148,9 +148,7 @@ public class UserInputController {
 		} else if (!Constants.isNumber(command.getParameter(1)) || !Constants.isNumber(command.getParameter(2))) {
 			throw new IllegalArgumentException();
 		} else {
-			// TODO: "worker1" should be changed with a constant as well as in the CliGame
-			NetMove playerMove = new NetMove(command.getParameter(0).equals("worker1") ? playerName.hashCode()+1 : playerName.hashCode()+2,Integer.parseInt(command.getParameter(1)),Integer.parseInt(command.getParameter(2)));
-			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_MOVE,playerName,playerMove));
+			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_MOVE,playerName,move));
 		}
 	}
 	public void getCommand(Command command, Turn turn, NetBuild build) throws IllegalStateException, IllegalArgumentException {
@@ -163,9 +161,7 @@ public class UserInputController {
 		} else if (!Constants.isNumber(command.getParameter(2)) || !Constants.isNumber(command.getParameter(3)) || !Constants.isNumber(command.getParameter(4)) || (!command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME) && !command.getParameter(1).equals(Constants.COMMAND_BUILD_BUILDING))) {
 			throw new IllegalArgumentException();
 		} else {
-			// TODO: "worker1" should be changed with a constant as well as in the CliGame
-			NetBuild playerBuild = new NetBuild(command.getParameter(0).equals("worker1") ? playerName.hashCode()+1 : playerName.hashCode()+2,Integer.parseInt(command.getParameter(3)),Integer.parseInt(command.getParameter(4)),Integer.parseInt(command.getParameter(2)), command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME));
-			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_BUILD,playerName,playerBuild));
+			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_BUILD,playerName,build));
 		}
 	}
 	public void getCommand(int num) throws IllegalArgumentException {

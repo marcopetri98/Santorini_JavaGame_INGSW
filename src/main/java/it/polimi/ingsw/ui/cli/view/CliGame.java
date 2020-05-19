@@ -37,6 +37,8 @@ public class CliGame {
 	private NetMap netMap;
 	private List<NetMove> netMoves;
 	private List<NetBuild> netBuilds;
+	private NetMove selectedMove;
+	private NetBuild selectedBuild;
 	private boolean drawPoss = false;
 	private String code = "null";
 	private String others;
@@ -60,6 +62,8 @@ public class CliGame {
 		netMap = null;
 		netMoves = null;
 		netBuilds = null;
+		selectedMove = null;
+		selectedBuild = null;
 		// functioning attributes
 		functioning = true;
 		inputLock = new Object();
@@ -89,7 +93,15 @@ public class CliGame {
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {	//Con gods apollo artemis ->restituisce false!!!!!!!!!
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
-					inputController.getCommand(currentCommand,phase.clone());
+					if (selectedMove != null) {
+						inputController.getCommand(currentCommand,phase.clone(),selectedMove);
+					} else if (selectedBuild != null) {
+						inputController.getCommand(currentCommand,phase.clone(),selectedBuild);
+					} else {
+						inputController.getCommand(currentCommand,phase.clone());
+					}
+					selectedMove = null;
+					selectedBuild = null;
 					sentCorrectMessage = true;
 				} else {
 					printError();
