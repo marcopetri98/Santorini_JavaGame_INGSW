@@ -135,31 +135,4 @@ public class ServerControllerStub extends ServerController {
 	public Turn givePhase() {
 		return turn.clone();
 	}
-	@Override
-	public NetAvailablePositions giveAvailablePositions() {
-		List<Move> testList = new ArrayList<>();
-		Map board = new Map();
-
-		testList.add(new Move(TypeMove.SIMPLE_MOVE, board.getCell(1, 1), board.getCell(1, 2), new Worker(Color.RED, new Player("Er test"), 1)));
-		return new NetAvailablePositions(testList);
-	}
-	@Override
-	public NetAvailableBuildings giveAvailableBuildings() {
-		List<Build> testList = new ArrayList<>();
-		Map board = new Map();
-
-		// if prometheus is being tested it returns a list with a build also in before phase
-		if (game.getPlayerTurn().getCard().getTypeGod() == TypeGod.CHANGE_FLOW_GOD) {
-			testList.add(new Build(new Worker(Color.RED,new Player("Carbonara"),1),board.getCell(1,1),false,TypeBuild.SIMPLE_BUILD));
-			return new NetAvailableBuildings(testList);
-		} else {
-			// if prometheus isn't being tested it returns a list with a build only in build phase
-			if (game.getPhase().getGamePhase() == GamePhase.BUILD) {
-				testList.add(new Build(new Worker(Color.RED,new Player("Amatriciana"),1),board.getCell(1,1),false,TypeBuild.SIMPLE_BUILD));
-				return new NetAvailableBuildings(testList);
-			} else {
-				return null;
-			}
-		}
-	}
 }

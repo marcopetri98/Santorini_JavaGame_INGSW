@@ -262,7 +262,8 @@ public class GameTest {
 	public void changeTurn() throws WrongPhaseException {
 		game.changeTurn();
 		assertEquals(game.getPhase().getPhase(),Phase.COLORS);
-		assertTrue(remoteViewDriver.isUpdatePhaseChangeCalled());
+		assertTrue(remoteViewDriver.updatePhaseChangeCalled);
+		assertTrue(remoteViewDriver.updateActivePlayerCalled);
 		remoteViewDriver.resetCalled();
 
 		// all three players has chosen the color

@@ -58,7 +58,7 @@ public class Prometheus extends GodCard {
 	@Override
 	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException{
 		// if it isn't before the moving phase this god has no power on building and throws an exception
-		if (turn.getGamePhase() != GamePhase.BEFOREMOVE || turn.getGamePhase() != GamePhase.BUILD) {
+		if (turn.getGamePhase() != GamePhase.BEFOREMOVE && turn.getGamePhase() != GamePhase.BUILD) {
 			throw new NoBuildException();
 		}
 

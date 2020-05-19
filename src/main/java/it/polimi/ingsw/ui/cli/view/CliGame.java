@@ -338,21 +338,23 @@ public class CliGame {
 		parseOther(obj);
 	}
 	private void parseColors(NetObject obj) {
-		NetColorPreparation ncp;
+		NetColorPreparation ncp = (NetColorPreparation) obj;
 		switch (obj.message) {
 			//COLORS
-			case Constants.COLOR_YOU :
-				activePlayer = player;
-				System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
-				code = Constants.COLOR_YOU;
-				break;
+			case Constants.TURN_PLAYERTURN -> {
+				if (ncp.player.equals(player)) {
+					System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
+				} else {
+					System.out.println(ncp.player+" is choosing a color.");
+				}
+				activePlayer = ncp.player;
+			}
 
-			case Constants.COLOR_ERROR :
+			case Constants.COLOR_ERROR -> {
 				System.out.println("The color is not available or the syntax was wrong.");
-				code = Constants.COLOR_ERROR;
-				break;
+			}
 
-			case Constants.COLOR_CHOICES :
+			case Constants.COLOR_CHOICES -> {
 				ncp = (NetColorPreparation) obj;
 				//players.add(ncp.player);
 				playerColors.add(ncp.color);
@@ -360,197 +362,157 @@ public class CliGame {
 					//players.add(ncp.next.player);
 					playerColors.add(ncp.next.color);
 				}
-				break;
+			}
 
-			case Constants.OTHERS_TURN:
-				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
-				System.out.println("The other player "+activePlayer+" is choosing a color");
-				break;
-
-			case Constants.GENERAL_SETUP_DISCONNECT:
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
 				functioning = false;
 				printServerError(obj);
-				break;
+			}
 		}
 
 	}
 	private void parseGods(NetObject obj){
-		NetDivinityChoice ndc;
+		NetDivinityChoice ndc = (NetDivinityChoice) obj;
 		switch (obj.message) {
 			//GODS
-			case Constants.GODS_CHALLENGER:
+			case Constants.GODS_CHALLENGER -> {
 				challenger = true;
 				code = Constants.GODS_CHALLENGER;
-				break;
+			}
 
-			case Constants.GODS_CHOOSE_STARTER:
-				//phase.advance();
-				System.out.println("Choose the player that has to start as the first one in the following list. Write with this syntax: starter playername");
-				for (String p : players) {
-					System.out.print(p + "\n");
-				}
-				System.out.print("Insert the player name: ");    //check name is ok in parsesyntax
-				code = Constants.GODS_CHOOSE_STARTER;
-				break;
-
-			case Constants.GODS_STARTER :
+			case Constants.GODS_STARTER -> {
 				ndc = (NetDivinityChoice) obj;
 				activePlayer = players.get(players.indexOf(ndc.player));
 				System.out.println("This is the player who is going to start the game: " + ndc.player);
 				code = Constants.GODS_STARTER;
-				break;
+			}
 
-			case Constants.GODS_YOU :
-				activePlayer = player;
-				if(challenger) {
-					if(godsGoAlreadyCalled) {
+			case Constants.TURN_PLAYERTURN -> {
+				activePlayer = ndc.player;
+				if (activePlayer.equals(player)) {
+					if (challenger) {
+						if (godsGoAlreadyCalled) {
+							//phase.advance();
+							System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+							System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+						} else {
+							System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+							System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
+							godsGoAlreadyCalled = true;
+						}
+					} else {
 						//phase.advance();
 						System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
 						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					}
-					else {
-						System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-						System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
-						godsGoAlreadyCalled = true;
-					}
+				} else {
+					System.out.println("The other player "+activePlayer+" is choosing a god");
 				}
-				else {
-					//phase.advance();
-					System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-					System.out.print("Insert the god: ");    //check god is ok in parsesyntax
-					code = Constants.GODS_YOU;
-				}
-				break;
+			}
 
-			case Constants.GODS_GODS :
+			case Constants.GODS_GODS -> {
 				ndc = (NetDivinityChoice) obj;
 				gods.addAll(ndc.getDivinities());
 				System.out.println("Just added players' divinities.");
-				break;
+			}
 
-			case Constants.GODS_OTHER :
-				//activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
-				System.out.println("Other players are now chosing the god. Hang on.");
-				code = Constants.GODS_OTHER;
-				break;
-
-			case Constants.GODS_ERROR :
+			case Constants.GODS_ERROR -> {
 				System.out.println("An error occurred while choosing the god.");
 				code = Constants.GODS_ERROR;
-				break;
+			}
 
-			case Constants.GODS_CHOICES :
+			case Constants.GODS_CHOICES -> {
 				/*ndc = (NetDivinityChoice) obj;
 				gods.add(ndc.divinity);
 				if (ndc.next != null) {
 					gods.add(ndc.next.divinity);
 				}*/
-				break;
+			}
 
-			case Constants.OTHERS_TURN:
-				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
-				System.out.println("The other player "+activePlayer+" is choosing a god");
-				break;
-
-			case Constants.GENERAL_SETUP_DISCONNECT:
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
 				functioning = false;
 				printServerError(obj);
-				break;
+			}
 		}
 
 	}
 	private void parseSetup(NetObject obj){
+		NetGameSetup ngs = (NetGameSetup)obj;
 		switch (obj.message) {
 			//SETUP [WORKERS ON MAP]
-			case Constants.GAMESETUP_PLACE:
-				activePlayer = player;
-				//NetGameSetup ntg = (NetGameSetup) obj;
-				//this.netMap = ntg.gameMap;
-				System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
-				System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
-				code = Constants.GAMESETUP_PLACE;
-				break;
+			case Constants.TURN_PLAYERTURN -> {
+				activePlayer = ngs.player;
+				if (activePlayer.equals(player)) {
+					//NetGameSetup ntg = (NetGameSetup) obj;
+					//this.netMap = ntg.gameMap;
+					System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
+					System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
+				} else {
+					System.out.println("The other player "+activePlayer+" is setting up the workers");
+				}
+			}
 
-			case Constants.GAMESETUP_ERROR:
+			case Constants.GAMESETUP_ERROR -> {
 				System.out.println("An error occurred while positioning the workers.");
 				code = Constants.GAMESETUP_ERROR;
-				break;
+			}
 
-			case Constants.GENERAL_SETUP_DISCONNECT:
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
 				functioning = false;
 				printServerError(obj);
-				break;
-
-			case Constants.OTHERS_TURN:
-				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
-				System.out.println("The other player "+activePlayer+" is setting up the workers");
-				break;
+			}
 		}
 	}
 	private void parsePlayerTurn(NetObject obj){
-		NetGaming ng;
+		NetGaming ng = (NetGaming) obj;
 		switch (obj.message) {
 			//ACTUAL GAME
-			case Constants.PLAYER_ERROR :
+			case Constants.PLAYER_ERROR -> {
 				System.out.println("The message sent is not correct.");
 				code = Constants.PLAYER_ERROR;
-				break;
+			}
 
-			case Constants.PLAYER_MOVE :
-				System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
-				System.out.println("Here is the map with the positions where you can move, marked with @:");
-				ng = (NetGaming) obj;
-				netMoves = ng.availablePositions.moves; //TODO: check - as well as case PLAYER_BUILD
-				drawPossibilities();
-				System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
-				code = Constants.PLAYER_MOVE;
-				break;
+			case Constants.TURN_PLAYERTURN -> {
+				activePlayer = ng.player;
+			}
 
-			case Constants.PLAYER_BUILD :
-				System.out.println("Now you have to build a building or a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
-				System.out.println("Here is the map with the position where you can build:");
-				ng = (NetGaming) obj;
-				netBuilds = ng.availableBuildings.builds;
-				drawPossibilities();
-				System.out.print("Now build: ");    //check the build is correct in parsesyntax
-				code = Constants.PLAYER_BUILD;
-				break;
+			case Constants.PLAYER_ACTIONS -> {
+				if (activePlayer.equals(player)) {
+					switch (phase.getGamePhase()) {
+						case BEFOREMOVE -> {
+							System.out.println("Now you have to first build a building and then move. Or you can just move. Use this syntax: beforebuild workerX x_coord y_coord, and then: move workerX x_coord y_coord");
+							ng = (NetGaming) obj;
+							netBuilds = ng.availableBuildings.builds;
+							netMoves = ng.availablePositions.moves;
+							drawPossibilities();
+							System.out.print("Now it's your turn: ");
+						}
+						case MOVE -> {
+							System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
+							System.out.println("Here is the map with the positions where you can move, marked with @:");
+							ng = (NetGaming) obj;
+							netMoves = ng.availablePositions.moves; //TODO: check - as well as case PLAYER_BUILD
+							drawPossibilities();
+							System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
+						}
+						case BUILD -> {
+							System.out.println("Now you have to build a building or a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
+							System.out.println("Here is the map with the position where you can build:");
+							ng = (NetGaming) obj;
+							netBuilds = ng.availableBuildings.builds;
+							drawPossibilities();
+							System.out.print("Now build: ");    //check the build is correct in parsesyntax
+						}
+					}
+				} else {
+					System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
+				}
+			}
 
-			case Constants.PLAYER_ACTIONS :
-				System.out.println("Now you have to first build a building and then move. Or you can just move. Use this syntax: beforebuild workerX x_coord y_coord, and then: move workerX x_coord y_coord");
-				ng = (NetGaming) obj;
-				netBuilds = ng.availableBuildings.builds;
-				netMoves = ng.availablePositions.moves;
-				drawPossibilities();
-				System.out.print("Now it's your turn: ");
-				break;
-
-
-			case Constants.PLAYER_FINISHED_TURN :
-				ng = (NetGaming) obj;
-				others = ng.player;
-				System.out.println(ng.player + " has just finished the turn.");
-				code = Constants.PLAYER_FINISHED_TURN;
-				break;
-
-			case Constants.PLAYER_TURN:
-				ng = (NetGaming) obj;
-				activePlayer = player;
-				System.out.println("It is you turn");
-				break;
-
-			case Constants.OTHERS_TURN :
-				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
-				System.out.println("A player has just finished his turn.");
-				System.out.println("This is the new map:");
-				drawMap();
-				code = Constants.OTHERS_TURN;
-				break;
-
-			case Constants.OTHERS_ERROR :
+			case Constants.OTHERS_ERROR -> {
 				System.out.println("An error occurred while running another player's turn.");
 				code = Constants.OTHERS_ERROR;
-				break;
+			}
 		}
 	}
 	private void parseOther(NetObject obj) {
