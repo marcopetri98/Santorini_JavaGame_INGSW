@@ -145,6 +145,13 @@ public class SetupManagerTest {
 
 		setupController.handleGodMessage(godsMessage);
 		assertTrue(gameStub.isSetStarterCalled());
+
+		setVariablesChoice(true,false);
+		gameStub.setPhase(GodsPhase.STARTER_CHOICE);
+		godsMessage = new NetDivinityChoice(Constants.GODS_IN_START_PLAYER,"Aldo","Giovanni",true);
+
+		setupController.handleGodMessage(godsMessage);
+		assertTrue(gameStub.isSetStarterCalled());
 	}
 
 	@Test

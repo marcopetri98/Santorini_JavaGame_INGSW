@@ -86,6 +86,7 @@ public class Server implements Runnable {
 				}
 			}
 
+			// TODO: say to all other players name and other players inside the lobby
 			// if there aren't player it creates the lobby, otherwise it add the player to the lobby
 			if (lobbyDimension == -1) {
 				lobbyClients.put(handler,name);

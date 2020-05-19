@@ -1,9 +1,6 @@
 package it.polimi.ingsw.ui.gui.controller;
 
-import it.polimi.ingsw.ui.gui.controller.MainGuiController;
 import javafx.animation.PathTransition;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -13,23 +10,18 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
 
 public class MenuSceneController {
-
 	@FXML
 	private ImageView button_exit;
-
 	@FXML
 	private ImageView menu_background;
-
 	@FXML
 	private ImageView logo_santorini;
-
 	@FXML
 	private ImageView button_play;
 
@@ -44,23 +36,27 @@ public class MenuSceneController {
 	/**
 	 * moving santorini_logo
 	 */
-	public void initialize() throws IOException {     //TODO: clouds and gods moving (optional)
+	public void initialize() {     //TODO: clouds and gods moving (optional)
 		PathTransition transition = new PathTransition();
 		transition.setNode(logo_santorini);
 		transition.setDuration(Duration.millis(3500));
 		transition.setPath(new Circle(355, 130, 7)); //x,y,radius (pixels)
 		transition.setCycleCount(PathTransition.INDEFINITE);
 		transition.play();
-		nextFXML = FXMLLoader.load(getClass().getResource("/fxml/nickname_serverAddress.fxml"));
-		nextScene = new Scene(nextFXML);
 	}
 
 	public void mousePressedPlay(MouseEvent mouseEvent) {
 		button_play.setImage(buttonPlayPressed);
-		nextStage = (Stage) ((Node)mouseEvent.getTarget()).getScene().getWindow();
 	}
-	public void mouseReleasedPlay(MouseEvent mouseEvent) {
+	public void mouseReleasedPlay(MouseEvent mouseEvent) throws IOException {
 		button_play.setImage(buttonPlay);
+
+		nextStage = (Stage) ((Node)mouseEvent.getTarget()).getScene().getWindow();
+		nextFXML = FXMLLoader.load(getClass().getResource("/fxml/nickname_serverAddress.fxml"));
+		nextScene = new Scene(nextFXML);
+		if (MainGuiController.getInstance().getSceneController() == null) {
+			MainGuiController.getInstance().setSceneController(NicknameServerAddressSceneController.getInstance());
+		}
 		nextStage.setScene(nextScene);
 	}
 

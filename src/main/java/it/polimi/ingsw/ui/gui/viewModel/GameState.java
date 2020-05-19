@@ -17,17 +17,22 @@ import java.util.*;
 public class GameState {
 	private String player;
 	private String activePlayer;
+	private int playerNumber;
 	private List<String> players;
 	private Map<String,String> gods;
 	private Map<String,Color> colors;
-	private final Turn turn;
+	private Turn turn;
 	private NetMap map;
 	private List<NetMove> possibleMoves;
 	private List<NetBuild> possibleBuilds;
 
 	public GameState() {
+		refresh();
+	}
+	public void refresh() {
 		player = null;
 		activePlayer = null;
+		playerNumber = 0;
 		players = new ArrayList<>();
 		gods = new HashMap<>();
 		colors = new HashMap<>();
@@ -47,6 +52,9 @@ public class GameState {
 	}
 	public String getActivePlayer() {
 		return activePlayer;
+	}
+	public int getPlayerNumber() {
+		return playerNumber;
 	}
 	public List<String> getPlayers() {
 		return new ArrayList<>(players);
@@ -86,6 +94,12 @@ public class GameState {
 			throw new IllegalArgumentException();
 		}
 		activePlayer = name;
+	}
+	public void setPlayerNumber(int value) throws IllegalArgumentException {
+		if (value != 2 && value != 3) {
+			throw new IllegalArgumentException();
+		}
+		playerNumber = value;
 	}
 	public void setPlayers(List<String> names) throws IllegalArgumentException {
 		if (names == null) {

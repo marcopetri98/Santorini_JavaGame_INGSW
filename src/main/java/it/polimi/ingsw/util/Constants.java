@@ -100,7 +100,16 @@ public final class Constants {
 	/* General connection messages */
 	public static final String CHECK = "ping";
 
+	/* Color scape variables */
+	public static final String RESET = "\\u001B[0m";
+	public static final String FG_RED = "\\u001B[31m";
+	public static final String FG_GREEN = "\\u001B[32m";
+	public static final String FG_BLU = "\\u001B[34m";
+	public static final String BG_GREEN = "\\u001B[42m";
+	public static final String BG_CYAN = "\\u001B[46m";
+
 	/* Constants used by static methods */
+	public static final int MAX_NICKNAME_LEN = 20;
 	private static final List<Character> number_chars = List.of('0','1','2','3','4','5','6','7','8','9');
 
 	/* Useful methods */

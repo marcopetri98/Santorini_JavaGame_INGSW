@@ -58,7 +58,7 @@ public class ClientMessageListener extends Thread {
 					viewController.retrieveConnectionError();
 				}
 
-				if (ingoingObject != null) {
+				if (ingoingObject != null && active) {
 					if (ingoingObject.message.equals(Constants.GENERAL_FATAL_ERROR)) {
 						viewController.retrieveError();
 					} else if (ingoingObject.message.equals(Constants.CHECK)) {
@@ -185,6 +185,14 @@ public class ClientMessageListener extends Thread {
 			}
 		}
 	}
+	public void closeSocketAndTerminate() {
+		try {
+			serverSocket.close();
+			setActive(false);
+		} catch (IOException e2) {
+			setActive(false);
+		}
+	}
 
 	/* **********************************************
 	 *												*
@@ -233,9 +241,9 @@ public class ClientMessageListener extends Thread {
 			return active;
 		}
 	}
-	public void activePlay() {
+	public boolean getWantsToPlay() {
 		synchronized (startLock) {
-			wantsToPlay = true;
+			return wantsToPlay;
 		}
 	}
 }
