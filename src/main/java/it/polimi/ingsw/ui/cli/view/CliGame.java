@@ -26,6 +26,7 @@ public class CliGame {
 	// state attributes that are used to represent the view
 	private boolean challenger = false;
 	private boolean godsGoAlreadyCalled = false;
+	private boolean alreadyPrintedPlay = false;
 	private Turn phase;
 	private List<String> players;
 	private List<Color> playerColors;
@@ -83,7 +84,8 @@ public class CliGame {
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
-				typeInputPrint();
+				//typeInputPrint();
+				System.out.println("\n"+"\u001B[46m"+activePlayer+"\u001B[0m"+"\n");
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {	//Con gods apollo artemis ->restituisce false!!!!!!!!!
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -153,6 +155,7 @@ public class CliGame {
 		netMoves.add(new NetMove(m));
 	}
 	public void addToQueue(NetObject message) {
+		System.out.println("\n"+"\u001B[31m"+message.message+"\u001B[0m"+"\n");
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -184,6 +187,7 @@ public class CliGame {
 					if (command.commandType.equals(Constants.COMMAND_COLOR_CHOICE) && command.getNumParameters() == 1 && Constants.COMMAND_COLOR_COLORS.contains(command.getParameter(0).toUpperCase())) {
 						return true;
 					}
+					return false;
 				}
 
 				//syntax: gods god1 god2 god3 OR god mygod
@@ -217,22 +221,27 @@ public class CliGame {
 							return true;
 						}
 					}
+					return false;
 				}
 
 				//syntax check and something more: worker worker1 x_coord1 y_coord1 worker2 x_coord2 y_coord2
 				case SETUP -> {
 					if (command.commandType.equals(Constants.COMMAND_GAMESETUP_POSITION) && command.getNumParameters() == 6 && command.getParameter(0).equals("worker1") && command.getParameter(3).equals("worker2")) {
-						for (int i = 2; i < 6; i++) {
+						for (int i = 1; i < 6; i++) {
 							if (i != 3) {
-								if (0 < Integer.parseInt(command.getParameter(i)) || Integer.parseInt(command.getParameter(i)) > 4) {
+								if (Integer.parseInt(command.getParameter(i)) < 0 || Integer.parseInt(command.getParameter(i)) > 4) {
 									return false;
 								}
 							}
 						}
-						if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
-							return false;
+						if(netMap != null){
+							if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
+								return false;
+							}
 						}
+						return true;
 					}
+					return false;
 				}
 
 				case PLAYERTURN -> {
@@ -248,6 +257,7 @@ public class CliGame {
 									}
 								}
 							}
+							return false;
 						}
 
 						//only syntax: move workerX x_coord y_coord
@@ -259,6 +269,7 @@ public class CliGame {
 									}
 								}
 							}
+							return false;
 						}
 					}
 				}
@@ -406,7 +417,7 @@ public class CliGame {
 				break;
 
 			case Constants.GODS_OTHER :
-				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
+				//activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("Other players are now chosing the god. Hang on.");
 				code = Constants.GODS_OTHER;
 				break;
@@ -424,10 +435,10 @@ public class CliGame {
 				}*/
 				break;
 
-			/*case Constants.OTHERS_TURN:
-				activePlayer = players.get(players.indexOf(activePlayer) == players.size() ? 0 : players.indexOf(activePlayer) + 1);
+			case Constants.OTHERS_TURN:
+				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("The other player "+activePlayer+" is choosing a god");
-				break;*/
+				break;
 
 			case Constants.GENERAL_SETUP_DISCONNECT:
 				functioning = false;
@@ -440,9 +451,10 @@ public class CliGame {
 		switch (obj.message) {
 			//SETUP [WORKERS ON MAP]
 			case Constants.GAMESETUP_PLACE:
-				NetGameSetup ntg = (NetGameSetup) obj;
-				this.netMap = ntg.gameMap;
-				System.out.println("Place the workers with the following syntax: worker worker1 x_coord y_coord worker2 x_coord y_coord");
+				activePlayer = player;
+				//NetGameSetup ntg = (NetGameSetup) obj;
+				//this.netMap = ntg.gameMap;
+				System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
 				System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
 				code = Constants.GAMESETUP_PLACE;
 				break;
@@ -455,6 +467,11 @@ public class CliGame {
 			case Constants.GENERAL_SETUP_DISCONNECT:
 				functioning = false;
 				printServerError(obj);
+				break;
+
+			case Constants.OTHERS_TURN:
+				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
+				System.out.println("The other player "+activePlayer+" is setting up the workers");
 				break;
 		}
 	}
@@ -507,8 +524,6 @@ public class CliGame {
 			case Constants.OTHERS_TURN :
 				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("A player has just finished his turn.");
-				ng = (NetGaming) obj;
-				netMap = ng.gameMap;
 				System.out.println("This is the new map:");
 				drawMap();
 				code = Constants.OTHERS_TURN;
@@ -563,7 +578,9 @@ public class CliGame {
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE:
+				NetGameSetup ngs = (NetGameSetup) obj;
 				System.out.println("The map has changed, take a look:");
+				this.netMap = ngs.gameMap;
 				drawMap();
 				code = Constants.GENERAL_GAMEMAP_UPDATE;
 				break;
@@ -593,16 +610,63 @@ public class CliGame {
 		switch (phase.getPhase()) {
 			case COLORS -> {
 				System.out.print("\n\n");
-				System.out.print("\t\t---------------------------------------------------------------------------------------------------------\n" +
-						"\t\t|                                                                                                       |\n" +
-						"\t\t|      _____ ____  _      ____  _____     _____ ______ _      ______ _____ _______ _____ ____  _   _    |\n" +
-						"\t\t|     / ____/ __ \\| |    / __ \\|  __ \\   / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |   |\n" +
-						"\t\t|    | |   | |  | | |   | |  | | |__) | | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |   |\n" +
-						"\t\t|    | |   | |  | | |   | |  | |  _  /   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |   |\n" +
-						"\t\t|    | |___| |__| | |___| |__| | | \\ \\   ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |   |\n" +
-						"\t\t|     \\_____\\____/|______\\____/|_|  \\_\\ |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|   |\n" +
-						"\t\t|                                                                                                       |\n" +
-						"\t\t---------------------------------------------------------------------------------------------------------\n\n\n");
+				System.out.print("\t\t----------------------------------------------------------------------------------------------------------\n" +
+						"\t\t|                                                                                                        |\n" +
+						"\t\t|      _____ ____  _      ____  _____     _____ ______ _      ______ _____ _______ _____ ____  _   _     |\n" +
+						"\t\t|     / ____/ __ \\| |    / __ \\|  __ \\   / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |    |\n" +
+						"\t\t|    | |   | |  | | |   | |  | | |__) | | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |    |\n" +
+						"\t\t|    | |   | |  | | |   | |  | |  _  /   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |    |\n" +
+						"\t\t|    | |___| |__| | |___| |__| | | \\ \\   ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |    |\n" +
+						"\t\t|     \\_____\\____/|______\\____/|_|  \\_\\ |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|    |\n" +
+						"\t\t|                                                                                                        |\n" +
+						"\t\t----------------------------------------------------------------------------------------------------------\n\n\n");
+			}
+
+			case GODS -> {
+				if(phase.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE){
+					System.out.print("\n\n");
+					System.out.print("\t\t-----------------------------------------------------------------------------------------------------\n" +
+							"\t\t|                                                                                                   |\n" +
+							"\t\t|      _____  ____  _____   _____    _____ ______ _      ______ _____ _______ _____ ____  _   _     |\n" +
+							"\t\t|     / ____|/ __ \\|  __ \\ / ____|  / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |    |\n" +
+							"\t\t|    | |  __| |  | | |  | | (___   | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |    |\n" +
+							"\t\t|    | | |_ | |  | | |  | |\\___ \\   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |    |\n" +
+							"\t\t|    | |__| | |__| | |__| |____) |  ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |    |\n" +
+							"\t\t|     \\_____|\\____/|_____/|_____/  |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|    |\n" +
+							"\t\t|                                                                                                   |\n" +
+							"\t\t-----------------------------------------------------------------------------------------------------\n\n\n");
+				}
+			}
+
+			case SETUP -> {
+				System.out.print("\n\n");
+				System.out.print("\t\t-----------------------------------------------\n" +
+						"\t\t|                                             |\n" +
+						"\t\t|      _____ ______ _______ _    _ _____      |\n" +
+						"\t\t|     / ____|  ____|__   __| |  | |  __ \\     |\n" +
+						"\t\t|    | (___ | |__     | |  | |  | | |__) |    |\n" +
+						"\t\t|     \\___ \\|  __|    | |  | |  | |  ___/     |\n" +
+						"\t\t|     ____) | |____   | |  | |__| | |         |\n" +
+						"\t\t|    |_____/|______|  |_|   \\____/|_|         |\n" +
+						"\t\t|                                             |\n" +
+						"\t\t-----------------------------------------------\n\n\n");
+			}
+
+			case PLAYERTURN -> {
+				if(!alreadyPrintedPlay){
+					System.out.print("\n\n");
+					System.out.print("\t\t-----------------------------------------\n" +
+							"\t\t|                                       |\n" +
+							"\t\t|     _____  _           __     ___     |\n" +
+							"\t\t|    |  __ \\| |        /\\\\ \\   / / |    |\n" +
+							"\t\t|    | |__) | |       /  \\\\ \\_/ /| |    |\n" +
+							"\t\t|    |  ___/| |      / /\\ \\\\   / | |    |\n" +
+							"\t\t|    | |    | |____ / ____ \\| |  |_|    |\n" +
+							"\t\t|    |_|    |______/_/    \\_\\_|  (_)    |\n" +
+							"\t\t|                                       |\n" +
+							"\t\t-----------------------------------------\n\n\n");
+					alreadyPrintedPlay = true;
+				}
 			}
 		}
 	}

@@ -63,7 +63,7 @@ public final class Constants {
 	public static final String GODS_IN_START_PLAYER = "gods-starter";					// sent to the server by the challenger to indicate the starter chosen
 	public static final List<String> GODS_GOD_NAMES = List.of("APOLLO","ARTEMIS","ATHENA","ATLAS","DEMETER","HEPHAESTUS","MINOTAUR","PAN","PROMETHEUS");
 	/* Game setup messages between client and server */
-	public static final String GAMESETUP_PLACE = "gamestup-place";						// sent to the user to indicate that he must place workers on the board
+	public static final String GAMESETUP_PLACE = "gamesetup-place";						// sent to the user to indicate that he must place workers on the board
 	public static final String GAMESETUP_ERROR = "gamesetup-error";						// sent to the user to indicate that its message was wrong
 	public static final String GAMESETUP_IN_PLACE = "gamesetup-player-positions";		// sent to the server to indicate the position chosen by the player for its workers
 	/* Player's turn messages between client and server */
@@ -101,12 +101,12 @@ public final class Constants {
 	public static final String CHECK = "ping";
 
 	/* Color scape variables */
-	public static final String RESET = "\\u001B[0m";
-	public static final String FG_RED = "\\u001B[31m";
-	public static final String FG_GREEN = "\\u001B[32m";
-	public static final String FG_BLU = "\\u001B[34m";
-	public static final String BG_GREEN = "\\u001B[42m";
-	public static final String BG_CYAN = "\\u001B[46m";
+	public static final String RESET = "\u001B[0m";
+	public static final String FG_RED = "\u001B[31m";
+	public static final String FG_GREEN = "\u001B[32m";
+	public static final String FG_BLU = "\u001B[34m";
+	public static final String BG_GREEN = "\u001B[42m";
+	public static final String BG_CYAN = "\u001B[46m";
 
 	/* Constants used by static methods */
 	public static final int MAX_NICKNAME_LEN = 20;
