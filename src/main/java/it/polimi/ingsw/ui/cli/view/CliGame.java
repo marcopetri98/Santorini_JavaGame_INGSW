@@ -521,6 +521,12 @@ public class CliGame {
 				code = Constants.PLAYER_FINISHED_TURN;
 				break;
 
+			case Constants.PLAYER_TURN:
+				ng = (NetGaming) obj;
+				activePlayer = player;
+				System.out.println("It is you turn");
+				break;
+
 			case Constants.OTHERS_TURN :
 				activePlayer = players.get(players.indexOf(activePlayer) == (players.size() - 1) ? 0 : players.indexOf(activePlayer) + 1);
 				System.out.println("A player has just finished his turn.");

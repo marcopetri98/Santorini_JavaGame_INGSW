@@ -232,14 +232,14 @@ public class ServerClientListenerThread extends Thread {
 					sendMessage(setupOutput);
 				// it says the client it is inside the lobby
 				} else if (serverResponse == 1) {
-					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED);
+					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED, lobbyServer.getLobbyDimension());
 					setGamePhase(NetworkPhase.LOBBY);
 					sendMessage(setupOutput);
 					lobbyServer.isNowPrepared(this);
 				// it says to the client that the game is starting
 				} else {
 					// the game phase is updated by the createGame of the server class
-					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH);
+					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH, lobbyServer.getLobbyDimension());
 					setGamePhase(NetworkPhase.LOBBY);
 					sendMessage(setupOutput);
 					lobbyServer.isNowPrepared(this);
@@ -252,7 +252,7 @@ public class ServerClientListenerThread extends Thread {
 					if (setupMessage.getNumber() < 4 && setupMessage.getNumber() > 1) {
 						setGamePhase(NetworkPhase.LOBBY);
 						lobbyServer.setPlayerNumber(setupMessage.getNumber(), this);
-						setupOutput = new NetSetup(Constants.SETUP_CREATE_WORKED);
+						setupOutput = new NetSetup(Constants.SETUP_CREATE_WORKED, lobbyServer.getLobbyDimension());
 						sendMessage(setupOutput);
 						lobbyServer.isNowPrepared(this);
 					// it sets an error message to send to the client

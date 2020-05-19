@@ -71,6 +71,7 @@ public final class Constants {
 	public static final String PLAYER_MOVE = "player-move";								// sent to the user to indicate that it is a turn where he must move
 	public static final String PLAYER_BUILD = "player-build";							// sent to the user to indicate that it is a turn where he must build
 	public static final String PLAYER_ACTIONS = "player-actions";						// sent to the user to indicate what he can do in this turn phase
+	public static final String PLAYER_TURN = "player-turn";								//
 	public static final String PLAYER_FINISHED_TURN = "player-finished";				// sent to the user to indicate that its turn is finished
 	public static final String PLAYER_IN_PASS = "player-pass";							// sent to the server to indicate that a player with prometheus wants to pass turn in before move phase
 	public static final String PLAYER_IN_MOVE = "player-move";							// sent to the server to indicate the move it wants to perform

@@ -157,18 +157,20 @@ public class Server implements Runnable {
 					throw new AlreadyStartedException();
 				}
 				// TODO: also if dimension is greater than 1 and the lobby is now empty
-				if (lobbyDimension == 1) {
-					if (creator == handler) {
-						creator = null;
-					}
-					synchronized (preparedListeners) {
+				if (lobbyDimension == 1 || lobbyClients.size() == 1) {
+					lobbyDimension = -1;
+				}
+				if (creator == handler) {
+					creator = null;
+				}
+				synchronized (preparedListeners) {
+					if (preparedListeners.contains(handler)) {
 						preparedListeners.remove(handler);
 						preparedListeners.notifyAll();
 					}
-					lobbyDimension = -1;
-					lobbyClients.notifyAll();
 				}
 				lobbyClients.remove(handler);
+				lobbyClients.notifyAll();
 			}
 		}
 	}
@@ -220,6 +222,16 @@ public class Server implements Runnable {
 	public boolean getToBeCreated() {
 		synchronized (lobbyClients) {
 			return lobbyDimension == 1;
+		}
+	}
+
+	/**
+	 * This function returns the dimension of the lobby
+	 * @return dimension of the lobby
+	 */
+	public int getLobbyDimension() {
+		synchronized (lobbyClients) {
+			return lobbyDimension;
 		}
 	}
 	/**

@@ -173,11 +173,16 @@ public class Game extends ObservableGame {
 				changeActivePlayer();
 			}
 		} else if (turn.getPhase() == Phase.SETUP) {
+			boolean finishedSetup = false;
 			if (players.indexOf(activePlayer) == players.size()-1) {
+				finishedSetup = true;
 				turn.advance();
 				notifyPhaseChange(turn.clone());
 			}
 			changeActivePlayer();
+			if (finishedSetup) {
+				notifyPhaseChange(turn.clone());
+			}
 		} else {
 			// the turn is finished and this if resets the player turn values
 			if (turn.getGamePhase() == GamePhase.BUILD) {

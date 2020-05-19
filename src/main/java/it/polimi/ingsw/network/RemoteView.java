@@ -433,9 +433,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 							// in the before move phase the player is notified that a player can either move or build (if builds are possible), if it move immediately passes to build phase
 							possibleBuildings = askBuildings();
 							possibleMoves = askPositions();
-							if (possibleBuildings == null || possibleBuildings.builds.size() == 0) {
-								notifyPass(clientHandler.getPlayerName());
-							} else {
+							if (possibleBuildings != null && possibleBuildings.builds.size() != 0) {
 								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ACTIONS,possibleBuildings,possibleMoves));
 							}
 						}
@@ -444,6 +442,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 							// if it has prometheus and has built before now it has to move, instead he has moved and must go directly to build phase
 							if ((hasBuilt && observedGame.getPlayerByName(clientHandler.getPlayerName()).getCard().getTypeGod() == TypeGod.CHANGE_FLOW_GOD) || (!hasBuilt && observedGame.getPlayerByName(clientHandler.getPlayerName()).getCard().getTypeGod() != TypeGod.CHANGE_FLOW_GOD)) {
 								possibleMoves = askPositions();
+							} else {
+								// TODO: see if is the best way to handle error
+								clientHandler.fatalError("Error in server");
 							}
 							if (possibleMoves != null && possibleMoves.moves.size() > 0) {
 								clientHandler.sendMessage(new NetGaming(Constants.PLAYER_MOVE,possibleMoves));
@@ -492,7 +493,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					}
 					case OTHERTURN -> {
 						clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
-						NetGaming othersEndTurn = new NetGaming(Constants.OTHERS_TURN);
+						NetGaming othersEndTurn = new NetGaming(Constants.PLAYER_TURN);
 						clientHandler.sendMessage(othersEndTurn);
 					}
 				}
