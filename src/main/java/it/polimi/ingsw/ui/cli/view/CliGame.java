@@ -13,10 +13,7 @@ import it.polimi.ingsw.util.exceptions.UserInputTimeoutException;
 
 import it.polimi.ingsw.util.Color;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class CliGame {
 	// other view object and attributes relative to the connection with server
@@ -24,28 +21,28 @@ public class CliGame {
 	private CliInput cliInput;
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
-	private boolean challenger = false;
-	private boolean godsGoAlreadyCalled = false;
-	private boolean alreadyPrintedPlay = false;
+	private boolean challenger;
 	private Turn phase;
 	private List<String> players;
-	private List<Color> playerColors;
+	//private List<Color> playerColors;
+	private Map<String, Color> playerColors;
 	private List<String> gods;
+	private Map<String, String> chosenGods;
 	private String player;
 	private String activePlayer;
-	private String starterPlayer;
 	private NetMap netMap;
 	private List<NetMove> netMoves;
 	private List<NetBuild> netBuilds;
 	private NetMove selectedMove;
 	private NetBuild selectedBuild;
-	private boolean drawPoss = false;
-	private String code = "null";
-	private String others;
-	private boolean sentCorrectMessage = false;
 	// attributes used for functioning
 	private boolean functioning;
 	private final Object inputLock;
+	private boolean godsGoAlreadyCalled = false;
+	private boolean alreadyPrintedPlay = false;
+	private boolean drawPoss = false;
+	private boolean sentCorrectMessage = false;
+	private boolean chooseStarter = false;
 
 	public CliGame(CliInput inputGetter) {
 		messages = new ArrayDeque<>();
@@ -55,8 +52,9 @@ public class CliGame {
 		challenger = false;
 		phase = new Turn();
 		players = new ArrayList<>();
-		playerColors = new ArrayList<>();
+		playerColors = new HashMap<>();
 		gods = new ArrayList<>();
+		chosenGods = new HashMap<>();
 		player = null;
 		activePlayer = null;
 		netMap = null;
@@ -89,7 +87,7 @@ public class CliGame {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
 				//typeInputPrint();
-				System.out.println("\n"+"\u001B[46m"+activePlayer+"\u001B[0m"+"\n");
+				System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {	//Con gods apollo artemis ->restituisce false!!!!!!!!!
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -147,9 +145,6 @@ public class CliGame {
 	public void setInputController(UserInputController inputController) {
 		this.inputController = inputController;
 	}
-	public void setNetMap(NetMap map){
-		netMap = map;
-	}
 	public void setPlayers(NetLobbyPreparation lobbyMsg) {
 		players = new ArrayList<>(players);
 		while (lobbyMsg != null) {
@@ -163,11 +158,8 @@ public class CliGame {
 		}
 		player = name;
 	}
-	public void addNetMove(Move m){
-		netMoves.add(new NetMove(m));
-	}
 	public void addToQueue(NetObject message) {
-		System.out.println("\n"+"\u001B[31m"+message.message+"\u001B[0m"+"\n");
+		System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -313,9 +305,6 @@ public class CliGame {
 	}
 
 	private void parseMessages(){
-		/*if(messages.size() != 0){
-			parseMessage(messages.getFirst());
-		}*/
 		while(messages.size() != 0){
 			parseMessage(messages.getFirst());
 			messages.remove();
@@ -332,22 +321,18 @@ public class CliGame {
 			switch (phase.getPhase()) {
 				case COLORS:
 					parseColors(obj);
-					//messages.remove();
 					break;
 
 				case GODS:
 					parseGods(obj);
-					//messages.remove();
 					break;
 
 				case SETUP:
 					parseSetup(obj);
-					//messages.remove();
 					break;
 
 				case PLAYERTURN:
 					parsePlayerTurn(obj);
-					//messages.remove();
 					break;
 			}
 		}
@@ -360,7 +345,13 @@ public class CliGame {
 			//COLORS
 			case Constants.TURN_PLAYERTURN -> {
 				if (ncp.player.equals(player)) {
-					System.out.println("Insert the color you want to use with the following syntax: color red/green/blue");
+					System.out.println("Insert the color you want to use with the following syntax \"color colorName\"");
+					System.out.print("Choose among: ");
+					if(!playerColors.containsValue(new Color("red")))	System.out.print("red ");
+					if(!playerColors.containsValue(new Color("green")))	System.out.print("green ");
+					if(!playerColors.containsValue(new Color("blue")))	System.out.print("blue");
+					System.out.print("\n");
+					System.out.print("Insert the color: ");
 				} else {
 					System.out.println(ncp.player+" is choosing a color.");
 				}
@@ -372,13 +363,7 @@ public class CliGame {
 			}
 
 			case Constants.COLOR_CHOICES -> {
-				ncp = (NetColorPreparation) obj;
-				//players.add(ncp.player);
-				playerColors.add(ncp.color);
-				if (ncp.next != null) {
-					//players.add(ncp.next.player);
-					playerColors.add(ncp.next.color);
-				}
+				playerColors.put(ncp.player, ncp.color);
 			}
 
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
@@ -393,15 +378,15 @@ public class CliGame {
 		switch (obj.message) {
 			//GODS
 			case Constants.GODS_CHALLENGER -> {
-				challenger = true;
-				code = Constants.GODS_CHALLENGER;
+				if(!player.equals(ndc.player)){	//TODO: challenger player given from server is wrong!!! therefore modify it and this
+					challenger = true;
+				}
 			}
 
 			case Constants.GODS_STARTER -> {
 				ndc = (NetDivinityChoice) obj;
 				activePlayer = players.get(players.indexOf(ndc.player));
 				System.out.println("This is the player who is going to start the game: " + ndc.player);
-				code = Constants.GODS_STARTER;
 			}
 
 			case Constants.TURN_PLAYERTURN -> {
@@ -409,17 +394,43 @@ public class CliGame {
 				if (activePlayer.equals(player)) {
 					if (challenger) {
 						if (godsGoAlreadyCalled) {
-							//phase.advance();
-							System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
-							System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+							if(chooseStarter) {
+								System.out.println("Insert the starter with this syntax \"starter playerName\"");
+								System.out.print("Choose the starter of the game among these: ");
+								if(players != null){
+									for(String player : players) {
+										System.out.print(player + " ");
+									}
+									System.out.print("\n");
+								}
+								System.out.print("Insert the starter: ");
+							} else {
+								System.out.println("Insert the god power you want to use with this syntax \"god godname\"");
+								System.out.print("Choose one god among these: ");
+								if(gods != null){
+									for(String x : gods) {
+										if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
+									}
+									System.out.print("\n");
+								}
+								System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+								chooseStarter = true;
+							}
 						} else {
-							System.out.print("Insert the gods you want to use with the following syntax: gods godname1 godname2 godname3\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+							System.out.println("Insert the gods you want to use with the following syntax \"gods godname1 godname2 godname3\"");
+							System.out.println("Choose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus");
 							System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
 							godsGoAlreadyCalled = true;
 						}
 					} else {
-						//phase.advance();
-						System.out.print("Insert the god power you want to use with the following syntax: god godname\nChoose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus.\n");
+						System.out.println("Insert the god power you want to use with this syntax \"god godname\"");
+						System.out.print("Choose one god among these: ");
+						if(gods != null){
+							for(String x : gods) {
+								if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
+							}
+							System.out.print("\n");
+						}
 						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					}
 				} else {
@@ -435,15 +446,10 @@ public class CliGame {
 
 			case Constants.GODS_ERROR -> {
 				System.out.println("An error occurred while choosing the god.");
-				code = Constants.GODS_ERROR;
 			}
 
 			case Constants.GODS_CHOICES -> {
-				/*ndc = (NetDivinityChoice) obj;
-				gods.add(ndc.divinity);
-				if (ndc.next != null) {
-					gods.add(ndc.next.divinity);
-				}*/
+				chosenGods.put(ndc.player, ndc.divinity);
 			}
 
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
@@ -471,7 +477,6 @@ public class CliGame {
 
 			case Constants.GAMESETUP_ERROR -> {
 				System.out.println("An error occurred while positioning the workers.");
-				code = Constants.GAMESETUP_ERROR;
 			}
 
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
@@ -486,7 +491,6 @@ public class CliGame {
 			//ACTUAL GAME
 			case Constants.PLAYER_ERROR -> {
 				System.out.println("The message sent is not correct.");
-				code = Constants.PLAYER_ERROR;
 			}
 
 			case Constants.TURN_PLAYERTURN -> {
@@ -528,7 +532,6 @@ public class CliGame {
 
 			case Constants.OTHERS_ERROR -> {
 				System.out.println("An error occurred while running another player's turn.");
-				code = Constants.OTHERS_ERROR;
 			}
 		}
 	}
@@ -539,21 +542,17 @@ public class CliGame {
 			//GENERAL SIGNALS
 			case Constants.GENERAL_ERROR:
 				System.out.println("An error occurred while inserting the data.");
-				code = Constants.GENERAL_ERROR;
 				break;
 
 			case Constants.GENERAL_PLAYER_DISCONNECTED:
 				ng = (NetGaming) obj;
-				others = ng.player;
 				System.out.println(ng.player + " just disconnected.");
-				code = Constants.GENERAL_PLAYER_DISCONNECTED;
 				break;
 
 			case Constants.GENERAL_WINNER:
 				ng = (NetGaming) obj;
 				for (String p : players) {
 					if (ng.player != null && ng.player.equals(p)) {
-						others = ng.player;
 						System.out.println(ng.player + " just won the game!");
 						break;
 					}
@@ -565,14 +564,11 @@ public class CliGame {
 				ng = (NetGaming) obj;
 				for (String p : players) {
 					if (ng.player != null && ng.player.equals(p)) {
-						others = ng.player;
 						System.out.println(ng.player + " just lost.");
 						break;
 					}
 				}
-				others = "You";
 				System.out.println("You lost the game.");
-				code = Constants.GENERAL_DEFEATED;
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE:
@@ -581,13 +577,11 @@ public class CliGame {
 					System.out.println("The map has changed, take a look:");
 					this.netMap = ngs.gameMap;
 					drawMap();
-					code = Constants.GENERAL_GAMEMAP_UPDATE;
 				} else if (phase.getPhase() == Phase.PLAYERTURN) {
 					ng = (NetGaming) obj;
 					System.out.println("The map has changed, take a look:");
 					this.netMap = ng.gameMap;
 					drawMap();
-					code = Constants.GENERAL_GAMEMAP_UPDATE;
 				}
 				break;
 
@@ -597,7 +591,6 @@ public class CliGame {
 				}*/
 				phase.advance();
 				printInitialPhase();
-				code = Constants.GENERAL_PHASE_UPDATE;
 				break;
 		}
 	}
