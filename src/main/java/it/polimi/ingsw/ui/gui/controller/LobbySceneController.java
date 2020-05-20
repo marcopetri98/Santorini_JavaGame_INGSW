@@ -134,9 +134,6 @@ public class LobbySceneController implements SceneController {
 				// update the lobby with player order
 				gameState.setPlayers(((NetLobbyPreparation)message).getPlayersList());
 				setupNames(true);
-				// sets the next scene
-				nextFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_colorV2.fxml"));
-				nextScene = new Scene(nextFXML);
 				// eliminate exit button because the game is starting
 				((AnchorPane) button_exit.getParent()).getChildren().remove(button_exit);
 			}
@@ -145,6 +142,9 @@ public class LobbySceneController implements SceneController {
 			}
 			case Constants.TURN_PLAYERTURN -> {
 				gameState.setActivePlayer(((NetColorPreparation)message).player);
+				// sets the next scene
+				nextFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_colorV2.fxml"));
+				nextScene = new Scene(nextFXML);
 				PauseTransition waitReadPlayers = new PauseTransition(Duration.seconds(5.0));
 				waitReadPlayers.setOnFinished((event) -> {
 					currentStage = (Stage) text_1.getScene().getWindow();

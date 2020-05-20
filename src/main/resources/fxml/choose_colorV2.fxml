@@ -15,17 +15,17 @@
             <Image url="@../img/choose_color_background.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_red" fitHeight="164.0" fitWidth="273.0" layoutX="187.0" layoutY="293.0" onMousePressed="#mousePressedRed" onMouseReleased="#mouseReleasedRed" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_red" fitHeight="165.0" fitWidth="273.0" layoutX="187.0" layoutY="293.0" onMousePressed="#mousePressedColor" onMouseReleased="#mouseReleasedColor" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/color_red_btn.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_green" fitHeight="164.0" fitWidth="328.0" layoutX="503.0" layoutY="294.0" onMousePressed="#mousePressedGreen" onMouseReleased="#mouseReleasedGreen" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_green" fitHeight="164.0" fitWidth="328.0" layoutX="503.0" layoutY="294.0" onMousePressed="#mousePressedColor" onMouseReleased="#mouseReleasedColor" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/color_green_btn.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_blue" fitHeight="164.0" fitWidth="351.0" layoutX="819.0" layoutY="292.0" onMousePressed="#mousePressedBlue" onMouseReleased="#mouseReleasedBlue" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_blue" fitHeight="164.0" fitWidth="351.0" layoutX="819.0" layoutY="292.0" onMousePressed="#mousePressedColor" onMouseReleased="#mouseReleasedColor" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/color_blue_btn.png" />
          </image>

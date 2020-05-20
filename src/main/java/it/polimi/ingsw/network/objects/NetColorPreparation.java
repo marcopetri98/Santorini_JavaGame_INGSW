@@ -7,6 +7,7 @@ import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Color;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class NetColorPreparation extends NetObject {
@@ -55,7 +56,7 @@ public class NetColorPreparation extends NetObject {
 		return next;
 	}
 	public Map<String,Color> getPlayerColorsMap() {
-		Map<String,Color> list = new HashMap<>();
+		Map<String,Color> list = new LinkedHashMap<>();
 		if (player != null && color != null) {
 			list.put(player,color);
 			if (next != null) {

@@ -56,6 +56,9 @@ public class ChooseNumPlayerSceneController implements SceneController {
 		currentObject = this;
 		MainGuiController.getInstance().setSceneController(this);
 		gameState = MainGuiController.getInstance().getGameState();
+
+		button_2.setImage(button2);
+		button_3.setImage(button3);
 	}
 
 	/* **********************************************

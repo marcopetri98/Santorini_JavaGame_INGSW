@@ -3,10 +3,7 @@ package it.polimi.ingsw.network.objects;
 // necessary imports of Java SE
 import it.polimi.ingsw.core.gods.GodCard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NetDivinityChoice extends NetObject {
 	public final String divinity;
@@ -104,7 +101,7 @@ public class NetDivinityChoice extends NetObject {
 		return player;
 	}
 	public Map<String,String> getPlayerGodMap() {
-		Map<String,String> list = new HashMap<>();
+		Map<String,String> list = new LinkedHashMap<>();
 		if (player != null && divinity != null) {
 			list.put(player,divinity);
 			if (next != null) {

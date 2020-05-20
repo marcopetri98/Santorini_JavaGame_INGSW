@@ -1,100 +1,239 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.network.objects.NetColorPreparation;
+import it.polimi.ingsw.network.objects.NetDivinityChoice;
+import it.polimi.ingsw.network.objects.NetObject;
+import it.polimi.ingsw.network.objects.NetSetup;
+import it.polimi.ingsw.ui.gui.viewModel.GameState;
+import it.polimi.ingsw.util.Color;
+import it.polimi.ingsw.util.Constants;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 
-public class ChooseColorSceneController {
-
+public class ChooseColorSceneController implements SceneController {
 	@FXML
 	private ImageView button_green;
-
 	@FXML
 	private ImageView button_red;
-
 	@FXML
 	private ImageView button_blue;
-
 	@FXML
 	private ImageView button_next;
-
 	@FXML
 	private ImageView button_exit;
-
 	@FXML
 	private Text text_player;
 
-	private String namePlayer = "sdfhjsjdflksdflksdf"; //only as example. //max 19
+	private Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
+	private Image buttonNext = new Image("/img/home_next_btn.png");
+	private Image buttonExitPressed = new Image("/img/home_exit_btn_pressed.png");
+	private Image buttonExit = new Image("/img/home_exit_btn.png");
+	private Image buttonRedPressed = new Image("/img/color_btn_coral_pressed.png");
+	private Image buttonRed = new Image("/img/color_red_btn.png");
+	private Image buttonGreenPressed = new Image("/img/color_btn_green_pressed.png");
+	private Image buttonGreen = new Image("/img/color_green_btn.png");
+	private Image buttonBluePressed = new Image("/img/color_btn_blue_pressed.png");
+	private Image buttonBlue = new Image("/img/color_blue_btn.png");
+	// TODO: place the grey image for the button (if not we've not the wanted effect)
+	private Image buttonRedGrey = new Image("/img/color_btn_coral_pressed.png");
+	private Image buttonGreenGrey = new Image("/img/color_btn_green_pressed.png");
+	private Image buttonBlueGrey = new Image("/img/color_btn_blue_pressed.png");
 
-	Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
-	Image buttonNext = new Image("/img/home_next_btn.png");
-	Image buttonExitPressed = new Image("/img/home_exit_btn_pressed.png");
-	Image buttonExit = new Image("/img/home_exit_btn.png");
-	Image buttonRedPressed = new Image("/img/color_btn_coral_pressed.png");
-	Image buttonRed = new Image("/img/color_red_btn.png");
-	Image buttonGreenPressed = new Image("/img/color_btn_green_pressed.png");
-	Image buttonGreen = new Image("/img/color_green_btn.png");
-	Image buttonBluePressed = new Image("/img/color_btn_blue_pressed.png");
-	Image buttonBlue = new Image("/img/color_blue_btn.png");
+	// objects used to change scene
+	private Parent previousFXML;
+	private Parent nextFXML;
+	private Scene previousScene;
+	private Scene nextScene;
+	private Stage currentStage;
+	private boolean redLocked = false, greenLocked = false, blueLocked = false;
+	private boolean challengerReceived = false;
+	private Color choice = null;
+
+	// triggers for server messages
+	private GameState gameState;
 
 	public void initialize(){
-		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
-		text_player.setText(namePlayer);
-	}
+		MainGuiController.getInstance().setSceneController(this);
+		gameState = MainGuiController.getInstance().getGameState();
+		setChoosingPlayer();
 
-	private String setNamePlayer() {
-		//TODO:...
-		return namePlayer;
-	}
-
-
-	public void mousePressedRed(MouseEvent mouseEvent) {
-		button_red.setImage(buttonRedPressed);
-		button_green.setImage(buttonGreen);
 		button_blue.setImage(buttonBlue);
-	}
-
-	public void mouseReleasedRed(MouseEvent mouseEvent) {
-		button_red.setImage(buttonRedPressed);
-	}
-
-	public void mousePressedGreen(MouseEvent mouseEvent) {
-		button_green.setImage(buttonGreenPressed);
-		button_blue.setImage(buttonBlue);
-		button_red.setImage(buttonRed);
-	}
-
-	public void mouseReleasedGreen(MouseEvent mouseEvent) {
-		button_green.setImage(buttonGreenPressed);
-	}
-
-	public void mousePressedBlue(MouseEvent mouseEvent) {
-		button_blue.setImage(buttonBluePressed);
 		button_red.setImage(buttonRed);
 		button_green.setImage(buttonGreen);
 	}
 
-	public void mouseReleasedBlue(MouseEvent mouseEvent) {
-		button_blue.setImage(buttonBluePressed);
-	}
+	/* **********************************************
+	 *												*
+	 *			HANDLERS OF USER INTERACTION		*
+	 * 												*
+	 ************************************************/
+	public void mousePressedColor(MouseEvent mouseEvent) {
+		ImageView buttonPressed = (ImageView) mouseEvent.getTarget();
 
+		if (buttonPressed.getImage().equals(buttonBlue) || buttonPressed.getImage().equals(buttonBluePressed)) {
+			if (buttonPressed.getImage().equals(buttonBlue)) {
+				button_blue.setImage(buttonBluePressed);
+				choice = Color.BLUE;
+				if (!redLocked) {
+					button_red.setImage(buttonRed);
+				}
+				if (!greenLocked) {
+					button_green.setImage(buttonGreen);
+				}
+			} else {
+				choice = null;
+				button_blue.setImage(buttonBlue);
+			}
+		} else if (buttonPressed.getImage().hashCode() == buttonRed.hashCode() || buttonPressed.getImage().hashCode() == buttonRedPressed.hashCode()) {
+			if (buttonPressed.getImage().equals(buttonRed)) {
+				button_red.setImage(buttonRedPressed);
+				choice = Color.RED;
+				if (!blueLocked) {
+					button_blue.setImage(buttonBlue);
+				}
+				if (!greenLocked) {
+					button_green.setImage(buttonGreen);
+				}
+			} else {
+				choice = null;
+				button_red.setImage(buttonRed);
+			}
+		} else if (buttonPressed.getImage().equals(buttonGreen) || buttonPressed.getImage().equals(buttonGreenPressed)) {
+			if (buttonPressed.getImage().equals(buttonGreen)) {
+				button_green.setImage(buttonGreenPressed);
+				choice = Color.GREEN;
+				if (!blueLocked) {
+					button_blue.setImage(buttonBlue);
+				}
+				if (!redLocked) {
+					button_red.setImage(buttonRed);
+				}
+			} else {
+				choice = null;
+				button_green.setImage(buttonGreen);
+			}
+		}
+	}
+	public void mouseReleasedColor(MouseEvent mouseEvent) {
+		// TODO: il the release event necessary?
+	}
 	public void mousePressedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNextPressed);
 	}
-
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
-	}
 
-	public void mousePressedExit(MouseEvent mouseEvent) {
+		if (choice != null) {
+			if (!gameState.getPlayer().equals(gameState.getActivePlayer())) {
+				// user is trying to choose the color in others turn
+				chooseInYourTurnError();
+			} else {
+				// user is trying to choose a color in its turn, a message of choose will be sent
+				((ImageView)mouseEvent.getTarget()).getScene().setCursor(Cursor.WAIT);
+				NetColorPreparation colorMsg = new NetColorPreparation(Constants.COLOR_IN_CHOICE,gameState.getPlayer(),choice);
+				MainGuiController.getInstance().sendMessage(colorMsg);
+			}
+		}
+	}
+	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
+		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
+		previousScene = new Scene(previousFXML);
 	}
-
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
+
+		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		MainGuiController.getInstance().sendMessage(netSetup);
+		MainGuiController.getInstance().refresh();
+		MainGuiController.getInstance().setSceneController(null);
+		currentStage = (Stage) button_exit.getScene().getWindow();
+		currentStage.setScene(previousScene);
+	}
+
+	/* **********************************************
+	 *												*
+	 *		EVENTS AFTER SERVER MESSAGE				*
+	 * 												*
+	 ************************************************/
+	private void chooseInYourTurnError() {
+		// TODO: implement graphic effect to say the user he can choose a color only in its turn
+	}
+	private void setChoosingPlayer() {
+		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
+		text_player.setText(gameState.getActivePlayer());
+	}
+
+	/* **********************************************
+	 *												*
+	 *		METHODS CALLED BY MAIN CONTROLLER		*
+	 * 												*
+	 ************************************************/
+	@Override
+	public void fatalError() {
+		// TODO: server has crashed, show it to the client
+	}
+	@Override
+	public void deposeMessage(NetObject message) throws IOException {
+		switch (message.message) {
+			case Constants.COLOR_CHOICES -> {
+				gameState.setColors(((NetColorPreparation)message).getPlayerColorsMap());
+				for (Color color : gameState.getColors().values()) {
+					if (color.equals(Color.BLUE)) {
+						button_blue.setImage(buttonBlueGrey);
+						blueLocked = true;
+					} else if (color.equals(Color.RED)) {
+						button_red.setImage(buttonRedGrey);
+						redLocked = true;
+					} else if (color.equals(Color.GREEN)) {
+						button_green.setImage(buttonGreenGrey);
+						greenLocked = true;
+					}
+				}
+				button_next.getScene().setCursor(Cursor.WAIT);
+			}
+			case Constants.GENERAL_PHASE_UPDATE -> {
+				gameState.advancePhase();
+			}
+			case Constants.GODS_CHALLENGER -> {
+				challengerReceived = true;
+			}
+			case Constants.TURN_PLAYERTURN -> {
+				if (!challengerReceived) {
+					gameState.setActivePlayer(((NetColorPreparation)message).player);
+					setChoosingPlayer();
+				} else {
+					gameState.setActivePlayer(((NetDivinityChoice)message).player);
+					if (gameState.getPlayer().equals(gameState.getActivePlayer())) {
+						// the player is the challenger
+						nextFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_gods_first.fxml"));
+						nextScene = new Scene(nextFXML);
+						currentStage = (Stage) button_next.getScene().getWindow();
+						currentStage.setScene(nextScene);
+					} else {
+						// the player isn't the challenger
+						nextFXML = FXMLLoader.load(getClass().getResource("/fxml/loading.fxml"));
+						nextScene = new Scene(nextFXML);
+						currentStage = (Stage) button_next.getScene().getWindow();
+						currentStage.setScene(nextScene);
+					}
+				}
+			}
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
+				// TODO: implement the disconnection shutdown after someone quit the game
+			}
+		}
 	}
 }

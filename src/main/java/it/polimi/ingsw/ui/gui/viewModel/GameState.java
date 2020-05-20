@@ -141,11 +141,11 @@ public class GameState {
 		}
 		gods = new LinkedHashMap<>(divinityMessage.getPlayerGodMap());
 	}
-	public void setColors(Map<String,String> mapping) throws IllegalArgumentException {
+	public void setColors(Map<String,Color> mapping) throws IllegalArgumentException {
 		if (mapping == null) {
 			throw new IllegalArgumentException();
 		}
-		gods = new LinkedHashMap<>(mapping);
+		colors = new LinkedHashMap<>(mapping);
 	}
 	public void setColors(NetColorPreparation colorMessage) throws IllegalArgumentException {
 		if (colorMessage == null) {

@@ -20,6 +20,17 @@ public final class Constants {
 	/* Version constants */
 	public static final int ACTUAL_VERSION = 1;
 
+	/* GOD NAMES */
+	public static final String APOLLO = "APOLLO";
+	public static final String ARTEMIS = "ARTEMIS";
+	public static final String ATHENA = "ATHENA";
+	public static final String ATLAS = "ATLAS";
+	public static final String DEMETER = "DEMETER";
+	public static final String HEPHAESTUS = "HEPHAESTUS";
+	public static final String MINOTAUR = "MINOTAUR";
+	public static final String PAN = "PAN";
+	public static final String PROMETHEUS = "PROMETHEUS";
+
 	/* General messages between client and server */
 	public static final String GENERAL_ERROR = "error";									// sent to the user to indicate general error about user's message
 	public static final String GENERAL_SETUP_DISCONNECT = "setup-disconnect";			// sent to the user to indicate that someone disconnected on setup and game will end
@@ -58,7 +69,7 @@ public final class Constants {
 	public static final String GODS_IN_GAME_GODS = "gods-game-gods";					// sent to the server by the challenger to indicate the gods chosen
 	public static final String GODS_IN_CHOICE = "gods-choice";							// sent to the server to indicate the god choice
 	public static final String GODS_IN_START_PLAYER = "gods-starter";					// sent to the server by the challenger to indicate the starter chosen
-	public static final List<String> GODS_GOD_NAMES = List.of("APOLLO","ARTEMIS","ATHENA","ATLAS","DEMETER","HEPHAESTUS","MINOTAUR","PAN","PROMETHEUS");
+	public static final List<String> GODS_GOD_NAMES = List.of(APOLLO,ARTEMIS,ATHENA,ATLAS,DEMETER,HEPHAESTUS,MINOTAUR,PAN,PROMETHEUS);
 	/* Game setup messages between client and server */
 	public static final String GAMESETUP_ERROR = "gamesetup-error";						// sent to the user to indicate that its message was wrong
 	public static final String GAMESETUP_IN_PLACE = "gamesetup-player-positions";		// sent to the server to indicate the position chosen by the player for its workers
