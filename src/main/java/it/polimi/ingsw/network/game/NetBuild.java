@@ -69,7 +69,7 @@ public class NetBuild implements Serializable {
 	}
 
 	public boolean isWellFormed() {
-		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID > 0 && level >= 1 && level <= 3) {
+		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID != 0 && level >= 0 && level <= 2) {
 			if (other != null) {
 				return other.isWellFormed();
 			} else {

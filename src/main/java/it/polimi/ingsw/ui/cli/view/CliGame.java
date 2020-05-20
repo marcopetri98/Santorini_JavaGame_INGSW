@@ -264,7 +264,7 @@ public class CliGame {
 								// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
 								// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
 								if (command.getNumParameters() == 5 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
-									if (Integer.parseInt(command.getParameter(2)) > 0 && Integer.parseInt(command.getParameter(2)) <= 3 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 && 0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4) {
+									if (Integer.parseInt(command.getParameter(2)) >= 0 && Integer.parseInt(command.getParameter(2)) <= 2 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 && 0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4) {
 										if(command.getParameter(1).equals("dome")){
 											if(command.getParameter(0).equals("worker1")){
 												selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
@@ -592,9 +592,9 @@ public class CliGame {
 				break;
 
 			case Constants.GENERAL_PHASE_UPDATE:
-				if (phase.getGamePhase() == GamePhase.BUILD) {
+				/*if (phase.getGamePhase() == GamePhase.BUILD) {
 					activePlayer = players.get(players.indexOf(activePlayer) == players.size() - 1 ? 0 : players.indexOf(activePlayer) + 1);
-				}
+				}*/
 				phase.advance();
 				printInitialPhase();
 				code = Constants.GENERAL_PHASE_UPDATE;

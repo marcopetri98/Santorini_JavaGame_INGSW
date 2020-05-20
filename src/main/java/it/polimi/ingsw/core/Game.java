@@ -263,8 +263,7 @@ public class Game extends ObservableGame {
 			computeMoves(getPlayerTurn().getWorker1(),true);
 			computeMoves(getPlayerTurn().getWorker2(),true);
 		} else {
-			computeBuilds(getPlayerTurn().getWorker1());
-			computeBuilds(getPlayerTurn().getWorker2());
+			computeBuilds(getPlayerTurn().getActiveWorker());
 		}
 		notifyPossibleActions(playerPossibleMoves,playerPossibleBuilds);
 		return true;

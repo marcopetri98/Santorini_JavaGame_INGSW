@@ -40,7 +40,7 @@ public class NetMove implements Serializable {
 	}
 
 	public boolean isWellFormed() {
-		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID > 0) {
+		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID != 0) {
 			if (other != null) {
 				return other.isWellFormed();
 			} else {
