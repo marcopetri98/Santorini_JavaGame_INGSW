@@ -5,6 +5,7 @@ import it.polimi.ingsw.network.objects.NetObject;
 import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Constants;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -15,7 +16,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -28,6 +31,12 @@ public class NicknameServerAddressSceneController implements SceneController {
 	private ImageView button_next;
 	@FXML
 	private ImageView button_exit;
+	@FXML
+	private ImageView icon_error;
+	@FXML
+	private ImageView icon_errorFatalBG;
+	@FXML
+	private ImageView icon_errorFatal;
 
 	private Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
 	private Image buttonNext = new Image("/img/home_next_btn.png");
@@ -40,6 +49,12 @@ public class NicknameServerAddressSceneController implements SceneController {
 	private Scene nextScene;
 	private Scene creatorScene;
 	private Stage currentStage;
+	private Image errorNickname = new Image("/img/error_invalidNickname.png");
+	private Image errorIP = new Image("/img/error_invalidIP.png");
+	private Image errorSupportIp = new Image("/img/error_connectIP.png");
+	private Image errorWait = new Image("/img/error_wait.png");
+	private Image errorFatalBG = new Image("/img/errorFatal_background.png");
+	private Image errorFatal = new Image("/img/error_fatal.png");
 
 	// triggers for server messages
 	private boolean messageCanBeSent = true;
@@ -50,7 +65,63 @@ public class NicknameServerAddressSceneController implements SceneController {
 	public void initialize() {
 		MainGuiController.getInstance().setSceneController(this);
 		gameState = MainGuiController.getInstance().getGameState();
+		icon_error.setImage(null);
+		icon_errorFatal.setImage(null);
+		icon_errorFatalBG.setImage(null);
+		icon_errorFatalBG.setDisable(true);
+		icon_errorFatal.setDisable(true);
 	}
+
+	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
+		imageView.setImage(image);
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
+
+	private void fadeImage(ImageView imageView, Image image){
+		imageView.setImage(image);
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
+		ft.setFromValue(0);
+		ft.setToValue(1);
+		ft.setCycleCount(1);
+		ft.play();
+	}
+
+	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+
+		return transition;
+	}
+
+	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
+		imageView.setImage(image);
+
+		Line line1 = new Line();
+		Line line2 = new Line();
+		Line line3 = new Line();
+		Line line4 = new Line();
+
+		SequentialTransition sequential = new SequentialTransition(setLine(imageView, line1, x1_1, y1_1, x2_1, y2_1, duration1), setLine(imageView, line2, x1_2, y1_2, x2_2, y2_2, duration2), setLine(imageView, line3, x1_3, y1_3, x2_3, y2_3, duration3), setLine(imageView, line4, x1_4, y1_4, x2_4, y2_4, duration4));
+		sequential.play();
+	}
+
 
 	/* **********************************************
 	 *												*
@@ -115,18 +186,22 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 * 												*
 	 ************************************************/
 	public void nicknameError() {
-		// TODO: draw the error in the function (invalid nickname)
+		icon_errorFatal.setDisable(false);
+		moveImage(icon_error, errorNickname, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		messageCanBeSent = true;
 	}
 	public void serverAddressError(int i) {
+		icon_errorFatal.setDisable(false);
 		if (i == 0) {
-			// TODO: server inserted isn't an ip, show this
+			moveImage(icon_error, errorIP, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		} else if (i == 1) {
-			// TODO: server inserted doesn't support this game, show this
+			moveImage(icon_error, errorSupportIp, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		}
 	}
 	public void waitError() {
-		// TODO: say the user to wait (user has clicked again on next before an arrive of a response from server)
+		icon_errorFatalBG.setDisable(false);
+		icon_errorFatal.setDisable(false);
+		moveImage(icon_error, errorWait, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 	}
 
 
@@ -137,7 +212,8 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: what to do here?
+		fadeImage(icon_errorFatalBG, errorFatalBG);
+		slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {

@@ -46,10 +46,7 @@ public class ChooseColorSceneController implements SceneController {
 	private Image buttonGreen = new Image("/img/color_green_btn.png");
 	private Image buttonBluePressed = new Image("/img/color_btn_blue_pressed.png");
 	private Image buttonBlue = new Image("/img/color_blue_btn.png");
-	// TODO: place the grey image for the button (if not we've not the wanted effect)
-	private Image buttonRedGrey = new Image("/img/color_btn_coral_pressed.png");
-	private Image buttonGreenGrey = new Image("/img/color_btn_green_pressed.png");
-	private Image buttonBlueGrey = new Image("/img/color_btn_blue_pressed.png");
+	private Image buttonColorDisabled = new Image("/img/color_disable.png");
 
 	// objects used to change scene
 	private Parent previousFXML;
@@ -192,13 +189,13 @@ public class ChooseColorSceneController implements SceneController {
 				gameState.setColors(((NetColorPreparation)message).getPlayerColorsMap());
 				for (Color color : gameState.getColors().values()) {
 					if (color.equals(Color.BLUE)) {
-						button_blue.setImage(buttonBlueGrey);
+						button_blue.setImage(buttonColorDisabled);
 						blueLocked = true;
 					} else if (color.equals(Color.RED)) {
-						button_red.setImage(buttonRedGrey);
+						button_red.setImage(buttonColorDisabled);
 						redLocked = true;
 					} else if (color.equals(Color.GREEN)) {
-						button_green.setImage(buttonGreenGrey);
+						button_green.setImage(buttonColorDisabled);
 						greenLocked = true;
 					}
 				}

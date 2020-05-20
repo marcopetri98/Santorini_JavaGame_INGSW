@@ -7,22 +7,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.ChooseNumPlayerSceneController">
    <children>
       <ImageView fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
             <Image url="@../img/choose_numPlayer_background.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="button_2" fitHeight="164.0" fitWidth="279.0" layoutX="290.0" layoutY="270.0" onMousePressed="#mousePressedButton2" onMouseReleased="#mouseReleasedButton2" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/num2_btn.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="button_3" fitHeight="164.0" fitWidth="279.0" layoutX="717.0" layoutY="270.0" onMousePressed="#mousePressedButton3" onMouseReleased="#mouseReleasedButton3" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/num3_btn.png" />
          </image>
       </ImageView>
       <ImageView fx:id="button_next" fitHeight="113.0" fitWidth="179.0" layoutX="550.0" layoutY="498.0" onMousePressed="#mousePressedNext" onMouseReleased="#mouseReleasedNext" pickOnBounds="true" preserveRatio="true">
@@ -33,6 +22,16 @@
       <ImageView fx:id="button_exit" fitHeight="75.0" fitWidth="131.0" layoutX="171.0" layoutY="583.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_2" fitHeight="164.0" fitWidth="279.0" layoutX="290.0" layoutY="270.0" onMousePressed="#mousePressedButton2" onMouseReleased="#mouseReleasedButton2" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/num2_btn.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_3" fitHeight="164.0" fitWidth="279.0" layoutX="717.0" layoutY="270.0" onMousePressed="#mousePressedButton3" onMouseReleased="#mouseReleasedButton3" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/num3_btn.png" />
          </image>
       </ImageView>
    </children>

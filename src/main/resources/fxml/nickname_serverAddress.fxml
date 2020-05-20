@@ -15,6 +15,21 @@
             <Image url="@../img/nickname_address_background.png" />
          </image>
       </ImageView>
+      <ImageView fx:id="icon_error" fitHeight="430.0" fitWidth="395.0" layoutX="884.0" layoutY="252.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/error_invalidNickname.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_errorFatal" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/error_fatal.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_errorFatalBG" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/errorFatal_background.png" />
+         </image>
+      </ImageView>
       <TextField fx:id="textField_nickname" blendMode="MULTIPLY" layoutX="455.0" layoutY="205.0" prefHeight="60.0" prefWidth="406.0" styleClass="textField_nickname" stylesheets="@../css/menu.css">
          <font>
             <Font name="LillyBelle" size="23.0" />
