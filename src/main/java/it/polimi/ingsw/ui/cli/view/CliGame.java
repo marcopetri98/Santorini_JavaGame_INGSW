@@ -349,11 +349,6 @@ public class CliGame {
 					parsePlayerTurn(obj);
 					//messages.remove();
 					break;
-
-				/*default:
-					parseOther(obj);
-					messages.remove();
-					break;*/
 			}
 		}
 
@@ -539,6 +534,7 @@ public class CliGame {
 	}
 	private void parseOther(NetObject obj) {
 		NetGaming ng;
+		NetGameSetup ngs;
 		switch (obj.message) {
 			//GENERAL SIGNALS
 			case Constants.GENERAL_ERROR:
@@ -580,11 +576,19 @@ public class CliGame {
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE:
-				NetGameSetup ngs = (NetGameSetup) obj;
-				System.out.println("The map has changed, take a look:");
-				this.netMap = ngs.gameMap;
-				drawMap();
-				code = Constants.GENERAL_GAMEMAP_UPDATE;
+				if (phase.getPhase() == Phase.SETUP) {
+					ngs = (NetGameSetup) obj;
+					System.out.println("The map has changed, take a look:");
+					this.netMap = ngs.gameMap;
+					drawMap();
+					code = Constants.GENERAL_GAMEMAP_UPDATE;
+				} else if (phase.getPhase() == Phase.PLAYERTURN) {
+					ng = (NetGaming) obj;
+					System.out.println("The map has changed, take a look:");
+					this.netMap = ng.gameMap;
+					drawMap();
+					code = Constants.GENERAL_GAMEMAP_UPDATE;
+				}
 				break;
 
 			case Constants.GENERAL_PHASE_UPDATE:

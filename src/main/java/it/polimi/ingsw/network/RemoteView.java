@@ -383,7 +383,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_PHASE_UPDATE));
 				}
 				case PLAYERTURN, OTHERTURN ->  {
-					clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_PHASE_UPDATE));
+					clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));
 				}
 			}
 		}

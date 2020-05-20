@@ -45,6 +45,8 @@ public class Game extends ObservableGame {
 		activePlayer = players.get(0);
 		winner = null;
 		isFinished = false;
+		playerPossibleMoves = new ArrayList<>();
+		playerPossibleBuilds = new ArrayList<>();
 	}
 
 	/* **********************************************
@@ -179,16 +181,11 @@ public class Game extends ObservableGame {
 				changeActivePlayer();
 			}
 		} else if (turn.getPhase() == Phase.SETUP) {
-			boolean finishedSetup = false;
 			if (players.indexOf(activePlayer) == players.size()-1) {
-				finishedSetup = true;
 				turn.advance();
 				notifyPhaseChange(turn.clone());
 			}
 			changeActivePlayer();
-			if (finishedSetup) {
-				notifyPhaseChange(turn.clone());
-			}
 		} else {
 			// the turn is finished and this if resets the player turn values
 			if (turn.getGamePhase() == GamePhase.BUILD) {
@@ -278,20 +275,28 @@ public class Game extends ObservableGame {
 				playerPossibleMoves.addAll(getPlayerTurn().getCard().checkMove(map,w,turn));
 			} else {
 				if (move) {
-					playerPossibleMoves.addAll(GodCard.standardMoves(map,w,turn));
+					if (GodCard.standardMoves(map,w,turn) != null) {
+						playerPossibleMoves.addAll(GodCard.standardMoves(map,w,turn));
+					}
 				} else {
 					Turn moveTurn = turn.clone();
 					moveTurn.advance();
-					playerPossibleMoves.addAll(GodCard.standardMoves(map,w,moveTurn));
+					if (GodCard.standardMoves(map, w, moveTurn) != null) {
+						playerPossibleMoves.addAll(GodCard.standardMoves(map, w, moveTurn));
+					}
 				}
 			}
 		} catch (NoMoveException e) {
 			if (move) {
-				playerPossibleMoves.addAll(GodCard.standardMoves(map,w,turn));
+				if (GodCard.standardMoves(map,w,turn) != null) {
+					playerPossibleMoves.addAll(GodCard.standardMoves(map,w,turn));
+				}
 			} else {
 				Turn moveTurn = turn.clone();
 				moveTurn.advance();
-				playerPossibleMoves.addAll(GodCard.standardMoves(map,w,moveTurn));
+				if (GodCard.standardMoves(map, w, moveTurn) != null) {
+					playerPossibleMoves.addAll(GodCard.standardMoves(map, w, moveTurn));
+				}
 			}
 		}
 

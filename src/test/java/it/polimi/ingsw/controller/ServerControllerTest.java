@@ -223,6 +223,7 @@ public class ServerControllerTest {
 
 		NetGameSetup gameSetupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Ezio Auditore",new Pair<Integer, Integer>(0,0),new Pair<Integer, Integer>(1,1));
 
+		// TODO: update, the stub does not have compute action method
 		serverController.updatePositions(remoteViewDriver,gameSetupMsg);
 		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
 		assertTrue(setupStub.isPositionWorkersCalled());

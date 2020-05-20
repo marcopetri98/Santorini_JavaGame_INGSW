@@ -109,9 +109,14 @@ public class ServerController implements ObserverController {
 			try {
 				setupController.positionWorkers(netObject);
 				observedModel.changeTurn();
-				observedModel.computeActions();
-				if (observedModel.getPlayerPossibleMoves() == null && observedModel.getPlayerPossibleBuilds() == null) {
-					observedModel.applyDefeat(observedModel.getPlayerTurn());
+				if (observedModel.getPlayers().get(0) == observedModel.getPlayerTurn()) {
+					observedModel.computeActions();
+					if (observedModel.getPlayerPossibleMoves().size() == 0 && observedModel.getPlayerPossibleBuilds().size() == 0) {
+						observedModel.applyDefeat(observedModel.getPlayerTurn());
+					} else if (observedModel.getPlayerPossibleBuilds().size() == 0) {
+						observedModel.changeTurn();
+						observedModel.computeActions();
+					}
 				}
 			} catch (BadRequestException e) {
 				caller.communicateError();
