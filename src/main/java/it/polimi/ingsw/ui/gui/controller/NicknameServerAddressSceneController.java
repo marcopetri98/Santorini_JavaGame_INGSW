@@ -42,18 +42,12 @@ public class NicknameServerAddressSceneController implements SceneController {
 	private Stage currentStage;
 
 	// triggers for server messages
-	private static NicknameServerAddressSceneController currentObject;
 	private boolean messageCanBeSent = true;
 	private boolean connectedToServer = false;
 	private String nameChosen;
 	private GameState gameState;
 
-	public static SceneController getInstance() {
-		return currentObject;
-	}
-
 	public void initialize() {
-		currentObject = this;
 		MainGuiController.getInstance().setSceneController(this);
 		gameState = MainGuiController.getInstance().getGameState();
 	}
@@ -149,22 +143,17 @@ public class NicknameServerAddressSceneController implements SceneController {
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
 			case Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_OUT_CONNFINISH -> {
+				gameState.setPlayerNumber(((NetSetup) message).number);
+				gameState.setPlayer(nameChosen);
 				nextFXML = FXMLLoader.load(getClass().getResource("/fxml/lobby.fxml"));
 				nextScene = new Scene(nextFXML);
-				if (MainGuiController.getInstance().getSceneController() == this) {
-					MainGuiController.getInstance().setSceneController(ChooseNumPlayerSceneController.getInstance());
-				}
-				gameState.setPlayer(nameChosen);
 				currentStage = (Stage) button_exit.getScene().getWindow();
 				currentStage.setScene(nextScene);
 			}
 			case Constants.SETUP_CREATE -> {
+				gameState.setPlayer(nameChosen);
 				creatorFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_numPlayer.fxml"));
 				creatorScene = new Scene(creatorFXML);
-				if (MainGuiController.getInstance().getSceneController() == this) {
-					MainGuiController.getInstance().setSceneController(ChooseNumPlayerSceneController.getInstance());
-				}
-				gameState.setPlayer(nameChosen);
 				currentStage = (Stage) button_exit.getScene().getWindow();
 				currentStage.setScene(creatorScene);
 			}

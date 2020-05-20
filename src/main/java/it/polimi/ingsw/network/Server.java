@@ -3,6 +3,8 @@ package it.polimi.ingsw.network;
 // necessary imports from other packages of the project
 import it.polimi.ingsw.controller.ServerController;
 import it.polimi.ingsw.core.Game;
+import it.polimi.ingsw.network.objects.NetLobbyPreparation;
+import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.MultipleList;
 import it.polimi.ingsw.util.exceptions.AlreadyStartedException;
 import it.polimi.ingsw.util.exceptions.FirstPlayerException;
@@ -11,19 +13,16 @@ import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 /**
  * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby
  */
 public class Server implements Runnable {
-	private final HashMap<ServerClientListenerThread, String> lobbyClients;
+	private final Map<ServerClientListenerThread, String> lobbyClients;
 	private final List<ServerClientListenerThread> preparedListeners;
-	private HashMap<ServerClientListenerThread, String> previousLobby;
+	private Map<ServerClientListenerThread, String> previousLobby;
 	private ServerClientListenerThread creator;
 	boolean starting;
 	private int lobbyDimension;
@@ -31,9 +30,9 @@ public class Server implements Runnable {
 
 	public Server() {
 		lobbyDimension = -1;
-		previousLobby = new HashMap<>();
+		previousLobby = new LinkedHashMap<>();
 		preparedListeners = new ArrayList<>();
-		lobbyClients = new HashMap<>();
+		lobbyClients = new LinkedHashMap<>();
 		creator = null;
 		starting = false;
 	}
@@ -112,6 +111,28 @@ public class Server implements Runnable {
 		}
 	}
 	/**
+	 * This function is intended to update players about the number of players inside the lobby, this is done informing all
+	 */
+	public void updatePlayerInLobby() {
+		synchronized (lobbyClients) {
+			NetLobbyPreparation lobbyInfo = null;
+			String[] playerNames = lobbyClients.values().toArray(new String[1]);
+
+			// builds the object indicating number of players inside the lobby to send to players (in this way the list is in the reverse order)
+			for (int i = 0; i < playerNames.length && playerNames[i] != null; i++) {
+				if (i == 0) {
+					lobbyInfo = new NetLobbyPreparation(Constants.LOBBY_INFO, playerNames[i], playerNames.length-i);
+				} else {
+					lobbyInfo = new NetLobbyPreparation(Constants.LOBBY_INFO, playerNames[i], playerNames.length-i, lobbyInfo);
+				}
+			}
+			// sends to all users inside the lobby a message containing every player inside the lobby
+			for (ServerClientListenerThread handler : lobbyClients.keySet()) {
+				handler.sendMessage(lobbyInfo);
+			}
+		}
+	}
+	/**
 	 * It saves in a list that this handler of a client is now prepared for the game creation
 	 * @param handler an handler of a client that is now prepared
 	 * @throws IllegalCallerException if the handler is not an handler of a player of the game
@@ -156,10 +177,7 @@ public class Server implements Runnable {
 					}
 					throw new AlreadyStartedException();
 				}
-				// TODO: also if dimension is greater than 1 and the lobby is now empty
-				if (lobbyDimension == 1 || lobbyClients.size() == 1) {
-					lobbyDimension = -1;
-				}
+
 				if (creator == handler) {
 					creator = null;
 				}
@@ -171,6 +189,11 @@ public class Server implements Runnable {
 				}
 				lobbyClients.remove(handler);
 				lobbyClients.notifyAll();
+				if (lobbyDimension == 1 || lobbyClients.size() == 0) {
+					lobbyDimension = -1;
+				} else {
+					updatePlayerInLobby();
+				}
 			}
 		}
 	}
@@ -242,6 +265,7 @@ public class Server implements Runnable {
 		synchronized (lobbyClients) {
 			lobbySize = lobbyClients.size();
 		}
+		// it is not needed to synchronize on lobbyClients because add players and remove players cannot execute until create game hasn't finished
 		synchronized (preparedListeners) {
 			while (preparedListeners.size() != lobbySize) {
 				try {

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.network.objects.NetGaming;
 import it.polimi.ingsw.network.objects.NetObject;
 import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
@@ -34,6 +35,8 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	Image button2Pressed = new Image("/img/num2_btn_pressed.png");
 	Image button3 = new Image("/img/num3_btn.png");
 	Image button3Pressed = new Image("/img/num3_btn_pressed.png");
+
+	// objects used to change scene
 	private Parent previousFXML;
 	private Parent nextFXML;
 	private Scene previousScene;
@@ -60,6 +63,7 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+	// FIXME: pressing the button can be collapsed into a unique function
 	public void mousePressedButton2(MouseEvent mouseEvent) {
 		if (button_2.getImage().equals(button2)) {
 			numPlayers = 2;
@@ -136,12 +140,11 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
 			case Constants.SETUP_CREATE_WORKED -> {
+				String[] players = new String[]{gameState.getPlayer()};
+				gameState.setPlayerNumber(((NetSetup) message).number);
+				gameState.setPlayers(players);
 				nextFXML = FXMLLoader.load(getClass().getResource("/fxml/lobby.fxml"));
 				nextScene = new Scene(nextFXML);
-				if (MainGuiController.getInstance().getSceneController() == this) {
-					MainGuiController.getInstance().setSceneController(LobbySceneController.getInstance());
-				}
-				gameState.setPlayerNumber(numPlayers);
 				currentStage = (Stage) button_exit.getScene().getWindow();
 				currentStage.setScene(nextScene);
 			}

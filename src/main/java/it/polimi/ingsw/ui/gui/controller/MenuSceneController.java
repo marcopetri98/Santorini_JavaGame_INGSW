@@ -54,9 +54,6 @@ public class MenuSceneController {
 		nextStage = (Stage) ((Node)mouseEvent.getTarget()).getScene().getWindow();
 		nextFXML = FXMLLoader.load(getClass().getResource("/fxml/nickname_serverAddress.fxml"));
 		nextScene = new Scene(nextFXML);
-		if (MainGuiController.getInstance().getSceneController() == null) {
-			MainGuiController.getInstance().setSceneController(NicknameServerAddressSceneController.getInstance());
-		}
 		nextStage.setScene(nextScene);
 	}
 

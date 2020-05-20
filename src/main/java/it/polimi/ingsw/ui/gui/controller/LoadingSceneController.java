@@ -45,12 +45,12 @@ public class LoadingSceneController {
 
 	private Image phase(){
 		//TODO:...
-		return loadingGods;
+		return loading;
 	}
 
 	private Image phaseLogo(){
 		//TODO:...
-		return logoGods;
+		return logoLoading;
 	}
 
 	public void mousePressedExit(MouseEvent mouseEvent) {

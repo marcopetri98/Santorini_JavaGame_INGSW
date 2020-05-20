@@ -235,6 +235,7 @@ public class ServerClientListenerThread extends Thread {
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNWORKED, lobbyServer.getLobbyDimension());
 					setGamePhase(NetworkPhase.LOBBY);
 					sendMessage(setupOutput);
+					lobbyServer.updatePlayerInLobby();
 					lobbyServer.isNowPrepared(this);
 				// it says to the client that the game is starting
 				} else {
@@ -242,6 +243,7 @@ public class ServerClientListenerThread extends Thread {
 					setupOutput = new NetSetup(Constants.SETUP_OUT_CONNFINISH, lobbyServer.getLobbyDimension());
 					setGamePhase(NetworkPhase.LOBBY);
 					sendMessage(setupOutput);
+					lobbyServer.updatePlayerInLobby();
 					lobbyServer.isNowPrepared(this);
 				}
 			// if the player is trying to setup the number of player inside the lobby it controls that is can do that
