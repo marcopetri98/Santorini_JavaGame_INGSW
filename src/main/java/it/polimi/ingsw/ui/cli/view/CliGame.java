@@ -263,9 +263,24 @@ public class CliGame {
 							if (command.commandType.equals(Constants.COMMAND_BUILD)) {
 								// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
 								// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
-								if (command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
-									if (0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4) {
-										return true;
+								if (command.getNumParameters() == 5 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
+									if (Integer.parseInt(command.getParameter(2)) > 0 && Integer.parseInt(command.getParameter(2)) <= 3 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 && 0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4) {
+										if(command.getParameter(1).equals("dome")){
+											if(command.getParameter(0).equals("worker1")){
+												selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
+											} else if (command.getParameter(0).equals("worker2")){
+												selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
+											}
+										} else if(command.getParameter(1).equals("building")) {
+											if(command.getParameter(0).equals("worker1")){
+												selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
+											} else if (command.getParameter(0).equals("worker2")){
+												selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
+											}
+										}
+										if(netBuilds.contains(selectedBuild)) {
+											return true;
+										}
 									}
 								}
 							}
@@ -277,7 +292,14 @@ public class CliGame {
 							if (command.commandType.equals(Constants.COMMAND_MOVE)) {
 								if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
 									if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
-										return true;
+										if(command.getParameter(0).equals("worker1")){
+											selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+										} else if (command.getParameter(0).equals("worker2")){
+											selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+										}
+										if(netMoves.contains(selectedMove)) {
+											return true;
+										}
 									}
 								}
 							}

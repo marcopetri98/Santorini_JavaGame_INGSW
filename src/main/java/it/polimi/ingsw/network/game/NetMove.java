@@ -50,4 +50,18 @@ public class NetMove implements Serializable {
 			return false;
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj instanceof NetMove){
+			NetMove m = (NetMove) obj;
+			if (this.workerID == m.workerID && this.cellX == m.cellX && this.cellY == m.cellY && ((this.other == null && m.other == null) || (this.other != null && m.other != null && this.other.equals(m.other)))) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
 }
