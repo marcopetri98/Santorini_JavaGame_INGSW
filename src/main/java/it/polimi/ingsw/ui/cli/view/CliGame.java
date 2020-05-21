@@ -395,7 +395,10 @@ public class CliGame {
 			}
 
 			case Constants.COLOR_CHOICES -> {
-				playerColors.put(ncp.player, ncp.color);
+				while(ncp != null) {
+					playerColors.put(ncp.player, ncp.color);
+					ncp = ncp.next;
+				}
 			}
 
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
