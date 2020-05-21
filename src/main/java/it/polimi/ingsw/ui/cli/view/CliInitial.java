@@ -308,16 +308,16 @@ public class CliInitial {
 		switch (i) {
 			case 1 -> {
 				System.out.print("\n\n");
-				System.out.print("\t\t--------------------------------------------------------------------------\n" +
-						 		 "\t\t|                                                                        |\n" +
-								 "\t\t|      _____          __  __ ______   _      ____  ____  ______     __   |\n" +
-								 "\t\t|     / ____|   /\\   |  \\/  |  ____| | |    / __ \\|  _ \\|  _ \\ \\   / /   |\n" +
-								 "\t\t|    | |  __   /  \\  | \\  / | |__    | |   | |  | | |_) | |_) \\ \\_/ /    |\n" +
-								 "\t\t|    | | |_ | / /\\ \\ | |\\/| |  __|   | |   | |  | |  _ <|  _ < \\   /     |\n" +
-								 "\t\t|    | |__| |/ ____ \\| |  | | |____  | |___| |__| | |_) | |_) | | |      |\n" +
-								 "\t\t|     \\_____/_/    \\_\\_|  |_|______| |______\\____/|____/|____/  |_|      |\n" +
-								 "\t\t|                                                                        |\n" +
-								 "\t\t--------------------------------------------------------------------------\n\n\n");
+				System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t---------------------------------------------------------------------------\n" +
+						 		 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|                                                                         |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|      _____          __  __ ______   _      ____  ____  ______     __    |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|     / ____|   /\\   |  \\/  |  ____| | |    / __ \\|  _ \\|  _ \\ \\   / /    |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    | |  __   /  \\  | \\  / | |__    | |   | |  | | |_) | |_) \\ \\_/ /     |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    | | |_ | / /\\ \\ | |\\/| |  __|   | |   | |  | |  _ <|  _ < \\   /      |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    | |__| |/ ____ \\| |  | | |____  | |___| |__| | |_) | |_) | | |       |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|     \\_____/_/    \\_\\_|  |_|______| |______\\____/|____/|____/  |_|       |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|                                                                         |\n" +
+								 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t---------------------------------------------------------------------------\n\n\n");
 			}
 		}
 	}
@@ -330,7 +330,8 @@ public class CliInitial {
 		}
 	}
 	private void printLobbyQuestion() {
-		System.out.print("If you want you can type disconnect and quit this lobby, if not you can wait the start (do not type nothing if you want to wait): ");
+		System.out.println("You can type \"disconnect\" at any time to quit the game. Otherwise wait for the start. You can also type \"help\" in-game, to visualize the italian version of the guide");
+		System.out.print("Waiting for other players to join...\n\n");
 	}
 	/**
 	 *

@@ -109,7 +109,7 @@ public final class Constants {
 	public static final String RESET = "\u001B[0m";
 	public static final String FG_RED = "\u001B[31m";
 	public static final String FG_GREEN = "\u001B[32m";
-	public static final String FG_BLU = "\u001B[34m";
+	public static final String FG_BLUE = "\u001B[34m";
 	public static final String BG_GREEN = "\u001B[42m";
 	public static final String BG_CYAN = "\u001B[46m";
 

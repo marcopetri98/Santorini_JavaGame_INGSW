@@ -87,9 +87,9 @@ public class CliGame {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
 				//typeInputPrint();
-				System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
+				//System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
 				currentCommand = cliInput.getInput();
-				if (parseSyntax(currentCommand)) {	//Con gods apollo artemis ->restituisce false!!!!!!!!!
+				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
 					if (selectedMove != null) {
 						inputController.getCommand(currentCommand,phase.clone(),selectedMove);
@@ -159,7 +159,7 @@ public class CliGame {
 		player = name;
 	}
 	public void addToQueue(NetObject message) {
-		System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
+		//System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -181,7 +181,13 @@ public class CliGame {
 
 	private boolean parseSyntax(Command command) {
 		if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
+			functioning = false;
 			return true;
+		}
+
+		if(command.commandType.toUpperCase().equals("HELP")){
+			printGuide();
+			return false;
 		}
 
 		if (player.equals(activePlayer)) {
@@ -189,7 +195,9 @@ public class CliGame {
 				//syntax: color colorname
 				case COLORS -> {
 					if (command.commandType.equals(Constants.COMMAND_COLOR_CHOICE) && command.getNumParameters() == 1 && Constants.COMMAND_COLOR_COLORS.contains(command.getParameter(0).toUpperCase())) {
-						return true;
+						if(!playerColors.containsValue(new Color(command.getParameter(0)))){
+							return true;
+						}
 					}
 					return false;
 				}
@@ -197,7 +205,7 @@ public class CliGame {
 				//syntax: gods god1 god2 god3 OR god mygod
 				case GODS -> {
 					if (phase.getGodsPhase().equals(GodsPhase.CHALLENGER_CHOICE) && challenger) {
-						if (command.commandType.equals(Constants.COMMAND_GODS_CHOICES) && (command.getNumParameters() == 2 || command.getNumParameters() == 3)) {
+						if (command.commandType.equals(Constants.COMMAND_GODS_CHOICES) && command.getNumParameters() == players.size()) {
 							int j = 0;
 							if(command.getNumParameters() == 3) {
 								for (int x = 0; x < 3; x++) {
@@ -220,7 +228,9 @@ public class CliGame {
 					} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE) || phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
 						// TODO: implement the state of gods chosen locally
 						if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
-							return true;
+							if(gods.contains(command.getParameter(0).toUpperCase()) && !chosenGods.containsValue(command.getParameter(0).toUpperCase())) {
+								return true;
+							}
 						} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
 							return true;
 						}
@@ -233,15 +243,26 @@ public class CliGame {
 					if (command.commandType.equals(Constants.COMMAND_GAMESETUP_POSITION) && command.getNumParameters() == 6 && command.getParameter(0).equals("worker1") && command.getParameter(3).equals("worker2")) {
 						for (int i = 1; i < 6; i++) {
 							if (i != 3) {
-								if (Integer.parseInt(command.getParameter(i)) < 0 || Integer.parseInt(command.getParameter(i)) > 4) {
+								try{
+									if (Integer.parseInt(command.getParameter(i)) < 0 || Integer.parseInt(command.getParameter(i)) > 4) {
+										return false;
+									}
+								} catch (NumberFormatException nfe) {
+									System.out.println("You didn't insert a correct number");
 									return false;
 								}
 							}
 						}
 						if(netMap != null){
-							if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
+							try {
+								if (netMap.getCell(Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2))).worker != null || netMap.getCell(Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(5))).worker != null) {
+									return false;
+								}
+							} catch (NumberFormatException nfe) {
+								nfe.printStackTrace();
 								return false;
 							}
+
 						}
 						return true;
 					}
@@ -256,24 +277,30 @@ public class CliGame {
 								// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
 								// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
 								if (command.getNumParameters() == 5 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
-									if (Integer.parseInt(command.getParameter(2)) >= 0 && Integer.parseInt(command.getParameter(2)) <= 2 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 && 0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4) {
-										if(command.getParameter(1).equals("dome")){
-											if(command.getParameter(0).equals("worker1")){
-												selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
-											} else if (command.getParameter(0).equals("worker2")){
-												selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
+									try {
+										if (Integer.parseInt(command.getParameter(2)) >= 0 && Integer.parseInt(command.getParameter(2)) <= 2 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 && 0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4) {
+											if(command.getParameter(1).equals("dome")){
+												if(command.getParameter(0).equals("worker1")){
+													selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
+												} else if (command.getParameter(0).equals("worker2")){
+													selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
+												}
+											} else if(command.getParameter(1).equals("building")) {
+												if(command.getParameter(0).equals("worker1")){
+													selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
+												} else if (command.getParameter(0).equals("worker2")){
+													selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
+												}
 											}
-										} else if(command.getParameter(1).equals("building")) {
-											if(command.getParameter(0).equals("worker1")){
-												selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
-											} else if (command.getParameter(0).equals("worker2")){
-												selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
+											if(netBuilds.contains(selectedBuild)) {
+												return true;
 											}
 										}
-										if(netBuilds.contains(selectedBuild)) {
-											return true;
-										}
+									} catch (NumberFormatException nfe) {
+										System.out.println("You didn't insert a correct number");
+										return false;
 									}
+
 								}
 							}
 							return false;
@@ -283,15 +310,20 @@ public class CliGame {
 						case MOVE -> {
 							if (command.commandType.equals(Constants.COMMAND_MOVE)) {
 								if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
-									if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
-										if(command.getParameter(0).equals("worker1")){
-											selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
-										} else if (command.getParameter(0).equals("worker2")){
-											selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+									try {
+										if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+											if(command.getParameter(0).equals("worker1")){
+												selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+											} else if (command.getParameter(0).equals("worker2")){
+												selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+											}
+											if(netMoves.contains(selectedMove)) {
+												return true;
+											}
 										}
-										if(netMoves.contains(selectedMove)) {
-											return true;
-										}
+									} catch (NumberFormatException nfe) {
+										System.out.println("You didn't insert a correct number");
+										return false;
 									}
 								}
 							}
@@ -345,7 +377,7 @@ public class CliGame {
 			//COLORS
 			case Constants.TURN_PLAYERTURN -> {
 				if (ncp.player.equals(player)) {
-					System.out.println("Insert the color you want to use with the following syntax \"color colorName\"");
+					System.out.println("Insert the color you want with the following syntax \"color colorName\"");
 					System.out.print("Choose among: ");
 					if(!playerColors.containsValue(new Color("red")))	System.out.print("red ");
 					if(!playerColors.containsValue(new Color("green")))	System.out.print("green ");
@@ -375,7 +407,7 @@ public class CliGame {
 	}
 	private void parseGods(NetObject obj){
 		NetDivinityChoice ndc = (NetDivinityChoice) obj;
-		switch (obj.message) {
+		switch (ndc.message) {
 			//GODS
 			case Constants.GODS_CHALLENGER -> {
 				if(!player.equals(ndc.player)){	//TODO: challenger player given from server is wrong!!! therefore modify it and this
@@ -412,6 +444,8 @@ public class CliGame {
 										if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
 									}
 									System.out.print("\n");
+								} else {
+									System.out.println("Design error, no gods were found");
 								}
 								System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 								chooseStarter = true;
@@ -430,6 +464,8 @@ public class CliGame {
 								if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
 							}
 							System.out.print("\n");
+						} else {
+							System.out.println("Design error, no gods were found");
 						}
 						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					}
@@ -439,9 +475,8 @@ public class CliGame {
 			}
 
 			case Constants.GODS_GODS -> {
-				ndc = (NetDivinityChoice) obj;
 				gods.addAll(ndc.getDivinities());
-				System.out.println("Just added players' divinities.");
+				//System.out.println("Just added players' divinities.");
 			}
 
 			case Constants.GODS_ERROR -> {
@@ -449,7 +484,10 @@ public class CliGame {
 			}
 
 			case Constants.GODS_CHOICES -> {
-				chosenGods.put(ndc.player, ndc.divinity);
+				while(ndc != null) {
+					chosenGods.put(ndc.player, ndc.divinity);
+					ndc = ndc.next;
+				}
 			}
 
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
@@ -466,10 +504,9 @@ public class CliGame {
 			case Constants.TURN_PLAYERTURN -> {
 				activePlayer = ngs.player;
 				if (activePlayer.equals(player)) {
-					//NetGameSetup ntg = (NetGameSetup) obj;
-					//this.netMap = ntg.gameMap;
+					//drawMap();
 					System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
-					System.out.print("Now place the workers on the map: ");    //check workers are ok in parsesyntax
+					System.out.print("Now place the workers on the map: ");		//check workers are ok in parsesyntax
 				} else {
 					System.out.println("The other player "+activePlayer+" is setting up the workers");
 				}
@@ -501,27 +538,31 @@ public class CliGame {
 				if (activePlayer.equals(player)) {
 					switch (phase.getGamePhase()) {
 						case BEFOREMOVE -> {
-							System.out.println("Now you have to first build a building and then move. Or you can just move. Use this syntax: beforebuild workerX x_coord y_coord, and then: move workerX x_coord y_coord");
-							ng = (NetGaming) obj;
-							netBuilds = ng.availableBuildings.builds;
-							netMoves = ng.availablePositions.moves;
-							drawPossibilities();
-							System.out.print("Now it's your turn: ");
+							if(chosenGods.containsValue("PROMETHEUS")) {
+								if(chosenGods.get(player).equals("PROMETHEUS")) {
+									ng = (NetGaming) obj;
+									netBuilds = ng.availableBuildings.builds;
+									netMoves = ng.availablePositions.moves;
+									drawPossibilities();
+									System.out.println("Now you have to first build a building and then move. Or you can just move. Use the syntax \"build workerX x_coord y_coord\" and then \"move workerX x_coord y_coord\"");
+									System.out.print("Now it's your turn: ");
+								}
+							}
 						}
 						case MOVE -> {
-							System.out.println("Now it's your turn! Move one of your workers. Use this syntax: move workerX x_coord y_coord");
-							System.out.println("Here is the map with the positions where you can move, marked with @:");
 							ng = (NetGaming) obj;
-							netMoves = ng.availablePositions.moves; //TODO: check - as well as case PLAYER_BUILD
+							netMoves = ng.availablePositions.moves;
 							drawPossibilities();
+							System.out.println("Here is the map with the positions where you can move, marked with @");
+							System.out.println("Now it's your turn! Move one of your workers. Use the syntax \"move workerX x_coord y_coord\"");
 							System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
 						}
 						case BUILD -> {
-							System.out.println("Now you have to build a building or a dome near a worker. Use this syntax: build workerX x_coord y_coord or, if you haven't moved any worker yet, the syntax: beforebuild workerX x_coord y_coord");
-							System.out.println("Here is the map with the position where you can build:");
 							ng = (NetGaming) obj;
 							netBuilds = ng.availableBuildings.builds;
 							drawPossibilities();
+							System.out.println("Here is the map with the position where you can build");
+							System.out.println("Now you have to build a building or a dome near the worker. Use the syntax \"build workerX dome/building level x_coord y_coord\"");
 							System.out.print("Now build: ");    //check the build is correct in parsesyntax
 						}
 					}
@@ -564,31 +605,28 @@ public class CliGame {
 				ng = (NetGaming) obj;
 				for (String p : players) {
 					if (ng.player != null && ng.player.equals(p)) {
-						System.out.println(ng.player + " just lost.");
+						System.out.println(ng.player + " just lost");
 						break;
 					}
 				}
-				System.out.println("You lost the game.");
+				System.out.println("You lost the game");
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE:
 				if (phase.getPhase() == Phase.SETUP) {
 					ngs = (NetGameSetup) obj;
-					System.out.println("The map has changed, take a look:");
 					this.netMap = ngs.gameMap;
+					System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The map has just changed, take a look\n");
 					drawMap();
 				} else if (phase.getPhase() == Phase.PLAYERTURN) {
 					ng = (NetGaming) obj;
-					System.out.println("The map has changed, take a look:");
 					this.netMap = ng.gameMap;
+					System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The map has just changed, take a look\n");
 					drawMap();
 				}
 				break;
 
 			case Constants.GENERAL_PHASE_UPDATE:
-				/*if (phase.getGamePhase() == GamePhase.BUILD) {
-					activePlayer = players.get(players.indexOf(activePlayer) == players.size() - 1 ? 0 : players.indexOf(activePlayer) + 1);
-				}*/
 				phase.advance();
 				printInitialPhase();
 				break;
@@ -609,87 +647,106 @@ public class CliGame {
 		switch (phase.getPhase()) {
 			case COLORS -> {
 				System.out.print("\n\n");
-				System.out.print("\t\t----------------------------------------------------------------------------------------------------------\n" +
-						"\t\t|                                                                                                        |\n" +
-						"\t\t|      _____ ____  _      ____  _____     _____ ______ _      ______ _____ _______ _____ ____  _   _     |\n" +
-						"\t\t|     / ____/ __ \\| |    / __ \\|  __ \\   / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |    |\n" +
-						"\t\t|    | |   | |  | | |   | |  | | |__) | | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |    |\n" +
-						"\t\t|    | |   | |  | | |   | |  | |  _  /   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |    |\n" +
-						"\t\t|    | |___| |__| | |___| |__| | | \\ \\   ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |    |\n" +
-						"\t\t|     \\_____\\____/|______\\____/|_|  \\_\\ |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|    |\n" +
-						"\t\t|                                                                                                        |\n" +
-						"\t\t----------------------------------------------------------------------------------------------------------\n\n\n");
+				System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t----------------------------------------------------------------------------------------------------------\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|                                                                                                        |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|      _____ ____  _      ____  _____     _____ ______ _      ______ _____ _______ _____ ____  _   _     |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|     / ____/ __ \\| |    / __ \\|  __ \\   / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |    |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|    | |   | |  | | |   | |  | | |__) | | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |    |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|    | |   | |  | | |   | |  | |  _  /   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |    |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|    | |___| |__| | |___| |__| | | \\ \\   ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |    |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|     \\_____\\____/|______\\____/|_|  \\_\\ |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|    |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t|                                                                                                        |\n" +
+						"\t\t\t\t\t\t\t\t\t\t\t\t----------------------------------------------------------------------------------------------------------\n\n\n");
 			}
 
 			case GODS -> {
 				if(phase.getGodsPhase() == GodsPhase.CHALLENGER_CHOICE){
 					System.out.print("\n\n");
-					System.out.print("\t\t-----------------------------------------------------------------------------------------------------\n" +
-							"\t\t|                                                                                                   |\n" +
-							"\t\t|      _____  ____  _____   _____    _____ ______ _      ______ _____ _______ _____ ____  _   _     |\n" +
-							"\t\t|     / ____|/ __ \\|  __ \\ / ____|  / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |    |\n" +
-							"\t\t|    | |  __| |  | | |  | | (___   | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |    |\n" +
-							"\t\t|    | | |_ | |  | | |  | |\\___ \\   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |    |\n" +
-							"\t\t|    | |__| | |__| | |__| |____) |  ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |    |\n" +
-							"\t\t|     \\_____|\\____/|_____/|_____/  |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|    |\n" +
-							"\t\t|                                                                                                   |\n" +
-							"\t\t-----------------------------------------------------------------------------------------------------\n\n\n");
+					System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t-----------------------------------------------------------------------------------------------------\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|                                                                                                   |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|      _____  ____  _____   _____    _____ ______ _      ______ _____ _______ _____ ____  _   _     |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|     / ____|/ __ \\|  __ \\ / ____|  / ____|  ____| |    |  ____/ ____|__   __|_   _/ __ \\| \\ | |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|    | |  __| |  | | |  | | (___   | (___ | |__  | |    | |__ | |       | |    | || |  | |  \\| |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|    | | |_ | |  | | |  | |\\___ \\   \\___ \\|  __| | |    |  __|| |       | |    | || |  | | . ` |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|    | |__| | |__| | |__| |____) |  ____) | |____| |____| |___| |____   | |   _| || |__| | |\\  |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|     \\_____|\\____/|_____/|_____/  |_____/|______|______|______\\_____|  |_|  |_____\\____/|_| \\_|    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t|                                                                                                   |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t-----------------------------------------------------------------------------------------------------\n\n\n");
+
 				}
 			}
 
 			case SETUP -> {
 				System.out.print("\n\n");
-				System.out.print("\t\t-----------------------------------------------\n" +
-						"\t\t|                                             |\n" +
-						"\t\t|      _____ ______ _______ _    _ _____      |\n" +
-						"\t\t|     / ____|  ____|__   __| |  | |  __ \\     |\n" +
-						"\t\t|    | (___ | |__     | |  | |  | | |__) |    |\n" +
-						"\t\t|     \\___ \\|  __|    | |  | |  | |  ___/     |\n" +
-						"\t\t|     ____) | |____   | |  | |__| | |         |\n" +
-						"\t\t|    |_____/|______|  |_|   \\____/|_|         |\n" +
-						"\t\t|                                             |\n" +
-						"\t\t-----------------------------------------------\n\n\n");
+				System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-----------------------------------------------\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|                                             |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|      _____ ______ _______ _    _ _____      |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|     / ____|  ____|__   __| |  | |  __ \\     |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    | (___ | |__     | |  | |  | | |__) |    |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|     \\___ \\|  __|    | |  | |  | |  ___/     |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|     ____) | |____   | |  | |__| | |         |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    |_____/|______|  |_|   \\____/|_|         |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|                                             |\n"+
+						"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-----------------------------------------------\n\n\n");
 			}
 
 			case PLAYERTURN -> {
 				if(!alreadyPrintedPlay){
 					System.out.print("\n\n");
-					System.out.print("\t\t-----------------------------------------\n" +
-							"\t\t|                                       |\n" +
-							"\t\t|     _____  _           __     ___     |\n" +
-							"\t\t|    |  __ \\| |        /\\\\ \\   / / |    |\n" +
-							"\t\t|    | |__) | |       /  \\\\ \\_/ /| |    |\n" +
-							"\t\t|    |  ___/| |      / /\\ \\\\   / | |    |\n" +
-							"\t\t|    | |    | |____ / ____ \\| |  |_|    |\n" +
-							"\t\t|    |_|    |______/_/    \\_\\_|  (_)    |\n" +
-							"\t\t|                                       |\n" +
-							"\t\t-----------------------------------------\n\n\n");
+					System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-----------------------------------------\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|                                       |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|     _____  _           __     ___     |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    |  __ \\| |        /\\\\ \\   / / |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    | |__) | |       /  \\\\ \\_/ /| |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    |  ___/| |      / /\\ \\\\   / | |    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    | |    | |____ / ____ \\| |  |_|    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|    |_|    |______/_/    \\_\\_|  (_)    |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|                                       |\n"+
+							"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-----------------------------------------\n\n\n");
 					alreadyPrintedPlay = true;
 				}
 			}
 		}
 	}
+
+	private void printGuide() {
+		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t************************* ~ Benvenuto nella guida di Santorini! ~ *************************" + Constants.RESET);
+		System.out.println("Qui ti verrà spiegato come giocare, e quali comandi utilizzare per poterlo fare correttamente.\n");
+		System.out.println("Il gioco è articolato in varie fasi, la prima delle quali consiste nel determinare i colori che vuoi utilizzare. Per fare ciò, il comando è \"color colorName\", in cui colorName può essere un colore a scelta tra red, green e blue.");
+		System.out.println("Nella seconda fase, avviene la scelta delle divinità: innanzitutto il \"challenger\" sceglierà due o tre divinità, a seconda del numero di giocatori, grazie al comando \"gods godName1 godName2 godName3\".\nChiaramente, in un gioco con due player, godName3 non verrà inserito.\n");
+		System.out.println("Successivamente, ogni giocatore provvede a scegliere il dio che vuole utilizzare tra quelli scelti dal challenger.Il comando da utilizzare per fare ciò, quando richiesto dal gioco, è \"god godName\". Ricorda: puoi scegliere solo uno tra gli dei scelti dal challenger!");
+		System.out.println("Ad un giocatore verrà ora chiesto di scegliere chi dovrà iniziare la partita: la scelta può ricadere su qualunque giocatore nel gioco, anche se stessi! Attenzione però: non per forza cominciare per primo rappresenta un vantaggio.");
+		System.out.println("Il comando per scegliere chi dovrà iniziare la partita è \"starter playerName\"\n");
+		System.out.println("La prossima fase è il setup del gioco: bisogna posizionare i worker! Il comando è \"position worker1 x_coord y_coord worker2 x_coord y_coord\". Al posto di x_coord e y_coord metti le coordinate alle quali vuoi posizionare il tuo worker.");
+		System.out.println("Attenzione: non puoi posizionare un worker dove già è presente un altro worker, anche se di un altro giocatore! Presta attenzione alla sintassi, è molto importante.\n");
+		System.out.println("E ora, ha inizio la fase di gioco! Ad ogni turno, sei costretto a muovere un worker e costruire, pena la sconfitta! Per muovere, il comando è \"move workerX x_coord y_coord\": sostituisci a workerX il worker che vuoi muovere.");
+		System.out.println("Per costruire, scrivi \"build workerX dome/building level x_coord y_coord\": scegli se costruire una dome o un building, dopodiché inserisci il livello al quale vuoi costruire (0, 1 ,2) e le coordinate. Ricorda: puoi costruire SOLO con il worker che hai mosso!");
+		System.out.println("Ricorda anche che puoi costruire una dome solo se è già presente un edificio di livello 3, a meno di poteri particolari del tuo dio!");
+		System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************" + Constants.RESET);
+		System.out.println("\n\n");
+	}
+
 	private void printError() {
 		if (player.equals(activePlayer)) {
 			switch (phase.getPhase()) {
-				case COLORS -> System.out.println("You must choose a color that is red, blue or green and that is not taken by another player.");
+				case COLORS -> System.out.println("You must choose a color that is red, blue or green and that is not taken by another player");
 				case GODS -> {
 					if (player.equals(players.get(0))) {
 						switch (phase.getGodsPhase()) {
-							case CHALLENGER_CHOICE -> System.out.println("You must choose "+players.size()+" gods from the previously showed.");
-							case GODS_CHOICE -> System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player.");
-							case STARTER_CHOICE -> System.out.println("You must choose a player that is inside the game.");
+							case CHALLENGER_CHOICE -> System.out.println("You must choose "+players.size()+" gods from the previously showed");
+							case GODS_CHOICE -> System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player");
+							case STARTER_CHOICE -> System.out.println("You must choose a player that is inside the game");
 						}
 					} else {
 						System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player.");
 					}
 				}
-				case SETUP -> System.out.println("You must place the worker in a valid cell.");
+				case SETUP -> System.out.println("You must place the worker in a valid cell, not occupied by other workers");
 				case PLAYERTURN -> {
 					switch (phase.getGamePhase()) {
-						case BEFOREMOVE -> System.out.println("You can build only in the cells showed before.");
-						case MOVE -> System.out.println("You must move in the cells showed before.");
-						case BUILD -> System.out.println("You must build only in one of the cells showed before.");
+						case BEFOREMOVE -> System.out.println("You can build only in the cells showed before");
+						case MOVE -> System.out.println("You must move in the cells showed before");
+						case BUILD -> System.out.println("You must build only in one of the cells showed before");
 					}
 				}
 			}
@@ -764,28 +821,28 @@ public class CliGame {
 		drawMap();
 	}
 	public void drawMap(){
-		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
-		//System.out.println("|" + drawSpaces(0) + "|" + drawSpaces(0) + "|" + drawSpaces(0) + "|" + drawSpaces(0) + "|" + drawSpaces(0) + "|");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,0)) + drawWorker(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawWorker(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawWorker(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawWorker(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawWorker(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,0)) + drawDome(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawDome(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawDome(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawDome(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawDome(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
-		System.out.println("|" + drawSpaces(2, netMap.getCell(0,0)) + drawBuilding(netMap.getCell(0,0)) + drawSpaces(2, netMap.getCell(0,0)) + "|" + drawSpaces(2, netMap.getCell(1,0)) + drawBuilding(netMap.getCell(1,0)) + drawSpaces(2, netMap.getCell(1,0)) + "|" + drawSpaces(2, netMap.getCell(2,0)) + drawBuilding(netMap.getCell(2,0)) + drawSpaces(2, netMap.getCell(2,0)) + "|" + drawSpaces(2, netMap.getCell(3,0)) + drawBuilding(netMap.getCell(3,0)) + drawSpaces(2, netMap.getCell(3,0)) + "|" + drawSpaces(2, netMap.getCell(4,0)) + drawBuilding(netMap.getCell(4,0)) + drawSpaces(2, netMap.getCell(4,0)) + "|");
-		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,1)) + drawWorker(netMap.getCell(0,1)) + drawSpaces(1, netMap.getCell(0,1)) + "|" + drawSpaces(1, netMap.getCell(1,1)) + drawWorker(netMap.getCell(1,1)) + drawSpaces(1, netMap.getCell(1,1)) + "|" + drawSpaces(1, netMap.getCell(2,1)) + drawWorker(netMap.getCell(2,1)) + drawSpaces(1, netMap.getCell(2,1)) + "|" + drawSpaces(1, netMap.getCell(3,1)) + drawWorker(netMap.getCell(3,1)) + drawSpaces(1, netMap.getCell(3,1)) + "|" + drawSpaces(1, netMap.getCell(4,1)) + drawWorker(netMap.getCell(4,1)) + drawSpaces(1, netMap.getCell(4,1)) + "|");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,1)) + drawDome(netMap.getCell(0,1)) + drawSpaces(1, netMap.getCell(0,1)) + "|" + drawSpaces(1, netMap.getCell(1,1)) + drawDome(netMap.getCell(1,1)) + drawSpaces(1, netMap.getCell(1,1)) + "|" + drawSpaces(1, netMap.getCell(2,1)) + drawDome(netMap.getCell(2,1)) + drawSpaces(1, netMap.getCell(2,1)) + "|" + drawSpaces(1, netMap.getCell(3,1)) + drawDome(netMap.getCell(3,1)) + drawSpaces(1, netMap.getCell(3,1)) + "|" + drawSpaces(1, netMap.getCell(4,1)) + drawDome(netMap.getCell(4,1)) + drawSpaces(1, netMap.getCell(4,1)) + "|");
-		System.out.println("|" + drawSpaces(2, netMap.getCell(0,1)) + drawBuilding(netMap.getCell(0,1)) + drawSpaces(2, netMap.getCell(0,1)) + "|" + drawSpaces(2, netMap.getCell(1,1)) + drawBuilding(netMap.getCell(1,1)) + drawSpaces(2, netMap.getCell(1,1)) + "|" + drawSpaces(2, netMap.getCell(2,1)) + drawBuilding(netMap.getCell(2,1)) + drawSpaces(2, netMap.getCell(2,1)) + "|" + drawSpaces(2, netMap.getCell(3,1)) + drawBuilding(netMap.getCell(3,1)) + drawSpaces(2, netMap.getCell(3,1)) + "|" + drawSpaces(2, netMap.getCell(4,1)) + drawBuilding(netMap.getCell(4,1)) + drawSpaces(2, netMap.getCell(4,1)) + "|");
-		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,2)) + drawWorker(netMap.getCell(0,2)) + drawSpaces(1, netMap.getCell(0,2)) + "|" + drawSpaces(1, netMap.getCell(1,2)) + drawWorker(netMap.getCell(1,2)) + drawSpaces(1, netMap.getCell(1,2)) + "|" + drawSpaces(1, netMap.getCell(2,2)) + drawWorker(netMap.getCell(2,2)) + drawSpaces(1, netMap.getCell(2,2)) + "|" + drawSpaces(1, netMap.getCell(3,2)) + drawWorker(netMap.getCell(3,2)) + drawSpaces(1, netMap.getCell(3,2)) + "|" + drawSpaces(1, netMap.getCell(4,2)) + drawWorker(netMap.getCell(4,2)) + drawSpaces(1, netMap.getCell(4,2)) + "|");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,2)) + drawDome(netMap.getCell(0,2)) + drawSpaces(1, netMap.getCell(0,2)) + "|" + drawSpaces(1, netMap.getCell(1,2)) + drawDome(netMap.getCell(1,2)) + drawSpaces(1, netMap.getCell(1,2)) + "|" + drawSpaces(1, netMap.getCell(2,2)) + drawDome(netMap.getCell(2,2)) + drawSpaces(1, netMap.getCell(2,2)) + "|" + drawSpaces(1, netMap.getCell(3,2)) + drawDome(netMap.getCell(3,2)) + drawSpaces(1, netMap.getCell(3,2)) + "|" + drawSpaces(1, netMap.getCell(4,2)) + drawDome(netMap.getCell(4,2)) + drawSpaces(1, netMap.getCell(4,2)) + "|");
-		System.out.println("|" + drawSpaces(2, netMap.getCell(0,2)) + drawBuilding(netMap.getCell(0,2)) + drawSpaces(2, netMap.getCell(0,2)) + "|" + drawSpaces(2, netMap.getCell(1,2)) + drawBuilding(netMap.getCell(1,2)) + drawSpaces(2, netMap.getCell(1,2)) + "|" + drawSpaces(2, netMap.getCell(2,2)) + drawBuilding(netMap.getCell(2,2)) + drawSpaces(2, netMap.getCell(2,2)) + "|" + drawSpaces(2, netMap.getCell(3,2)) + drawBuilding(netMap.getCell(3,2)) + drawSpaces(2, netMap.getCell(3,2)) + "|" + drawSpaces(2, netMap.getCell(4,2)) + drawBuilding(netMap.getCell(4,2)) + drawSpaces(2, netMap.getCell(4,2)) + "|");
-		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,3)) + drawWorker(netMap.getCell(0,3)) + drawSpaces(1, netMap.getCell(0,3)) + "|" + drawSpaces(1, netMap.getCell(1,3)) + drawWorker(netMap.getCell(1,3)) + drawSpaces(1, netMap.getCell(1,3)) + "|" + drawSpaces(1, netMap.getCell(2,3)) + drawWorker(netMap.getCell(2,3)) + drawSpaces(1, netMap.getCell(2,3)) + "|" + drawSpaces(1, netMap.getCell(3,3)) + drawWorker(netMap.getCell(3,3)) + drawSpaces(1, netMap.getCell(3,3)) + "|" + drawSpaces(1, netMap.getCell(4,3)) + drawWorker(netMap.getCell(4,3)) + drawSpaces(1, netMap.getCell(4,3)) + "|");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,3)) + drawDome(netMap.getCell(0,3)) + drawSpaces(1, netMap.getCell(0,3)) + "|" + drawSpaces(1, netMap.getCell(1,3)) + drawDome(netMap.getCell(1,3)) + drawSpaces(1, netMap.getCell(1,3)) + "|" + drawSpaces(1, netMap.getCell(2,3)) + drawDome(netMap.getCell(2,3)) + drawSpaces(1, netMap.getCell(2,3)) + "|" + drawSpaces(1, netMap.getCell(3,3)) + drawDome(netMap.getCell(3,3)) + drawSpaces(1, netMap.getCell(3,3)) + "|" + drawSpaces(1, netMap.getCell(4,3)) + drawDome(netMap.getCell(4,3)) + drawSpaces(1, netMap.getCell(4,3)) + "|");
-		System.out.println("|" + drawSpaces(2, netMap.getCell(0,3)) + drawBuilding(netMap.getCell(0,3)) + drawSpaces(2, netMap.getCell(0,3)) + "|" + drawSpaces(2, netMap.getCell(1,3)) + drawBuilding(netMap.getCell(1,3)) + drawSpaces(2, netMap.getCell(1,3)) + "|" + drawSpaces(2, netMap.getCell(2,3)) + drawBuilding(netMap.getCell(2,3)) + drawSpaces(2, netMap.getCell(2,3)) + "|" + drawSpaces(2, netMap.getCell(3,3)) + drawBuilding(netMap.getCell(3,3)) + drawSpaces(2, netMap.getCell(3,3)) + "|" + drawSpaces(2, netMap.getCell(4,3)) + drawBuilding(netMap.getCell(4,3)) + drawSpaces(2, netMap.getCell(4,3)) + "|");
-		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,4)) + drawWorker(netMap.getCell(0,4)) + drawSpaces(1, netMap.getCell(0,4)) + "|" + drawSpaces(1, netMap.getCell(1,4)) + drawWorker(netMap.getCell(1,4)) + drawSpaces(1, netMap.getCell(1,4)) + "|" + drawSpaces(1, netMap.getCell(2,4)) + drawWorker(netMap.getCell(2,4)) + drawSpaces(1, netMap.getCell(2,4)) + "|" + drawSpaces(1, netMap.getCell(3,4)) + drawWorker(netMap.getCell(3,4)) + drawSpaces(1, netMap.getCell(3,4)) + "|" + drawSpaces(1, netMap.getCell(4,4)) + drawWorker(netMap.getCell(4,4)) + drawSpaces(1, netMap.getCell(4,4)) + "|");
-		System.out.println("|" + drawSpaces(1, netMap.getCell(0,4)) + drawDome(netMap.getCell(0,4)) + drawSpaces(1, netMap.getCell(0,4)) + "|" + drawSpaces(1, netMap.getCell(1,4)) + drawDome(netMap.getCell(1,4)) + drawSpaces(1, netMap.getCell(1,4)) + "|" + drawSpaces(1, netMap.getCell(2,4)) + drawDome(netMap.getCell(2,4)) + drawSpaces(1, netMap.getCell(2,4)) + "|" + drawSpaces(1, netMap.getCell(3,4)) + drawDome(netMap.getCell(3,4)) + drawSpaces(1, netMap.getCell(3,4)) + "|" + drawSpaces(1, netMap.getCell(4,4)) + drawDome(netMap.getCell(4,4)) + drawSpaces(1, netMap.getCell(4,4)) + "|");
-		System.out.println("|" + drawSpaces(2, netMap.getCell(0,4)) + drawBuilding(netMap.getCell(0,4)) + drawSpaces(2, netMap.getCell(0,4)) + "|" + drawSpaces(2, netMap.getCell(1,4)) + drawBuilding(netMap.getCell(1,4)) + drawSpaces(2, netMap.getCell(1,4)) + "|" + drawSpaces(2, netMap.getCell(2,4)) + drawBuilding(netMap.getCell(2,4)) + drawSpaces(2, netMap.getCell(2,4)) + "|" + drawSpaces(2, netMap.getCell(3,4)) + drawBuilding(netMap.getCell(3,4)) + drawSpaces(2, netMap.getCell(3,4)) + "|" + drawSpaces(2, netMap.getCell(4,4)) + drawBuilding(netMap.getCell(4,4)) + drawSpaces(2, netMap.getCell(4,4)) + "|");
-		System.out.println("+-------------+-------------+-------------+-------------+-------------+");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "       0      |      1      |      2      |      3      |      4       ");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "+-------------+-------------+-------------+-------------+-------------+");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,0)) + drawWorker(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawWorker(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawWorker(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawWorker(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawWorker(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0\t" + "|" + drawSpaces(1, netMap.getCell(0,0)) + drawDome(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawDome(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawDome(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawDome(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawDome(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(2, netMap.getCell(0,0)) + drawBuilding(netMap.getCell(0,0)) + drawSpaces(2, netMap.getCell(0,0)) + "|" + drawSpaces(2, netMap.getCell(1,0)) + drawBuilding(netMap.getCell(1,0)) + drawSpaces(2, netMap.getCell(1,0)) + "|" + drawSpaces(2, netMap.getCell(2,0)) + drawBuilding(netMap.getCell(2,0)) + drawSpaces(2, netMap.getCell(2,0)) + "|" + drawSpaces(2, netMap.getCell(3,0)) + drawBuilding(netMap.getCell(3,0)) + drawSpaces(2, netMap.getCell(3,0)) + "|" + drawSpaces(2, netMap.getCell(4,0)) + drawBuilding(netMap.getCell(4,0)) + drawSpaces(2, netMap.getCell(4,0)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-\t" + "+-------------+-------------+-------------+-------------+-------------+");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,1)) + drawWorker(netMap.getCell(0,1)) + drawSpaces(1, netMap.getCell(0,1)) + "|" + drawSpaces(1, netMap.getCell(1,1)) + drawWorker(netMap.getCell(1,1)) + drawSpaces(1, netMap.getCell(1,1)) + "|" + drawSpaces(1, netMap.getCell(2,1)) + drawWorker(netMap.getCell(2,1)) + drawSpaces(1, netMap.getCell(2,1)) + "|" + drawSpaces(1, netMap.getCell(3,1)) + drawWorker(netMap.getCell(3,1)) + drawSpaces(1, netMap.getCell(3,1)) + "|" + drawSpaces(1, netMap.getCell(4,1)) + drawWorker(netMap.getCell(4,1)) + drawSpaces(1, netMap.getCell(4,1)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t1\t" + "|" + drawSpaces(1, netMap.getCell(0,1)) + drawDome(netMap.getCell(0,1)) + drawSpaces(1, netMap.getCell(0,1)) + "|" + drawSpaces(1, netMap.getCell(1,1)) + drawDome(netMap.getCell(1,1)) + drawSpaces(1, netMap.getCell(1,1)) + "|" + drawSpaces(1, netMap.getCell(2,1)) + drawDome(netMap.getCell(2,1)) + drawSpaces(1, netMap.getCell(2,1)) + "|" + drawSpaces(1, netMap.getCell(3,1)) + drawDome(netMap.getCell(3,1)) + drawSpaces(1, netMap.getCell(3,1)) + "|" + drawSpaces(1, netMap.getCell(4,1)) + drawDome(netMap.getCell(4,1)) + drawSpaces(1, netMap.getCell(4,1)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(2, netMap.getCell(0,1)) + drawBuilding(netMap.getCell(0,1)) + drawSpaces(2, netMap.getCell(0,1)) + "|" + drawSpaces(2, netMap.getCell(1,1)) + drawBuilding(netMap.getCell(1,1)) + drawSpaces(2, netMap.getCell(1,1)) + "|" + drawSpaces(2, netMap.getCell(2,1)) + drawBuilding(netMap.getCell(2,1)) + drawSpaces(2, netMap.getCell(2,1)) + "|" + drawSpaces(2, netMap.getCell(3,1)) + drawBuilding(netMap.getCell(3,1)) + drawSpaces(2, netMap.getCell(3,1)) + "|" + drawSpaces(2, netMap.getCell(4,1)) + drawBuilding(netMap.getCell(4,1)) + drawSpaces(2, netMap.getCell(4,1)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-\t" + "+-------------+-------------+-------------+-------------+-------------+");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,2)) + drawWorker(netMap.getCell(0,2)) + drawSpaces(1, netMap.getCell(0,2)) + "|" + drawSpaces(1, netMap.getCell(1,2)) + drawWorker(netMap.getCell(1,2)) + drawSpaces(1, netMap.getCell(1,2)) + "|" + drawSpaces(1, netMap.getCell(2,2)) + drawWorker(netMap.getCell(2,2)) + drawSpaces(1, netMap.getCell(2,2)) + "|" + drawSpaces(1, netMap.getCell(3,2)) + drawWorker(netMap.getCell(3,2)) + drawSpaces(1, netMap.getCell(3,2)) + "|" + drawSpaces(1, netMap.getCell(4,2)) + drawWorker(netMap.getCell(4,2)) + drawSpaces(1, netMap.getCell(4,2)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t2\t" + "|" + drawSpaces(1, netMap.getCell(0,2)) + drawDome(netMap.getCell(0,2)) + drawSpaces(1, netMap.getCell(0,2)) + "|" + drawSpaces(1, netMap.getCell(1,2)) + drawDome(netMap.getCell(1,2)) + drawSpaces(1, netMap.getCell(1,2)) + "|" + drawSpaces(1, netMap.getCell(2,2)) + drawDome(netMap.getCell(2,2)) + drawSpaces(1, netMap.getCell(2,2)) + "|" + drawSpaces(1, netMap.getCell(3,2)) + drawDome(netMap.getCell(3,2)) + drawSpaces(1, netMap.getCell(3,2)) + "|" + drawSpaces(1, netMap.getCell(4,2)) + drawDome(netMap.getCell(4,2)) + drawSpaces(1, netMap.getCell(4,2)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(2, netMap.getCell(0,2)) + drawBuilding(netMap.getCell(0,2)) + drawSpaces(2, netMap.getCell(0,2)) + "|" + drawSpaces(2, netMap.getCell(1,2)) + drawBuilding(netMap.getCell(1,2)) + drawSpaces(2, netMap.getCell(1,2)) + "|" + drawSpaces(2, netMap.getCell(2,2)) + drawBuilding(netMap.getCell(2,2)) + drawSpaces(2, netMap.getCell(2,2)) + "|" + drawSpaces(2, netMap.getCell(3,2)) + drawBuilding(netMap.getCell(3,2)) + drawSpaces(2, netMap.getCell(3,2)) + "|" + drawSpaces(2, netMap.getCell(4,2)) + drawBuilding(netMap.getCell(4,2)) + drawSpaces(2, netMap.getCell(4,2)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-\t" + "+-------------+-------------+-------------+-------------+-------------+");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,3)) + drawWorker(netMap.getCell(0,3)) + drawSpaces(1, netMap.getCell(0,3)) + "|" + drawSpaces(1, netMap.getCell(1,3)) + drawWorker(netMap.getCell(1,3)) + drawSpaces(1, netMap.getCell(1,3)) + "|" + drawSpaces(1, netMap.getCell(2,3)) + drawWorker(netMap.getCell(2,3)) + drawSpaces(1, netMap.getCell(2,3)) + "|" + drawSpaces(1, netMap.getCell(3,3)) + drawWorker(netMap.getCell(3,3)) + drawSpaces(1, netMap.getCell(3,3)) + "|" + drawSpaces(1, netMap.getCell(4,3)) + drawWorker(netMap.getCell(4,3)) + drawSpaces(1, netMap.getCell(4,3)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3\t" + "|" + drawSpaces(1, netMap.getCell(0,3)) + drawDome(netMap.getCell(0,3)) + drawSpaces(1, netMap.getCell(0,3)) + "|" + drawSpaces(1, netMap.getCell(1,3)) + drawDome(netMap.getCell(1,3)) + drawSpaces(1, netMap.getCell(1,3)) + "|" + drawSpaces(1, netMap.getCell(2,3)) + drawDome(netMap.getCell(2,3)) + drawSpaces(1, netMap.getCell(2,3)) + "|" + drawSpaces(1, netMap.getCell(3,3)) + drawDome(netMap.getCell(3,3)) + drawSpaces(1, netMap.getCell(3,3)) + "|" + drawSpaces(1, netMap.getCell(4,3)) + drawDome(netMap.getCell(4,3)) + drawSpaces(1, netMap.getCell(4,3)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(2, netMap.getCell(0,3)) + drawBuilding(netMap.getCell(0,3)) + drawSpaces(2, netMap.getCell(0,3)) + "|" + drawSpaces(2, netMap.getCell(1,3)) + drawBuilding(netMap.getCell(1,3)) + drawSpaces(2, netMap.getCell(1,3)) + "|" + drawSpaces(2, netMap.getCell(2,3)) + drawBuilding(netMap.getCell(2,3)) + drawSpaces(2, netMap.getCell(2,3)) + "|" + drawSpaces(2, netMap.getCell(3,3)) + drawBuilding(netMap.getCell(3,3)) + drawSpaces(2, netMap.getCell(3,3)) + "|" + drawSpaces(2, netMap.getCell(4,3)) + drawBuilding(netMap.getCell(4,3)) + drawSpaces(2, netMap.getCell(4,3)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-\t" + "+-------------+-------------+-------------+-------------+-------------+");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,4)) + drawWorker(netMap.getCell(0,4)) + drawSpaces(1, netMap.getCell(0,4)) + "|" + drawSpaces(1, netMap.getCell(1,4)) + drawWorker(netMap.getCell(1,4)) + drawSpaces(1, netMap.getCell(1,4)) + "|" + drawSpaces(1, netMap.getCell(2,4)) + drawWorker(netMap.getCell(2,4)) + drawSpaces(1, netMap.getCell(2,4)) + "|" + drawSpaces(1, netMap.getCell(3,4)) + drawWorker(netMap.getCell(3,4)) + drawSpaces(1, netMap.getCell(3,4)) + "|" + drawSpaces(1, netMap.getCell(4,4)) + drawWorker(netMap.getCell(4,4)) + drawSpaces(1, netMap.getCell(4,4)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4\t" + "|" + drawSpaces(1, netMap.getCell(0,4)) + drawDome(netMap.getCell(0,4)) + drawSpaces(1, netMap.getCell(0,4)) + "|" + drawSpaces(1, netMap.getCell(1,4)) + drawDome(netMap.getCell(1,4)) + drawSpaces(1, netMap.getCell(1,4)) + "|" + drawSpaces(1, netMap.getCell(2,4)) + drawDome(netMap.getCell(2,4)) + drawSpaces(1, netMap.getCell(2,4)) + "|" + drawSpaces(1, netMap.getCell(3,4)) + drawDome(netMap.getCell(3,4)) + drawSpaces(1, netMap.getCell(3,4)) + "|" + drawSpaces(1, netMap.getCell(4,4)) + drawDome(netMap.getCell(4,4)) + drawSpaces(1, netMap.getCell(4,4)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(2, netMap.getCell(0,4)) + drawBuilding(netMap.getCell(0,4)) + drawSpaces(2, netMap.getCell(0,4)) + "|" + drawSpaces(2, netMap.getCell(1,4)) + drawBuilding(netMap.getCell(1,4)) + drawSpaces(2, netMap.getCell(1,4)) + "|" + drawSpaces(2, netMap.getCell(2,4)) + drawBuilding(netMap.getCell(2,4)) + drawSpaces(2, netMap.getCell(2,4)) + "|" + drawSpaces(2, netMap.getCell(3,4)) + drawBuilding(netMap.getCell(3,4)) + drawSpaces(2, netMap.getCell(3,4)) + "|" + drawSpaces(2, netMap.getCell(4,4)) + drawBuilding(netMap.getCell(4,4)) + drawSpaces(2, netMap.getCell(4,4)) + "|");
+		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "+-------------+-------------+-------------+-------------+-------------+");
 
 		writeAllInfo();
 
@@ -862,11 +919,19 @@ public class CliGame {
 		}
 		return "ERROR";
 	}
-	public char drawWorker(NetCell netC){
+	public String drawWorker(NetCell netC){
 		if(netC.worker != null){
-			return 'W';
+			if(playerColors.get(netC.worker.owner).equals(new Color("red"))) {
+				return Constants.FG_RED + "W" + Constants.RESET;
+			} else if(playerColors.get(netC.worker.owner).equals(new Color("green"))) {
+				return Constants.FG_GREEN + "W" + Constants.RESET;
+			} else if(playerColors.get(netC.worker.owner).equals(new Color("blue"))) {
+				return Constants.FG_BLUE + "W" + Constants.RESET;
+			} else {
+				return "W";
+			}
 		}
-		return ' ';
+		return " ";
 	}
 	public char drawDome(NetCell netC){
 		if (netC.building.dome) {
@@ -892,9 +957,18 @@ public class CliGame {
 			for(int x = 0; x < 5; x++){
 				NetWorker myWorker = netMap.getCell(x,y).worker;
 				if(myWorker != null){
-					System.out.println("Il worker " + myWorker.workerID + " del player " + myWorker.owner + " è in posizione:  x = " + x + "; y = " + y + ".");
+					System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "Il ");
+					if(myWorker.workerID == myWorker.owner.hashCode() + 1) {
+						System.out.print("worker1");
+					} else if(myWorker.workerID == myWorker.owner.hashCode() + 2) {
+						System.out.print("worker2");
+					} else {
+						System.out.print(myWorker.workerID);
+					}
+					System.out.print(" di " + myWorker.owner + " è in posizione:  x = " + x + "; y = " + y + ".");
 				}
 			}
+			System.out.print("\n");
 		}
 	}
 }
