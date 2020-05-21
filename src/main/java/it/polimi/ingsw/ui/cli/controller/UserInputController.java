@@ -154,7 +154,7 @@ public class UserInputController {
 	public void getCommand(Command command, Turn turn, NetBuild build) throws IllegalStateException, IllegalArgumentException {
 		if (!command.commandType.equals(Constants.COMMAND_BUILD)) {
 			throw new IllegalArgumentException();
-		} else if (turn.getPhase() != Phase.PLAYERTURN || turn.getGamePhase() != GamePhase.BUILD) {
+		} else if (turn.getPhase() != Phase.PLAYERTURN || (turn.getPhase() == Phase.PLAYERTURN && turn.getGamePhase() == GamePhase.MOVE)) {
 			throw new IllegalStateException();
 		} else if (command.getNumParameters() != 5 || build == null) {
 			throw new IllegalArgumentException();
