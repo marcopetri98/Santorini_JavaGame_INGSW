@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.gui.viewModel;
 
+import it.polimi.ingsw.core.Player;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
@@ -19,6 +20,7 @@ public class GameState {
 	private String activePlayer;
 	private int playerNumber;
 	private List<String> players;
+	private List<String> godsName;
 	private Map<String,String> gods;
 	private Map<String,Color> colors;
 	private Turn turn;
@@ -58,6 +60,9 @@ public class GameState {
 	}
 	public List<String> getPlayers() {
 		return new ArrayList<>(players);
+	}
+	public List<String> getGodsName() {
+		return new ArrayList<>(godsName);
 	}
 	public Map<String, String> getGods() {
 		return new LinkedHashMap<>(gods);
@@ -128,6 +133,49 @@ public class GameState {
 			}
 		}
 		players = new ArrayList<>(Arrays.asList(names));
+	}
+	public void setStarter(String starter) throws IllegalArgumentException {
+		if (starter == null || !players.contains(starter)) {
+			throw new IllegalArgumentException();
+		}
+		if (players.indexOf(starter) != 0) {
+			List<String> temp = new ArrayList<>();
+			for (int i = players.indexOf(starter); i < players.size(); i++) {
+				temp.add(players.get(i));
+			}
+			for (int i = 0; i < players.indexOf(starter); i++) {
+				temp.add(players.get(i));
+			}
+			players = temp;
+		}
+	}
+	public void setGodsName(String[] names) throws IllegalArgumentException {
+		if (names == null) {
+			throw new IllegalArgumentException();
+		} else {
+			for (int i = 0; i < names.length; i++) {
+				for (int j = i+1; j < names.length; j++) {
+					if (names[i].equals(names[j])) {
+						throw new IllegalArgumentException();
+					}
+				}
+			}
+		}
+		godsName = new ArrayList<>(Arrays.asList(names));
+	}
+	public void setGodsName(List<String> names) throws IllegalArgumentException {
+		if (names == null) {
+			throw new IllegalArgumentException();
+		} else {
+			for (int i = 0; i < names.size(); i++) {
+				for (int j = i+1; j < names.size(); j++) {
+					if (names.get(i).equals(names.get(j))) {
+						throw new IllegalArgumentException();
+					}
+				}
+			}
+		}
+		godsName = new ArrayList<>(names);
 	}
 	public void setGods(Map<String,String> mapping) throws IllegalArgumentException {
 		if (mapping == null) {

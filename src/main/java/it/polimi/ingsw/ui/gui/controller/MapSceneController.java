@@ -2,11 +2,14 @@ package it.polimi.ingsw.ui.gui.controller;
 
 import it.polimi.ingsw.network.objects.NetObject;
 import it.polimi.ingsw.network.objects.NetSetup;
+import it.polimi.ingsw.ui.gui.viewModel.GameState;
+import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
 import javafx.animation.PathTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -128,8 +131,6 @@ public class MapSceneController implements SceneController {
 	private boolean pressedWorker1 = false;     //??????????
 	private boolean pressedWorker2 = false;  //??????????
 
-	private String namePlayer = "sdfhjsjdflksdflksdf"; //max19
-
 	Image boxWorkers = new Image("/img/map/box_workers.png");
 	Image boxBuild = new Image("/img/map/box_build.png");
 	Image columnRight = new Image("/img/map/column_right.png");
@@ -178,14 +179,24 @@ public class MapSceneController implements SceneController {
 
 	ImageView workerSelected = null;
 
+	// objects used to change scene
+	private Parent previousFXML;
+	private Parent nextFXML;
+	private Scene previousScene;
+	private Scene nextScene;
+	private Stage currentStage;
+
+	// triggers for server messages
+	private GameState gameState;
 
 	public void initialize() {
-		// MainGuiController.getInstance().getGameState().getColors().get(MainGuiController.getInstance().getGameState().getPlayer());
+		MainGuiController.getInstance().getGameState().getColors().get(MainGuiController.getInstance().getGameState().getPlayer());
+		gameState = MainGuiController.getInstance().getGameState();
+
 		description_god.setImage(null);
 		initializeCells();
 		initializeAnimations();
-		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
-		text_player.setText(setNamePlayer());
+		setActivePlayer();
 		button_build.setDisable(true);
 		button_dome.setDisable(true);
 	}
@@ -235,23 +246,58 @@ public class MapSceneController implements SceneController {
 		cell_44.setImage(blank);
 	}
 
-	// TODO: methods to be deleted
-	private String setNamePlayer() {
-		//TODO:...
-		return namePlayer;
+	// initialize method
+	public Image colorPlayer() {
+		if (gameState.getColors().get(gameState.getPlayer()).equals(Color.BLUE)) {
+			return workerBlue;
+		} else if (gameState.getColors().get(gameState.getPlayer()).equals(Color.GREEN)) {
+			return workerRed;
+		} else {
+			return workerGreen;
+		}
 	}
-	public Image colorPlayer(/*...*/) {
-		//TODO:
-		//like: if(players.color == red) then return the image of the red worker, obviously
-		return workerBlue;
-	}
+	// active player information data
 	public Image godPlayer() {
-		//TODO: same logic as colorPlayer...
-		return new Image("/img/gods/card_apollo.png");
+		if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.APOLLO)) {
+			return new Image("/img/gods/card_apollo.png");
+		}else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.ARTEMIS)) {
+			return new Image("/img/gods/card_artemis.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.ATHENA)) {
+			return new Image("/img/gods/card_athena.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.ATLAS)) {
+			return new Image("/img/gods/card_atlas.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.DEMETER)) {
+			return new Image("/img/gods/card_demeter.png");
+		}  else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.HEPHAESTUS)) {
+			return new Image("/img/gods/card_hephaestus.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.MINOTAUR)) {
+			return new Image("/img/gods/card_minotaur.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.PAN)) {
+			return new Image("/img/gods/card_pan.png");
+		} else {
+			return new Image("/img/gods/card_prometheus.png");
+		}
 	}
 	public Image descriptionGodCard() {
-		//TODO:....
-		return new Image("/img/gods/description_apollo.png");
+		if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.APOLLO)) {
+			return new Image("/img/gods/description_apollo.png");
+		}else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.ARTEMIS)) {
+			return new Image("/img/gods/description_artemis.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.ATHENA)) {
+			return new Image("/img/gods/description_athena.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.ATLAS)) {
+			return new Image("/img/gods/description_atlas.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.DEMETER)) {
+			return new Image("/img/gods/description_demeter.png");
+		}  else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.HEPHAESTUS)) {
+			return new Image("/img/gods/description_hephaestus.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.MINOTAUR)) {
+			return new Image("/img/gods/description_minotaur.png");
+		} else if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.PAN)) {
+			return new Image("/img/gods/description_pan.png");
+		} else {
+			return new Image("/img/gods/description_prometheus.png");
+		}
 	}
 
 	/* **********************************************
@@ -272,11 +318,20 @@ public class MapSceneController implements SceneController {
 			pressedIconExit = false;
 		}
 	}
-	public void mousePressedExit(MouseEvent mouseEvent) {
+	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
+		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
+		previousScene = new Scene(previousFXML);
 	}
-	public void MouseReleasedExit(MouseEvent mouseEvent) {
+	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
+
+		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		MainGuiController.getInstance().sendMessage(netSetup);
+		MainGuiController.getInstance().refresh();
+		MainGuiController.getInstance().setSceneController(null);
+		currentStage = (Stage) button_exit.getScene().getWindow();
+		currentStage.setScene(previousScene);
 	}
 	public void mousePressedBuild(MouseEvent mouseEvent) {
 		if (!pressedButtonBuild) {
@@ -325,7 +380,6 @@ public class MapSceneController implements SceneController {
 			placeWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
 		}
 	}
-
 	public void mousePressedCell(MouseEvent mouseEvent) {
 		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
 		if(colorPlayer().equals(workerRed)){
@@ -637,6 +691,10 @@ public class MapSceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
+	private void setActivePlayer() {
+		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+		text_player.setText(gameState.getActivePlayer());
+	}
 
 	/* **********************************************
 	 *												*

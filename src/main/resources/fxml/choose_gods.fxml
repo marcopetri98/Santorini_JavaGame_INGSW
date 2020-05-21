@@ -15,21 +15,6 @@
             <Image url="@../img/choose_god_background.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="card_1" fitHeight="168.0" fitWidth="126.0" layoutX="433.0" layoutY="302.0" onMouseEntered="#mouseEnteredCard1" onMouseExited="#mouseExitedCard1" onMousePressed="#mousePressedCard1" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/gods/card_minotaur.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="card_3" fitHeight="168.0" fitWidth="126.0" layoutX="578.0" layoutY="302.0" onMouseEntered="#mouseEnteredCard3" onMouseExited="#mouseExitedCard3" onMousePressed="#mousePressedCard3" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/gods/card_pan.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="card_2" fitHeight="168.0" fitWidth="135.0" layoutX="723.0" layoutY="302.0" onMouseEntered="#mouseEnteredCard2" onMouseExited="#mouseExitedCard2" onMousePressed="#mousePressedCard2" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/gods/card_prometheus.png" />
-         </image>
-      </ImageView>
       <ImageView fx:id="button_exit" fitHeight="74.0" fitWidth="181.0" layoutX="174.0" layoutY="584.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/home_exit_btn.png" />
@@ -45,6 +30,25 @@
             <Image url="@../img/gods/description_apollo.png" />
          </image>
       </ImageView>
+      <HBox fx:id="god_cards_list" alignment="CENTER" layoutX="324.0" layoutY="285.0" prefHeight="205.0" prefWidth="647.0">
+         <children>
+            <ImageView fx:id="card_1" fitHeight="168.0" fitWidth="126.0" onMouseEntered="#mouseEnteredCard" onMouseExited="#mouseExitedCard" onMousePressed="#mousePressedCard" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/gods/card_minotaur.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="card_3" fitHeight="168.0" fitWidth="126.0" onMouseEntered="#mouseEnteredCard" onMouseExited="#mouseExitedCard" onMousePressed="#mousePressedCard" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/gods/card_pan.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="card_2" fitHeight="168.0" fitWidth="135.0" onMouseEntered="#mouseEnteredCard" onMouseExited="#mouseExitedCard" onMousePressed="#mousePressedCard" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/gods/card_prometheus.png" />
+               </image>
+            </ImageView>
+         </children>
+      </HBox>
       <Text fx:id="text_player" layoutX="478.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="339.826171875">
          <font>
             <Font size="30.0" />

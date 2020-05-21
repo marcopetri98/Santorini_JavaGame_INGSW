@@ -41,7 +41,7 @@
             <Image url="@../img/map/box_exit.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_exit" fitHeight="48.0" fitWidth="96.0" layoutX="1074.0" layoutY="11.0" onMousePressed="#mousePressedExit" onMouseReleased="#MouseReleasedExit" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_exit" fitHeight="48.0" fitWidth="96.0" layoutX="1074.0" layoutY="11.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/home_exit_btn.png" />
          </image>

@@ -337,7 +337,7 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
 			case Constants.GODS_GODS -> {
-				gameState.setGods(((NetDivinityChoice)message).getPlayerGodMap());
+				gameState.setGodsName(((NetDivinityChoice)message).getDivinities());
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {
 				gameState.advancePhase();

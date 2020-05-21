@@ -214,6 +214,7 @@ public class ServerClientListenerThread extends Thread {
 	 * @param setupMessage the message sent by the client
 	 * @throws AssertionError if this object has passed wrong parameters to the server functions
 	 */
+	// TODO: control that every msg.player is not null and all null pointers
 	private void parseSetupInput(NetSetup setupMessage) {
 		NetSetup setupOutput;
 		String nameReceived;

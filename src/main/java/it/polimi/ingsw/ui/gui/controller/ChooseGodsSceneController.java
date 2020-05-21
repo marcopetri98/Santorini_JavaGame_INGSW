@@ -1,35 +1,46 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.network.objects.NetDivinityChoice;
+import it.polimi.ingsw.network.objects.NetObject;
+import it.polimi.ingsw.network.objects.NetSetup;
+import it.polimi.ingsw.ui.gui.viewModel.GameState;
+import it.polimi.ingsw.util.Color;
+import it.polimi.ingsw.util.Constants;
 import javafx.animation.PathTransition;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class ChooseGodsSceneController {
+import java.io.IOException;
 
+public class ChooseGodsSceneController implements SceneController {
 	@FXML
 	private ImageView button_exit;
-
 	@FXML
 	private ImageView card_3;
-
 	@FXML
 	private ImageView description;
-
 	@FXML
 	private ImageView card_1;
-
 	@FXML
 	private ImageView button_next;
-
 	@FXML
 	private ImageView card_2;
-
+	@FXML
+	private HBox god_cards_list;
 	@FXML
 	private Text text_player;
 
@@ -66,31 +77,194 @@ public class ChooseGodsSceneController {
 	Image buttonExitPressed = new Image("/img/home_exit_btn_pressed.png");
 	Image buttonExit = new Image("/img/home_exit_btn.png");
 
-	private int numPlayer = 2; //TODO:.........
-	private String namePlayer = "sdfhjsjdflksdflksdf"; //only as example. //max 21
+	// objects used to change scene
+	private Parent previousFXML;
+	private Parent nextFXML;
+	private Scene previousScene;
+	private Scene nextScene;
+	private Stage currentStage;
+	private String godName = null;
 
+	// triggers for server messages
+	private GameState gameState;
 	private boolean pressed = false;
 
 
 	public void initialize(){
+		MainGuiController.getInstance().setSceneController(this);
+		gameState = MainGuiController.getInstance().getGameState();
+
 		description.setImage(null);
+		setChoosingPlayer();
 		parsingPlayersCard();
-		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
-		text_player.setText(namePlayer);
 	}
 
-	public void parsingPlayersCard(){
-		//TODO...If a card received is equals cardApollo, then card1.setImage(cardApollo)... example
-		card_1.setImage(cardApollo);
-		card_2.setImage(cardArtemis);
-		card_3.setImage(cardAtlas);
+	public void parsingPlayersCard() {
+		setGodImage(card_1,gameState.getGodsName().get(0));
+		setGodImage(card_2,gameState.getGodsName().get(1));
+		if (gameState.getPlayers().size() == 3) {
+			setGodImage(card_3,gameState.getGodsName().get(2));
+		} else {
+			god_cards_list.getChildren().remove(card_3);
+		}
 	}
 
-	private String setNamePlayer() {
-		//TODO:...
-		return namePlayer;
-	}
+	/* **********************************************
+	 *												*
+	 *			HANDLERS OF USER INTERACTION		*
+	 * 												*
+	 ************************************************/
+	public void mouseEnteredCard(MouseEvent mouseEvent) {
+		ImageView entered = (ImageView) mouseEvent.getTarget();
 
+		if (entered.equals(card_1)) {
+			mouseEnterCard(description, parsingCard(card_1));
+		} else if (entered.equals(card_2)) {
+			mouseEnterCard(description, parsingCard(card_2));
+		} else if (entered.equals(card_3)) {
+			mouseEnterCard(description, parsingCard(card_3));
+		}
+	}
+	public void mouseExitedCard(MouseEvent mouseEvent) {
+		mouseExitCard(description);
+	}
+	public void mousePressedCard(MouseEvent mouseEvent) {
+		ImageView card = (ImageView) mouseEvent.getTarget();
+		if (!pressed) {
+			if (card.getImage().equals(cardApollo)) {
+				card.setImage(cardApolloPressed);
+				godName = Constants.APOLLO;
+				pressed = true;
+			} else if (card.getImage().equals(cardArtemis)) {
+				card.setImage(cardArtemisPressed);
+				godName = Constants.ARTEMIS;
+				pressed = true;
+			} else if (card.getImage().equals(cardAthena)) {
+				card.setImage(cardAthenaPressed);
+				godName = Constants.ATHENA;
+				pressed = true;
+			} else if (card.getImage().equals(cardAtlas)) {
+				card.setImage(cardAtlasPressed);
+				godName = Constants.ATLAS;
+				pressed = true;
+			} else if (card.getImage().equals(cardDemeter)) {
+				card.setImage(cardDemeterPressed);
+				godName = Constants.DEMETER;
+				pressed = true;
+			} else if (card.getImage().equals(cardHephaestus)) {
+				card.setImage(cardHephaestusPressed);
+				godName = Constants.HEPHAESTUS;
+				pressed = true;
+			} else if (card.getImage().equals(cardMinotaur)) {
+				card.setImage(cardMinotaurPressed);
+				godName = Constants.MINOTAUR;
+				pressed = true;
+			} else if (card.getImage().equals(cardPan)) {
+				card.setImage(cardPanPressed);
+				godName = Constants.PAN;
+				pressed = true;
+			} else if (card.getImage().equals(cardPrometheus)) {
+				card.setImage(cardPrometheusPressed);
+				godName = Constants.PROMETHEUS;
+				pressed = true;
+			}
+		} else {
+			if (card.getImage().equals(cardApolloPressed)) {
+				card.setImage(cardApollo);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardArtemisPressed)) {
+				card.setImage(cardArtemis);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardAthenaPressed)) {
+				card.setImage(cardAthena);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardAtlasPressed)) {
+				card.setImage(cardAtlas);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardDemeterPressed)) {
+				card.setImage(cardDemeter);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardHephaestusPressed)) {
+				card.setImage(cardHephaestus);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardMinotaurPressed)) {
+				card.setImage(cardMinotaur);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardPanPressed)) {
+				card.setImage(cardPan);
+				godName = null;
+				pressed = false;
+			} else if (card.getImage().equals(cardPrometheusPressed)) {
+				card.setImage(cardPrometheus);
+				godName = null;
+				pressed = false;
+			}
+		}
+	}
+	public void mousePressedNext(MouseEvent mouseEvent) {
+		button_next.setImage(buttonNextPressed);
+	}
+	public void mouseReleasedNext(MouseEvent mouseEvent) {
+		button_next.setImage(buttonNext);
+
+		if (godName == null) {
+			wrongSelectOfGod();
+		} else {
+			// the user selected a god, so the request of the selection is sent to the server
+			((ImageView)mouseEvent.getTarget()).getScene().setCursor(Cursor.WAIT);
+			NetDivinityChoice godMessage = new NetDivinityChoice(Constants.GODS_IN_CHOICE,gameState.getPlayer(),godName,false);
+			MainGuiController.getInstance().sendMessage(godMessage);
+		}
+	}
+	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
+		button_exit.setImage(buttonExitPressed);
+		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
+		previousScene = new Scene(previousFXML);
+	}
+	public void mouseReleasedExit(MouseEvent mouseEvent) {
+		button_exit.setImage(buttonExit);
+
+		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		MainGuiController.getInstance().sendMessage(netSetup);
+		MainGuiController.getInstance().refresh();
+		MainGuiController.getInstance().setSceneController(null);
+		currentStage = (Stage) button_exit.getScene().getWindow();
+		currentStage.setScene(previousScene);
+	}
+	private void mouseEnterCard(ImageView imageView, Image image){
+		imageView.setImage(image);
+		Line line = new Line();
+		line.setStartX(182);
+		line.setStartY(500);
+		line.setEndX(182);
+		line.setEndY(174);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(450));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
+	private void mouseExitCard(ImageView imageView){
+		Line line = new Line();
+		line.setStartX(182);
+		line.setStartY(174);
+		line.setEndX(182);
+		line.setEndY(500);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(450));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
 	/**
 	 * parsing the card I entered with mouseEvent
 	 * @param card the card I entered in
@@ -118,151 +292,93 @@ public class ChooseGodsSceneController {
 		}
 		return null;
 	}
-
-	private void pressingCard(MouseEvent mouseEvent) {
-		ImageView card = (ImageView) mouseEvent.getTarget();
-		if (!pressed) {
-			if (card.getImage().equals(cardApollo)) {
-				card.setImage(cardApolloPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardArtemis)) {
-				card.setImage(cardArtemisPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardAthena)) {
-				card.setImage(cardAthenaPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardAtlas)) {
-				card.setImage(cardAtlasPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardDemeter)) {
-				card.setImage(cardDemeterPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardHephaestus)) {
-				card.setImage(cardHephaestusPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardMinotaur)) {
-				card.setImage(cardMinotaurPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardPan)) {
-				card.setImage(cardPanPressed);
-				pressed = true;
-			} else if (card.getImage().equals(cardPrometheus)) {
-				card.setImage(cardPrometheusPressed);
-				pressed = true;
-			}
-		} else {
-			if (card.getImage().equals(cardApolloPressed)) {
-				card.setImage(cardApollo);
-				pressed = false;
-			} else if (card.getImage().equals(cardArtemisPressed)) {
-				card.setImage(cardArtemis);
-				pressed = false;
-			} else if (card.getImage().equals(cardAthenaPressed)) {
-				card.setImage(cardAthena);
-				pressed = false;
-			} else if (card.getImage().equals(cardAtlasPressed)) {
-				card.setImage(cardAtlas);
-				pressed = false;
-			} else if (card.getImage().equals(cardDemeterPressed)) {
-				card.setImage(cardDemeter);
-				pressed = false;
-			} else if (card.getImage().equals(cardHephaestusPressed)) {
-				card.setImage(cardHephaestus);
-				pressed = false;
-			} else if (card.getImage().equals(cardMinotaurPressed)) {
-				card.setImage(cardMinotaur);
-				pressed = false;
-			} else if (card.getImage().equals(cardPanPressed)) {
-				card.setImage(cardPan);
-				pressed = false;
-			} else if (card.getImage().equals(cardPrometheusPressed)) {
-				card.setImage(cardPrometheus);
-				pressed = false;
-			}
+	private void setGodImage(ImageView card, String godName) {
+		if (godName.equals(Constants.APOLLO)) {
+			card.setImage(cardApollo);
+		}else if (godName.equals(Constants.ARTEMIS)) {
+			card.setImage(cardArtemis);
+		} else if (godName.equals(Constants.ATHENA)) {
+			card.setImage(cardAthena);
+		} else if (godName.equals(Constants.ATLAS)) {
+			card.setImage(cardAtlas);
+		} else if (godName.equals(Constants.DEMETER)) {
+			card.setImage(cardDemeter);
+		}  else if (godName.equals(Constants.HEPHAESTUS)) {
+			card.setImage(cardHephaestus);
+		} else if (godName.equals(Constants.MINOTAUR)) {
+			card.setImage(cardMinotaur);
+		} else if (godName.equals(Constants.PAN)) {
+			card.setImage(cardPan);
+		} else if (godName.equals(Constants.PROMETHEUS)) {
+			card.setImage(cardPrometheus);
 		}
 	}
 
-	private void mouseEnterCard(ImageView imageView, Image image){
-		imageView.setImage(image);
-		Line line = new Line();
-		line.setStartX(182);
-		line.setStartY(500);
-		line.setEndX(182);
-		line.setEndY(174);
-		PathTransition transition = new PathTransition();
-		transition.setNode(imageView);
-		transition.setDuration(Duration.millis(450));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
+	/* **********************************************
+	 *												*
+	 *		EVENTS AFTER SERVER MESSAGE				*
+	 * 												*
+	 ************************************************/
+	public void wrongSelectOfGod() {
+		// TODO: say to the user that he has not selected a god
+	}
+	public void setChoosingPlayer() {
+		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
+		text_player.setText(gameState.getActivePlayer());
+	}
+	public void disableGod(String name) {
+		/* TODO: set the god card specified with the name as disable
+		*   tip1: using gameState.getPlayerNumber() you can find number of player -> how many cards you need to explore */
 	}
 
-	private void mouseExitCard(ImageView imageView){
-		Line line = new Line();
-		line.setStartX(182);
-		line.setStartY(174);
-		line.setEndX(182);
-		line.setEndY(500);
-		PathTransition transition = new PathTransition();
-		transition.setNode(imageView);
-		transition.setDuration(Duration.millis(450));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
+	/* **********************************************
+	 *												*
+	 *		METHODS CALLED BY MAIN CONTROLLER		*
+	 * 												*
+	 ************************************************/
+	@Override
+	public void fatalError() {
+		// TODO: server has crashed, show it to the client
 	}
+	@Override
+	public void deposeMessage(NetObject message) throws IOException {
+		switch (message.message) {
+			case Constants.GODS_CHOICES -> {
+				button_exit.getScene().setCursor(Cursor.DEFAULT);
+				gameState.setGods(((NetDivinityChoice)message).getPlayerGodMap());
+				for (String god : gameState.getGods().values()) {
+					if (god.equals(godName)) {
+						godName = null;
+						pressed = false;
+					}
+					disableGod(god);
+				}
+			}
+			case Constants.GENERAL_PHASE_UPDATE -> {
+				gameState.advancePhase();
+			}
+			case Constants.TURN_PLAYERTURN -> {
+				gameState.setActivePlayer(((NetDivinityChoice)message).getPlayer());
 
-
-	public void mouseEnteredCard1(MouseEvent mouseEvent) {
-		mouseEnterCard(description, parsingCard(card_1));
+				// if all players have selected the god they must change window
+				if (gameState.getGods().size() == gameState.getPlayerNumber()) {
+					// if the player is now the active player he is the challenger, he must choose the starter, the others must go in wait for it
+					if (gameState.getPlayer().equals(gameState.getActivePlayer())) {
+						nextFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_starter.fxml"));
+						nextScene = new Scene(nextFXML);
+						currentStage = (Stage) button_next.getScene().getWindow();
+						currentStage.setScene(nextScene);
+					} else {
+						nextFXML = FXMLLoader.load(getClass().getResource("/fxml/loading.fxml"));
+						nextScene = new Scene(nextFXML);
+						currentStage = (Stage) button_next.getScene().getWindow();
+						currentStage.setScene(nextScene);
+					}
+				}
+			}
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
+				// TODO: implement the disconnection shutdown after someone quit the game
+			}
+		}
 	}
-
-	public void mouseExitedCard1(MouseEvent mouseEvent) {
-		mouseExitCard(description);
-	}
-
-	public void mouseEnteredCard2(MouseEvent mouseEvent) {
-		mouseEnterCard(description, parsingCard(card_2));
-	}
-
-	public void mouseExitedCard2(MouseEvent mouseEvent) {
-		mouseExitCard(description);
-	}
-
-	public void mouseEnteredCard3(MouseEvent mouseEvent) {
-		mouseEnterCard(description, parsingCard(card_3));
-	}
-
-	public void mouseExitedCard3(MouseEvent mouseEvent) {
-		mouseExitCard(description);
-	}
-
-	public void mousePressedCard1(MouseEvent mouseEvent) {
-		pressingCard(mouseEvent);
-	}
-
-	public void mousePressedCard2(MouseEvent mouseEvent) {
-		pressingCard(mouseEvent);
-	}
-
-	public void mousePressedCard3(MouseEvent mouseEvent) {
-		pressingCard(mouseEvent);
-	}
-
-	public void mousePressedNext(MouseEvent mouseEvent) {
-		button_next.setImage(buttonNextPressed);
-	}
-
-	public void mouseReleasedNext(MouseEvent mouseEvent) {
-		button_next.setImage(buttonNext);
-	}
-
-	public void mousePressedExit(MouseEvent mouseEvent) {
-		button_exit.setImage(buttonExitPressed);
-	}
-
-	public void mouseReleasedExit(MouseEvent mouseEvent) {
-		button_exit.setImage(buttonExit);
-	}
-
-
 }

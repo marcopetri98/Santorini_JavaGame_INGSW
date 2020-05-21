@@ -2,10 +2,7 @@ package it.polimi.ingsw.ui.gui.controller;
 
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
-import it.polimi.ingsw.network.objects.NetColorPreparation;
-import it.polimi.ingsw.network.objects.NetDivinityChoice;
-import it.polimi.ingsw.network.objects.NetObject;
-import it.polimi.ingsw.network.objects.NetSetup;
+import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
@@ -107,18 +104,29 @@ public class LoadingSceneController implements SceneController {
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
+			case Constants.GODS_STARTER -> {
+				gameState.setStarter(((NetDivinityChoice)message).getPlayer());
+			}
 			case Constants.GODS_GODS -> {
-				gameState.setGods(((NetDivinityChoice)message).getPlayerGodMap());
+				gameState.setGodsName(((NetDivinityChoice)message).getDivinities());
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {
 				gameState.advancePhase();
 			}
 			case Constants.TURN_PLAYERTURN -> {
-				gameState.setActivePlayer(((NetDivinityChoice)message).player);
-				nextFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_gods.fxml"));
-				nextScene = new Scene(nextFXML);
-				currentStage = (Stage) button_exit.getScene().getWindow();
-				currentStage.setScene(nextScene);
+				if (gameState.getGods().size() == 0) {
+					gameState.setActivePlayer(((NetDivinityChoice)message).player);
+					nextFXML = FXMLLoader.load(getClass().getResource("/fxml/choose_gods.fxml"));
+					nextScene = new Scene(nextFXML);
+					currentStage = (Stage) button_exit.getScene().getWindow();
+					currentStage.setScene(nextScene);
+				} else {
+					gameState.setActivePlayer(((NetGameSetup)message).player);
+					nextFXML = FXMLLoader.load(getClass().getResource("/fxml/map.fxml"));
+					nextScene = new Scene(nextFXML);
+					currentStage = (Stage) button_exit.getScene().getWindow();
+					currentStage.setScene(nextScene);
+				}
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
 				// TODO: implement the disconnection shutdown after someone quit the game

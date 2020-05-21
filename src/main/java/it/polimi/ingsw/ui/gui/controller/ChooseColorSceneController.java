@@ -186,15 +186,25 @@ public class ChooseColorSceneController implements SceneController {
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
 			case Constants.COLOR_CHOICES -> {
+				button_exit.getScene().setCursor(Cursor.DEFAULT);
 				gameState.setColors(((NetColorPreparation)message).getPlayerColorsMap());
 				for (Color color : gameState.getColors().values()) {
 					if (color.equals(Color.BLUE)) {
+						if (choice != null && choice.equals(Color.BLUE)) {
+							choice = null;
+						}
 						button_blue.setImage(buttonColorDisabled);
 						blueLocked = true;
 					} else if (color.equals(Color.RED)) {
+						if (choice != null && choice.equals(Color.RED)) {
+							choice = null;
+						}
 						button_red.setImage(buttonColorDisabled);
 						redLocked = true;
 					} else if (color.equals(Color.GREEN)) {
+						if (choice != null && choice.equals(Color.GREEN)) {
+							choice = null;
+						}
 						button_green.setImage(buttonColorDisabled);
 						greenLocked = true;
 					}
