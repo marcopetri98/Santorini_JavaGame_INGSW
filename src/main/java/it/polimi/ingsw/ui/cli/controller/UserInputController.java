@@ -156,11 +156,11 @@ public class UserInputController {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.PLAYERTURN || (turn.getPhase() == Phase.PLAYERTURN && turn.getGamePhase() == GamePhase.MOVE)) {
 			throw new IllegalStateException();
-		} else if (command.getNumParameters() != 5 || build == null) {
+		} else if (/*command.getNumParameters() != 5 || */build == null) {
 			throw new IllegalArgumentException();
-		} else if (!Constants.isNumber(command.getParameter(2)) || !Constants.isNumber(command.getParameter(3)) || !Constants.isNumber(command.getParameter(4)) || (!command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME) && !command.getParameter(1).equals(Constants.COMMAND_BUILD_BUILDING))) {
+		} /*else if (!Constants.isNumber(command.getParameter(2)) || !Constants.isNumber(command.getParameter(3)) || !Constants.isNumber(command.getParameter(4)) || (!command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME) && !command.getParameter(1).equals(Constants.COMMAND_BUILD_BUILDING))) {
 			throw new IllegalArgumentException();
-		} else {
+		} */else {
 			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_BUILD,playerName,build));
 		}
 	}

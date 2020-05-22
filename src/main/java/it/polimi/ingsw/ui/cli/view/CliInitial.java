@@ -330,7 +330,7 @@ public class CliInitial {
 		}
 	}
 	private void printLobbyQuestion() {
-		System.out.println("You can type \"disconnect\" at any time to quit the game. Otherwise wait for the start. You can also type \"help\" in-game, to visualize the italian version of the guide");
+		System.out.println("You can type \"disconnect\" at any time to quit the game. Otherwise wait for the start. You can also type \"help\" in-game, to visualize the English version of the guide");
 		System.out.print("Waiting for other players to join...\n\n");
 	}
 	/**

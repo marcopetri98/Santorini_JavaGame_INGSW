@@ -35,6 +35,7 @@ public class CliGame {
 	private List<NetBuild> netBuilds;
 	private NetMove selectedMove;
 	private NetBuild selectedBuild;
+	private int activeWorkerID;
 	// attributes used for functioning
 	private boolean functioning;
 	private final Object inputLock;
@@ -43,6 +44,7 @@ public class CliGame {
 	private boolean drawPoss = false;
 	private boolean sentCorrectMessage = false;
 	private boolean chooseStarter = false;
+	private boolean printedGuide = false;
 
 	public CliGame(CliInput inputGetter) {
 		messages = new ArrayDeque<>();
@@ -87,7 +89,7 @@ public class CliGame {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
 				//typeInputPrint();
-				//System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
+				System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -159,7 +161,7 @@ public class CliGame {
 		player = name;
 	}
 	public void addToQueue(NetObject message) {
-		//System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
+		System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -187,6 +189,13 @@ public class CliGame {
 
 		if(command.commandType.toUpperCase().equals("HELP")){
 			printGuide();
+			printedGuide = true;
+			return false;
+		}
+
+		if(Constants.GODS_GOD_NAMES.contains(command.commandType.toUpperCase())) {
+			printGodGuide(command.commandType.toUpperCase());
+			printedGuide = true;
 			return false;
 		}
 
@@ -271,70 +280,217 @@ public class CliGame {
 
 				case PLAYERTURN -> {
 					switch (phase.getGamePhase()) {
-						//only syntax: build workerX dome/building level x_coord y_coord
 						case BEFOREMOVE, BUILD -> {
 							if (command.commandType.equals(Constants.COMMAND_BUILD)) {
 								// FIXME 1: if the user is trying to build in a cell with a dome or another worker this must return an error, here it returns true
 								// FIXME 2: if the user is trying to build in a position that isn't present in netbuild list is forbidden
-								if (command.getNumParameters() == 5 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
-									try {
-										if (Integer.parseInt(command.getParameter(2)) >= 0 && Integer.parseInt(command.getParameter(2)) <= 2 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4 && 0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4) {
-											if(command.getParameter(1).equals("dome")){
-												if(command.getParameter(0).equals("worker1")){
-													selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
-												} else if (command.getParameter(0).equals("worker2")){
-													selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), true);
+
+								switch(chosenGods.get(player)) {
+
+									case Constants.DEMETER :	//only syntax: build dome/building x_coord y_coord (dome/building x_coord y_coord)
+										if (command.getNumParameters() == 6 && (command.getParameter(0).equals("dome") || command.getParameter(0).equals("building")) && (command.getParameter(3).equals("dome") || command.getParameter(3).equals("building"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													if(0 <= Integer.parseInt(command.getParameter(4)) && Integer.parseInt(command.getParameter(4)) <= 4 && 0 <= Integer.parseInt(command.getParameter(5)) && Integer.parseInt(command.getParameter(5)) <= 4) {
+														int x1 = Integer.parseInt(command.getParameter(1));
+														int y1 = Integer.parseInt(command.getParameter(2));
+														int x2 = Integer.parseInt(command.getParameter(4));
+														int y2 = Integer.parseInt(command.getParameter(5));
+
+														if(command.getParameter(0).equals("dome")){
+															if(command.getParameter(3).equals("dome")) {
+																selectedBuild = new NetBuild(activeWorkerID, x2, y2, netMap.getCell(x2,y2).building.level, true);	//second Build
+															} else {
+																selectedBuild = new NetBuild(activeWorkerID, x2, y2, netMap.getCell(x2,y2).building.level, false);	//second Build
+															}
+															selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true, selectedBuild);	//first Build
+														} else if(command.getParameter(0).equals("building")) {
+															if(command.getParameter(3).equals("dome")) {
+																selectedBuild = new NetBuild(activeWorkerID, x2, y2, netMap.getCell(x2,y2).building.level, true);	//second Build
+															} else {
+																selectedBuild = new NetBuild(activeWorkerID, x2, y2, netMap.getCell(x2,y2).building.level, false);	//second Build
+															}
+															selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false, selectedBuild);	//first Build
+														}
+														if(netBuilds.contains(selectedBuild)) {
+															return true;
+														}
+													}
 												}
-											} else if(command.getParameter(1).equals("building")) {
-												if(command.getParameter(0).equals("worker1")){
-													selectedBuild = new NetBuild(player.hashCode()+1, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
-												} else if (command.getParameter(0).equals("worker2")){
-													selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
-												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
 											}
-											/*if(netBuilds.contains(selectedBuild)) {
-												return true;
-											}*/
-											for(NetBuild netB : netBuilds) {
-												if(netB.equals(selectedBuild) ||(netB.other != null && netB.other.equals(selectedBuild))){
-													return true;
+
+										} else if (command.getNumParameters() == 3 && (command.getParameter(0).equals("dome") || command.getParameter(0).equals("building"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													int x1 = Integer.parseInt(command.getParameter(1));
+													int y1 = Integer.parseInt(command.getParameter(2));
+													if(command.getParameter(0).equals("dome")){
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true);
+													} else if(command.getParameter(0).equals("building")) {
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false);
+													}
+													if(netBuilds.contains(selectedBuild)) {
+														return true;
+													}
 												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
 											}
 										}
-									} catch (NumberFormatException nfe) {
-										System.out.println("You didn't insert a correct number");
 										return false;
-									}
 
+									case Constants.HEPHAESTUS :	//only syntax: build dome/building x_coord y_coord (double)
+										if (command.getNumParameters() == 4 && (command.getParameter(0).equals("dome") || command.getParameter(0).equals("building")) && (command.getParameter(3).equals("double"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													int x1 = Integer.parseInt(command.getParameter(1));
+													int y1 = Integer.parseInt(command.getParameter(2));
+
+													if(command.getParameter(0).equals("dome")){
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level + 1, true);	//second Build
+													} else if(command.getParameter(0).equals("building")) {
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level + 1, false);	//second Build
+													}
+													selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false, selectedBuild);	//first Build
+
+													if(netBuilds.contains(selectedBuild)) {
+														return true;
+													}
+												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
+											}
+
+										} else if (command.getNumParameters() == 3 && (command.getParameter(0).equals("dome") || command.getParameter(0).equals("building"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													int x1 = Integer.parseInt(command.getParameter(1));
+													int y1 = Integer.parseInt(command.getParameter(2));
+													if(command.getParameter(0).equals("dome")){
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true);
+													} else if(command.getParameter(0).equals("building")) {
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false);
+													}
+													if(netBuilds.contains(selectedBuild)) {
+														return true;
+													}
+												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
+											}
+										}
+										return false;
+
+									default :	//only syntax: build dome/building x_coord y_coord   (previous: build workerX dome/building level x_coord y_coord)
+										if (command.getNumParameters() == 3 && (command.getParameter(0).equals("dome") || command.getParameter(0).equals("building"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													int x1 = Integer.parseInt(command.getParameter(1));
+													int y1 = Integer.parseInt(command.getParameter(2));
+													if(command.getParameter(0).equals("dome")){
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true);
+													} else if(command.getParameter(0).equals("building")) {
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false);
+													}
+													if(netBuilds.contains(selectedBuild)) {
+														return true;
+													}
+												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
+											}
+										}
+										return false;
 								}
 							}
 							return false;
 						}
 
 						//only syntax: move workerX x_coord y_coord
-						case MOVE -> {	//TODO: ammettere anche mosse nella other move
+						case MOVE -> {
 							if (command.commandType.equals(Constants.COMMAND_MOVE)) {
-								if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
-									try {
-										if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
-											if(command.getParameter(0).equals("worker1")){
-												selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
-											} else if (command.getParameter(0).equals("worker2")){
-												selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+
+								switch(chosenGods.get(player)) {
+
+									case Constants.APOLLO, Constants.MINOTAUR :
+										if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													if(command.getParameter(0).equals("worker1")){
+														selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													} else if (command.getParameter(0).equals("worker2")){
+														selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													}
+													for(NetMove netM : netMoves) {
+														if(netM.isLike(selectedMove)){
+															selectedMove = netM;
+															activeWorkerID = netM.workerID;
+															return true;
+														}
+													}
+												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
 											}
+										}
+										return false;
+
+									case Constants.ARTEMIS :
+										if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													if(command.getParameter(0).equals("worker1")){
+														selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													} else if (command.getParameter(0).equals("worker2")){
+														selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													}
 											/*if(netMoves.contains(selectedMove)) {
 												return true;
 											}*/
-											for(NetMove netM : netMoves) {
-												if(netM.equals(selectedMove) || (netM.other != null && netM.other.equals(selectedMove))){
-													return true;
+													for(NetMove netM : netMoves) {
+														if(netM.isLike(selectedMove) || netM.other != null && netM.other.isLike(selectedMove)){
+															selectedMove = netM;
+															activeWorkerID = netM.workerID;
+															return true;
+														}
+													}
 												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
 											}
 										}
-									} catch (NumberFormatException nfe) {
-										System.out.println("You didn't insert a correct number");
 										return false;
-									}
+
+									default :
+										if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													if(command.getParameter(0).equals("worker1")){
+														selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													} else if (command.getParameter(0).equals("worker2")){
+														selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													}
+													if(netMoves.contains(selectedMove)) {
+														activeWorkerID = selectedMove.workerID;
+														return true;
+													}
+												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
+											}
+										}
+										return false;
+
 								}
 							}
 							return false;
@@ -483,7 +639,21 @@ public class CliGame {
 						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
 					}
 				} else {
-					System.out.println("The other player "+activePlayer+" is choosing a god");
+
+					switch(phase.getGodsPhase()) {
+						case CHALLENGER_CHOICE :
+							System.out.println("The challenger "+activePlayer+" is choosing the gods for the game");
+							break;
+
+						case GODS_CHOICE :
+							System.out.println("The other player "+activePlayer+" is choosing his god");
+							break;
+
+						case STARTER_CHOICE :
+							System.out.println("The challenger "+activePlayer+" is now choosing the starter player");
+							break;
+					}
+
 				}
 			}
 
@@ -575,12 +745,18 @@ public class CliGame {
 							netBuilds = ng.availableBuildings.builds;
 							drawPossibilities();
 							System.out.println("Here is the map with the position where you can build");
-							System.out.println("Now you have to build a building or a dome near the worker. Use the syntax \"build workerX dome/building level x_coord y_coord\"");
+							System.out.println("Now you have to build a building or a dome near the worker. Use the syntax \"build building/dome x_coord y_coord\"");
 							System.out.print("Now build: ");    //check the build is correct in parsesyntax
 						}
 					}
 				} else {
-					System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
+					if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {
+						if(chosenGods.values().contains(Constants.PROMETHEUS)) {
+							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
+						}
+					} else {
+						System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
+					}
 				}
 			}
 
@@ -606,13 +782,13 @@ public class CliGame {
 			case Constants.GENERAL_WINNER:
 				ng = (NetGaming) obj;
 				for (String p : players) {
-					if (ng.player != null && ng.player.equals(p)) {
+					if (ng.player != null && ng.player.equals(p) && !player.equals(ng.player)) {
 						System.out.println(ng.player + " just won the game!");
 						break;
 					}
 				}
 				if(player.equals(ng.player)){
-					System.out.println("You won! Good job!");
+					printVictory();
 				}
 				functioning = false;
 				break;
@@ -620,15 +796,25 @@ public class CliGame {
 			case Constants.GENERAL_DEFEATED:
 				ng = (NetGaming) obj;
 				for (String p : players) {
-					if (ng.player != null && ng.player.equals(p)) {
+					if (ng.player != null && ng.player.equals(p) && !player.equals(ng.player)) {
 						System.out.println(ng.player + " just lost");
+						if(players.size() == 2) {
+							printVictory();
+						}
 						break;
 					}
 				}
 				if(player.equals(ng.player)){
 					System.out.println("You lost the game:(");
 				}
-				functioning = false;
+				if(players.size() == 3) {
+					playerColors.remove(ng.player);
+					gods.remove(chosenGods.get(ng.player));
+					chosenGods.remove(ng.player);
+					players.remove(ng.player);
+				}
+
+				//functioning = false;
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE:
@@ -647,6 +833,7 @@ public class CliGame {
 
 			case Constants.GENERAL_PHASE_UPDATE:
 				phase.advance();
+				System.out.println("\n"+Constants.BG_CYAN+phase.getPhase()+" "+phase.getGodsPhase()+" "+phase.getGamePhase()+Constants.RESET+"\n");	//Only for debug purposes
 				printInitialPhase();
 				break;
 		}
@@ -728,49 +915,182 @@ public class CliGame {
 		}
 	}
 
+	private void printVictory() {
+		System.out.println("``   ```.\"^riyyv*}y\\`      -    `:,.  `_:~^T>`=:_-_:\".'       `^Ywlx}cr^=^xxiv^:::,-~xYREOgPq9#@#QZd0#@@@@@@@@@@@@#B$RgQDQ$dEIT;:~*?x*\"'~  `!            ':~!,:,,:=-`*!`                             .`           \n" +
+				"```     `_~^*\\uVw3I*`       `          `   `<v,_::_``        `!xT}xL?l|u3OdGV*~^rv)*|(vZ$QbE8######BBBQQ$8gQ##@@#Q0d5M0QQ8EMDWyx>'``-!==*  ,=                      -!`               `              ``            \n" +
+				"```       '_=ruIIVY*_``\"__'              ```:rv>-`       .___:^)*!:!rTxuTLx)^*rTWT^-^|vv}r_rk8QQg$8OIx^\"`.!^u5gQQQQ8G*''<xVmPhcwVcv^,.     `*`                    `-`                  \"_``     `   ``            \n" +
+				"`        `::!^rr*:-'`   ``:-         `-_,,,,-'``..-:~. `:;^^rvx*!`  '}cccccVVuuuyycVcuuuuulVwTxr~:.           `_=*v}kIyccccuuuuucVVVVzVcuuuuy'              `_-`                      ,,  ``   `.  `       `````` \n" +
+				"``.-`   .,_``-::``         ``  `  `_^)r~!,'   -VB#gr.  '!**rvL}r:`                                                                              `            `=xucr`             `` `-`    `   ``     ````````````\n" +
+				"__=,'`      .~}^`            `  ```-_,:\"'   -w###I_     `*Vzeeu*:`                                                                              `-:~rvxr:`      }6QQV`          `` `.`     ``''``   ````````````  \n" +
+				"r=::::.    =dBQr`              ``:^,-.`    *#@@#~                              ```````````````````````      ```````````````  ``                                 `y#@@8:     `'-___,_-'``````',^:'````````````     \n" +
+				"L*:..,\". `)Q@#R~``._,`        `-,--!`     =@@@#^                                ```````` `````````````````````'```````  ` `                                       u#@@#~  `_:=;^**<=:_.````'=oEP;`                \n" +
+				"~_'` _^*iZ#@#6~`` '-`:~=`    -~='   `    _B@@#c                                                                                                                    8#@@B.`_!<*rrr*<!\"_.``\"?TYvL::=\".              \n" +
+				"    `!*l#@@@$!   `_!~=-_~!_`_>!.         z#BQ#.         -*xvv).     `*vvr, `*vv*`    `^xiii}xr  *vvvvvvvvvvx\"    :(iLYYx;`   .*vvvvvi)_  .^xvvv:    .\\xvr.         }#$QQT`-,::!::,_-'`-^x?!)}i**=_`:!!:-````    ``\n" +
+				"` `!!--}@@@#Y`       `=^\"`~x*`          `M3vP0           `MQB8=     `ZQD'   ^QQr   `zBBs)=~vK8  y*==*QQZ==~)v  )R#P*=^i6#B]`  ~QQx!~VQ#M-  xQB8z    vQQY`          =#})VP`  ````````,)v:\")Tv,`  `!<=:-.-__\"-```.=<\n" +
+				"v~_-' `a@@@Q=`        '\"ik}:-_'        `*gDX$I            :Q##Q`    3##?    \\##x  .6##~      *  `   :##0    ` m##x     `O##z  |##|   P##T   x##@z` (##I            `0MIdgr        .<r\"!?}^:-``````.-:!:_.''``-\"!~:\n" +
+				"^_-`  !Q@@#M!`     .!(VzGmur-  `    `,;^d@@BBc             >B88U`  }QQT     v88L  lQ83              :B8O     -B8B       =B8Q, \\$gu:=]0QR_    xQ88Gc8Qv              6Q#@@M      `-.`,vVxYu}vrr<.``````'.-_,\":\"_---\n" +
+				")!_  `m@@@Di_   `.\"=xzci]}x!.       -~;=Q@@##T              r^~)r _i<|      ^>;^  *~;?              -v=v     -)<L`      _T=v' ^!:*^^r}:       !r~>^*,               M#@@@B    ._.``<cycY(>!!-'v~\"_---__\"\":::,_...-\n" +
+				"0h*'`*B@@#E]` `!!~r}56O3\\<_        `__.!UcT*sQ*              :GMM)IM(       :WM:   xM3?`    `;-     `UqY      ~WMV\"    `uGV`  :MM: ,qMv        -KMm_              `cB}xhQM  !~:..~xYx)?xvr>>irrr*<;>><<<^;=!:,--,\"\n" +
+				"QRwr*b#@@#M:`,^}YkGdd5}=          \"rv(\\uI}v` =0E,             V5MM5M.       xPGx   `TZZGwYYwdd-     !dHZ`      ^KOdy}YVZOy-   xMMx  }OZj-      :OqOr             ^DP! _]! -=-`-!i}vrvx?^~===??)rrr)rrr*^^==!::\":~^\n" +
+				"QBwUm#@@@B^_^(}a$BQEk(-      ```.!)xuy}}oTv*` `vQV`           `eixI:       `^^^*`    `!^)r)>\"      `~^^r:  `     \"^rr(*=`    `^^^*`  ~^**`     >}xVx            !z*  '.  =^`.,=rv^<^***)\\)rr)??|\\()r*^<=!::!!:!~\\x\n" +
+				"MT!=K#@@@k<x}WgBQ#8y~-       `!~vT}Tcu}r^~!=:,r,*De`           \"*;~                             ``       ``````                               `*~~~r            ~:,!__-'_!._:~****^vv?iT}xx|)rrrr)vxv|*>===!!!=^}y\n" +
+				"x-.\"GQ@@a*T3Q8Eza0Mx,`      `-*u3PKKuv<:__,._=iDqMI-                                         ```````` ````````````                                            `iKKMvrr^!!;^*)vx}T}xyVcIUwuYv)r)viTVyc}x*<=====~rys\n" +
+				"x!,cg@@R}M0$8jmB#Rd|.````'..-~vjMqWHVv^!\"__\"!~*V#$O>                                       ``` ````````````````````   `                                     ``}ZD8}YYLv|]YTcyzIeKIcoaIMZMHmzyVwImmehy}v^~!!=~<^\\Kd\n" +
+				"(<mB@QdEBB0quKR8Q$3]=:::!!=^?}cmPmIj}(^!::::;)r)9BDP:                                            ```````````````                                             =MOBXVVc}}lcVVywkjky}iiyy5ZMM5H3sUIzkVuYx)*>==~^*vc$B\n" +
+				"ZQ#89$$OZmV}rvTuY}uLr)|x}uVo56R6dZHUu}x)r^<!:<|)LQmwc       `_;xVXI33zkkT}x))^>:\".`                      ``                    '-:=>*(x}ukIh3Mmyu}Lx^\".``   `IIGEXXzVucuuTT}Y}TYY}T}]useKaamXylYxvrrrr)vvvxLTckGB#\n" +
+				"#$6sbbyjlk3Guuyw}xxxVXmPWmsZ9R6OdMKhy}x*~^)?^^}ycPIVV`'<xumMEDMjq666OMyL**||L}VzPqdg$RMKViv^!-                      -=<rxuXPZ$Q06PokTTvvr**^^!:!=!*x}ixv*!_`^dMZM5GsIokcxvv?|\\vxxxvxTkXseXkVuYxv|)r?x}uyzIsKmmmM##\n" +
+				"Q3ke3wPd6$D06MRIYYVHOMOOMmKdOOOdM3IkV}x?vxv)*<umMbqIPM8QQQQ8g$DmuTcOR6OdUx:`       .zBB8KDggQ#Q$qw(!`        -^Lkdg88E96h}WQBV:      ```'.-_\"\"\"\"!!rvxL}TuywyXGMZMMWmyVT}L]xv|vvv(r\\}ucVyyyVVcTTTTuVyIKHMdO6OdZMR#@\n" +
+				"D33VXRBBQdV)xIGmwzaGMMZqhzmZdbMMMHUojXjXhsmezx^r3E$$Z3R8QQg$0DEERRKrxPqqMbMIY.   `v\\~VVBBk~~mDd60QB##Es^`:xPB@@##gOWZ}_'x$BoG*k}~\",:-..--_,,-`-!^r)?\\vxxYTuyzIUUjir?lVu}xx\\)rr*<<r\\xLTVkzkkkkXhUsm3GZdOR0$$$$0Eg@@\n" +
+				"gIz3ZZMMwivvL]uwVIqMORDDdMMddZZZddddZZMddbZdOO5V*rk8QDqO0DOMMd699R96h*e6OOZG3P):-!*rvZ=e0#8}Q#Q98B0RDB#@@@@@@####BgQB$LD@8Go6jXVKd]. `-,:\":\",_:!=~;;>^*r|vxYlcT*~ruVuu}Lx?r*;=!;*vYuykIma3G5MMZMZZZddORD00$gg$Dg@@\n" +
+				"gd6WPoTYThkyTcmmM9RE000Eg$EddddOED6dZM5Md6REEE09eIVyjUhwu}LYxr*?|iTedM;L5M3UzlwcmV!:rRdDRR#88$MPWdQQ89O@@@@#@##B8Ddqg8B#8Dg8$E6QE_  `-,::_,_,-..```'.-,:!rYVux*)}}}}}L]vr^~!=^)x}uVkIKHMZddZZM5WGGGHGWMMMMZZZbM9#@");
+		System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  You won! Good job!");
+	}
+
 	private void printGuide() {
-		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t************************* ~ Benvenuto nella guida di Santorini! ~ *************************" + Constants.RESET);
-		System.out.println("Qui ti verrà spiegato come giocare, e quali comandi utilizzare per poterlo fare correttamente.\n");
-		System.out.println("Il gioco è articolato in varie fasi, la prima delle quali consiste nel determinare i colori che vuoi utilizzare. Per fare ciò, il comando è \"color colorName\", in cui colorName può essere un colore a scelta tra red, green e blue.");
-		System.out.println("Nella seconda fase, avviene la scelta delle divinità: innanzitutto il \"challenger\" sceglierà due o tre divinità, a seconda del numero di giocatori, grazie al comando \"gods godName1 godName2 godName3\".\nChiaramente, in un gioco con due player, godName3 non verrà inserito.\n");
-		System.out.println("Successivamente, ogni giocatore provvede a scegliere il dio che vuole utilizzare tra quelli scelti dal challenger.Il comando da utilizzare per fare ciò, quando richiesto dal gioco, è \"god godName\". Ricorda: puoi scegliere solo uno tra gli dei scelti dal challenger!");
-		System.out.println("Ad un giocatore verrà ora chiesto di scegliere chi dovrà iniziare la partita: la scelta può ricadere su qualunque giocatore nel gioco, anche se stessi! Attenzione però: non per forza cominciare per primo rappresenta un vantaggio.");
-		System.out.println("Il comando per scegliere chi dovrà iniziare la partita è \"starter playerName\"\n");
-		System.out.println("La prossima fase è il setup del gioco: bisogna posizionare i worker! Il comando è \"position worker1 x_coord y_coord worker2 x_coord y_coord\". Al posto di x_coord e y_coord metti le coordinate alle quali vuoi posizionare il tuo worker.");
-		System.out.println("Attenzione: non puoi posizionare un worker dove già è presente un altro worker, anche se di un altro giocatore! Presta attenzione alla sintassi, è molto importante.\n");
-		System.out.println("E ora, ha inizio la fase di gioco! Ad ogni turno, sei costretto a muovere un worker e costruire, pena la sconfitta! Per muovere, il comando è \"move workerX x_coord y_coord\": sostituisci a workerX il worker che vuoi muovere.");
-		System.out.println("Per costruire, scrivi \"build workerX dome/building level x_coord y_coord\": scegli se costruire una dome o un building, dopodiché inserisci il livello al quale vuoi costruire (0, 1 ,2) e le coordinate. Ricorda: puoi costruire SOLO con il worker che hai mosso!");
-		System.out.println("Ricorda anche che puoi costruire una dome solo se è già presente un edificio di livello 3, a meno di poteri particolari del tuo dio!");
-		System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************" + Constants.RESET);
+		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t**************************** ~ Welcome to Santorini's guide! ~ ****************************" + Constants.RESET);
+		System.out.println("Here you'll be told how to play, and what commands to use to do it properly.\n");
+		System.out.println("The game is divided into several stages, the first of which is to determine the colors you want to use. To do this, the command is \"color colorName\", where colorName can be a color of choice between red, green, and blue.");
+		System.out.println("In the second phase, the choice of divinities takes place: firstly, the \"challenger\" will choose two or three deities, depending on the number of players, thanks to the command \"gods godName1 godName2 godName3\".\nClearly, in a game with two players, godName3 will not be inserted.\n");
+		System.out.println("Next, each player chooses the god he wants to use from those chosen by the challenger. The command to use to do this, when required by the game, is \"god godName\". Remember: you can only choose one of the gods chosen by the challenger!");
+		System.out.println("A player will now be asked to choose who will start the game: the choice can fall on any player in the game, even themselves! Beware though: not necessarily starting first is an advantage.");
+		System.out.println("The command to choose who should start the game is \"starter playerName\"\n");
+		System.out.println("The next step is the setup of the game: you have to place the workers! The command is \"position worker1 x_coord y_coord worker2 x_coord y_coord\". Instead of x_coord and y_coord put the coordinates to which you want to place your worker.");
+		System.out.println("Warning: You can't place a worker where another worker already has another worker, even if it's another player! Pay attention to syntax, it's very important.\n");
+		System.out.println("And now, the phase of the game begins! At each turn, you are forced to move a worker and build, after defeat! To move, the command is \"move workerX x_coord y_coord\": replace workerX as the worker you want to move.");
+		System.out.println("To build, the standard command is \"build dome/building x_coord y_coord\": choose whether to build a dome or building, then enter the coordinates. Remember: you can only build with the worker you moved!");
+		System.out.println("Also remember that you can only build a dome if there is already a level 3 building, unless your god has a particular power!\n");
+		System.out.println("If you want to learn the special commands for your god, or his/her power, write the name whenever you want. Otherwise write the right command for the gamephase and continue playing! See you soon!:)");
+		System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
 		System.out.println("\n\n");
 	}
 
+	private void printGodGuide(String godName) {
+		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t************************* ~ Welcome to the Gods info paragraph! ~ *************************" + Constants.RESET);
+		System.out.print("You selected ");
+		switch(godName) {
+			case Constants.APOLLO :
+				System.out.println(Constants.FG_RED + "Apollo\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Move");
+				System.out.println("Power\t\t\t->\tYour Worker may move into an opponent Worker’s space by forcing their Worker to the space yours just vacated");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.ARTEMIS :
+				System.out.println(Constants.FG_RED + "Artemis\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Move");
+				System.out.println("Power\t\t\t->\tYour Worker may move one additional time, but not back to its initial space");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.ATHENA :
+				System.out.println(Constants.FG_RED + "Athena\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tOpponent’s Turn");
+				System.out.println("Power\t\t\t->\tIf one of your Workers moved up on your last turn, opponent Workers cannot move up this turn");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.ATLAS :
+				System.out.println(Constants.FG_RED + "Atlas\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Build");
+				System.out.println("Power\t\t\t->\tYour Worker may build a dome at any level");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.DEMETER :
+				System.out.println(Constants.FG_RED + "Demeter\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Build");
+				System.out.println("Power\t\t\t->\tYour Worker may build one additional time, but not on the same space");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord (building/dome x_coord y_coord)\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.HEPHAESTUS :
+				System.out.println(Constants.FG_RED + "Hephaestus\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Build");
+				System.out.println("Power\t\t\t->\tYour Worker may build one additional block (not dome) on top of your first block");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord (double)\"");
+				System.out.println("Additional notes: only write double if you want to build two buildings in the same spot!");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.MINOTAUR :
+				System.out.println(Constants.FG_RED + "Minotaur\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Move");
+				System.out.println("Power\t\t\t->\tYour Worker may move into an opponent Worker’s space, if their Worker can be forced one space straight backwards to an unoccupied space at any level");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.PAN :
+				System.out.println(Constants.FG_RED + "Pan\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tWin Condition");
+				System.out.println("Power\t\t\t->\tYou also win if your Worker moves down two or more levels");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+
+			case Constants.PROMETHEUS :
+				System.out.println(Constants.FG_RED + "Prometheus\n" + Constants.RESET);
+				System.out.println("Here is the power:\n");
+				System.out.println("Phase\t\t\t->\tYour Turn");
+				System.out.println("Power\t\t\t->\tIf your Worker does not move up, it may build both before and after moving");
+				System.out.println("Move command\t->\t\"move workerX x_coord y_coord\"");
+				System.out.println("Build command\t->\t\"build building/dome x_coord y_coord\"");
+				System.out.println(Constants.FG_RED + "\t\t\t\t\t\t\t\t\t\t\t\t\t*******************************************************************************************\n\n" + Constants.RESET);
+				break;
+		}
+	}
+
 	private void printError() {
-		if (player.equals(activePlayer)) {
-			switch (phase.getPhase()) {
-				case COLORS -> System.out.println("You must choose a color that is red, blue or green and that is not taken by another player");
-				case GODS -> {
-					if (player.equals(players.get(0))) {
-						switch (phase.getGodsPhase()) {
-							case CHALLENGER_CHOICE -> System.out.println("You must choose "+players.size()+" gods from the previously showed");
-							case GODS_CHOICE -> System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player");
-							case STARTER_CHOICE -> System.out.println("You must choose a player that is inside the game");
-						}
-					} else {
-						System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player.");
-					}
-				}
-				case SETUP -> System.out.println("You must place the worker in a valid cell, not occupied by other workers");
-				case PLAYERTURN -> {
-					switch (phase.getGamePhase()) {
-						case BEFOREMOVE -> System.out.println("You can build only in the cells showed before");
-						case MOVE -> System.out.println("You must move in the cells showed before");
-						case BUILD -> System.out.println("You must build only in one of the cells showed before");
-					}
-				}
-			}
+		if(printedGuide) {
+			printedGuide = false;
 		} else {
-			System.out.println("You can only disconnect during turn of other players.");
+			if (player.equals(activePlayer)) {
+				switch (phase.getPhase()) {
+					case COLORS -> System.out.println("You must choose a color that is red, blue or green and that is not taken by another player");
+					case GODS -> {
+						if (player.equals(players.get(0))) {
+							switch (phase.getGodsPhase()) {
+								case CHALLENGER_CHOICE -> System.out.println("You must choose "+players.size()+" gods from the previously showed");
+								case GODS_CHOICE -> System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player");
+								case STARTER_CHOICE -> System.out.println("You must choose a player that is inside the game");
+							}
+						} else {
+							System.out.println("You must choose one of the god chosen by the challenger that is not taken by another player.");
+						}
+					}
+					case SETUP -> System.out.println("You must place the worker in a valid cell, not occupied by other workers");
+					case PLAYERTURN -> {
+						switch (phase.getGamePhase()) {
+							case BEFOREMOVE -> System.out.println("You can build only in the cells showed before");
+							case MOVE -> System.out.println("You must move in the cells showed before");
+							case BUILD -> System.out.println("You must build only in one of the cells showed before");
+						}
+					}
+				}
+			} else {
+				System.out.println("You can only disconnect or visualize the guide during turn of other players.");
+			}
 		}
 	}
 	private void printServerError(NetObject obj) {
@@ -988,7 +1308,7 @@ public class CliGame {
 			for(int x = 0; x < 5; x++){
 				NetWorker myWorker = netMap.getCell(x,y).worker;
 				if(myWorker != null){
-					System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "Il ");
+					System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The ");
 					if(myWorker.workerID == myWorker.owner.hashCode() + 1) {
 						System.out.print("worker1");
 					} else if(myWorker.workerID == myWorker.owner.hashCode() + 2) {
@@ -996,10 +1316,18 @@ public class CliGame {
 					} else {
 						System.out.print(myWorker.workerID);
 					}
-					System.out.print(" di " + myWorker.owner + " è in posizione:  x = " + x + "; y = " + y + ".");
+					System.out.print(" of " + myWorker.owner + " is in position:  x = " + x + "; y = " + y + ".");
 					System.out.print("\n");
 				}
 			}
+		}
+		System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "**************************************************************\n");
+		for(String player : players) {
+			System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The player ");
+			System.out.print(player);
+			System.out.print(" has the god ");
+			System.out.print(chosenGods.get(player) + ".");
+			System.out.print("\n");
 		}
 	}
 }

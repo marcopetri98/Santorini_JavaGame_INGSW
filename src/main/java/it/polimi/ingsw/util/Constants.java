@@ -105,7 +105,7 @@ public final class Constants {
 	/* General connection messages */
 	public static final String CHECK = "ping";
 
-	/* Color scape variables */
+	/* Color escape variables */
 	public static final String RESET = "\u001B[0m";
 	public static final String FG_RED = "\u001B[31m";
 	public static final String FG_GREEN = "\u001B[32m";
