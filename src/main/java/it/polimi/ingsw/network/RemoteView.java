@@ -364,7 +364,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					clientHandler.sendMessage(new NetColorPreparation(Constants.GENERAL_PHASE_UPDATE));
 
 					Game caller = (Game) observed;
-					NetDivinityChoice divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER, caller.getPlayerTurn().getPlayerName());
+					NetDivinityChoice divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER, caller.getPlayers().get(0).getPlayerName());
 					clientHandler.sendMessage(divinityChoice);
 				}
 				case GODS ->  {

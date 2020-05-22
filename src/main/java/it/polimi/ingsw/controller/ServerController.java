@@ -267,7 +267,8 @@ public class ServerController implements ObserverController {
 							caller.communicateError();
 						} else {
 							observedModel.changeTurn();
-							if (!observedModel.computeActions()) {
+							observedModel.computeActions();
+							if (observedModel.getPlayerPossibleBuilds().size() == 0) {
 								observedModel.changeTurn();
 								observedModel.computeActions();
 								defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());

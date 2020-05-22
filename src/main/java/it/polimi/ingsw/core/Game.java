@@ -250,6 +250,7 @@ public class Game extends ObservableGame {
 	 * This function computes only the moves and the builds which the player can perform in its turn, if the player can perform a move or a build it returns true, otherwise false
 	 * @return true if player can perform an action, false instead
 	 */
+	// TODO: maybe can be void
 	public synchronized boolean computeActions() {
 		playerPossibleMoves = new ArrayList<>();
 		playerPossibleBuilds = new ArrayList<>();
@@ -266,7 +267,11 @@ public class Game extends ObservableGame {
 			computeBuilds(getPlayerTurn().getActiveWorker());
 		}
 		notifyPossibleActions(playerPossibleMoves,playerPossibleBuilds);
-		return true;
+		if (playerPossibleMoves.size() != 0 || playerPossibleBuilds.size() != 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	private synchronized void computeMoves(Worker w, boolean move) {
 		try {
