@@ -1,5 +1,6 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.network.objects.NetGaming;
 import it.polimi.ingsw.network.objects.NetObject;
 import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
@@ -251,9 +252,9 @@ public class MapSceneController implements SceneController {
 		if (gameState.getColors().get(gameState.getPlayer()).equals(Color.BLUE)) {
 			return workerBlue;
 		} else if (gameState.getColors().get(gameState.getPlayer()).equals(Color.GREEN)) {
-			return workerRed;
-		} else {
 			return workerGreen;
+		} else {
+			return workerRed;
 		}
 	}
 	// active player information data
@@ -326,7 +327,7 @@ public class MapSceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		NetGaming netSetup = new NetGaming(Constants.GENERAL_DISCONNECT);
 		MainGuiController.getInstance().sendMessage(netSetup);
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);

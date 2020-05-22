@@ -172,7 +172,6 @@ public class ClientMessageListener extends Thread {
 			return true;
 		} catch (IOException e) {
 			viewController.retrieveConnectionError();
-			setActive(false);
 			return false;
 		}
 	}

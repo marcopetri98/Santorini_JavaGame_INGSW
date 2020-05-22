@@ -152,7 +152,7 @@ public class ChooseColorSceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		NetColorPreparation netSetup = new NetColorPreparation(Constants.GENERAL_DISCONNECT);
 		MainGuiController.getInstance().sendMessage(netSetup);
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);

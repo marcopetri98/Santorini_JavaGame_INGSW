@@ -191,9 +191,8 @@ public class Server implements Runnable {
 				lobbyClients.notifyAll();
 				if (lobbyDimension == 1 || lobbyClients.size() == 0) {
 					lobbyDimension = -1;
-				} else {
-					updatePlayerInLobby();
 				}
+				updatePlayerInLobby();
 			}
 		}
 	}

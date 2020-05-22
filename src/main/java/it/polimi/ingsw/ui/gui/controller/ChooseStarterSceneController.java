@@ -133,7 +133,7 @@ public class ChooseStarterSceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		NetDivinityChoice netSetup = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);
 		MainGuiController.getInstance().sendMessage(netSetup);
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);

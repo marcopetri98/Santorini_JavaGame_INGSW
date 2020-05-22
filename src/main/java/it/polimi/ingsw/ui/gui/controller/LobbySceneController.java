@@ -76,7 +76,7 @@ public class LobbySceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
+		NetLobbyPreparation netSetup = new NetLobbyPreparation(Constants.GENERAL_DISCONNECT);
 		MainGuiController.getInstance().sendMessage(netSetup);
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);

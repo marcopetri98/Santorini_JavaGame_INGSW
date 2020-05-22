@@ -227,11 +227,12 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		fadeImage(icon_errorFatalBG, errorFatalBG);
+		// TODO: move in other scenes
+		/*fadeImage(icon_errorFatalBG, errorFatalBG);
 		slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);
 		icon_errorFatalBG.toFront();
 		icon_errorFatal.toFront();
-		button_exit.toFront();
+		button_exit.toFront();*/
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
