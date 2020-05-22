@@ -71,6 +71,15 @@ public class ChooseGodsSceneController implements SceneController {
 	Image cardPrometheus = new Image("/img/gods/card_prometheus.png");
 	Image cardPrometheusPressed = new Image("/img/gods/card_prometheus_pressed.png");
 	Image descriptionPrometheus = new Image("/img/gods/description_prometheus.png");
+	Image cardApolloDisabled = new Image("/img/gods/card_apollo_disabled.png");
+	Image cardArtemisDisabled = new Image("/img/gods/card_artemis_disabled.png");
+	Image cardAthenaDisabled = new Image("/img/gods/card_athena_disabled.png");
+	Image cardAtlasDisabled = new Image("/img/gods/card_atlas_disabled.png");
+	Image cardDemeterDisabled = new Image("/img/gods/card_demeter_disabled.png");
+	Image cardHephaestusDisabled = new Image("/img/gods/card_hephaestus_disabled.png");
+	Image cardMinotaurDisabled = new Image("/img/gods/card_minotaur_disabled.png");
+	Image cardPanDisabled = new Image("/img/gods/card_pan_disabled.png");
+	Image cardPrometheusDisabled = new Image("/img/gods/card_prometheus_disabled.png");
 
 	Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
 	Image buttonNext = new Image("/img/home_next_btn.png");
@@ -88,6 +97,8 @@ public class ChooseGodsSceneController implements SceneController {
 	// triggers for server messages
 	private GameState gameState;
 	private boolean pressed = false;
+
+	private String god;
 
 
 	public void initialize(){
@@ -327,8 +338,120 @@ public class ChooseGodsSceneController implements SceneController {
 		text_player.setText(gameState.getActivePlayer());
 	}
 	public void disableGod(String name) {
-		/* TODO: set the god card specified with the name as disable
-		*   tip1: using gameState.getPlayerNumber() you can find number of player -> how many cards you need to explore */
+		for(String item : gameState.getGods().values()){
+			if(item.equals(name)){
+				switch (name.toUpperCase()){
+					case Constants.APOLLO -> {
+						if (card_1.getImage().equals(cardApollo)) {
+							card_2.setImage(cardApolloDisabled);
+						} else if (card_2.getImage().equals(cardApollo)) {
+							card_2.setImage(cardApolloDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardApollo)) {
+								card_3.setImage(cardApolloDisabled);
+							}
+						}
+					}
+					case Constants.ARTEMIS -> {
+						if (card_1.getImage().equals(cardArtemis)) {
+							card_2.setImage(cardArtemisDisabled);
+						} else if (card_2.getImage().equals(cardArtemis)) {
+							card_2.setImage(cardArtemisDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardArtemis)) {
+								card_3.setImage(cardArtemisDisabled);
+							}
+						}
+					}
+					case Constants.ATHENA -> {
+						if (card_1.getImage().equals(cardAthena)) {
+							card_2.setImage(cardAthenaDisabled);
+						} else if (card_2.getImage().equals(cardAthena)) {
+							card_2.setImage(cardAthenaDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardAthena)) {
+								card_3.setImage(cardAthenaDisabled);
+							}
+						}
+					}
+					case Constants.ATLAS -> {
+						if (card_1.getImage().equals(cardAtlas)) {
+							card_2.setImage(cardAtlasDisabled);
+						} else if (card_2.getImage().equals(cardAtlas)) {
+							card_2.setImage(cardAtlasDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardAtlas)) {
+								card_3.setImage(cardAtlasDisabled);
+							}
+						}
+					}
+					case Constants.DEMETER -> {
+						if (card_1.getImage().equals(cardDemeter)) {
+							card_2.setImage(cardDemeterDisabled);
+						} else if (card_2.getImage().equals(cardDemeter)) {
+							card_2.setImage(cardDemeterDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardDemeter)) {
+								card_3.setImage(cardDemeterDisabled);
+							}
+						}
+					}
+					case Constants.HEPHAESTUS -> {
+						if (card_1.getImage().equals(cardHephaestus)) {
+							card_2.setImage(cardHephaestusDisabled);
+						} else if (card_2.getImage().equals(cardHephaestus)) {
+							card_2.setImage(cardHephaestusDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardHephaestus)) {
+								card_3.setImage(cardHephaestusDisabled);
+							}
+						}
+					}
+					case Constants.MINOTAUR -> {
+						if (card_1.getImage().equals(cardMinotaur)) {
+							card_2.setImage(cardMinotaurDisabled);
+						} else if (card_2.getImage().equals(cardMinotaur)) {
+							card_2.setImage(cardMinotaurDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardMinotaur)) {
+								card_3.setImage(cardMinotaurDisabled);
+							}
+						}
+					}
+					case Constants.PAN -> {
+						if (card_1.getImage().equals(cardPan)) {
+							card_2.setImage(cardPanDisabled);
+						} else if (card_2.getImage().equals(cardPan)) {
+							card_2.setImage(cardPanDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardPan)) {
+								card_3.setImage(cardPanDisabled);
+							}
+						}
+					}
+					case Constants.PROMETHEUS -> {
+						if (card_1.getImage().equals(cardPrometheus)) {
+							card_2.setImage(cardPrometheusDisabled);
+						} else if (card_2.getImage().equals(cardPrometheus)) {
+							card_2.setImage(cardPrometheusDisabled);
+						}
+						if(gameState.getPlayerNumber() == 3) {
+							if(card_3.getImage().equals(cardPrometheus)) {
+								card_3.setImage(cardPrometheusDisabled);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/* **********************************************

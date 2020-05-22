@@ -37,6 +37,8 @@ public class NicknameServerAddressSceneController implements SceneController {
 	private ImageView icon_errorFatalBG;
 	@FXML
 	private ImageView icon_errorFatal;
+	@FXML
+	private AnchorPane anchorPane;
 
 	private Image buttonNextPressed = new Image("/img/home_next_btn_pressed.png");
 	private Image buttonNext = new Image("/img/home_next_btn.png");
@@ -189,19 +191,32 @@ public class NicknameServerAddressSceneController implements SceneController {
 		icon_errorFatal.setDisable(false);
 		moveImage(icon_error, errorNickname, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		messageCanBeSent = true;
+		button_next.toFront();
+		textField_nickname.toFront();
+		textField_address.toFront();
 	}
 	public void serverAddressError(int i) {
 		icon_errorFatal.setDisable(false);
 		if (i == 0) {
 			moveImage(icon_error, errorIP, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+			button_next.toFront();
+			textField_nickname.toFront();
+			textField_address.toFront();
 		} else if (i == 1) {
 			moveImage(icon_error, errorSupportIp, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+			button_next.toFront();
+			textField_nickname.toFront();
+			textField_address.toFront();
 		}
 	}
 	public void waitError() {
 		icon_errorFatalBG.setDisable(false);
 		icon_errorFatal.setDisable(false);
 		moveImage(icon_error, errorWait, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		button_next.toFront();
+		button_exit.toFront();
+		textField_nickname.toFront();
+		textField_address.toFront();
 	}
 
 
@@ -214,6 +229,9 @@ public class NicknameServerAddressSceneController implements SceneController {
 	public void fatalError() {
 		fadeImage(icon_errorFatalBG, errorFatalBG);
 		slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);
+		icon_errorFatalBG.toFront();
+		icon_errorFatal.toFront();
+		button_exit.toFront();
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
