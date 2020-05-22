@@ -423,7 +423,7 @@ public class CliGame {
 		switch (ndc.message) {
 			//GODS
 			case Constants.GODS_CHALLENGER -> {
-				if(!player.equals(ndc.player)){	//TODO: challenger player given from server is wrong!!! therefore modify it and this
+				if(player.equals(ndc.player)){
 					challenger = true;
 				}
 			}
@@ -611,7 +611,10 @@ public class CliGame {
 						break;
 					}
 				}
-				System.out.println("You won! Good job!");
+				if(player.equals(ng.player)){
+					System.out.println("You won! Good job!");
+				}
+				functioning = false;
 				break;
 
 			case Constants.GENERAL_DEFEATED:
@@ -622,7 +625,10 @@ public class CliGame {
 						break;
 					}
 				}
-				System.out.println("You lost the game");
+				if(player.equals(ng.player)){
+					System.out.println("You lost the game:(");
+				}
+				functioning = false;
 				break;
 
 			case Constants.GENERAL_GAMEMAP_UPDATE:
@@ -991,9 +997,9 @@ public class CliGame {
 						System.out.print(myWorker.workerID);
 					}
 					System.out.print(" di " + myWorker.owner + " è in posizione:  x = " + x + "; y = " + y + ".");
+					System.out.print("\n");
 				}
 			}
-			System.out.print("\n");
 		}
 	}
 }
