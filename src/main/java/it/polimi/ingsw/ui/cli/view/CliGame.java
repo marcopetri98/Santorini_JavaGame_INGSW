@@ -292,8 +292,13 @@ public class CliGame {
 													selectedBuild = new NetBuild(player.hashCode()+2, Integer.parseInt(command.getParameter(3)), Integer.parseInt(command.getParameter(4)), Integer.parseInt(command.getParameter(2)), false);
 												}
 											}
-											if(netBuilds.contains(selectedBuild)) {
+											/*if(netBuilds.contains(selectedBuild)) {
 												return true;
+											}*/
+											for(NetBuild netB : netBuilds) {
+												if(netB.equals(selectedBuild) ||(netB.other != null && netB.other.equals(selectedBuild))){
+													return true;
+												}
 											}
 										}
 									} catch (NumberFormatException nfe) {
@@ -307,7 +312,7 @@ public class CliGame {
 						}
 
 						//only syntax: move workerX x_coord y_coord
-						case MOVE -> {
+						case MOVE -> {	//TODO: ammettere anche mosse nella other move
 							if (command.commandType.equals(Constants.COMMAND_MOVE)) {
 								if (command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
 									try {
@@ -317,8 +322,13 @@ public class CliGame {
 											} else if (command.getParameter(0).equals("worker2")){
 												selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
 											}
-											if(netMoves.contains(selectedMove)) {
+											/*if(netMoves.contains(selectedMove)) {
 												return true;
+											}*/
+											for(NetMove netM : netMoves) {
+												if(netM.equals(selectedMove) || (netM.other != null && netM.other.equals(selectedMove))){
+													return true;
+												}
 											}
 										}
 									} catch (NumberFormatException nfe) {
@@ -856,18 +866,23 @@ public class CliGame {
 		if(drawPoss){
 			if(phase.getGamePhase() == GamePhase.MOVE){
 				if(netMoves != null){
-					for(NetMove netM : netMoves){
-						if(netM.cellX == netMap.getX(netC) && netM.cellY == netMap.getY(netC)){
-							if (type == 0) {
-								return "@@@@@@@@@@@@@";
+					for(NetMove netM : netMoves){	//TODO: ciclare anche sulle move other
+						NetMove x = netM;
+						while(x != null) {
+							if(x.cellX == netMap.getX(netC) && x.cellY == netMap.getY(netC)){
+								if (type == 0) {
+									return "@@@@@@@@@@@@@";
+								}
+								else if (type == 1) {
+									return "@@@@@@";
+								}
+								else if (type == 2) {
+									return "@@@@@";
+								}
 							}
-							else if (type == 1) {
-								return "@@@@@@";
-							}
-							else if (type == 2) {
-								return "@@@@@";
-							}
+							x = x.other;
 						}
+
 					}
 				}
 				if (type == 0) {
@@ -885,15 +900,22 @@ public class CliGame {
 				if(netBuilds != null){
 					for(NetBuild netB : netBuilds){
 						if(netB.cellX == netMap.getX(netC) && netB.cellY == netMap.getY(netC)){
-							if (type == 0) {
-								return "@@@@@@@@@@@@@";
+							NetBuild x = netB;
+							while(x != null) {
+								if(x.cellX == netMap.getX(netC) && x.cellY == netMap.getY(netC)){
+									if (type == 0) {
+										return "@@@@@@@@@@@@@";
+									}
+									else if (type == 1) {
+										return "@@@@@@";
+									}
+									else if (type == 2) {
+										return "@@@@@";
+									}
+								}
+								x = x.other;
 							}
-							else if (type == 1) {
-								return "@@@@@@";
-							}
-							else if (type == 2) {
-								return "@@@@@";
-							}
+
 						}
 					}
 				}
