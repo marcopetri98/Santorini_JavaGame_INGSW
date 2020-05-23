@@ -38,7 +38,36 @@ public class NetMove implements Serializable {
 		cellY = y;
 		other = null;
 	}
+	public NetMove(int workerID, int x, int y, NetMove other) {
+		this.workerID = workerID;
+		cellX = x;
+		cellY = y;
+		this.other = null;
+	}
 
+	/* **********************************************
+	 *												*
+	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+	 * 												*
+	 ************************************************/
+	public NetMove setWorkerId(int id) {
+		return new NetMove(id,cellX,cellY,other);
+	}
+	public NetMove setX(int x) {
+		return new NetMove(workerID,x,cellY,other);
+	}
+	public NetMove setY(int y) {
+		return new NetMove(workerID,cellX,y,other);
+	}
+	public NetMove setOther(NetMove otherMove) {
+		return new NetMove(workerID,cellX,cellY,otherMove);
+	}
+
+	/* **********************************************
+	 *												*
+	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
+	 * 												*
+	 ************************************************/
 	public boolean isWellFormed() {
 		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID != 0) {
 			if (other != null) {
@@ -50,7 +79,6 @@ public class NetMove implements Serializable {
 			return false;
 		}
 	}
-
 	public boolean isLike(Object obj){
 		if(obj instanceof NetMove){
 			NetMove m = (NetMove) obj;
@@ -63,7 +91,6 @@ public class NetMove implements Serializable {
 			return false;
 		}
 	}
-
 	@Override
 	public boolean equals(Object obj){
 		if(obj instanceof NetMove){

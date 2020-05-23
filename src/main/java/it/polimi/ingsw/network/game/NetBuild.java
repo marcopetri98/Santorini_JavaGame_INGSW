@@ -88,6 +88,19 @@ public class NetBuild implements Serializable {
 		}
 	}
 
+	public boolean isLike(Object obj){
+		if(obj instanceof NetBuild){
+			NetBuild b = (NetBuild) obj;
+			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.level == b.level && this.dome == b.dome) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
 	@Override
 	public boolean equals(Object obj){
 		if(obj instanceof NetBuild){

@@ -23,7 +23,54 @@ public class NetWorker implements Serializable {
 		owner = worker.owner.getPlayerName();
 		position = pos;
 	}
+	public NetWorker(NetWorker worker, NetCell pos) {
+		color = worker.color;
+		workerID = worker.workerID;
+		owner = worker.owner;
+		position = pos;
+	}
+	private NetWorker(NetWorker worker, Color newColor) {
+		color = newColor;
+		workerID = worker.workerID;
+		owner = worker.owner;
+		position = worker.position;
+	}
+	private NetWorker(NetWorker worker, int id) {
+		color = worker.color;
+		workerID = id;
+		owner = worker.owner;
+		position = worker.position;
+	}
+	private NetWorker(NetWorker worker, String ownerName) {
+		color = worker.color;
+		workerID = worker.workerID;
+		owner = ownerName;
+		position = worker.position;
+	}
 
+	/* **********************************************
+	 *												*
+	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+	 * 												*
+	 ************************************************/
+	public NetWorker setColor(Color color) {
+		return new NetWorker(this,color);
+	}
+	public NetWorker setOwner(String name) {
+		return new NetWorker(this,name);
+	}
+	public NetWorker setWorkerId(int id) {
+		return new NetWorker(this,id);
+	}
+	public NetWorker setCell(NetCell cell) {
+		return new NetWorker(this,cell);
+	}
+
+	/* **********************************************
+	 *												*
+	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
+	 * 												*
+	 ************************************************/
 	public Color getColor() {
 		return color;
 	}
@@ -35,5 +82,15 @@ public class NetWorker implements Serializable {
 	}
 	public NetCell getPosition() {
 		return position;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NetWorker) {
+			NetWorker other = (NetWorker) obj;
+			if (workerID == other.workerID && owner.equals(other.owner) && color.equals(other.color)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -1,6 +1,5 @@
 package it.polimi.ingsw.ui.gui.viewModel;
 
-import it.polimi.ingsw.core.Player;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
@@ -81,6 +80,30 @@ public class GameState {
 	}
 	public List<NetBuild> getPossibleBuilds() {
 		return new ArrayList<>(possibleBuilds);
+	}
+
+	/* **********************************************
+	 *												*
+	 *		ADVANCED GETTERS FOR THIS CLASS			*
+	 * 												*
+	 ************************************************/
+	public int containsLike(NetMove wantedMove) {
+		int counter = 0;
+		for (int i = 0; i < possibleMoves.size(); i++) {
+			if (possibleMoves.get(i).isLike(wantedMove)) {
+				counter++;
+			}
+		}
+		return counter;
+	}
+	public int containsLike(NetBuild wantedBuild) {
+		int counter = 0;
+		for (int i = 0; i < possibleBuilds.size(); i++) {
+			if (possibleBuilds.get(i).isLike(wantedBuild)) {
+				counter++;
+			}
+		}
+		return counter;
 	}
 
 	/* **********************************************
@@ -238,9 +261,15 @@ public class GameState {
 
 	/* **********************************************
 	 *												*
-	 *			SETTERS FOR THIS CLASS				*
+	 *			MODIFIERS FOR THIS CLASS			*
 	 * 												*
 	 ************************************************/
+	public void removePlayer(String name) throws IllegalArgumentException {
+		if (!players.contains(name) || name == null) {
+			throw new IllegalArgumentException();
+		}
+		players.remove(name);
+	}
 	public void advancePhase() {
 		turn.advance();
 	}

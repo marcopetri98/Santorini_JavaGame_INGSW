@@ -22,7 +22,34 @@ public class NetMap implements Serializable {
 			}
 		}
 	}
+	private NetMap(NetMap netMap, NetCell cell, int x, int y) {
+		cells = new ArrayList<>();
+		for (int i = 0; i <= 4; i++) {
+			cells.add(new ArrayList<NetCell>());
+			for (int j = 0; j <= 4; j++) {
+				if (i != x || j != y) {
+					cells.get(i).add(new NetCell(netMap.getCell(i,j)));
+				} else {
+					cells.get(i).add(cell);
+				}
+			}
+		}
+	}
 
+	/* **********************************************
+	 *												*
+	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+	 * 												*
+	 ************************************************/
+	public NetMap changeCell(NetCell newCell, int x, int y) {
+		return new NetMap(this,newCell,x,y);
+	}
+
+	/* **********************************************
+	 *												*
+	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
+	 * 												*
+	 ************************************************/
 	public NetCell getCell(int x, int y) throws IllegalArgumentException {
 		if (x < 0 || y < 0 || x >= Constants.MAP_SIDE || y >= Constants.MAP_SIDE) {
 			throw new IllegalArgumentException();
@@ -56,27 +83,6 @@ public class NetMap implements Serializable {
 
 	// TODO: are these really necessary?
 	// security check methods
-	/**
-	 * It check if the map isn't corrupted and has the original format
-	 * @return true if map isn't corrupted
-	 */
-	public boolean trueMap() {
-		if (cells.size() != Constants.MAP_SIDE) {
-			return false;
-		}
-		// it checks that the map has the right size and that each cell and building isn't corrupted
-		for (int i = 0; i < cells.size(); i++) {
-			if (cells.get(i).size() != Constants.MAP_SIDE) {
-				return false;
-			}
-			for (int j = 0; j < cells.get(i).size(); j++) {
-				if (!cells.get(i).get(j).trueCell() || numberOfCell(cells.get(i).get(j)) != 1) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 	public boolean containWorker(NetWorker worker) {
 		for (int i = 0; i < cells.size(); i++) {
 			for (int j = 0; j < cells.get(i).size(); j++) {

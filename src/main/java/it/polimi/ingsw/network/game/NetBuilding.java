@@ -12,17 +12,50 @@ public class NetBuilding implements Serializable {
 		level = building.getLevel();
 		dome = building.getDome();
 	}
+	public NetBuilding(NetBuilding building) {
+		level = building.getLevel();
+		dome = building.isDome();
+	}
+	private NetBuilding(NetBuilding building, int newLevel) {
+		level = newLevel;
+		dome = building.isDome();
+	}
+	private NetBuilding(NetBuilding building, boolean newDome) {
+		level = building.getLevel();
+		dome = newDome;
+	}
 
+	/* **********************************************
+	 *												*
+	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+	 * 												*
+	 ************************************************/
+	public NetBuilding setLevel(int level) {
+		return new NetBuilding(this,level);
+	}
+	public NetBuilding setLevel(boolean dome) {
+		return new NetBuilding(this,dome);
+	}
+
+	/* **********************************************
+	 *												*
+	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
+	 * 												*
+	 ************************************************/
 	public int getLevel() {
 		return level;
 	}
 	public boolean isDome() {
 		return dome;
 	}
-
-	// TODO: is this really necessary?
-	// security check methods
-	public boolean trueBuilding() {
-		return level <= 3 && level >= 0;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NetBuilding) {
+			NetBuilding other = (NetBuilding) obj;
+			if (level == other.level && dome == other.dome) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

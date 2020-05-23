@@ -17,25 +17,58 @@ public class NetCell implements Serializable {
 			worker = null;
 		}
 	}
+	public NetCell(NetCell netCell) {
+		building = new NetBuilding(netCell.getBuilding());
+		if(netCell.getWorker() != null){
+			worker = new NetWorker(netCell.getWorker(), this);
+		} else {
+			worker = null;
+		}
+	}
+	private NetCell(NetCell netCell, NetWorker netWorker) {
+		building = new NetBuilding(netCell.getBuilding());
+		worker = netWorker;
+	}
+	private NetCell(NetCell netCell, NetBuilding netBuilding) {
+		building = netBuilding;
+		if(netCell.getWorker() != null){
+			worker = new NetWorker(netCell.getWorker(), this);
+		} else {
+			worker = null;
+		}
+	}
 
+	/* **********************************************
+	 *												*
+	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+	 * 												*
+	 ************************************************/
+	public NetCell setWorker(NetWorker worker) {
+		return new NetCell(this,worker);
+	}
+	public NetCell setBuilding(NetBuilding building) {
+		return new NetCell(this,building);
+	}
+
+	/* **********************************************
+	 *												*
+	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
+	 * 												*
+	 ************************************************/
 	public NetBuilding getBuilding() {
 		return building;
 	}
 	public NetWorker getWorker() {
 		return worker;
 	}
-
-	// TODO: is this really necessary?
-	// security check methods
-	public boolean trueCell() {
-		if (building == null) {
-			return false;
-		} else {
-			if (worker != null) {
-				return building.trueBuilding() && worker.position == this;
-			} else {
-				return building.trueBuilding();
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof NetCell) {
+			NetCell other = (NetCell) obj;
+			if (((worker != null && other.worker != null && worker.equals(other.worker)) || (worker == null && other.worker == null)) && building.equals(other.building)) {
+				return true;
 			}
 		}
+		return false;
 	}
 }
