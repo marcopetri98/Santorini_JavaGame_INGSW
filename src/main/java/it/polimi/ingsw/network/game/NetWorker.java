@@ -23,4 +23,17 @@ public class NetWorker implements Serializable {
 		owner = worker.owner.getPlayerName();
 		position = pos;
 	}
+
+	public Color getColor() {
+		return color;
+	}
+	public String getOwner() {
+		return owner;
+	}
+	public int getWorkerID() {
+		return workerID;
+	}
+	public NetCell getPosition() {
+		return position;
+	}
 }

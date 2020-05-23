@@ -145,8 +145,8 @@ public class NicknameServerAddressSceneController implements SceneController {
 
 		if (!messageCanBeSent) {
 			waitError();
-		} else if (nickname.split(" ").length > 1 || nickname.length() > Constants.MAX_NICKNAME_LEN) {
-			nicknameError();
+		} else if (nickname.split(" ").length > 1 || nickname.length() > Constants.MAX_NICKNAME_LEN || nickname.length() < Constants.MIN_NICKNAME_LEN) {
+			nicknameError(0);
 		} else if (serverAddress.split("\\.").length != 4) {
 			serverAddressError(0);
 		} else if (!Constants.isNumber(serverAddress.split("\\.")[0]) || !Constants.isNumber(serverAddress.split("\\.")[1]) || !Constants.isNumber(serverAddress.split("\\.")[2]) || !Constants.isNumber(serverAddress.split("\\.")[3])) {
@@ -187,7 +187,11 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
-	public void nicknameError() {
+	/**
+	 *
+	 * @param type 0 if it receives an error from the gui, 1 if it receives an error from the server
+	 */
+	public void nicknameError(int type) {
 		icon_errorFatal.setDisable(false);
 		moveImage(icon_error, errorNickname, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		messageCanBeSent = true;
@@ -256,7 +260,7 @@ public class NicknameServerAddressSceneController implements SceneController {
 				messageCanBeSent = true;
 				nameChosen = null;
 				button_exit.getScene().setCursor(Cursor.DEFAULT);
-				nicknameError();
+				nicknameError(1);
 			}
 		}
 	}

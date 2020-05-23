@@ -1,11 +1,15 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.core.state.Phase;
+import it.polimi.ingsw.network.game.NetCell;
+import it.polimi.ingsw.network.game.NetMap;
+import it.polimi.ingsw.network.objects.NetGameSetup;
 import it.polimi.ingsw.network.objects.NetGaming;
 import it.polimi.ingsw.network.objects.NetObject;
-import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
+import it.polimi.ingsw.util.Pair;
 import javafx.animation.PathTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -59,55 +63,55 @@ public class MapSceneController implements SceneController {
 	@FXML
 	private ImageView description_god;
 	@FXML
-	private ImageView cell_00;
+	private ImageView cell_0_0;
 	@FXML
-	private ImageView cell_01;
+	private ImageView cell_0_1;
 	@FXML
-	private ImageView cell_02;
+	private ImageView cell_0_2;
 	@FXML
-	private ImageView cell_03;
+	private ImageView cell_0_3;
 	@FXML
-	private ImageView cell_04;
+	private ImageView cell_0_4;
 	@FXML
-	private ImageView cell_10;
+	private ImageView cell_1_0;
 	@FXML
-	private ImageView cell_11;
+	private ImageView cell_1_1;
 	@FXML
-	private ImageView cell_12;
+	private ImageView cell_1_2;
 	@FXML
-	private ImageView cell_13;
+	private ImageView cell_1_3;
 	@FXML
-	private ImageView cell_14;
+	private ImageView cell_1_4;
 	@FXML
-	private ImageView cell_20;
+	private ImageView cell_2_0;
 	@FXML
-	private ImageView cell_21;
+	private ImageView cell_2_1;
 	@FXML
-	private ImageView cell_22;
+	private ImageView cell_2_2;
 	@FXML
-	private ImageView cell_23;
+	private ImageView cell_2_3;
 	@FXML
-	private ImageView cell_24;
+	private ImageView cell_2_4;
 	@FXML
-	private ImageView cell_30;
+	private ImageView cell_3_0;
 	@FXML
-	private ImageView cell_31;
+	private ImageView cell_3_1;
 	@FXML
-	private ImageView cell_32;
+	private ImageView cell_3_2;
 	@FXML
-	private ImageView cell_33;
+	private ImageView cell_3_3;
 	@FXML
-	private ImageView cell_34;
+	private ImageView cell_3_4;
 	@FXML
-	private ImageView cell_40;
+	private ImageView cell_4_0;
 	@FXML
-	private ImageView cell_41;
+	private ImageView cell_4_1;
 	@FXML
-	private ImageView cell_42;
+	private ImageView cell_4_2;
 	@FXML
-	private ImageView cell_43;
+	private ImageView cell_4_3;
 	@FXML
-	private ImageView cell_44;
+	private ImageView cell_4_4;
 	@FXML
 	private GridPane gridPane_cells;
 	@FXML
@@ -190,14 +194,26 @@ public class MapSceneController implements SceneController {
 	// triggers for server messages
 	private GameState gameState;
 
+	// variables for gui
+	private int worker1Id;
+	private int worker2Id;
+	private Pair<Integer,Integer> worker1StartingPos;
+	private Pair<Integer,Integer> worker2StartingPos;
+	private boolean waitingResponse = false;
+	private boolean workerLocking = false;
+	private int workerLocked = 0;
+
 	public void initialize() {
-		MainGuiController.getInstance().getGameState().getColors().get(MainGuiController.getInstance().getGameState().getPlayer());
+		MainGuiController.getInstance().setSceneController(this);
 		gameState = MainGuiController.getInstance().getGameState();
+		worker1Id = gameState.getPlayer().hashCode()+1;
+		worker2Id = gameState.getPlayer().hashCode()+2;
 
 		description_god.setImage(null);
 		initializeCells();
 		initializeAnimations();
 		setActivePlayer();
+		button_exit.toBack();
 		button_build.setDisable(true);
 		button_dome.setDisable(true);
 	}
@@ -220,31 +236,31 @@ public class MapSceneController implements SceneController {
 		slidingImage(clouds_right, cloudsRight, 400, 359, 1200, 359, 3200);
 	}
 	private void initializeCells() {
-		cell_00.setImage(blank);
-		cell_10.setImage(blank);
-		cell_20.setImage(blank);
-		cell_30.setImage(blank);
-		cell_40.setImage(blank);
-		cell_01.setImage(blank);
-		cell_11.setImage(blank);
-		cell_21.setImage(blank);
-		cell_31.setImage(blank);
-		cell_41.setImage(blank);
-		cell_02.setImage(blank);
-		cell_12.setImage(blank);
-		cell_22.setImage(blank);
-		cell_32.setImage(blank);
-		cell_42.setImage(blank);
-		cell_03.setImage(blank);
-		cell_13.setImage(blank);
-		cell_23.setImage(blank);
-		cell_33.setImage(blank);
-		cell_43.setImage(blank);
-		cell_04.setImage(blank);
-		cell_14.setImage(blank);
-		cell_24.setImage(blank);
-		cell_34.setImage(blank);
-		cell_44.setImage(blank);
+		cell_0_0.setImage(blank);
+		cell_1_0.setImage(blank);
+		cell_2_0.setImage(blank);
+		cell_3_0.setImage(blank);
+		cell_4_0.setImage(blank);
+		cell_0_1.setImage(blank);
+		cell_1_1.setImage(blank);
+		cell_2_1.setImage(blank);
+		cell_3_1.setImage(blank);
+		cell_4_1.setImage(blank);
+		cell_0_2.setImage(blank);
+		cell_1_2.setImage(blank);
+		cell_2_2.setImage(blank);
+		cell_3_2.setImage(blank);
+		cell_4_2.setImage(blank);
+		cell_0_3.setImage(blank);
+		cell_1_3.setImage(blank);
+		cell_2_3.setImage(blank);
+		cell_3_3.setImage(blank);
+		cell_4_3.setImage(blank);
+		cell_0_4.setImage(blank);
+		cell_1_4.setImage(blank);
+		cell_2_4.setImage(blank);
+		cell_3_4.setImage(blank);
+		cell_4_4.setImage(blank);
 	}
 
 	// initialize method
@@ -308,11 +324,13 @@ public class MapSceneController implements SceneController {
 	 ************************************************/
 	public void mousePressedIconExit(MouseEvent mouseEvent) {
 		if (!pressedIconExit) {
+			button_exit.toFront();
 			icon_exit.setImage(iconExitPressed);
 			slidingImage(box_exit, boxExit, 300, 47, 127, 47, 500);
 			slidingImage(button_exit, buttonExit, 200, 24, 36, 24, 500);
 			pressedIconExit = true;
 		} else {
+			button_exit.toBack();
 			icon_exit.setImage(iconExit);
 			slidingImage(box_exit, boxExit, 127, 47, 310, 47, 500);
 			slidingImage(button_exit, buttonExit, 36, 24, 220, 24, 500);
@@ -364,6 +382,58 @@ public class MapSceneController implements SceneController {
 		slidingImage(description_god, descriptionGodCard(), 129, 125, 129, 400, 450);
 	}
 
+	public void mousePressedCell(MouseEvent mouseEvent) {
+		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
+
+		// TODO: maybe we can insert actions on cells also on others turn
+		// if the player is clicking a cell on its turn it active possible actions
+		if (gameState.getActivePlayer().equals(gameState.getPlayer()) && !waitingResponse) {
+			if (colorPlayer().equals(workerRed)) {
+				movingWorker(pressedCell, workerRed, workerRedPressed, build1Red, build2Red, build3Red, build1RedPressed, build2RedPressed, build3RedPressed);
+			} else if (colorPlayer().equals(workerGreen)) {
+				movingWorker(pressedCell, workerGreen, workerGreenPressed, build1Green, build2Green, build3Green, build1GreenPressed, build2GreenPressed, build3GreenPressed);
+			} else if (colorPlayer().equals(workerBlue)) {
+				movingWorker(pressedCell, workerBlue, workerBluePressed, build1Blue, build2Blue, build3Blue, build1BluePressed, build2BluePressed, build3BluePressed);
+			}
+
+			pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
+		}
+	}
+	/**
+	 * This function press a worker not set up on the map before in the setup phase before starting the game, this does not place it
+	 * @param mouseEvent
+	 */
+	public void mousePressedSetWorker(MouseEvent mouseEvent) {
+		if (gameState.getTurn().getPhase() == Phase.SETUP) {
+			Image workerNormal = colorPlayer();
+			Image workerPressed = colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed);
+
+			if (((ImageView) mouseEvent.getTarget()).getImage().equals(workerNormal)) {
+				workerSelected = ((ImageView) mouseEvent.getTarget());
+				workerSelected.setImage(workerPressed);
+				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
+					pressedWorker1 = true;
+					worker2.setImage(workerNormal); //not pressed
+					pressedWorker2 = false;
+				} else { //worker2
+					pressedWorker2 = true;
+					worker1.setImage(workerNormal);
+					pressedWorker1 = false;
+				}
+			} else {
+				workerSelected = null; //deselect
+				((ImageView) mouseEvent.getTarget()).setImage(workerNormal);
+				pressedWorker1 = false;
+				pressedWorker2 = false;
+			}
+		}
+	}
+
+	/* **********************************************
+	 *												*
+	 *			METHODS FOR USER INTERACTION		*
+	 * 												*
+	 ************************************************/
 	private void movingWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build2Worker, Image build3Worker, Image build1WorkerPressed, Image build2WorkerPressed, Image build3WorkerPressed){
 		if (cellPressed.getImage().equals(worker) || cellPressed.getImage().equals(build1Worker) || cellPressed.getImage().equals(build2Worker) || cellPressed.getImage().equals(build3Worker)) {
 			if (!pressedButtonBuild && !pressedButtonDome) {
@@ -380,138 +450,6 @@ public class MapSceneController implements SceneController {
 		} else if (!cellPressed.getImage().equals(buildDome)) {
 			placeWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
 		}
-	}
-	public void mousePressedCell(MouseEvent mouseEvent) {
-		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
-		if(colorPlayer().equals(workerRed)){
-			movingWorker(pressedCell, workerRed, workerRedPressed, build1Red, build2Red, build3Red, build1RedPressed, build2RedPressed, build3RedPressed);
-		} else if(colorPlayer().equals(workerGreen)){
-			movingWorker(pressedCell, workerGreen, workerGreenPressed, build1Green, build2Green, build3Green, build1GreenPressed, build2GreenPressed, build3GreenPressed);
-		} else if(colorPlayer().equals(workerBlue)){
-			movingWorker(pressedCell, workerBlue, workerBluePressed, build1Blue, build2Blue, build3Blue, build1BluePressed, build2BluePressed, build3BluePressed);
-		}
-		pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
-	}
-	public void mousePressedSetWorker(MouseEvent mouseEvent) {
-		button_dome.setDisable(true);
-		button_build.setDisable(true);
-		if (colorPlayer().equals(workerRed)) {
-			if (((ImageView) mouseEvent.getTarget()).getImage().equals(workerRed)) {
-				workerSelected = ((ImageView) mouseEvent.getTarget());
-				workerSelected.setImage(workerRedPressed);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = true;
-					worker2.setImage(workerRed); //not pressed
-					pressedWorker2 = false;
-				} else { //worker2
-					pressedWorker2 = true;
-					worker1.setImage(workerRed);
-					pressedWorker1 = false;
-				}
-			} else {
-				workerSelected = null; //deselect
-				((ImageView) mouseEvent.getTarget()).setImage(workerRed);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = false;
-					pressedWorker2 = false;
-				} else {
-					pressedWorker2 = false;
-					pressedWorker1 = false;
-				}
-			}
-		} else if (colorPlayer().equals(workerGreen)) {
-			if (((ImageView) mouseEvent.getTarget()).getImage().equals(workerGreen)) {
-				workerSelected = ((ImageView) mouseEvent.getTarget());
-				workerSelected.setImage(workerGreenPressed);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = true;
-					worker2.setImage(workerGreen);
-					pressedWorker2 = false;
-				} else {
-					pressedWorker2 = true;
-					worker1.setImage(workerGreen);
-					pressedWorker1 = false;
-				}
-			} else {
-				workerSelected = null;
-				((ImageView) mouseEvent.getTarget()).setImage(workerGreen);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = false;
-					pressedWorker2 = false;
-				} else {
-					pressedWorker2 = false;
-					pressedWorker1 = false;
-				}
-			}
-		} else if (colorPlayer().equals(workerBlue)) {
-			if (((ImageView) mouseEvent.getTarget()).getImage().equals(workerBlue)) {
-				workerSelected = ((ImageView) mouseEvent.getTarget());
-				workerSelected.setImage(workerBluePressed);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = true;
-					worker2.setImage(workerBlue);
-					pressedWorker2 = false;
-				} else {
-					pressedWorker2 = true;
-					worker1.setImage(workerBlue);
-					pressedWorker1 = false;
-				}
-			} else {
-				workerSelected = null;
-				((ImageView) mouseEvent.getTarget()).setImage(workerBlue);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = false;
-					pressedWorker2 = false;
-				} else {
-					pressedWorker2 = false;
-					pressedWorker1 = false;
-				}
-			}
-		}
-	}
-
-	/* **********************************************
-	 *												*
-	 *			METHODS FOR USER INTERACTION		*
-	 * 												*
-	 ************************************************/
-	/**
-	 * This function moves through a line path an image.
-	 *
-	 * @param imageView the imageView I want to move
-	 * @param image     the png of the imageView
-	 * @param x1        the x coordinate at the beginning
-	 * @param y1        the y coordinate at the beginning
-	 * @param x2        the x coordinate at the end
-	 * @param y2        the y coordinate at the end
-	 * @param duration  time of the transition, in milliseconds
-	 */
-	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
-		imageView.setImage(image);
-		Line line = new Line();
-		line.setStartX(x1);
-		line.setStartY(y1);
-		line.setEndX(x2);
-		line.setEndY(y2);
-		PathTransition transition = new PathTransition();
-		transition.setNode(imageView);
-		transition.setDuration(Duration.millis(duration));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
-	}
-	private void slidingText(Text text, int x1, int y1, int x2, int y2, int duration) {
-		Line line = new Line();
-		line.setStartX(x1);
-		line.setStartY(y1);
-		line.setEndX(x2);
-		line.setEndY(y2);
-		PathTransition transition = new PathTransition();
-		transition.setNode(text);
-		transition.setDuration(Duration.millis(duration));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
 	}
 	private void pressingCell(ImageView cell, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
 		if (pressedButtonBuild) {
@@ -610,81 +548,187 @@ public class MapSceneController implements SceneController {
 		}
 	}
 	private void placeWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
-		if (workerSelected != null) { //if you are placing a worker
-			// TODO: controlling checkmove...
-			if (cellPressed.getImage().equals(blank)) {
-				cellPressed.setImage(worker);
+		boolean possibleToPerform;
+		NetCell netCellPressed;
+
+		//if you are placing a worker
+		if (workerSelected != null) {
+			// check if the action can be performed and set the variable possibleToPerform to indicate this
+			if (gameState.getTurn().getPhase() == Phase.SETUP) {
+				// evaluates if this is a possible move in setup phase
+				if (gameState.getMap() != null) {
+					netCellPressed = gameState.getMap().getCell(Integer.parseInt(cellPressed.getId().split("_")[1]), Integer.parseInt(cellPressed.getId().split("_")[2]));
+					if (netCellPressed.getWorker() == null) {
+						possibleToPerform = true;
+					} else {
+						possibleToPerform = false;
+						wrongMove();
+					}
+				} else {
+					possibleToPerform = true;
+				}
+			} else {
+				// evaluates if this is a possible move during player's turn
+				// TODO: evaluate player's turn moves
+				possibleToPerform = false;
+			}
+
+			// effectuates the move
+			if (possibleToPerform) {
 				if (workerSelected.getId().equals("worker1") || workerSelected.getId().equals("worker2")) {
+					if (workerSelected.getId().equals("worker1")) {
+						worker1StartingPos = new Pair<>(Integer.parseInt(cellPressed.getId().split("_")[1]),Integer.parseInt(cellPressed.getId().split("_")[2]));
+					} else {
+						worker2StartingPos = new Pair<>(Integer.parseInt(cellPressed.getId().split("_")[1]),Integer.parseInt(cellPressed.getId().split("_")[2]));
+					}
+					cellPressed.setImage(worker);
 					((AnchorPane) workerSelected.getParent()).getChildren().remove(workerSelected);
+					workerSelected = null;
 					++setWorkers;
 					if (setWorkers == 2) {
 						slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
-						button_build.setDisable(false);
-						button_dome.setDisable(false);
+						sendWorkerPositions();
 					}
-					workerSelected = null;
 				} else {
-					if(workerSelected.getImage().equals(workerPressed)) {
-						workerSelected.setImage(blank);
-						workerSelected = null;
-					} else if(workerSelected.getImage().equals(build1WorkerPressed)) {
-						workerSelected.setImage(build1);
-						workerSelected = null;
-					} else if(workerSelected.getImage().equals(build2WorkerPressed)) {
-						workerSelected.setImage(build2);
-						workerSelected = null;
-					} else if(workerSelected.getImage().equals(build3WorkerPressed)) {
-						workerSelected.setImage(build3);
-						workerSelected = null;
+					// TODO: what about conditioned moves?
+					if (cellPressed.getImage().equals(blank) || cellPressed.getImage().equals(build1) || cellPressed.getImage().equals(build2) || cellPressed.getImage().equals(build3)) {
+						cellPressed.setImage(cellPressed.getImage().equals(blank) ? worker : (cellPressed.getImage().equals(build1) ? build1Worker : (cellPressed.getImage().equals(build2) ? build2Worker : build3Worker)));
+						if (workerSelected.getImage().equals(workerPressed)) {
+							workerSelected.setImage(blank);
+							workerSelected = null;
+						} else if (workerSelected.getImage().equals(build1WorkerPressed)) {
+							workerSelected.setImage(build1);
+							workerSelected = null;
+						} else if (workerSelected.getImage().equals(build2WorkerPressed)) {
+							workerSelected.setImage(build2);
+							workerSelected = null;
+						} else if (workerSelected.getImage().equals(build3WorkerPressed)) {
+							workerSelected.setImage(build3);
+							workerSelected = null;
+						}
 					}
-				}
-			} else if (cellPressed.getImage().equals(build1)) {
-				cellPressed.setImage(build1Worker);
-				if (workerSelected.getImage().equals(workerPressed)) {
-					workerSelected.setImage(blank);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build1WorkerPressed)) {
-					workerSelected.setImage(build1);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build2WorkerPressed)) {
-					workerSelected.setImage(build2);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build3WorkerPressed)) {
-					workerSelected.setImage(build3);
-					workerSelected = null;
-				}
-			} else if (cellPressed.getImage().equals(build2)) {
-				cellPressed.setImage(build2Worker);
-				if (workerSelected.getImage().equals(workerPressed)) {
-					workerSelected.setImage(blank);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build1WorkerPressed)) {
-					workerSelected.setImage(build1);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build2WorkerPressed)) {
-					workerSelected.setImage(build2);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build3WorkerPressed)) {
-					workerSelected.setImage(build3);
-					workerSelected = null;
-				}
-			} else if (cellPressed.getImage().equals(build3)) {
-				cellPressed.setImage(build3Worker);
-				if (workerSelected.getImage().equals(workerPressed)) {
-					workerSelected.setImage(blank);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build1WorkerPressed)) {
-					workerSelected.setImage(build1);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build2WorkerPressed)) {
-					workerSelected.setImage(build2);
-					workerSelected = null;
-				} else if (workerSelected.getImage().equals(build3WorkerPressed)) {
-					workerSelected.setImage(build3);
-					workerSelected = null;
 				}
 			}
 		}
+	}
+
+	/* **********************************************
+	 *												*
+	 *		ANIMATIONS FOR THE GAME MAP				*
+	 * 												*
+	 ************************************************/
+	/**
+	 * This function moves through a line path an image.
+	 *
+	 * @param imageView the imageView I want to move
+	 * @param image     the png of the imageView
+	 * @param x1        the x coordinate at the beginning
+	 * @param y1        the y coordinate at the beginning
+	 * @param x2        the x coordinate at the end
+	 * @param y2        the y coordinate at the end
+	 * @param duration  time of the transition, in milliseconds
+	 */
+	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
+		imageView.setImage(image);
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
+	private void slidingText(Text text, int x1, int y1, int x2, int y2, int duration) {
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(text);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
+
+	/* **********************************************
+	 *												*
+	 *		SUPPORT METHODS USED TO HANDLE INPUT	*
+	 * 												*
+	 ************************************************/
+	private boolean otherPossibleMoves() {
+		// TODO: implement the possibility to create complex moves
+		return false;
+	}
+	private boolean otherPossibleBuilds() {
+		// TODO: implement the possibility to create complex builds
+		return false;
+	}
+	private ImageView getCell(int x, int y) {
+		switch (x) {
+			case 0 -> {
+				switch (y) {
+					case 0 -> { return cell_0_0; }
+					case 1 -> { return cell_0_1; }
+					case 2 -> { return cell_0_2; }
+					case 3 -> { return cell_0_3; }
+					case 4 -> { return cell_0_4; }
+				}
+			}
+			case 1 -> {
+				switch (y) {
+					case 0 -> { return cell_1_0; }
+					case 1 -> { return cell_1_1; }
+					case 2 -> { return cell_1_2; }
+					case 3 -> { return cell_1_3; }
+					case 4 -> { return cell_1_4; }
+				}
+			}
+			case 2 -> {
+				switch (y) {
+					case 0 -> { return cell_2_0; }
+					case 1 -> { return cell_2_1; }
+					case 2 -> { return cell_2_2; }
+					case 3 -> { return cell_2_3; }
+					case 4 -> { return cell_2_4; }
+				}
+			}
+			case 3 -> {
+				switch (y) {
+					case 0 -> { return cell_3_0; }
+					case 1 -> { return cell_3_1; }
+					case 2 -> { return cell_3_2; }
+					case 3 -> { return cell_3_3; }
+					case 4 -> { return cell_3_4; }
+				}
+			}
+			case 4 -> {
+				switch (y) {
+					case 0 -> { return cell_4_0; }
+					case 1 -> { return cell_4_1; }
+					case 2 -> { return cell_4_2; }
+					case 3 -> { return cell_4_3; }
+					case 4 -> { return cell_4_4; }
+				}
+			}
+		}
+		throw new AssertionError("Controller is trying to access a cell which does not exists");
+	}
+
+	/* **********************************************
+	 *												*
+	 *		MESSAGE BUILDERS TO SEND TO SERVER		*
+	 * 												*
+	 ************************************************/
+	private void sendWorkerPositions() {
+		button_exit.getScene().setCursor(Cursor.WAIT);
+		NetGameSetup workerPositions = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,gameState.getPlayer(),worker1StartingPos,worker2StartingPos);
+		MainGuiController.getInstance().sendMessage(workerPositions);
 	}
 
 	/* **********************************************
@@ -695,6 +739,61 @@ public class MapSceneController implements SceneController {
 	private void setActivePlayer() {
 		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
 		text_player.setText(gameState.getActivePlayer());
+	}
+	private void updateMap() {
+		NetMap map = gameState.getMap();
+
+		for (int i = 0; i < Constants.MAP_SIDE; i++) {
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if (map.getCell(i,j).getWorker() == null) {
+					// sets the correct image for cells where there isn't a worker
+					if (map.getCell(i,j).getBuilding().isDome()) {
+						getCell(i,j).setImage(buildDome);
+					} else {
+						switch (map.getCell(i, j).getBuilding().getLevel()) {
+							case 0 -> {
+								getCell(i,j).setImage(blank);
+							}
+							case 1 -> {
+								getCell(i,j).setImage(build1);
+							}
+							case 2 -> {
+								getCell(i,j).setImage(build2);
+							}
+							case 3 -> {
+								getCell(i,j).setImage(build3);
+							}
+						}
+					}
+				} else {
+					// sets the image for cells where there are workers
+					Color playerColor = gameState.getColors().get(map.getCell(i,j).getWorker().getOwner());
+					Image workerImg;
+
+					switch (map.getCell(i, j).getBuilding().getLevel()) {
+						case 0 -> {
+							workerImg = playerColor.equals(Color.RED) ? workerRed : (playerColor.equals(Color.GREEN) ? workerGreen : workerBlue);
+							getCell(i,j).setImage(workerImg);
+						}
+						case 1 -> {
+							workerImg = playerColor.equals(Color.RED) ? build1Red : (playerColor.equals(Color.GREEN) ? build1Green : build1Blue);
+							getCell(i,j).setImage(workerImg);
+						}
+						case 2 -> {
+							workerImg = playerColor.equals(Color.RED) ? build2Red : (playerColor.equals(Color.GREEN) ? build2Green : build2Blue);
+							getCell(i,j).setImage(workerImg);
+						}
+						case 3 -> {
+							workerImg = playerColor.equals(Color.RED) ? build3Red : (playerColor.equals(Color.GREEN) ? build3Green : build3Blue);
+							getCell(i,j).setImage(workerImg);
+						}
+					}
+				}
+			}
+		}
+	}
+	private void wrongMove() {
+		// TODO: prompts to the user that he is trying to perform an impossible move in its turn
 	}
 
 	/* **********************************************
@@ -708,6 +807,49 @@ public class MapSceneController implements SceneController {
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
-		// TODO: implement
+		switch (message.message) {
+			case Constants.GENERAL_PHASE_UPDATE -> {
+				gameState.advancePhase();
+			}
+			case Constants.TURN_PLAYERTURN -> {
+				button_exit.getScene().setCursor(Cursor.DEFAULT);
+				if (gameState.getTurn().getPhase() == Phase.SETUP) {
+					NetGameSetup gameSetupMessage = (NetGameSetup) message;
+					gameState.setActivePlayer(gameSetupMessage.player);
+				} else {
+					NetGaming gamingMessage = (NetGaming) message;
+					gameState.setActivePlayer(gamingMessage.player);
+				}
+				setActivePlayer();
+				card_god.setImage(godPlayer());
+				description_god.setImage(descriptionGodCard());
+			}
+			case Constants.GENERAL_GAMEMAP_UPDATE -> {
+				button_exit.getScene().setCursor(Cursor.DEFAULT);
+				if (gameState.getTurn().getPhase() == Phase.SETUP) {
+					NetGameSetup gameSetupMessage = (NetGameSetup) message;
+					gameState.setMap(gameSetupMessage.gameMap);
+				} else {
+					NetGaming gamingMessage = (NetGaming) message;
+					gameState.setMap(gamingMessage.gameMap);
+				}
+				updateMap();
+			}
+			case Constants.GENERAL_SETUP_DISCONNECT -> {
+				// TODO: someone has disconnected and for this reason the game is finished because we're in the setup
+			}
+			case Constants.GENERAL_PLAYER_DISCONNECTED -> {
+
+			}
+			case Constants.GENERAL_WINNER -> {
+
+			}
+			case Constants.GENERAL_DEFEATED -> {
+
+			}
+			case Constants.PLAYER_ACTIONS -> {
+
+			}
+		}
 	}
 }

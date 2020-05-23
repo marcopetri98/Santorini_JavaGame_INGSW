@@ -23,8 +23,11 @@ public class NetMap implements Serializable {
 		}
 	}
 
-	public NetCell getCell(int X, int Y){
-		return cells.get(X).get(Y);
+	public NetCell getCell(int x, int y) throws IllegalArgumentException {
+		if (x < 0 || y < 0 || x >= Constants.MAP_SIDE || y >= Constants.MAP_SIDE) {
+			throw new IllegalArgumentException();
+		}
+		return cells.get(x).get(y);
 	}
 	public int getX(NetCell c) throws IllegalArgumentException {
 		for (int i = 0; i < cells.size(); i++) {

@@ -13,6 +13,13 @@ public class NetBuilding implements Serializable {
 		dome = building.getDome();
 	}
 
+	public int getLevel() {
+		return level;
+	}
+	public boolean isDome() {
+		return dome;
+	}
+
 	// TODO: is this really necessary?
 	// security check methods
 	public boolean trueBuilding() {

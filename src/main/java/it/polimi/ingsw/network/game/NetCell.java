@@ -18,6 +18,13 @@ public class NetCell implements Serializable {
 		}
 	}
 
+	public NetBuilding getBuilding() {
+		return building;
+	}
+	public NetWorker getWorker() {
+		return worker;
+	}
+
 	// TODO: is this really necessary?
 	// security check methods
 	public boolean trueCell() {
