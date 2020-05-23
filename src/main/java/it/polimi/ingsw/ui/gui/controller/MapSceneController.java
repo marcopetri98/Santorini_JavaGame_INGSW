@@ -10,6 +10,7 @@ import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
+import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -116,6 +117,8 @@ public class MapSceneController implements SceneController {
 	private GridPane gridPane_cells;
 	@FXML
 	private Text text_player;
+	@FXML
+	private ImageView button_endTurn;
 
 	private boolean pressedIconExit = false;
 	private boolean pressedButtonBuild = false;
@@ -181,6 +184,9 @@ public class MapSceneController implements SceneController {
 	Image build3RedPressed = new Image("/img/map/build3_redPressed.png");
 	Image build3GreenPressed = new Image("/img/map/build3_greenPressed.png");
 	Image build3BluePressed = new Image("/img/map/build3_bluePressed.png");
+	Image buttonEndTurn = new Image("/img/map/button_endTurn.png");
+	Image buttonEndTurnPressed = new Image("/img/map/button_endTurn_pressed.png");
+	Image buttonEndTurnDisabled = new Image("/img/map/button_endTurn_disabled.png");
 
 	ImageView workerSelected = null;
 
@@ -209,6 +215,8 @@ public class MapSceneController implements SceneController {
 		worker1Id = gameState.getPlayer().hashCode()+1;
 		worker2Id = gameState.getPlayer().hashCode()+2;
 
+		button_endTurn.toBack();
+		button_endTurn.setImage(null);
 		description_god.setImage(null);
 		initializeCells();
 		initializeAnimations();
@@ -217,6 +225,16 @@ public class MapSceneController implements SceneController {
 		button_build.setDisable(true);
 		button_dome.setDisable(true);
 	}
+
+	private void fadeImage(ImageView imageView, Image image){
+		imageView.setImage(image);
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
+		ft.setFromValue(0);
+		ft.setToValue(1);
+		ft.setCycleCount(1);
+		ft.play();
+	}
+
 	private void initializeAnimations() {
 		slidingImage(box_exit, boxExit, 300, 47, 300, 47, 500);
 		slidingImage(button_exit, buttonExit, 200, 24, 200, 24, 500);
@@ -325,6 +343,9 @@ public class MapSceneController implements SceneController {
 	public void mousePressedIconExit(MouseEvent mouseEvent) {
 		if (!pressedIconExit) {
 			button_exit.toFront();
+			column_right.toFront();
+			worker2.toFront();
+			icon_exit.toFront();
 			icon_exit.setImage(iconExitPressed);
 			slidingImage(box_exit, boxExit, 300, 47, 127, 47, 500);
 			slidingImage(button_exit, buttonExit, 200, 24, 36, 24, 500);
@@ -587,6 +608,8 @@ public class MapSceneController implements SceneController {
 					++setWorkers;
 					if (setWorkers == 2) {
 						slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
+						button_endTurn.toFront();
+						fadeImage(button_endTurn, buttonEndTurnDisabled);
 						sendWorkerPositions();
 					}
 				} else {
@@ -851,5 +874,11 @@ public class MapSceneController implements SceneController {
 
 			}
 		}
+	}
+
+	public void mousePressedEndTurn(MouseEvent mouseEvent) {
+	}
+
+	public void mouseReleasedEndTurn(MouseEvent mouseEvent) {
 	}
 }
