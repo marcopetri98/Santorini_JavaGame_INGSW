@@ -456,6 +456,7 @@ public class MapSceneController implements SceneController {
 					if (gameState.getPossibleBuilds().contains(wantedBuild)) {
 						performedBuild = wantedBuild;
 						button_endTurn.setImage(buttonEndTurn);
+						button_endTurn.setDisable(false);
 
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
@@ -491,6 +492,7 @@ public class MapSceneController implements SceneController {
 					if (gameState.getPossibleBuilds().contains(wantedBuild)) {
 						performedBuild = wantedBuild;
 						button_endTurn.setImage(buttonEndTurn);
+						button_endTurn.setDisable(false);
 
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
@@ -574,6 +576,7 @@ public class MapSceneController implements SceneController {
 					if (setWorkers == 2) {
 						slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
 						button_endTurn.toFront();
+						button_endTurn.setDisable(true);
 						fadeImage(button_endTurn, buttonEndTurnDisabled);
 						sendWorkerPositions();
 					}
@@ -847,6 +850,7 @@ public class MapSceneController implements SceneController {
 		performedBuild = null;
 		pressedButtonDome = false;
 		pressedButtonBuild = false;
+		button_endTurn.setDisable(true);
 		button_dome.setImage(buttonDome);
 		button_build.setImage(buttonBuild);
 	}
@@ -992,6 +996,9 @@ public class MapSceneController implements SceneController {
 			case Constants.GENERAL_WINNER -> {
 				NetGaming netGaming = (NetGaming) message;
 				finished = true;
+				button_build.setDisable(true);
+				button_dome.setDisable(true);
+				button_endTurn.setDisable(true);
 				playerWon(netGaming.player);
 			}
 			case Constants.GENERAL_DEFEATED -> {
