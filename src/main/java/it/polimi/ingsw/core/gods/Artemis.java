@@ -114,8 +114,8 @@ public class Artemis extends GodCard {
 									if (!m.getCell(x2, y2).getBuilding().getDome()) {   //Check there is NO dome
 										if (m.getCell(x2, y2).getWorker() == null) {   //Check there is no worker on cell
 											//Adds a move with another linked move
-											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w);
-											firstMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x1, y1), m.getCell(x2, y2), w));
+											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x2, y2), w);
+											//firstMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x1, y1), m.getCell(x2, y2), w));
 											moves.add(firstMove);
 										}
 									}
