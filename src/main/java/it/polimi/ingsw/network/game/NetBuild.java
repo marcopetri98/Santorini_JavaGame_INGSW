@@ -5,6 +5,8 @@ import it.polimi.ingsw.core.Build;
 import it.polimi.ingsw.util.Constants;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used by the player to communicate to the server if
@@ -75,9 +77,66 @@ public class NetBuild implements Serializable {
 			other = new NetBuild(build.getOther());
 		}
 	}
+	private NetBuild(NetBuild build, NetBuild other) {
+		workerID = build.workerID;
+		cellX = build.cellX;
+		cellY = build.cellY;
+		level = build.level;
+		dome = build.dome;
+		this.other = other;
+	}
 
+	/* **********************************************
+	 *												*
+	 *		MODIFIERS FOR BUILD IMMUTABLE OBJECT	*
+	 * 												*
+	 ************************************************/
+	public NetBuild setWorkerId(int id) {
+		return new NetBuild(id,cellX,cellY,level,dome,other);
+	}
+	public NetBuild setCellX(int x) {
+		return new NetBuild(workerID,x,cellY,level,dome,other);
+	}
+	public NetBuild setCellY(int y) {
+		return new NetBuild(workerID,cellX,y,level,dome,other);
+	}
+	public NetBuild setLevel(int newLevel) {
+		return new NetBuild(workerID,cellX,cellY,newLevel,dome,other);
+	}
+	public NetBuild setDome(boolean newDome) {
+		return new NetBuild(workerID,cellX,cellY,level,newDome,other);
+	}
+	public NetBuild setOther(NetBuild otherBuild) {
+		return new NetBuild(this,otherBuild);
+	}
+	public NetBuild appendOther(NetBuild elementToAdd) {
+		List<NetBuild> listOfNetBuilds = getNetBuildsList();
+		NetBuild toReturn = elementToAdd;
+		for (int i = listOfNetBuilds.size()-1; i >= 0; i--) {
+			toReturn = listOfNetBuilds.get(i).setOther(toReturn);
+		}
+
+		return toReturn;
+	}
+
+	/* **********************************************
+	 *												*
+	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
+	 * 												*
+	 ************************************************/
+	public List<NetBuild> getNetBuildsList() {
+		List<NetBuild> returnList = new ArrayList<>();
+		returnList.add(this);
+
+		NetBuild pointer = other;
+		while (pointer != null) {
+			returnList.add(pointer);
+			pointer = pointer.other;
+		}
+		return returnList;
+	}
 	public boolean isWellFormed() {
-		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID != 0 && level >= 0 && level <= 2) {
+		if (cellX >= 0 && cellX < Constants.MAP_SIDE && cellY >= 0 && cellY < Constants.MAP_SIDE && workerID != 0 && level >= 0 && level <= 3) {
 			if (other != null) {
 				return other.isWellFormed();
 			} else {
@@ -87,7 +146,6 @@ public class NetBuild implements Serializable {
 			return false;
 		}
 	}
-
 	public boolean isLike(Object obj){
 		if(obj instanceof NetBuild){
 			NetBuild b = (NetBuild) obj;

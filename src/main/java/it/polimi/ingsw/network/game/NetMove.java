@@ -47,7 +47,7 @@ public class NetMove implements Serializable {
 
 	/* **********************************************
 	 *												*
-	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+	 *		MODIFIERS FOR MOVE IMMUTABLE OBJECT		*
 	 * 												*
 	 ************************************************/
 	public NetMove setWorkerId(int id) {

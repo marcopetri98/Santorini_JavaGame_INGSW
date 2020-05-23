@@ -57,17 +57,21 @@ public class NetMap implements Serializable {
 		return cells.get(x).get(y);
 	}
 	public int getX(NetCell c) throws IllegalArgumentException {
-		for (int i = 0; i < cells.size(); i++) {
-			if (cells.get(i).contains(c)) {
-				return i;
+		for (int i = 0; i < Constants.MAP_SIDE; i++) {
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if (c == cells.get(i).get(j)) {
+					return i;
+				}
 			}
 		}
 		throw new IllegalArgumentException();
 	}
 	public int getY(NetCell c) throws IllegalArgumentException  {
-		for (int i = 0; i < cells.size(); i++) {
-			if (cells.get(i).contains(c)) {
-				return cells.get(i).indexOf(c);
+		for (int i = 0; i < Constants.MAP_SIDE; i++) {
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if (c == cells.get(i).get(j)) {
+					return j;
+				}
 			}
 		}
 		throw new IllegalArgumentException();

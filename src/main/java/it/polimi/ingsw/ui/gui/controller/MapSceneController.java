@@ -1,10 +1,8 @@
 package it.polimi.ingsw.ui.gui.controller;
 
+import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.Phase;
-import it.polimi.ingsw.network.game.NetCell;
-import it.polimi.ingsw.network.game.NetMap;
-import it.polimi.ingsw.network.game.NetMove;
-import it.polimi.ingsw.network.game.NetWorker;
+import it.polimi.ingsw.network.game.*;
 import it.polimi.ingsw.network.objects.NetGameSetup;
 import it.polimi.ingsw.network.objects.NetGaming;
 import it.polimi.ingsw.network.objects.NetObject;
@@ -127,21 +125,11 @@ public class MapSceneController implements SceneController {
 	private boolean pressedIconExit = false;
 	private boolean pressedButtonBuild = false;
 	private boolean pressedButtonDome = false;
-	private boolean pressedBuild1Red = false;
-	private boolean pressedBuild2Red = false;
-	private boolean pressedBuild3Red = false;
-	private boolean pressedBuild1Green = false;
-	private boolean pressedBuild2Green = false;
-	private boolean pressedBuild3Green = false;
-	private boolean pressedBuild1Blue = false;
-	private boolean pressedBuild2Blue = false;
-	private boolean pressedBuild3Blue = false;
 	private int setWorkers = 0;
-	private boolean pressedSetWorker1 = false;
-	private boolean pressedSetWorker2 = false;
 
-	private boolean pressedWorker1 = false;     //??????????
-	private boolean pressedWorker2 = false;  //??????????
+	// TODO: are necessary?
+	private boolean pressedWorker1 = false;
+	private boolean pressedWorker2 = false;
 
 	Image boxWorkers = new Image("/img/map/box_workers.png");
 	Image boxBuild = new Image("/img/map/box_build.png");
@@ -205,21 +193,16 @@ public class MapSceneController implements SceneController {
 	private GameState gameState;
 
 	// variables for gui
-	private int worker1Id;
-	private int worker2Id;
 	private Pair<Integer,Integer> worker1StartingPos;
 	private Pair<Integer,Integer> worker2StartingPos;
 	private boolean finished = false;
 	private boolean waitingResponse = false;
-	private boolean workerLocking = false;
-	private int workerLocked = 0;
 	private NetMove performedMove = null;
+	private NetBuild performedBuild = null;
 
 	public void initialize() {
 		MainGuiController.getInstance().setSceneController(this);
 		gameState = MainGuiController.getInstance().getGameState();
-		worker1Id = gameState.getPlayer().hashCode()+1;
-		worker2Id = gameState.getPlayer().hashCode()+2;
 
 		button_endTurn.toBack();
 		button_endTurn.setImage(null);
@@ -228,10 +211,11 @@ public class MapSceneController implements SceneController {
 		initializeAnimations();
 		setActivePlayer();
 		button_exit.toBack();
+		button_build.toFront();
+		button_dome.toFront();
 		button_build.setDisable(true);
 		button_dome.setDisable(true);
 	}
-
 	private void fadeImage(ImageView imageView, Image image){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -240,7 +224,6 @@ public class MapSceneController implements SceneController {
 		ft.setCycleCount(1);
 		ft.play();
 	}
-
 	private void initializeAnimations() {
 		slidingImage(box_exit, boxExit, 300, 47, 300, 47, 500);
 		slidingImage(button_exit, buttonExit, 200, 24, 200, 24, 500);
@@ -384,7 +367,6 @@ public class MapSceneController implements SceneController {
 			button_build.setImage(buttonBuildPressed);
 			pressedButtonBuild = true;
 			button_dome.setDisable(true);
-
 		} else {
 			button_build.setImage(buttonBuild);
 			button_dome.setDisable(false);
@@ -423,7 +405,7 @@ public class MapSceneController implements SceneController {
 				movingWorker(pressedCell, workerBlue, workerBluePressed, build1Blue, build2Blue, build3Blue, build1BluePressed, build2BluePressed, build3BluePressed);
 			}
 
-			pressingCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
+			buildOnCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
 		} else if (waitingResponse) {
 			waitAction(0);
 		} else if (!gameState.getActivePlayer().equals(gameState.getPlayer())) {
@@ -431,37 +413,11 @@ public class MapSceneController implements SceneController {
 		}
 	}
 	public void mousePressedEndTurn(MouseEvent mouseEvent) {
+		button_endTurn.setImage(buttonEndTurnPressed);
 	}
 	public void mouseReleasedEndTurn(MouseEvent mouseEvent) {
-	}
-	/**
-	 * This function press a worker not set up on the map before in the setup phase before starting the game, this does not place it
-	 * @param mouseEvent
-	 */
-	public void mousePressedSetWorker(MouseEvent mouseEvent) {
-		if (gameState.getTurn().getPhase() == Phase.SETUP) {
-			Image workerNormal = colorPlayer();
-			Image workerPressed = colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed);
-
-			if (((ImageView) mouseEvent.getTarget()).getImage().equals(workerNormal)) {
-				workerSelected = ((ImageView) mouseEvent.getTarget());
-				workerSelected.setImage(workerPressed);
-				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
-					pressedWorker1 = true;
-					worker2.setImage(workerNormal); //not pressed
-					pressedWorker2 = false;
-				} else { //worker2
-					pressedWorker2 = true;
-					worker1.setImage(workerNormal);
-					pressedWorker1 = false;
-				}
-			} else {
-				workerSelected = null; //deselect
-				((ImageView) mouseEvent.getTarget()).setImage(workerNormal);
-				pressedWorker1 = false;
-				pressedWorker2 = false;
-			}
-		}
+		button_endTurn.setImage(buttonEndTurn);
+		sendWorkerBuild();
 	}
 
 	/* **********************************************
@@ -486,50 +442,84 @@ public class MapSceneController implements SceneController {
 			placeWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
 		}
 	}
-	private void pressingCell(ImageView cell, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
-		if (pressedButtonBuild) {
-			if (cell.getImage().equals(blank)) {
-				cell.setImage(build1);
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			} else if (cell.getImage().equals(build1)) {
-				cell.setImage(build2);
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			} else if (cell.getImage().equals(build2)) {
-				cell.setImage(build3);
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			} else {
-				button_build.setImage(buttonBuild);
-				button_dome.setDisable(false);
-				pressedButtonBuild = false;
-			}
-			button_dome.setImage(buttonDome);
-			pressedButtonDome = false;
-			button_build.setDisable(false);
-		}
+	private void buildOnCell(ImageView cellPressed, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
+		if (workerSelected != null && (pressedButtonBuild || pressedButtonDome)) {
+			// player is trying to build
+			if (pressedButtonBuild) {
+				NetBuild wantedBuild, complexBuild;
+				NetMap map = gameState.getMap();
+				NetCell cellClicked = map.getCell(Integer.parseInt(cellPressed.getId().split("_")[1]),Integer.parseInt(cellPressed.getId().split("_")[2]));
+				NetCell workerSel = map.getCell(Integer.parseInt(workerSelected.getId().split("_")[1]),Integer.parseInt(workerSelected.getId().split("_")[2]));
+				wantedBuild = new NetBuild(workerSel.getWorker().getWorkerID(), map.getX(cellClicked), map.getY(cellClicked), cellClicked.getBuilding().getLevel(), cellClicked.getBuilding().isDome());
 
-		if (pressedButtonDome) {
-			if (cell.getImage().equals(build3)) { //TODO: remember atlas...
-				cell.setImage(buildDome);
-				button_dome.setImage(buttonDome);
-				pressedButtonDome = false;
-				button_build.setDisable(false);
-			} else {
-				button_dome.setImage(buttonDome);
-				pressedButtonDome = false;
-				button_build.setDisable(false);
+				if (performedBuild == null) {
+					if (gameState.getPossibleBuilds().contains(wantedBuild)) {
+						performedBuild = wantedBuild;
+						button_endTurn.setImage(buttonEndTurn);
+
+						// player wants to build a building he can build, now the map is updated
+						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
+						updateMap();
+					} else {
+						wrongAction(1);
+					}
+				} else {
+					// builds the NetBuild which is wanted to be performed by the player
+					complexBuild = performedBuild.appendOther(wantedBuild);
+					if (gameState.getPossibleBuilds().contains(complexBuild)) {
+						performedBuild = complexBuild;
+						button_endTurn.setImage(buttonEndTurn);
+
+						// player wants to build a building he can build, now the map is updated
+						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
+						updateMap();
+					} else {
+						wrongAction(1);
+					}
+				}
 			}
+
+			// player is trying to build a dome
+			if (pressedButtonDome) {
+				NetBuild wantedBuild, complexBuild;
+				NetMap map = gameState.getMap();
+				NetCell cellClicked = map.getCell(Integer.parseInt(cellPressed.getId().split("_")[1]),Integer.parseInt(cellPressed.getId().split("_")[2]));
+				NetCell workerSel = map.getCell(Integer.parseInt(workerSelected.getId().split("_")[1]),Integer.parseInt(workerSelected.getId().split("_")[2]));
+				wantedBuild = new NetBuild(workerSel.getWorker().getWorkerID(),map.getX(cellClicked),map.getY(cellClicked),cellClicked.getBuilding().getLevel(),true);
+
+				if (performedBuild == null) {
+					if (gameState.getPossibleBuilds().contains(wantedBuild)) {
+						performedBuild = wantedBuild;
+						button_endTurn.setImage(buttonEndTurn);
+
+						// player wants to build a building he can build, now the map is updated
+						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
+						updateMap();
+					} else {
+						wrongAction(1);
+					}
+				} else {
+					// builds the NetBuild which is wanted to be performed by the player
+					complexBuild = performedBuild.appendOther(wantedBuild);
+					if (gameState.getPossibleBuilds().contains(complexBuild)) {
+						performedBuild = complexBuild;
+						button_endTurn.setImage(buttonEndTurn);
+
+						// player wants to build a building he can build, now the map is updated
+						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
+						updateMap();
+					} else {
+						wrongAction(1);
+					}
+				}
+			}
+		} else {
+			wrongAction(1);
 		}
 	}
 	private void placeWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
-		boolean possibleToPerform;
-		NetCell netCellPressed;
-		NetCell netWorkerCell, movingWorkerCell;
+		boolean possibleToPerform = false;
+		NetCell netCellPressed, netWorkerCell, movingWorkerCell;
 		NetMove performingMovement = null, currentMove;
 		NetMap netMap;
 		ImageView cellToChange;
@@ -550,7 +540,7 @@ public class MapSceneController implements SceneController {
 				} else {
 					possibleToPerform = true;
 				}
-			} else {
+			} else if (gameState.getTurn().getGamePhase() == GamePhase.BEFOREMOVE || gameState.getTurn().getGamePhase() == GamePhase.MOVE) {
 				// evaluates if this is a possible move during player's turn
 				netWorkerCell = gameState.getMap().getCell(Integer.parseInt(workerSelected.getId().split("_")[1]), Integer.parseInt(workerSelected.getId().split("_")[2]));
 				performingMovement = new NetMove(netWorkerCell.getWorker().getWorkerID(),Integer.parseInt(cellPressed.getId().split("_")[1]),Integer.parseInt(cellPressed.getId().split("_")[2]));
@@ -598,7 +588,7 @@ public class MapSceneController implements SceneController {
 							netMap = gameState.getMap();
 							netMap = netMap.changeCell(netMap.getCell(currentMove.cellX,currentMove.cellY).setWorker(movingWorkerCell.getWorker()),currentMove.cellX,currentMove.cellY);
 							if (!cellsChanged.contains(new Pair<>(currentMove.cellX,currentMove.cellY))) {
-								netMap = netMap.changeCell(movingWorkerCell.setWorker(null),netMap.getX(movingWorkerCell),netMap.getY(movingWorkerCell));
+								netMap = netMap.changeCell(movingWorkerCell.setWorker(null),Integer.parseInt(workerSelected.getId().split("_")[1]),Integer.parseInt(workerSelected.getId().split("_")[2]));
 							}
 							gameState.setMap(netMap);
 
@@ -611,7 +601,7 @@ public class MapSceneController implements SceneController {
 							netMap = gameState.getMap();
 							movingWorkerCell = netMap.getCell(currentMove.cellX,currentMove.cellY);
 							netMap = netMap.changeCell(netMap.getCell(currentMove.cellX,currentMove.cellY).setWorker(nowMoving.getWorker()),currentMove.cellX,currentMove.cellY);
-							netMap = netMap.changeCell(movingWorkerCell.setWorker(null),netMap.getX(movingWorkerCell),netMap.getY(movingWorkerCell));
+							netMap = netMap.changeCell(movingWorkerCell.setWorker(null),currentMove.cellX,currentMove.cellY);
 							cellsChanged.add(new Pair<>(currentMove.cellX,currentMove.cellY));
 							gameState.setMap(netMap);
 
@@ -622,24 +612,9 @@ public class MapSceneController implements SceneController {
 					updateMap();
 					sendWorkerMove(performedMove);
 					performedMove = null;
-
-					/*if (cellPressed.getImage().equals(blank) || cellPressed.getImage().equals(build1) || cellPressed.getImage().equals(build2) || cellPressed.getImage().equals(build3)) {
-						cellPressed.setImage(cellPressed.getImage().equals(blank) ? worker : (cellPressed.getImage().equals(build1) ? build1Worker : (cellPressed.getImage().equals(build2) ? build2Worker : build3Worker)));
-						if (workerSelected.getImage().equals(workerPressed)) {
-							workerSelected.setImage(blank);
-							workerSelected = null;
-						} else if (workerSelected.getImage().equals(build1WorkerPressed)) {
-							workerSelected.setImage(build1);
-							workerSelected = null;
-						} else if (workerSelected.getImage().equals(build2WorkerPressed)) {
-							workerSelected.setImage(build2);
-							workerSelected = null;
-						} else if (workerSelected.getImage().equals(build3WorkerPressed)) {
-							workerSelected.setImage(build3);
-							workerSelected = null;
-						}
-					}*/
 				}
+			} else {
+				wrongAction(0);
 			}
 		}
 	}
@@ -649,9 +624,6 @@ public class MapSceneController implements SceneController {
 	 *		CHANGES TO THE GAME MAP IMAGES			*
 	 * 												*
 	 ************************************************/
-	private void makeMove(NetMove performingMovement, ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
-
-	}
 	private void swapWorkers(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		if (workerSelected.getImage().equals(workerPressed)) {
 			workerSelected.setImage(worker);
@@ -706,6 +678,35 @@ public class MapSceneController implements SceneController {
 			workerSelected = cellPressed;
 			workerSelected.setImage(build3Worker);
 			workerSelected = null;
+		}
+	}
+	/**
+	 * This function press a worker not set up on the map before in the setup phase before starting the game, this does not place it
+	 * @param mouseEvent
+	 */
+	public void mousePressedSetWorker(MouseEvent mouseEvent) {
+		if (gameState.getTurn().getPhase() == Phase.SETUP) {
+			Image workerNormal = colorPlayer();
+			Image workerPressed = colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed);
+
+			if (((ImageView) mouseEvent.getTarget()).getImage().equals(workerNormal)) {
+				workerSelected = ((ImageView) mouseEvent.getTarget());
+				workerSelected.setImage(workerPressed);
+				if (((ImageView) mouseEvent.getTarget()).getId().equals("worker1")) {
+					pressedWorker1 = true;
+					worker2.setImage(workerNormal); //not pressed
+					pressedWorker2 = false;
+				} else { //worker2
+					pressedWorker2 = true;
+					worker1.setImage(workerNormal);
+					pressedWorker1 = false;
+				}
+			} else {
+				workerSelected = null; //deselect
+				((ImageView) mouseEvent.getTarget()).setImage(workerNormal);
+				pressedWorker1 = false;
+				pressedWorker2 = false;
+			}
 		}
 	}
 
@@ -824,16 +825,30 @@ public class MapSceneController implements SceneController {
 	 ************************************************/
 	private void sendWorkerPositions() {
 		button_exit.getScene().setCursor(Cursor.WAIT);
+		waitingResponse = true;
 		NetGameSetup workerPositions = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,gameState.getPlayer(),worker1StartingPos,worker2StartingPos);
 		MainGuiController.getInstance().sendMessage(workerPositions);
 	}
 	private void sendWorkerMove(NetMove move) {
 		button_exit.getScene().setCursor(Cursor.WAIT);
+		waitingResponse = true;
+		button_build.setDisable(false);
+		button_dome.setDisable(false);
 		NetGaming movePerformed = new NetGaming(Constants.PLAYER_IN_MOVE,gameState.getPlayer(),move);
 		MainGuiController.getInstance().sendMessage(movePerformed);
 	}
 	private void sendWorkerBuild() {
-
+		button_exit.getScene().setCursor(Cursor.WAIT);
+		waitingResponse = true;
+		button_build.setDisable(true);
+		button_dome.setDisable(true);
+		NetGaming buildPerformed = new NetGaming(Constants.PLAYER_IN_BUILD,gameState.getPlayer(),performedBuild);
+		MainGuiController.getInstance().sendMessage(buildPerformed);
+		performedBuild = null;
+		pressedButtonDome = false;
+		pressedButtonBuild = false;
+		button_dome.setImage(buttonDome);
+		button_build.setImage(buttonBuild);
 	}
 
 	/* **********************************************
@@ -921,6 +936,9 @@ public class MapSceneController implements SceneController {
 	private void playerDisconnected(String name) {
 		// TODO: prompts to the user that the player has disconnected
 	}
+	private void changePhase() {
+		// TODO: notify to the user that he is entered in a new phase
+	}
 
 	/* **********************************************
 	 *												*
@@ -947,10 +965,12 @@ public class MapSceneController implements SceneController {
 					gameState.setActivePlayer(gamingMessage.player);
 				}
 				setActivePlayer();
+				button_endTurn.setImage(buttonEndTurnDisabled);
 				card_god.setImage(godPlayer());
 			}
 			case Constants.GENERAL_GAMEMAP_UPDATE -> {
 				button_exit.getScene().setCursor(Cursor.DEFAULT);
+				waitingResponse = false;
 				if (gameState.getTurn().getPhase() == Phase.SETUP) {
 					NetGameSetup gameSetupMessage = (NetGameSetup) message;
 					gameState.setMap(gameSetupMessage.gameMap);

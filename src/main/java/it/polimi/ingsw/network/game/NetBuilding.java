@@ -33,7 +33,7 @@ public class NetBuilding implements Serializable {
 	public NetBuilding setLevel(int level) {
 		return new NetBuilding(this,level);
 	}
-	public NetBuilding setLevel(boolean dome) {
+	public NetBuilding setDome(boolean dome) {
 		return new NetBuilding(this,dome);
 	}
 
