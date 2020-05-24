@@ -170,6 +170,6 @@
             <Image url="@../img/home_exit_btn.png" />
          </image>
       </ImageView>
-      <Text fx:id="text_playerMessage" layoutX="561.0" layoutY="472.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="155.826171875" />
+      <Text fx:id="text_playerMessage" layoutX="561.0" layoutY="472.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="155.826171875" />
    </children>
 </AnchorPane>

@@ -274,9 +274,9 @@ public class MapSceneController implements SceneController {
 		ft.setToValue(to);
 		ft.setCycleCount(1);
 		if(flag == 1){
-			imageView.toBack();
-		} else {
 			imageView.toFront();
+		} else {
+			imageView.toBack();
 		}
 		return ft;
 	}
@@ -286,9 +286,9 @@ public class MapSceneController implements SceneController {
 		ft.setToValue(to);
 		ft.setCycleCount(1);
 		if(flag == 1){
-			text.toBack();
-		} else {
 			text.toFront();
+		} else {
+			text.toBack();
 		}
 		return ft;
 	}
@@ -527,12 +527,13 @@ public class MapSceneController implements SceneController {
 
 	public void mousePressedExit2(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
-		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
-		previousScene = new Scene(previousFXML);
+
 	}
 	public void mouseReleasedExit2(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExit);
 
+		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
+		previousScene = new Scene(previousFXML);
 		MainGuiController.getInstance().setSceneController(null);
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
@@ -544,9 +545,9 @@ public class MapSceneController implements SceneController {
 
 	public void mouseReleasedWatch(MouseEvent mouseEvent) {
 		button_watch.setImage(buttonWatch);
-		slidingImage(icon_message, iconLost, 650, 325, 650, 0, 1250);
+
 		fadeImage(button_watch, buttonWatch, 1, 0, 0);
-		button_watch.toBack();
+		slidingImage(icon_message, iconLost, 650, 0, 650, 325, 1250);
 		button_exit2.toFront();
 	}
 
@@ -1138,17 +1139,26 @@ public class MapSceneController implements SceneController {
 			button_watch.toFront();
 
 		} else {
-			icon_message.toFront();
+//			icon_message.toFront();
+//			text_playerMessage.toFront();
+//			text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+//			text_player.setText(name);
+//
+//			fadeText(text_playerMessage, 0, 1);
+//			fadeText(text_playerMessage, 1, 0);
+//			SequentialTransition iconLost = new SequentialTransition(setFadeImage(icon_message, iconOtherLost, 0, 1, 1), setFadeImage(icon_message, iconOtherLost, 1, 0, 1));
+//			SequentialTransition textLooser = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 1), setFadeText(text_playerMessage, 1, 0, 1));
+//			ParallelTransition looser = new ParallelTransition(iconLost, textLooser);
+//			looser.play();
+//
+			fadeImage(icon_message, iconOtherLost, 0, 1, 1);
 			text_playerMessage.toFront();
-			text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
-			text_player.setText(name);
-
 			fadeText(text_playerMessage, 0, 1);
+			text_playerMessage.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+			text_playerMessage.setText(name);
+			fadeImage(icon_message, iconOtherLost, 1, 0, 0);
 			fadeText(text_playerMessage, 1, 0);
-			SequentialTransition iconLost = new SequentialTransition(setFadeImage(icon_message, iconOtherLost, 0, 1, 0), setFadeImage(icon_message, iconOtherLost, 1, 0, 1));
-			SequentialTransition textLooser = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 0), setFadeText(text_playerMessage, 1, 0, 1));
-			ParallelTransition looser = new ParallelTransition(iconLost, textLooser);
-			looser.play();
+			text_playerMessage.toBack();
 		}
 	}
 	private void playerWon(String name) {
@@ -1160,31 +1170,26 @@ public class MapSceneController implements SceneController {
 			icon_message.toFront();
 			button_exit2.toFront();
 		} else {
-			icon_message.toFront();
+			fadeImage(BG_message, BGwatch, 0, 1, 1);
+			fadeImage(icon_message, iconOtherWon, 0, 1, 1);
+			fadeImage(button_exit2, buttonExit, 0, 1, 1);
 			text_playerMessage.toFront();
-			text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
-			text_player.setText(name);
-
 			fadeText(text_playerMessage, 0, 1);
-			fadeText(text_playerMessage, 1, 0);
-			SequentialTransition iconWin = new SequentialTransition(setFadeImage(icon_message, iconOtherWon, 0, 1, 0), setFadeImage(icon_message, iconOtherWon, 1, 0, 1));
-			SequentialTransition textWinner = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 0), setFadeText(text_playerMessage, 1, 0, 1));
-			ParallelTransition winner = new ParallelTransition(iconWin, textWinner);
-			winner.play();
+			text_playerMessage.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+			text_playerMessage.setText(name);
 		}
 	}
 	private void playerDisconnected(String name) {
-		icon_message.toFront();
-		text_playerMessage.toFront();
-		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
-		text_player.setText(name);
-
-		fadeText(text_playerMessage, 0, 1);
-		fadeText(text_playerMessage, 1, 0);
-		SequentialTransition iconDisconnect = new SequentialTransition(setFadeImage(icon_message, iconDisconnected, 0, 1, 0), setFadeImage(icon_message, iconDisconnected, 1, 0, 1));
-		SequentialTransition textDisconnect = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 0), setFadeText(text_playerMessage, 1, 0, 1));
-		ParallelTransition disconnect = new ParallelTransition(iconDisconnect, textDisconnect);
-		disconnect.play();
+		if (!gameState.getPlayer().equals(name)) {
+			fadeImage(icon_message, iconDisconnected, 0, 1, 1);
+			text_playerMessage.toFront();
+			fadeText(text_playerMessage, 0, 1);
+			text_playerMessage.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+			text_playerMessage.setText(name);
+			fadeImage(icon_message, iconDisconnected, 1, 0, 0);
+			fadeText(text_playerMessage, 1, 0);
+			text_playerMessage.toBack();
+		}
 	}
 
 	/* **********************************************
