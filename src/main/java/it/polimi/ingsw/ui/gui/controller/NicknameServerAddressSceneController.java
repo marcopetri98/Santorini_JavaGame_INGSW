@@ -52,6 +52,7 @@ public class NicknameServerAddressSceneController implements SceneController {
 	private Scene creatorScene;
 	private Stage currentStage;
 	private Image errorNickname = new Image("/img/error_invalidNickname.png");
+	private Image errorNicknameSame = new Image("/img/error_invalidNickname_same.png");
 	private Image errorIP = new Image("/img/error_invalidIP.png");
 	private Image errorSupportIp = new Image("/img/error_connectIP.png");
 	private Image errorWait = new Image("/img/error_wait.png");
@@ -192,12 +193,20 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 * @param type 0 if it receives an error from the gui, 1 if it receives an error from the server
 	 */
 	public void nicknameError(int type) {
-		icon_errorFatal.setDisable(false);
-		moveImage(icon_error, errorNickname, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		if(type == 0) {
+			icon_errorFatal.setDisable(false);
+			moveImage(icon_error, errorNickname, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198, 212, 600, 212, 700, 1000, 1000, 500);
+			button_next.toFront();
+			textField_nickname.toFront();
+			textField_address.toFront();
+		} else {
+			icon_errorFatal.setDisable(false);
+			moveImage(icon_error, errorNicknameSame, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+			button_next.toFront();
+			textField_nickname.toFront();
+			textField_address.toFront();
+		}
 		messageCanBeSent = true;
-		button_next.toFront();
-		textField_nickname.toFront();
-		textField_address.toFront();
 	}
 	public void serverAddressError(int i) {
 		icon_errorFatal.setDisable(false);

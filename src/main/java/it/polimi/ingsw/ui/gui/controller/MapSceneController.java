@@ -10,8 +10,7 @@ import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
-import javafx.animation.FadeTransition;
-import javafx.animation.PathTransition;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -121,6 +120,19 @@ public class MapSceneController implements SceneController {
 	private Text text_player;
 	@FXML
 	private ImageView button_endTurn;
+	@FXML
+	private ImageView icon_error;
+	@FXML
+	private ImageView button_exit2;
+	@FXML
+	private ImageView BG_message;
+	@FXML
+	private ImageView button_watch;
+	@FXML
+	private ImageView icon_message;
+	@FXML
+	private Text text_playerMessage;
+
 
 	private boolean pressedIconExit = false;
 	private boolean pressedButtonBuild = false;
@@ -179,6 +191,18 @@ public class MapSceneController implements SceneController {
 	Image buttonEndTurn = new Image("/img/map/button_endTurn.png");
 	Image buttonEndTurnPressed = new Image("/img/map/button_endTurn_pressed.png");
 	Image buttonEndTurnDisabled = new Image("/img/map/button_endTurn_disabled.png");
+	Image errorWait = new Image("/img/error_wait.png");
+	Image errorMove = new Image("/img/error_move.png");
+	Image errorBuild = new Image("/img/error_build.png");
+	Image errorSelectWorker = new Image("/img/error_selectWorker.png");
+	Image BGwatch = new Image("/img/passiveWatchFilter.png");
+	Image iconLost = new Image("/img/message_lost.png");
+	Image iconOtherLost = new Image("/img/message_otherLost.png");
+	Image buttonWatch = new Image("/img/button_watch.png");
+	Image buttonWatchPressed = new Image("/img/button_watch_pressed.png");
+	Image iconWon = new Image("/img/message_won.png");
+	Image iconOtherWon = new Image("/img/message_otherWon.png");
+	Image iconDisconnected = new Image("/img/message_otherDisconnected.png");
 
 	ImageView workerSelected = null;
 
@@ -207,23 +231,94 @@ public class MapSceneController implements SceneController {
 		button_endTurn.toBack();
 		button_endTurn.setImage(null);
 		description_god.setImage(null);
+		icon_error.setImage(null);
 		initializeCells();
 		initializeAnimations();
 		setActivePlayer();
+		BG_message.toBack();
+		icon_message.toBack();
+		button_exit2.toBack();
+		button_watch.toBack();
+		icon_error.toBack();
 		button_exit.toBack();
 		button_build.toFront();
 		button_dome.toFront();
 		button_build.setDisable(true);
 		button_dome.setDisable(true);
+		text_playerMessage.toBack();
+		icon_message.setImage(null);
+		BG_message.setImage(null);
+		button_watch.setImage(null);
+		button_exit2.setImage(null);
 	}
-	private void fadeImage(ImageView imageView, Image image){
+	private void fadeImage(ImageView imageView, Image image, int from, int to, int flag){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
-		ft.setFromValue(0);
-		ft.setToValue(1);
+		ft.setFromValue(from);
+		ft.setToValue(to);
+		ft.setCycleCount(1);
+		if(flag == 1){
+			imageView.toFront();
+		}
+		ft.play();
+	}
+
+	private Transition setFadeImage(ImageView imageView, Image image, int from, int to, int flag){
+		imageView.setImage(image);
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
+		ft.setFromValue(from);
+		ft.setToValue(to);
+		ft.setCycleCount(1);
+		if(flag == 1){
+			imageView.toBack();
+		}
+		return ft;
+	}
+	private Transition setFadeText(Text text, int from, int to, int flag){
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), text);
+		ft.setFromValue(from);
+		ft.setToValue(to);
+		ft.setCycleCount(1);
+		if(flag == 1){
+			text.toBack();
+		}
+		return ft;
+	}
+
+	private void fadeText(Text text, int from, int to){
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), text);
+		ft.setFromValue(from);
+		ft.setToValue(to);
 		ft.setCycleCount(1);
 		ft.play();
 	}
+
+	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+
+		return transition;
+	}
+
+	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
+		imageView.setImage(image);
+
+		Line line1 = new Line();
+		Line line2 = new Line();
+		Line line3 = new Line();
+		Line line4 = new Line();
+
+		SequentialTransition sequential = new SequentialTransition(setLine(imageView, line1, x1_1, y1_1, x2_1, y2_1, duration1), setLine(imageView, line2, x1_2, y1_2, x2_2, y2_2, duration2), setLine(imageView, line3, x1_3, y1_3, x2_3, y2_3, duration3), setLine(imageView, line4, x1_4, y1_4, x2_4, y2_4, duration4));
+		sequential.play();
+	}
+
 	private void initializeAnimations() {
 		slidingImage(box_exit, boxExit, 300, 47, 300, 47, 500);
 		slidingImage(button_exit, buttonExit, 200, 24, 200, 24, 500);
@@ -420,6 +515,31 @@ public class MapSceneController implements SceneController {
 		sendWorkerBuild();
 	}
 
+	public void mousePressedExit2(MouseEvent mouseEvent) throws IOException {
+		button_exit.setImage(buttonExitPressed);
+		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
+		previousScene = new Scene(previousFXML);
+	}
+	public void mouseReleasedExit2(MouseEvent mouseEvent) throws IOException {
+		button_exit.setImage(buttonExit);
+
+		MainGuiController.getInstance().setSceneController(null);
+		currentStage = (Stage) button_exit.getScene().getWindow();
+		currentStage.setScene(previousScene);
+	}
+
+	public void mousePressedWatch(MouseEvent mouseEvent) {
+		button_watch.setImage(buttonWatchPressed);
+	}
+
+	public void mouseReleasedWatch(MouseEvent mouseEvent) {
+		button_watch.setImage(buttonWatch);
+		slidingImage(icon_message, iconLost, 650, 325, 650, 0, 1250);
+		fadeImage(button_watch, buttonWatch, 1, 0, 0);
+		button_watch.toBack();
+		button_exit2.toFront();
+	}
+
 	/* **********************************************
 	 *												*
 	 *			METHODS FOR USER INTERACTION		*
@@ -516,7 +636,9 @@ public class MapSceneController implements SceneController {
 				}
 			}
 		} else {
-			wrongAction(1);
+			if (workerSelected == null && (pressedButtonDome || pressedButtonBuild)) {
+				wrongAction(2);
+			}
 		}
 	}
 	private void placeWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
@@ -527,7 +649,7 @@ public class MapSceneController implements SceneController {
 		ImageView cellToChange;
 
 		//if you are placing a worker
-		if (workerSelected != null) {
+		if (workerSelected != null && !pressedButtonDome && !pressedButtonBuild) {
 			// check if the action can be performed and set the variable possibleToPerform to indicate this
 			if (gameState.getTurn().getPhase() == Phase.SETUP) {
 				// evaluates if this is a possible move in setup phase
@@ -577,7 +699,7 @@ public class MapSceneController implements SceneController {
 						slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
 						button_endTurn.toFront();
 						button_endTurn.setDisable(true);
-						fadeImage(button_endTurn, buttonEndTurnDisabled);
+						fadeImage(button_endTurn, buttonEndTurnDisabled, 0, 1, 0);
 						sendWorkerPositions();
 					}
 				} else if (performingMovement != null) {
@@ -713,6 +835,8 @@ public class MapSceneController implements SceneController {
 		}
 	}
 
+
+
 	/* **********************************************
 	 *												*
 	 *		ANIMATIONS FOR THE GAME MAP				*
@@ -831,6 +955,7 @@ public class MapSceneController implements SceneController {
 		waitingResponse = true;
 		NetGameSetup workerPositions = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,gameState.getPlayer(),worker1StartingPos,worker2StartingPos);
 		MainGuiController.getInstance().sendMessage(workerPositions);
+		workerSelected = null;
 	}
 	private void sendWorkerMove(NetMove move) {
 		button_exit.getScene().setCursor(Cursor.WAIT);
@@ -839,6 +964,7 @@ public class MapSceneController implements SceneController {
 		button_dome.setDisable(false);
 		NetGaming movePerformed = new NetGaming(Constants.PLAYER_IN_MOVE,gameState.getPlayer(),move);
 		MainGuiController.getInstance().sendMessage(movePerformed);
+		workerSelected = null;
 	}
 	private void sendWorkerBuild() {
 		button_exit.getScene().setCursor(Cursor.WAIT);
@@ -848,6 +974,7 @@ public class MapSceneController implements SceneController {
 		NetGaming buildPerformed = new NetGaming(Constants.PLAYER_IN_BUILD,gameState.getPlayer(),performedBuild);
 		MainGuiController.getInstance().sendMessage(buildPerformed);
 		performedBuild = null;
+		workerSelected = null;
 		pressedButtonDome = false;
 		pressedButtonBuild = false;
 		button_endTurn.setDisable(true);
@@ -918,31 +1045,90 @@ public class MapSceneController implements SceneController {
 	}
 	/**
 	 *
-	 * @param i 0 if it is a wrong move, 1 if is a wrong build
+	 * @param i 0 if it is a wrong move, 1 if is a wrong build, 2 user is trying to build without selecting a worker.
 	 */
 	private void wrongAction(int i) {
-		// TODO: prompts to the user that he is trying to perform an impossible move in its turn
-		// TODO: prompts to the user that he is trying to perform an impossible build in its turn
+		if(i == 0){
+			icon_error.toFront();
+			moveImage(icon_error, errorMove, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		} else if(i == 1) {
+			icon_error.toFront();
+			moveImage(icon_error, errorBuild, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		} else {
+			icon_error.toFront();
+			moveImage(icon_error, errorSelectWorker, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		}
 	}
 	/**
 	 *
 	 * @param i 1 if he must wait its turn, 0 if he must wait server response
 	 */
 	private void waitAction(int i) {
-		// TODO: prompts to the user that he must wait
+		icon_error.toFront();
+		moveImage(icon_error, errorWait, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		icon_error.toBack();
 	}
 	private void playerLost(String name) {
-		// TODO: prompts to the user that the player name has lost the game
+		if (gameState.getPlayer().equals(name)) {
+			fadeImage(BG_message, BGwatch, 0, 1, 0);
+			slidingImage(icon_message, iconLost, 650, 0, 650, 325, 1250);
+			BG_message.toFront();
+			icon_message.toFront();
+			button_exit2.toFront();
+			button_watch.toFront();
+
+		} else {
+			icon_message.toFront();
+			text_playerMessage.toFront();
+			text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+			text_player.setText(name);
+
+			fadeText(text_playerMessage, 0, 1);
+			fadeText(text_playerMessage, 1, 0);
+			SequentialTransition iconLost = new SequentialTransition(setFadeImage(icon_message, iconOtherLost, 0, 1, 0), setFadeImage(icon_message, iconOtherLost, 1, 0, 1));
+			SequentialTransition textLooser = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 0), setFadeText(text_playerMessage, 1, 0, 1));
+			ParallelTransition looser = new ParallelTransition(iconLost, textLooser);
+			looser.play();
+		}
 	}
 	private void playerWon(String name) {
-		// TODO: prompts to the user that the player name has won the game
+		if (gameState.getPlayer().equals(name)) {
+			fadeImage(BG_message, BGwatch, 0, 1, 0);
+			fadeImage(button_exit2, buttonExit, 0, 1, 1);
+			slidingImage(icon_message, iconWon, 650, 0, 650, 325, 1250);
+			BG_message.toFront();
+			icon_message.toFront();
+
+		} else {
+			icon_message.toFront();
+			text_playerMessage.toFront();
+			text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+			text_player.setText(name);
+
+			fadeText(text_playerMessage, 0, 1);
+			fadeText(text_playerMessage, 1, 0);
+			SequentialTransition iconWin = new SequentialTransition(setFadeImage(icon_message, iconOtherWon, 0, 1, 0), setFadeImage(icon_message, iconOtherWon, 1, 0, 1));
+			SequentialTransition textWinner = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 0), setFadeText(text_playerMessage, 1, 0, 1));
+			ParallelTransition winner = new ParallelTransition(iconWin, textWinner);
+			winner.play();
+		}
 	}
 	private void playerDisconnected(String name) {
-		// TODO: prompts to the user that the player has disconnected
+		icon_message.toFront();
+		text_playerMessage.toFront();
+		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
+		text_player.setText(name);
+
+		fadeText(text_playerMessage, 0, 1);
+		fadeText(text_playerMessage, 1, 0);
+		SequentialTransition iconDisconnect = new SequentialTransition(setFadeImage(icon_message, iconDisconnected, 0, 1, 0), setFadeImage(icon_message, iconDisconnected, 1, 0, 1));
+		SequentialTransition textDisconnect = new SequentialTransition(setFadeText(text_playerMessage, 0, 1, 0), setFadeText(text_playerMessage, 1, 0, 1));
+		ParallelTransition disconnect = new ParallelTransition(iconDisconnect, textDisconnect);
+		disconnect.play();
 	}
-	private void changePhase() {
-		// TODO: notify to the user that he is entered in a new phase
-	}
+//	private void changePhase() {
+//		// TODO: notify to the user that he is entered in a new phase
+//	}
 
 	/* **********************************************
 	 *												*
@@ -1012,4 +1198,6 @@ public class MapSceneController implements SceneController {
 			}
 		}
 	}
+
+
 }

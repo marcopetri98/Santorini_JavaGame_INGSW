@@ -34,14 +34,14 @@
             <Font name="LillyBelle" size="23.0" />
          </font>
       </TextField>
-      <ImageView fx:id="icon_errorFatal" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <image>
-            <Image url="@../img/error_fatal.png" />
-         </image>
-      </ImageView>
       <ImageView fx:id="icon_errorFatalBG" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
             <Image url="@../img/errorFatal_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_errorFatal" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/error_fatal.png" />
          </image>
       </ImageView>
       <ImageView fx:id="button_exit" fitHeight="75.0" fitWidth="142.0" layoutX="171.0" layoutY="582.0" onMousePressed="#mousePressedExit" onMouseReleased="#mouseReleasedExit" pickOnBounds="true" preserveRatio="true">
