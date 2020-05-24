@@ -457,7 +457,7 @@ public class ServerClientListenerThread extends Thread {
 				output.reset();
 			} catch (IOException e2) {
 				setActive(false);
-				disconnect();
+				closeSocketAndTerminate();
 			}
 		}
 	}

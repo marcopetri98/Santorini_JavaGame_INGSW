@@ -128,6 +128,15 @@ public class Prometheus extends GodCard {
 				}
 			}
 		} else {
+			if (w == owner.getWorker1()) {
+				if (owner.getWorker2().itHasBuilt()) {
+					return moves;
+				}
+			} else {
+				if (owner.getWorker1().itHasBuilt()) {
+					return moves;
+				}
+			}
 			// the player hasn't built before moving and can move up
 			int x = m.getX(w.getPos());
 			int y = m.getY(w.getPos());

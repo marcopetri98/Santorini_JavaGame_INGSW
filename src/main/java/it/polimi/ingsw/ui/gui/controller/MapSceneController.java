@@ -222,6 +222,7 @@ public class MapSceneController implements SceneController {
 	private boolean finished = false;
 	private boolean waitingResponse = false;
 	private boolean transitioningFromSetupToPlay = false;
+	private boolean hasBuilt = false;
 	private NetMove performedMove = null;
 	private NetBuild performedBuild = null;
 
@@ -499,12 +500,14 @@ public class MapSceneController implements SceneController {
 		// TODO: maybe we can insert actions on cells also on others turn
 		// if the player is clicking a cell on its turn it active possible actions
 		if (gameState.getActivePlayer().equals(gameState.getPlayer()) && !waitingResponse && !finished) {
-			if (colorPlayer().equals(workerRed)) {
-				movingWorker(pressedCell, workerRed, workerRedPressed, build1Red, build2Red, build3Red, build1RedPressed, build2RedPressed, build3RedPressed);
-			} else if (colorPlayer().equals(workerGreen)) {
-				movingWorker(pressedCell, workerGreen, workerGreenPressed, build1Green, build2Green, build3Green, build1GreenPressed, build2GreenPressed, build3GreenPressed);
-			} else if (colorPlayer().equals(workerBlue)) {
-				movingWorker(pressedCell, workerBlue, workerBluePressed, build1Blue, build2Blue, build3Blue, build1BluePressed, build2BluePressed, build3BluePressed);
+			if (!pressedButtonDome && !pressedButtonBuild) {
+				if (colorPlayer().equals(workerRed)) {
+					movingWorker(pressedCell, workerRed, workerRedPressed, build1Red, build2Red, build3Red, build1RedPressed, build2RedPressed, build3RedPressed);
+				} else if (colorPlayer().equals(workerGreen)) {
+					movingWorker(pressedCell, workerGreen, workerGreenPressed, build1Green, build2Green, build3Green, build1GreenPressed, build2GreenPressed, build3GreenPressed);
+				} else if (colorPlayer().equals(workerBlue)) {
+					movingWorker(pressedCell, workerBlue, workerBluePressed, build1Blue, build2Blue, build3Blue, build1BluePressed, build2BluePressed, build3BluePressed);
+				}
 			}
 
 			buildOnCell(pressedCell, blank, build1, build2, build3, buildDome, button_build, buttonBuild, button_dome, buttonDome);
@@ -588,6 +591,7 @@ public class MapSceneController implements SceneController {
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
+						hasBuilt = true;
 
 						if (workerSel.getBuilding().getLevel() == 0) {
 							workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
@@ -611,6 +615,7 @@ public class MapSceneController implements SceneController {
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
+						hasBuilt = true;
 
 						if (workerSel.getBuilding().getLevel() == 0) {
 							workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
@@ -644,6 +649,17 @@ public class MapSceneController implements SceneController {
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
+						hasBuilt = true;
+
+						if (workerSel.getBuilding().getLevel() == 0) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 1) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build1RedPressed : (colorPlayer().equals(workerGreen) ? build1GreenPressed: build1BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 2) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build2RedPressed : (colorPlayer().equals(workerGreen) ? build2GreenPressed : build2BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 3) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
+						}
 					} else {
 						wrongAction(1);
 					}
@@ -657,6 +673,17 @@ public class MapSceneController implements SceneController {
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
+						hasBuilt = true;
+
+						if (workerSel.getBuilding().getLevel() == 0) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 1) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build1RedPressed : (colorPlayer().equals(workerGreen) ? build1GreenPressed: build1BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 2) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build2RedPressed : (colorPlayer().equals(workerGreen) ? build2GreenPressed : build2BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 3) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
+						}
 					} else {
 						wrongAction(1);
 					}
@@ -676,7 +703,7 @@ public class MapSceneController implements SceneController {
 		ImageView cellToChange;
 
 		//if you are placing a worker
-		if (workerSelected != null && !pressedButtonDome && !pressedButtonBuild) {
+		if (workerSelected != null && !pressedButtonDome && !pressedButtonBuild && !hasBuilt) {
 			// check if the action can be performed and set the variable possibleToPerform to indicate this
 			if (gameState.getTurn().getPhase() == Phase.SETUP) {
 				// evaluates if this is a possible move in setup phase
@@ -766,6 +793,10 @@ public class MapSceneController implements SceneController {
 					performedMove = null;
 				}
 			} else {
+				wrongAction(0);
+			}
+		} else {
+			if (hasBuilt) {
 				wrongAction(0);
 			}
 		}
@@ -1004,6 +1035,7 @@ public class MapSceneController implements SceneController {
 		workerSelected = null;
 		pressedButtonDome = false;
 		pressedButtonBuild = false;
+		hasBuilt = false;
 		button_endTurn.setDisable(true);
 		button_endTurn.setImage(buttonEndTurnDisabled);
 		button_dome.setImage(buttonDome);
