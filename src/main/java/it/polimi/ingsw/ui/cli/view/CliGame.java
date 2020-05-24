@@ -287,51 +287,74 @@ public class CliGame {
 							switch(chosenGods.get(player)) {
 
 								case Constants.PROMETHEUS :
-									if (command.commandType.equals(Constants.COMMAND_BUILD) && command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
-										try {
-											if (0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4) {
-												int x1 = Integer.parseInt(command.getParameter(2));
-												int y1 = Integer.parseInt(command.getParameter(3));
+									if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {
+										if (command.commandType.equals(Constants.COMMAND_BUILD) && command.getNumParameters() == 4 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2")) && (command.getParameter(1).equals("dome") || command.getParameter(1).equals("building"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4 && 0 <= Integer.parseInt(command.getParameter(3)) && Integer.parseInt(command.getParameter(3)) <= 4) {
+													int x1 = Integer.parseInt(command.getParameter(2));
+													int y1 = Integer.parseInt(command.getParameter(3));
 
-												if(command.getParameter(0).equals("worker1")) {
-													activeWorkerID = player.hashCode() + 1;
-												} else {
-													activeWorkerID = player.hashCode() + 2;
-												}
+													if(command.getParameter(0).equals("worker1")) {
+														activeWorkerID = player.hashCode() + 1;
+													} else {
+														activeWorkerID = player.hashCode() + 2;
+													}
 
-												if(command.getParameter(1).equals("dome")){
-													selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true);
-												} else if(command.getParameter(1).equals("building")) {
-													selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false);
+													if(command.getParameter(1).equals("dome")){
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true);
+													} else if(command.getParameter(1).equals("building")) {
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false);
+													}
+													if(netBuilds.contains(selectedBuild)) {
+														hasBuiltBefore = true;
+														return true;
+													}
 												}
-												if(netBuilds.contains(selectedBuild)) {
-													hasBuiltBefore = true;
-													return true;
-												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
 											}
-										} catch (NumberFormatException nfe) {
-											System.out.println("You didn't insert a correct number");
-											return false;
-										}
-									} else if (command.commandType.equals(Constants.COMMAND_MOVE) && phase.getGamePhase() == GamePhase.BEFOREMOVE && command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
-										try {
-											if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
-												if(command.getParameter(0).equals("worker1")){
-													selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
-												} else if (command.getParameter(0).equals("worker2")){
-													selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+										} else if (command.commandType.equals(Constants.COMMAND_MOVE) && command.getNumParameters() == 3 && (command.getParameter(0).equals("worker1") || command.getParameter(0).equals("worker2"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													if(command.getParameter(0).equals("worker1")){
+														selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													} else if (command.getParameter(0).equals("worker2")){
+														selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+													}
+													if(netMoves.contains(selectedMove)) {
+														activeWorkerID = selectedMove.workerID;
+														return true;
+													}
 												}
-												if(netMoves.contains(selectedMove)) {
-													activeWorkerID = selectedMove.workerID;
-													return true;
-												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
 											}
-										} catch (NumberFormatException nfe) {
-											System.out.println("You didn't insert a correct number");
-											return false;
 										}
+										return false;
+									} else if(phase.getGamePhase() == GamePhase.BUILD) {
+										if (command.commandType.equals(Constants.COMMAND_BUILD) && command.getNumParameters() == 3 && (command.getParameter(0).equals("dome") || command.getParameter(0).equals("building"))) {
+											try {
+												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
+													int x1 = Integer.parseInt(command.getParameter(1));
+													int y1 = Integer.parseInt(command.getParameter(2));
+													if(command.getParameter(0).equals("dome")){
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, true);
+													} else if(command.getParameter(0).equals("building")) {
+														selectedBuild = new NetBuild(activeWorkerID, x1, y1, netMap.getCell(x1,y1).building.level, false);
+													}
+													if(netBuilds.contains(selectedBuild)) {
+														return true;
+													}
+												}
+											} catch (NumberFormatException nfe) {
+												System.out.println("You didn't insert a correct number");
+												return false;
+											}
+										}
+										return false;
 									}
-									return false;
 
 								case Constants.DEMETER :	//only syntax: build dome/building x_coord y_coord (dome/building x_coord y_coord)
 									if (command.commandType.equals(Constants.COMMAND_BUILD)) {
@@ -528,6 +551,7 @@ public class CliGame {
 	private void parseMessages(){
 		while(messages.size() != 0){
 			parseMessage(messages.getFirst());
+			if(functioning == false)	break;
 			messages.remove();
 		}
 	}
@@ -773,8 +797,12 @@ public class CliGame {
 						}
 					}
 				} else {
-					if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {
+					if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {	//if I'm in beforemove I show the message only if someone has prometheus
 						if(chosenGods.values().contains(Constants.PROMETHEUS)) {
+							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
+						}
+					} else if(phase.getGamePhase() == GamePhase.MOVE) {	//if I'm in move and the activePlayer has prometheus, I don't show it
+						if(chosenGods.get(activePlayer).equals(Constants.PROMETHEUS)) {
 							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
 						}
 					} else {
@@ -1383,5 +1411,6 @@ public class CliGame {
 			System.out.print(chosenGods.get(player) + ".");
 			System.out.print("\n");
 		}
+		System.out.print("\n");
 	}
 }
