@@ -221,6 +221,7 @@ public class MapSceneController implements SceneController {
 	private Pair<Integer,Integer> worker2StartingPos;
 	private boolean finished = false;
 	private boolean waitingResponse = false;
+	private boolean transitioningFromSetupToPlay = false;
 	private NetMove performedMove = null;
 	private NetBuild performedBuild = null;
 
@@ -259,6 +260,8 @@ public class MapSceneController implements SceneController {
 		ft.setCycleCount(1);
 		if(flag == 1){
 			imageView.toFront();
+		} else {
+			imageView.toBack();
 		}
 		ft.play();
 	}
@@ -271,6 +274,8 @@ public class MapSceneController implements SceneController {
 		ft.setCycleCount(1);
 		if(flag == 1){
 			imageView.toBack();
+		} else {
+			imageView.toFront();
 		}
 		return ft;
 	}
@@ -281,6 +286,8 @@ public class MapSceneController implements SceneController {
 		ft.setCycleCount(1);
 		if(flag == 1){
 			text.toBack();
+		} else {
+			text.toFront();
 		}
 		return ft;
 	}
@@ -581,6 +588,16 @@ public class MapSceneController implements SceneController {
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
+
+						if (workerSel.getBuilding().getLevel() == 0) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 1) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build1RedPressed : (colorPlayer().equals(workerGreen) ? build1GreenPressed: build1BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 2) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build2RedPressed : (colorPlayer().equals(workerGreen) ? build2GreenPressed : build2BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 3) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
+						}
 					} else {
 						wrongAction(1);
 					}
@@ -594,6 +611,16 @@ public class MapSceneController implements SceneController {
 						// player wants to build a building he can build, now the map is updated
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
+
+						if (workerSel.getBuilding().getLevel() == 0) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 1) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build1RedPressed : (colorPlayer().equals(workerGreen) ? build1GreenPressed: build1BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 2) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build2RedPressed : (colorPlayer().equals(workerGreen) ? build2GreenPressed : build2BluePressed));
+						} else if (workerSel.getBuilding().getLevel() == 3) {
+							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
+						}
 					} else {
 						wrongAction(1);
 					}
@@ -978,6 +1005,7 @@ public class MapSceneController implements SceneController {
 		pressedButtonDome = false;
 		pressedButtonBuild = false;
 		button_endTurn.setDisable(true);
+		button_endTurn.setImage(buttonEndTurnDisabled);
 		button_dome.setImage(buttonDome);
 		button_build.setImage(buttonBuild);
 	}
@@ -1098,7 +1126,7 @@ public class MapSceneController implements SceneController {
 			slidingImage(icon_message, iconWon, 650, 0, 650, 325, 1250);
 			BG_message.toFront();
 			icon_message.toFront();
-
+			button_exit2.toFront();
 		} else {
 			icon_message.toFront();
 			text_playerMessage.toFront();
@@ -1126,9 +1154,6 @@ public class MapSceneController implements SceneController {
 		ParallelTransition disconnect = new ParallelTransition(iconDisconnect, textDisconnect);
 		disconnect.play();
 	}
-//	private void changePhase() {
-//		// TODO: notify to the user that he is entered in a new phase
-//	}
 
 	/* **********************************************
 	 *												*
@@ -1143,7 +1168,20 @@ public class MapSceneController implements SceneController {
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
 			case Constants.GENERAL_PHASE_UPDATE -> {
+				if (gameState.getTurn().getPhase() == Phase.SETUP) {
+					transitioningFromSetupToPlay = true;
+				}
 				gameState.advancePhase();
+				if (gameState.getTurn().getGamePhase() == GamePhase.BEFOREMOVE && gameState.getPlayer().equals(gameState.getActivePlayer())) {
+					button_dome.setDisable(false);
+					button_build.setDisable(false);
+				} else if (gameState.getTurn().getGamePhase() == GamePhase.MOVE && gameState.getPlayer().equals(gameState.getActivePlayer())) {
+					button_dome.setDisable(true);
+					button_build.setDisable(true);
+				} else if (gameState.getTurn().getGamePhase() == GamePhase.BUILD && gameState.getPlayer().equals(gameState.getActivePlayer())) {
+					button_dome.setDisable(false);
+					button_build.setDisable(false);
+				}
 			}
 			case Constants.TURN_PLAYERTURN -> {
 				button_exit.getScene().setCursor(Cursor.DEFAULT);
@@ -1153,6 +1191,13 @@ public class MapSceneController implements SceneController {
 				} else {
 					NetGaming gamingMessage = (NetGaming) message;
 					gameState.setActivePlayer(gamingMessage.player);
+					if (transitioningFromSetupToPlay) {
+						if (gameState.getPlayer().equals(gameState.getActivePlayer())) {
+							button_dome.setDisable(false);
+							button_build.setDisable(false);
+						}
+						transitioningFromSetupToPlay = false;
+					}
 				}
 				setActivePlayer();
 				button_endTurn.setImage(buttonEndTurnDisabled);

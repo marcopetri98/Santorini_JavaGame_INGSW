@@ -17,12 +17,11 @@ public class ObservableRemoteView extends ObservableObject {
 
 	@Override
 	public void addObserver(ObserverObject obs) throws IllegalArgumentException {
+		super.addObserver(obs);
 		if (obs instanceof ObserverController) {
 			if (ctrObs == null) {
 				ctrObs = (ObserverController)obs;
 			}
-		} else {
-			super.addObserver(obs);
 		}
 	}
 	@Override

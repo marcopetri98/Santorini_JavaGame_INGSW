@@ -75,14 +75,18 @@ public class Hephaestus extends GodCard {
 							if (m.getCell(x1, y1).getWorker() == null) {   			//Check there isn't any worker on the cell
 								if (!m.getCell(x1, y1).getBuilding().getDome()) {   		//Check there is NO dome
 									if(m.getCell(x1, y1).getBuilding().getLevel() <= 2) {
-										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));				//adds possible build: only one block
+										//adds possible build: only one block
+										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));
 										if (m.getCell(x1, y1).getBuilding().getLevel() <= 1) {
 											Build secondBuild = new Build(w, m.getCell(x1, y1), false, TypeBuild.CONDITIONED_BUILD);
 											secondBuild.setCondition(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));
-											builds.add(secondBuild);												//adds possible build: two block build
+											//adds possible build: two block build
+											builds.add(secondBuild);
 										}
+									} else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) {
+										// adds possible build: single dome on top of three level building
+										builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));
 									}
-									else if(m.getCell(x1, y1).getBuilding().getLevel() == 3) builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));	//adds possible build: single dome on top of three level building
 								}
 							}
 						}

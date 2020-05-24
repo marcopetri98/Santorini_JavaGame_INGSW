@@ -149,7 +149,7 @@ public class NetBuild implements Serializable {
 	public boolean isLike(Object obj){
 		if(obj instanceof NetBuild){
 			NetBuild b = (NetBuild) obj;
-			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.level == b.level && this.dome == b.dome) {
+			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.dome == b.dome) {
 				return true;
 			} else {
 				return false;
@@ -163,7 +163,7 @@ public class NetBuild implements Serializable {
 	public boolean equals(Object obj){
 		if(obj instanceof NetBuild){
 			NetBuild b = (NetBuild) obj;
-			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.level == b.level && this.dome == b.dome && ((this.other == null && b.other == null) || (this.other != null && b.other != null && this.other.equals(b.other)))) {
+			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.dome == b.dome && ((this.other == null && b.other == null) || (this.other != null && b.other != null && this.other.equals(b.other)))) {
 				return true;
 			} else {
 				return false;

@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.game;
 
 // necessary imports from other packages of the project
 import it.polimi.ingsw.core.Move;
+import it.polimi.ingsw.core.TypeMove;
 
 // necessary imports of Java SE
 import java.io.Serializable;
@@ -17,7 +18,9 @@ public class NetAvailablePositions implements Serializable {
 	public NetAvailablePositions(List<Move> possibleMoves) {
 		moves = new ArrayList<>();
 		for (Move m : possibleMoves) {
-			moves.add(new NetMove(m));
+			if (m.typeMove != TypeMove.FORBIDDEN_MOVE) {
+				moves.add(new NetMove(m));
+			}
 		}
 	}
 

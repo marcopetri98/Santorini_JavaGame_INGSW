@@ -99,7 +99,7 @@ public class Prometheus extends GodCard {
 	@Override
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {   //worker->activeworker
 		// if the phase isn't the move phase it throws a move exception
-		if (turn.getGamePhase() != GamePhase.MOVE) {
+		if (turn.getGamePhase() == GamePhase.BUILD) {
 			throw new NoMoveException();
 		}
 
