@@ -726,7 +726,7 @@ public class MapSceneController implements SceneController {
 						slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
 						button_endTurn.toFront();
 						button_endTurn.setDisable(true);
-						fadeImage(button_endTurn, buttonEndTurnDisabled, 0, 1, 0);
+						fadeImage(button_endTurn, buttonEndTurnDisabled, 0, 1, 1);
 						sendWorkerPositions();
 					}
 				} else if (performingMovement != null) {
