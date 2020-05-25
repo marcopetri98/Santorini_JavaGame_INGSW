@@ -1258,7 +1258,10 @@ public class MapSceneController implements SceneController {
 			case Constants.GENERAL_PLAYER_DISCONNECTED -> {
 				NetGaming netGaming = (NetGaming) message;
 				gameState.removePlayer(netGaming.player);
-				playerLost(netGaming.player);
+				finished = true;
+				button_build.setDisable(true);
+				button_dome.setDisable(true);
+				button_endTurn.setDisable(true);
 				playerDisconnected(netGaming.player);
 			}
 			case Constants.GENERAL_WINNER -> {

@@ -106,15 +106,30 @@ public class Game extends ObservableGame {
 		// removes the player and his workers
 		notifyDefeat(player.getPlayerName());
 		if(this.players.size() == 2) {
+			removePlayer(player);
 			applyWin(players.get(players.indexOf(player) == 1 ? 0 : 1));
 		} else {
 			if (activePlayer == player) {
 				int playerIndex = players.indexOf(player);
 				activePlayer = players.get(playerIndex == players.size() - 1 ? 0 : playerIndex + 1);
+				removePlayer(player);
+				notifyMove(getMap());
+
 				notifyActivePlayer(activePlayer.getPlayerName());
+				while (turn.getGamePhase() != GamePhase.BEFOREMOVE) {
+					turn.advance();
+					notifyPhaseChange(turn.clone());
+				}
+				computeActions();
+
+				if (getPlayerPossibleMoves().size() == 0 && getPlayerPossibleBuilds().size() == 0) {
+					applyDefeat(getPlayerTurn());
+				} else if (getPlayerPossibleBuilds().size() == 0) {
+					changeTurn();
+					computeActions();
+				}
 			}
 		}
-		removePlayer(player);
 	}
 	public synchronized void applyDisconnection(String playerName) throws IllegalArgumentException {
 		if (playerName == null) {
@@ -128,25 +143,10 @@ public class Game extends ObservableGame {
 			notifyEndForDisconnection();
 			removeAllObservers();
 		} else {
-			// applies the disconnection, if the player doesn't exist this line throws IllegalArgumentException
-			int playerIndex = players.indexOf(player);
-
-			if (players.size() == 2) {
-				removePlayer(player);
-				notifyQuit(playerName);
-				applyWin(players.get(0));
-			} else {
-				// distinguish if the disconnecting player is the active player or not because the game isn't finished
-				if (player == activePlayer) {
-					activePlayer = players.get(playerIndex == players.size() - 1 ? 0 : playerIndex + 1);
-					removePlayer(player);
-					notifyQuit(playerName);
-					notifyActivePlayer(activePlayer.getPlayerName());
-				} else {
-					removePlayer(player);
-					notifyQuit(playerName);
-				}
-			}
+			isFinished = true;
+			removePlayer(player);
+			notifyQuit(playerName);
+			removeAllObservers();
 		}
 	}
 	public synchronized void applyWorkerLock(Player player, int worker) throws IllegalArgumentException {
