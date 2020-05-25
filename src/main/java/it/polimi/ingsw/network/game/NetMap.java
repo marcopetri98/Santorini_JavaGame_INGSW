@@ -36,6 +36,16 @@ public class NetMap implements Serializable {
 		}
 	}
 
+	public NetMap() {
+		cells = new ArrayList<>();
+		for (int x = 0; x <= 4; x++) {
+			cells.add(new ArrayList<NetCell>());
+			for (int y = 0; y <= 4; y++) {
+				cells.get(x).add(new NetCell());
+			}
+		}
+	}
+
 	/* **********************************************
 	 *												*
 	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*

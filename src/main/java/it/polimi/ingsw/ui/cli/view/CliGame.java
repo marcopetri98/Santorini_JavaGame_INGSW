@@ -30,6 +30,7 @@ public class CliGame {
 	private Map<String, String> chosenGods;
 	private String player;
 	private String activePlayer;
+	private String starter;
 	private NetMap netMap;
 	private List<NetMove> netMoves;
 	private List<NetBuild> netBuilds;
@@ -40,10 +41,10 @@ public class CliGame {
 	private boolean functioning;
 	private final Object inputLock;
 	private boolean godsGoAlreadyCalled = false;
+	private boolean chooseStarter = false;	//true se il challenger deve scegliere il player
 	private boolean alreadyPrintedPlay = false;
 	private boolean drawPoss = false;
 	private boolean sentCorrectMessage = false;
-	private boolean chooseStarter = false;
 	private boolean printedGuide = false;
 	private boolean cellToFill = false;
 	private boolean hasBuiltBefore = false;	//for prometheus
@@ -91,7 +92,7 @@ public class CliGame {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
 				//typeInputPrint();
-				//System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
+				System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -163,7 +164,7 @@ public class CliGame {
 		player = name;
 	}
 	public void addToQueue(NetObject message) {
-		//System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
+		System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -632,6 +633,7 @@ public class CliGame {
 
 			case Constants.GODS_STARTER -> {
 				ndc = (NetDivinityChoice) obj;
+				starter = ndc.player;
 				activePlayer = players.get(players.indexOf(ndc.player));
 				System.out.println("This is the player who is going to start the game: " + ndc.player);
 			}
@@ -733,7 +735,10 @@ public class CliGame {
 			case Constants.TURN_PLAYERTURN -> {
 				activePlayer = ngs.player;
 				if (activePlayer.equals(player)) {
-					//drawMap();
+					if(starter.equals(player)) {
+						netMap = new NetMap();
+						drawMap();
+					}
 					System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
 					System.out.print("Now place the workers on the map: ");		//check workers are ok in parsesyntax
 				} else {
@@ -829,6 +834,9 @@ public class CliGame {
 			case Constants.GENERAL_PLAYER_DISCONNECTED:
 				ng = (NetGaming) obj;
 				System.out.println(ng.player + " just disconnected.");
+				if(players.contains(ng.player)) {
+					functioning = false;
+				}
 				break;
 
 			case Constants.GENERAL_WINNER:
@@ -850,9 +858,9 @@ public class CliGame {
 				for (String p : players) {
 					if (ng.player != null && ng.player.equals(p) && !player.equals(ng.player)) {
 						System.out.println(ng.player + " just lost");
-						if(players.size() == 2) {
+						/*if(players.size() == 2) {
 							printVictory();
-						}
+						}*/
 						break;
 					}
 				}
@@ -885,7 +893,7 @@ public class CliGame {
 
 			case Constants.GENERAL_PHASE_UPDATE:
 				phase.advance();
-				//System.out.println("\n"+Constants.BG_CYAN+phase.getPhase()+" "+phase.getGodsPhase()+" "+phase.getGamePhase()+Constants.RESET+"\n");	//Only for debug purposes
+				System.out.println("\n"+Constants.BG_CYAN+phase.getPhase()+" "+phase.getGodsPhase()+" "+phase.getGamePhase()+Constants.RESET+"\n");	//Only for debug purposes
 				printInitialPhase();
 				break;
 		}
@@ -1392,7 +1400,7 @@ public class CliGame {
 	}
 
 	public void writeAllInfo(){
-		for (int y = 0; y < 5; y++) {
+		/*for (int y = 0; y < 5; y++) {
 			for(int x = 0; x < 5; x++){
 				NetWorker myWorker = netMap.getCell(x,y).worker;
 				if(myWorker != null){
@@ -1409,7 +1417,7 @@ public class CliGame {
 				}
 			}
 		}
-		System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "**************************************************************\n");
+		System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "**************************************************************\n");*/
 		for(String xplayer : players) {
 			System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The player ");
 			if(playerColors.get(xplayer).equals(new Color("RED"))) {
