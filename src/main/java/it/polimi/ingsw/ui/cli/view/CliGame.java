@@ -549,9 +549,8 @@ public class CliGame {
 	}
 
 	private void parseMessages(){
-		while(messages.size() != 0){
+		while(messages.size() != 0 && functioning){
 			parseMessage(messages.getFirst());
-			if(functioning == false)	break;
 			messages.remove();
 		}
 	}
@@ -802,7 +801,9 @@ public class CliGame {
 							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
 						}
 					} else if(phase.getGamePhase() == GamePhase.MOVE) {	//if I'm in move and the activePlayer has prometheus, I don't show it
-						if(chosenGods.get(activePlayer).equals(Constants.PROMETHEUS)) {
+						if(!chosenGods.values().contains(Constants.PROMETHEUS)) {
+							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
+						} else if(chosenGods.get(activePlayer).equals(Constants.PROMETHEUS)) {
 							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
 						}
 					} else {
@@ -1253,7 +1254,7 @@ public class CliGame {
 								}
 								else if (type == 1) {
 									cellToFill = true;
-									return "@@@@@@";
+									return "@@@@@";
 								}
 								else if (type == 2) {
 									cellToFill = true;
@@ -1275,7 +1276,7 @@ public class CliGame {
 				}
 				else if (type == 1) {
 					cellToFill = false;
-					return "      ";
+					return "     ";
 				}
 				else if (type == 2) {
 					cellToFill = false;
@@ -1296,7 +1297,7 @@ public class CliGame {
 									}
 									else if (type == 1) {
 										cellToFill = true;
-										return "@@@@@@";
+										return "@@@@@";
 									}
 									else if (type == 2) {
 										cellToFill = true;
@@ -1315,7 +1316,7 @@ public class CliGame {
 				}
 				else if (type == 1) {
 					cellToFill = false;
-					return "      ";
+					return "     ";
 				}
 				else if (type == 2) {
 					cellToFill = false;
@@ -1331,7 +1332,7 @@ public class CliGame {
 			}
 			else if (type == 1) {
 				cellToFill = false;
-				return "      ";
+				return "     ";
 			}
 			else if (type == 2) {
 				cellToFill = false;
@@ -1342,30 +1343,35 @@ public class CliGame {
 	}
 	public String drawWorker(NetCell netC){
 		if(netC.worker != null){
+			String playerNum = netC.worker.workerID == netC.worker.owner.hashCode() + 1 ? "1" : "2";
 			if(playerColors.get(netC.worker.owner).equals(new Color("red"))) {
-				return Constants.FG_RED + "W" + Constants.RESET;
+				return (Constants.FG_RED + "W." + playerNum + Constants.RESET);
 			} else if(playerColors.get(netC.worker.owner).equals(new Color("green"))) {
-				return Constants.FG_GREEN + "W" + Constants.RESET;
+				return Constants.FG_GREEN + "W." + playerNum + Constants.RESET;
 			} else if(playerColors.get(netC.worker.owner).equals(new Color("blue"))) {
-				return Constants.FG_BLUE + "W" + Constants.RESET;
+				return Constants.FG_BLUE + "W." + playerNum + Constants.RESET;
 			} else {
-				return "W";
+				return "WWW";
 			}
 		}
 		if(drawPoss && cellToFill) {
-			return "@";
+			return "@@@";
 		} else {
-			return " ";
+			return "   ";
 		}
 	}
-	public char drawDome(NetCell netC){
+	public String drawDome(NetCell netC){
 		if (netC.building.dome) {
-			return 'D';
+			if(drawPoss && cellToFill) {
+				return "@D@";
+			} else {
+				return " D ";
+			}
 		}
 		if(drawPoss && cellToFill) {
-			return '@';
+			return "@@@";
 		} else {
-			return ' ';
+			return "   ";
 		}
 	}
 	public String drawBuilding(NetCell netC){
@@ -1404,11 +1410,17 @@ public class CliGame {
 			}
 		}
 		System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "**************************************************************\n");
-		for(String player : players) {
+		for(String xplayer : players) {
 			System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The player ");
-			System.out.print(player);
+			if(playerColors.get(xplayer).equals(new Color("RED"))) {
+				System.out.print(Constants.FG_RED + xplayer + Constants.RESET);
+			} else if (playerColors.get(xplayer).equals(new Color("BLUE"))) {
+				System.out.print(Constants.FG_BLUE + xplayer + Constants.RESET);
+			} else if(playerColors.get(xplayer).equals(new Color("GREEN"))) {
+				System.out.print(Constants.FG_GREEN + xplayer + Constants.RESET);
+			}
 			System.out.print(" has the god ");
-			System.out.print(chosenGods.get(player) + ".");
+			System.out.print(chosenGods.get(xplayer) + ".");
 			System.out.print("\n");
 		}
 		System.out.print("\n");
