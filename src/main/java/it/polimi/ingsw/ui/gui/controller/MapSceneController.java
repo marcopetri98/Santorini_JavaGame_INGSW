@@ -115,6 +115,56 @@ public class MapSceneController implements SceneController {
 	@FXML
 	private ImageView cell_4_4;
 	@FXML
+	private ImageView possibleCell_0_0;
+	@FXML
+	private ImageView possibleCell_0_1;
+	@FXML
+	private ImageView possibleCell_0_2;
+	@FXML
+	private ImageView possibleCell_0_3;
+	@FXML
+	private ImageView possibleCell_0_4;
+	@FXML
+	private ImageView possibleCell_1_0;
+	@FXML
+	private ImageView possibleCell_1_1;
+	@FXML
+	private ImageView possibleCell_1_2;
+	@FXML
+	private ImageView possibleCell_1_3;
+	@FXML
+	private ImageView possibleCell_1_4;
+	@FXML
+	private ImageView possibleCell_2_0;
+	@FXML
+	private ImageView possibleCell_2_1;
+	@FXML
+	private ImageView possibleCell_2_2;
+	@FXML
+	private ImageView possibleCell_2_3;
+	@FXML
+	private ImageView possibleCell_2_4;
+	@FXML
+	private ImageView possibleCell_3_0;
+	@FXML
+	private ImageView possibleCell_3_1;
+	@FXML
+	private ImageView possibleCell_3_2;
+	@FXML
+	private ImageView possibleCell_3_3;
+	@FXML
+	private ImageView possibleCell_3_4;
+	@FXML
+	private ImageView possibleCell_4_0;
+	@FXML
+	private ImageView possibleCell_4_1;
+	@FXML
+	private ImageView possibleCell_4_2;
+	@FXML
+	private ImageView possibleCell_4_3;
+	@FXML
+	private ImageView possibleCell_4_4;
+	@FXML
 	private GridPane gridPane_cells;
 	@FXML
 	private Text text_player;
@@ -205,6 +255,7 @@ public class MapSceneController implements SceneController {
 	Image iconWon = new Image("/img/message_won.png");
 	Image iconOtherWon = new Image("/img/message_otherWon.png");
 	Image iconDisconnected = new Image("/img/message_otherDisconnected.png");
+	Image cellTarget = new Image("/img/map/cell_target.png");
 
 	ImageView workerSelected = null;
 
