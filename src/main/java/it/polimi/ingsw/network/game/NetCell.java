@@ -26,10 +26,6 @@ public class NetCell implements Serializable {
 			worker = null;
 		}
 	}
-	public NetCell() {
-		building = new NetBuilding();
-		worker = null;
-	}
 	private NetCell(NetCell netCell, NetWorker netWorker) {
 		building = new NetBuilding(netCell.getBuilding());
 		worker = netWorker;

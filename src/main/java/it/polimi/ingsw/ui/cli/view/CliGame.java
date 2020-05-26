@@ -736,7 +736,7 @@ public class CliGame {
 				activePlayer = ngs.player;
 				if (activePlayer.equals(player)) {
 					if(starter.equals(player)) {
-						netMap = new NetMap();
+						netMap = new NetMap(new it.polimi.ingsw.core.Map());
 						drawMap();
 					}
 					System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
