@@ -96,16 +96,23 @@ public class CliGame {
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
-					if (selectedMove != null) {
-						inputController.getCommand(currentCommand,phase.clone(),selectedMove);
-					} else if (selectedBuild != null) {
-						inputController.getCommand(currentCommand,phase.clone(),selectedBuild);
-					} else {
-						inputController.getCommand(currentCommand,phase.clone());
+					cliInput.setTimeout();
+					if(!cliInput.getUndo()){	//at the end of a 5 sec TIMER getUndo returns true if undo was written; if undo wasn't written I run the usual code || TODO: add if for particular gamephase if required
+						if (selectedMove != null) {
+							inputController.getCommand(currentCommand,phase.clone(),selectedMove);
+						} else if (selectedBuild != null) {
+							inputController.getCommand(currentCommand,phase.clone(),selectedBuild);
+						} else {
+							inputController.getCommand(currentCommand,phase.clone());
+						}
+						selectedMove = null;
+						selectedBuild = null;
+						sentCorrectMessage = true;
+					} else {	//otherwise I tell to rewrite the line
+						System.out.println("You undid your action, insert again your command");
+						sentCorrectMessage = false;
 					}
-					selectedMove = null;
-					selectedBuild = null;
-					sentCorrectMessage = true;
+
 				} else {
 					printError();
 				}

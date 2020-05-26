@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 public class CliInput {
 	private int timePassed;
 	private final int timeout = 1000;
+	private final int timeoutUndo = 5000;
 	private boolean timeoutActive;
 	private final Object timeoutLock;
 
@@ -31,7 +32,6 @@ public class CliInput {
 	 * @return
 	 */
 	public Command getInput() throws UserInputTimeoutException, IOException {
-
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = null;
 		boolean foundSomething = false;
@@ -39,7 +39,7 @@ public class CliInput {
 		dropTimeout();
 
 		// waits until the user hasn't wrote something
-		while (timePassed < 1000 && !foundSomething) {
+		while (timePassed < timeout && !foundSomething) {
 			if (!reader.ready()) {
 				try {
 					synchronized (timeoutLock) {
@@ -66,6 +66,47 @@ public class CliInput {
 			// it resets the time passed for the next input call
 			dropTimeout();
 			return new Command(userInput.split(" "));
+		}
+	}
+
+	public boolean getUndo() throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String userInput = null;
+		boolean foundSomething = false;
+		resetInsertedInput();
+		//dropTimeout();
+
+		// waits until the user hasn't wrote something
+		while (timePassed < timeoutUndo && !foundSomething) {
+			if (!reader.ready()) {
+				try {
+					synchronized (timeoutLock) {
+						if (timeoutActive) {
+							timePassed += 500;
+						}
+					}
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					throw new AssertionError("Someone interrupted the executing thread");
+				}
+			} else {
+				userInput = reader.readLine();
+				foundSomething = true;
+			}
+		}
+
+		dropTimeout();
+		if (userInput == null) {
+			// if there was a timeout it throws an exception
+			System.out.print("\n");
+			return false;
+		} else {
+			// it resets the time passed for the next input call
+			if((new Command(userInput.split(" "))).commandType.toUpperCase().equals("UNDO")) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
