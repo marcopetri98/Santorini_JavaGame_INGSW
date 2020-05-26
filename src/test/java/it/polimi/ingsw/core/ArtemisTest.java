@@ -57,33 +57,39 @@ public class ArtemisTest {
 
 		i=0; j=1; s=0; t=2;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove));
 
 		i=0; j=1; s=1; t=2;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove1.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove1));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove1));
 
 		i=0; j=1; s=1; t=0;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove2.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove2));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove2));
 
 		i=1; j=0; s=0; t=1;
 		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove3.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove3));
 
 		i=1; j=0; s=2; t=0;
 		Move newMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove4.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove4 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove4));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove4));
 
 		i=1; j=0; s=2; t=1;
 		Move newMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove5.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove5 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove5));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove5));
 
 		i=1; j=0;
 		Move newMove6 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
@@ -133,18 +139,21 @@ public class ArtemisTest {
 
 		i=1; j=0; s=0; t=0;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove));
 
 		i=0; j=2; s=0; t=3;
 		Move newMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove1.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove1 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove1));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove1));
 
 		i=0; j=2; s=1; t=3;
 		Move newMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		newMove2.setCondition(new Move(TypeMove.SIMPLE_MOVE, map.getCell(i,j), map.getCell(s,t), map.getCell(x, y).getWorker()));
+		Move secondMove2 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(s,t), map.getCell(x, y).getWorker());
 		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(newMove2));
+		assertTrue(artemis.checkMove(map, player.getWorker1(), turn).contains(secondMove2));
 
 		i=0; j=0;
 		Move newMove3 = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
