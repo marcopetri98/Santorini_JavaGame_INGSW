@@ -617,11 +617,11 @@ public class MapSceneController implements SceneController {
 	}
 
 	public void mousePressedExit2(MouseEvent mouseEvent) throws IOException {
-		button_exit.setImage(buttonExitPressed);
+		button_exit2.setImage(buttonExitPressed);
 
 	}
 	public void mouseReleasedExit2(MouseEvent mouseEvent) throws IOException {
-		button_exit.setImage(buttonExit);
+		button_exit2.setImage(buttonExit);
 
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
