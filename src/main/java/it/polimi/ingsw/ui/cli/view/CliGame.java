@@ -1253,11 +1253,10 @@ public class CliGame {
 				netMap = netMap.changeCell(netMap.getCell(xFoundOther,yFoundOther).setWorker(null), xFoundOther, yFoundOther);	//sets null the othermove's worker
 			}
 			if(xFound != -1) {
-				//netMap = netMap.changeCell(new NetCell(netMap.getCell(xFound,yFound), tmpWorker), netMove.cellX, netMove.cellY);	//sets worker in the new place
-				netMap = netMap.changeCell(netMap.getCell(xFound,yFound).setWorker(tmpWorker), netMove.cellX, netMove.cellY);	//sets worker in the new place
+				netMap = netMap.changeCell(netMap.getCell(netMove.cellX,netMove.cellY).setWorker(tmpWorker), netMove.cellX, netMove.cellY);	//sets worker in the new place
 			}
 			if(xFoundOther != -1) {
-				netMap = netMap.changeCell(netMap.getCell(xFoundOther,yFoundOther).setWorker(tmpWorkerOther), netMove.other.cellX, netMove.other.cellY);	//sets other worker in the new place
+				netMap = netMap.changeCell(netMap.getCell(netMove.other.cellX,netMove.other.cellY).setWorker(tmpWorkerOther), netMove.other.cellX, netMove.other.cellY);	//sets other worker in the new place
 			}
 
 			drawMap();
