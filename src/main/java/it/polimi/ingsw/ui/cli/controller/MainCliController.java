@@ -73,9 +73,15 @@ public class MainCliController implements GraphicInterface {
 	@Override
 	public void retrieveError() {
 		if (pregameStage) {
-			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
-			pregameView.queueMessage(clientErrorMsg);
-			inputHandler.setTimeout();
+			if (pregameView.isMenuPhase()) {
+				NetObject clientErrorMsg = new NetSetup(Constants.GENERAL_FATAL_ERROR);
+				pregameView.queueMessage(clientErrorMsg);
+				inputHandler.setTimeout();
+			} else {
+				NetObject clientErrorMsg = new NetLobbyPreparation(Constants.GENERAL_FATAL_ERROR);
+				pregameView.queueMessage(clientErrorMsg);
+				inputHandler.setTimeout();
+			}
 		} else {
 			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
 			gameView.addToQueue(clientErrorMsg);
@@ -86,11 +92,11 @@ public class MainCliController implements GraphicInterface {
 	public void retrieveConnectionError() {
 		if (pregameStage) {
 			if (pregameView.isMenuPhase()) {
-				NetObject clientErrorMsg = new NetObject(Constants.GENERAL_NOT_EXIST_SERVER);
+				NetObject clientErrorMsg = new NetSetup(Constants.GENERAL_NOT_EXIST_SERVER);
 				pregameView.queueMessage(clientErrorMsg);
 				inputHandler.setTimeout();
 			} else {
-				NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);
+				NetObject clientErrorMsg = new NetLobbyPreparation(Constants.GENERAL_FATAL_ERROR);
 				pregameView.queueMessage(clientErrorMsg);
 				inputHandler.setTimeout();
 			}

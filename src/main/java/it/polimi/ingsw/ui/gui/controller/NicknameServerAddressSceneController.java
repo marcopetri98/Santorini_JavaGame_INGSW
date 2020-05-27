@@ -161,12 +161,17 @@ public class NicknameServerAddressSceneController implements SceneController {
 			((ImageView)mouseEvent.getTarget()).getScene().setCursor(Cursor.WAIT);
 			NetSetup netSetupMessage = new NetSetup(Constants.SETUP_IN_PARTICIPATE,nickname);
 
-			if (MainGuiController.getInstance().connectToServer(serverAddress)) {
-				MainGuiController.getInstance().sendMessage(netSetupMessage);
+			if (!connectedToServer) {
+				if (MainGuiController.getInstance().connectToServer(serverAddress)) {
+					connectedToServer = true;
+					MainGuiController.getInstance().sendMessage(netSetupMessage);
+				} else {
+					serverAddressError(1);
+					messageCanBeSent = true;
+					button_exit.getScene().setCursor(Cursor.DEFAULT);
+				}
 			} else {
-				serverAddressError(1);
-				messageCanBeSent = true;
-				button_exit.getScene().setCursor(Cursor.DEFAULT);
+				MainGuiController.getInstance().sendMessage(netSetupMessage);
 			}
 		}
 	}

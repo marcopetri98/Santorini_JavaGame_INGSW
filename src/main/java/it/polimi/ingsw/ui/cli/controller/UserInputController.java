@@ -192,4 +192,13 @@ public class UserInputController {
 			listener.sendMessage(new NetSetup(Constants.SETUP_IN_PARTICIPATE,playerName));
 		}
 	}
+	public void tryAnotherName(String name) throws IllegalArgumentException, IllegalStateException {
+		if (playerName == null) {
+			throw new IllegalArgumentException();
+		} else if (!listener.getWantsToPlay()) {
+			throw new IllegalStateException();
+		}
+		this.playerName = name;
+		listener.sendMessage(new NetSetup(Constants.SETUP_IN_PARTICIPATE,playerName));
+	}
 }

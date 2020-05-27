@@ -159,10 +159,10 @@ public class CliInitial {
 				if (command.commandType.length() < 5 || command.getNumParameters() != 0) {
 					printError(1);
 				} else {
-					// if the user is trying another name because there is already a player with that name, it immediately tries to connect
+					// if the user is trying another name because there is already a player with that name, it immediately tries to participate to a lobby
 					if (serverAddress != null) {
 						nameChosen = command.commandType;
-						userInputController.connect(nameChosen,serverAddress);
+						userInputController.tryAnotherName(nameChosen);
 						synchronized (messages) {
 							try {
 								if (messages.isEmpty()) {
@@ -250,6 +250,10 @@ public class CliInitial {
 			}
 			case Constants.SETUP_ERROR -> {
 				printError(5);
+			}
+			case Constants.GENERAL_NOT_EXIST_SERVER -> {
+				serverAddress = null;
+				printError(7);
 			}
 		}
 	}
@@ -365,6 +369,10 @@ public class CliInitial {
 
 			case 6:
 				System.out.println("You can only disconnect or wait inside the lobby.");
+				break;
+
+			case 7:
+				System.out.println("The server isn't a Santorini's game server.");
 				break;
 
 			case 100:
