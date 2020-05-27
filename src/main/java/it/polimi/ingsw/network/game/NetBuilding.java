@@ -16,6 +16,14 @@ public class NetBuilding implements Serializable {
 		level = building.getLevel();
 		dome = building.isDome();
 	}
+	public NetBuilding(NetBuild nB) {
+		if(nB.level < 3) {
+			this.level = nB.level + 1;
+		} else {
+			this.level = 3;
+		}
+		this.dome = nB.dome;
+	}
 	private NetBuilding(NetBuilding building, int newLevel) {
 		level = newLevel;
 		dome = building.isDome();

@@ -96,6 +96,7 @@ public class CliGame {
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
+					drawProvisionalMap();
 					cliInput.setTimeout();
 					if(!cliInput.getUndo()){	//at the end of a 5 sec TIMER getUndo returns true if undo was written; if undo wasn't written I run the usual code || TODO: add if for particular gamephase if required
 						if (selectedMove != null) {
@@ -110,6 +111,8 @@ public class CliGame {
 						sentCorrectMessage = true;
 					} else {	//otherwise I tell to rewrite the line
 						System.out.println("You undid your action, insert again your command");
+						selectedMove = null;
+						selectedBuild = null;
 						sentCorrectMessage = false;
 					}
 
@@ -1221,12 +1224,68 @@ public class CliGame {
 		}
 	}
 
+	private void drawProvisionalMap() {
+		if(selectedMove != null) {
+			NetMove netMove = selectedMove;
+			NetWorker tmpWorker = null;
+			NetWorker tmpWorkerOther = null;
+			int xFound = -1, yFound = -1, xFoundOther = -1, yFoundOther = -1;
+			for (int x = 0; x <= 4; x++) {
+				for (int y = 0; y <= 4; y++) {
+					if (netMap.getCell(x, y).worker != null && netMap.getCell(x, y).worker.workerID == netMove.workerID) {
+						xFound = x;
+						yFound = y;
+						tmpWorker = netMap.getCell(x, y).worker;
+
+					}
+					if (netMove.other != null && netMap.getCell(x, y).worker != null && netMap.getCell(x, y).worker.workerID == netMove.other.workerID) {
+						xFoundOther = x;
+						yFoundOther = y;
+						tmpWorkerOther = netMap.getCell(x, y).worker;
+
+					}
+				}
+			}
+			if(xFound != -1) {
+				netMap = netMap.changeCell(netMap.getCell(xFound,yFound).setWorker(null), xFound, yFound);	//sets null the first move's worker
+			}
+			if(xFoundOther != -1) {
+				netMap = netMap.changeCell(netMap.getCell(xFoundOther,yFoundOther).setWorker(null), xFoundOther, yFoundOther);	//sets null the othermove's worker
+			}
+			if(xFound != -1) {
+				//netMap = netMap.changeCell(new NetCell(netMap.getCell(xFound,yFound), tmpWorker), netMove.cellX, netMove.cellY);	//sets worker in the new place
+				netMap = netMap.changeCell(netMap.getCell(xFound,yFound).setWorker(tmpWorker), netMove.cellX, netMove.cellY);	//sets worker in the new place
+			}
+			if(xFoundOther != -1) {
+				netMap = netMap.changeCell(netMap.getCell(xFoundOther,yFoundOther).setWorker(tmpWorkerOther), netMove.other.cellX, netMove.other.cellY);	//sets other worker in the new place
+			}
+
+			drawMap();
+
+		}
+		if(selectedBuild != null) {
+			NetBuild netBuild = selectedBuild;
+
+			NetBuilding netBuilding = new NetBuilding(netBuild);
+			netMap = netMap.changeCell(netMap.getCell(netBuild.cellX,netBuild.cellY).setBuilding(netBuilding), netBuild.cellX, netBuild.cellY);	//sets the new build
+			if(netBuild.other != null) {
+				netBuilding = new NetBuilding(netBuild.other);
+				netMap = netMap.changeCell(netMap.getCell(netBuild.other.cellX,netBuild.other.cellY).setBuilding(netBuilding), netBuild.other.cellX, netBuild.other.cellY);	//sets the new other build
+			}
+
+
+			drawMap();
+
+
+		}
+	}
+
 	// DRAWING FUNCTIONS
-	public void drawPossibilities(){
+	private void drawPossibilities(){
 		drawPoss = true;
 		drawMap();
 	}
-	public void drawMap(){
+	private void drawMap(){
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "       0      |      1      |      2      |      3      |      4       ");
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "+-------------+-------------+-------------+-------------+-------------+");
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,0)) + drawDome(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawDome(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawDome(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawDome(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawDome(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
