@@ -273,7 +273,12 @@
          </image>
       </ImageView>
       <Text fx:id="text_player" layoutX="94.0" layoutY="184.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="155.826171875" />
-      <ImageView fx:id="button_endTurn" fitHeight="183.0" fitWidth="156.0" layoutX="1020.0" layoutY="118.0" onMousePressed="#mousePressedEndTurn" onMouseReleased="#mouseReleasedEndTurn" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_undo" fitHeight="131.0" fitWidth="105.0" layoutX="1038.0" layoutY="214.0" onMousePressed="#mousePressedUndo" onMouseReleased="#mouseReleasedUndo" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/button_undo.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_endTurn" fitHeight="150.0" fitWidth="137.0" layoutX="1026.0" layoutY="87.0" onMousePressed="#mousePressedEndTurn" onMouseReleased="#mouseReleasedEndTurn" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/map/button_endTurn.png" />
          </image>

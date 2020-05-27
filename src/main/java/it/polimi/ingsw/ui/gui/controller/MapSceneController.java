@@ -21,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -29,6 +30,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MapSceneController implements SceneController {
@@ -184,6 +186,8 @@ public class MapSceneController implements SceneController {
 	private Text text_playerMessage;
 	@FXML
 	private Text text_playerMessageLost;
+	@FXML
+	private ImageView button_undo;
 
 
 	private boolean pressedIconExit = false;
@@ -256,8 +260,18 @@ public class MapSceneController implements SceneController {
 	Image iconOtherWon = new Image("/img/message_otherWon.png");
 	Image iconDisconnected = new Image("/img/message_otherDisconnected.png");
 	Image cellTarget = new Image("/img/map/cell_target.png");
+	Image buttonUndo = new Image("/img/map/button_undo.png");
+	Image buttonUndoPressed = new Image("/img/map/button_undo_pressed.png");
+	Image buttonUndoDisabled = new Image("/img/map/button_undo_disabled.png");
+	Image buttonUndo5 = new Image("/img/map/button_undo5.png");
+	Image buttonUndo4 = new Image("/img/map/button_undo4.png");
+	Image buttonUndo3 = new Image("/img/map/button_undo3.png");
+	Image buttonUndo2 = new Image("/img/map/button_undo2.png");
+	Image buttonUndo1 = new Image("/img/map/button_undo1.png");
 
 	ImageView workerSelected = null;
+
+	Timeline timeline; //for undo button
 
 	// objects used to change scene
 	private Parent previousFXML;
@@ -285,6 +299,8 @@ public class MapSceneController implements SceneController {
 
 		button_endTurn.toBack();
 		button_endTurn.setImage(null);
+		button_undo.toBack();
+		button_undo.setImage(null);
 		description_god.setImage(null);
 		icon_error.setImage(null);
 		initializeCells();
@@ -305,7 +321,29 @@ public class MapSceneController implements SceneController {
 		BG_message.setImage(null);
 		button_watch.setImage(null);
 		button_exit2.setImage(null);
+
 	}
+
+
+	private void timerInitialize(){
+		button_undo.toFront();
+		button_undo.setDisable(true);
+		fadeImage(button_undo, buttonUndoDisabled, 0, 1, 1);
+	}
+
+	private void timerCountdown(){
+		button_undo.setDisable(false);
+		timeline = new Timeline(
+				new KeyFrame(Duration.ZERO, new KeyValue(button_undo.imageProperty(), buttonUndo5)),
+				new KeyFrame(Duration.seconds(1), new KeyValue(button_undo.imageProperty(), buttonUndo4)),
+				new KeyFrame(Duration.seconds(2), new KeyValue(button_undo.imageProperty(), buttonUndo3)),
+				new KeyFrame(Duration.seconds(3), new KeyValue(button_undo.imageProperty(), buttonUndo2)),
+				new KeyFrame(Duration.seconds(4), new KeyValue(button_undo.imageProperty(), buttonUndo1)),
+				new KeyFrame(Duration.seconds(5), new KeyValue(button_undo.imageProperty(), buttonUndoDisabled))
+		);
+		timeline.play();
+	}
+
 	private void fadeImage(ImageView imageView, Image image, int from, int to, int flag){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -604,6 +642,20 @@ public class MapSceneController implements SceneController {
 		button_exit2.toFront();
 	}
 
+	public void mousePressedUndo(MouseEvent mouseEvent) {
+		if(button_undo.getImage().equals(buttonUndo5) || button_undo.getImage().equals(buttonUndo4) || button_undo.getImage().equals(buttonUndo3) || button_undo.getImage().equals(buttonUndo2) || button_undo.getImage().equals(buttonUndo1)) {
+			timeline.stop();
+			button_undo.setImage(buttonUndoPressed);
+		}
+	}
+
+	public void mouseReleasedUndo(MouseEvent mouseEvent) {
+		if(button_undo.getImage().equals(buttonUndoPressed)) {
+			button_undo.setImage(buttonUndoDisabled);
+			button_undo.setDisable(true);
+		}
+	}
+
 	/* **********************************************
 	 *												*
 	 *			METHODS FOR USER INTERACTION		*
@@ -807,6 +859,7 @@ public class MapSceneController implements SceneController {
 						slidingImage(box_workers, boxWorkers, 159, 122, 450, 122, 750);
 						button_endTurn.toFront();
 						button_endTurn.setDisable(true);
+						timerInitialize();
 						fadeImage(button_endTurn, buttonEndTurnDisabled, 0, 1, 1);
 						sendWorkerPositions();
 					}
