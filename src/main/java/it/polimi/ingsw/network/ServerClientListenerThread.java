@@ -75,6 +75,7 @@ public class ServerClientListenerThread extends Thread {
 	private final ObjectInputStream input;
 	private final ObjectOutputStream output;
 	private final Object scopeLock, stateLock, playerNameLock;
+	private static long thread_number;
 
 	/**
 	 * The constructor initialize a listener for client's messages in the setup stage, this server listens for messages of setup until the games start, when it starts it changes the gamePhase and listen to other messages, depending on the game phase
@@ -82,7 +83,8 @@ public class ServerClientListenerThread extends Thread {
 	 * @param clientSocket This parameter is the client's socket which this object listen
 	 */
 	public ServerClientListenerThread(Socket clientSocket, Server server) throws IOException {
-		super("ServerClientListenerThread");
+		super("ServerClientListenerThread_"+thread_number);
+		thread_number++;
 		gamePhase = NetworkPhase.PRELOBBY;
 		active = true;
 		verifyClient = true;
@@ -129,7 +131,9 @@ public class ServerClientListenerThread extends Thread {
 			} catch (IOException e) {
 				verifyClient = false;
 				ingoingObject = null;
-				disconnect();
+				if (playerName != null) {
+					disconnect();
+				}
 				active = false;
 			}
 

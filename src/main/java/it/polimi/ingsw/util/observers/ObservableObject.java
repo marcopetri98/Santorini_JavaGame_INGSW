@@ -33,7 +33,6 @@ public class ObservableObject {
 		observers.clear();
 	}
 	public void notifyQuit(String playerName) throws NullPointerException {
-		// TODO: cuncurrentModificationException
 		if (playerName == null) {
 			throw new NullPointerException();
 		}

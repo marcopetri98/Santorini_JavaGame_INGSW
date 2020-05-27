@@ -461,7 +461,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			}
 			clientHandler.closeSocketAndTerminate();
 			observed.removeObserver(this);
-			removeAllObservers();
 		}
 	}
 }
