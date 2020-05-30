@@ -32,6 +32,7 @@ public class CliInput {
 	 * @return
 	 */
 	public Command getInput() throws UserInputTimeoutException, IOException {
+		//TODO: vedere altre classi per evitare buffering
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = null;
 		boolean foundSomething = false;
@@ -74,17 +75,12 @@ public class CliInput {
 		String userInput = null;
 		boolean foundSomething = false;
 		resetInsertedInput();
-		//dropTimeout();
 
 		// waits until the user hasn't wrote something
 		while (timePassed < timeoutUndo && !foundSomething) {
 			if (!reader.ready()) {
 				try {
-					synchronized (timeoutLock) {
-						if (timeoutActive) {
-							timePassed += 500;
-						}
-					}
+					timePassed += 200;
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					throw new AssertionError("Someone interrupted the executing thread");

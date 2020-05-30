@@ -32,16 +32,18 @@ public class CliGame {
 	private String activePlayer;
 	private String starter;
 	private NetMap netMap;
+	private NetMap oldNetMap;
 	private List<NetMove> netMoves;
 	private List<NetBuild> netBuilds;
 	private NetMove selectedMove;
 	private NetBuild selectedBuild;
 	private int activeWorkerID;
 	// attributes used for functioning
+	private boolean printInput = false;
 	private boolean functioning;
 	private final Object inputLock;
 	private boolean godsGoAlreadyCalled = false;
-	private boolean chooseStarter = false;	//true se il challenger deve scegliere il player
+	private boolean chooseStarter = false;	//true if the challenger has to choose the player
 	private boolean alreadyPrintedPlay = false;
 	private boolean drawPoss = false;
 	private boolean sentCorrectMessage = false;
@@ -91,14 +93,35 @@ public class CliGame {
 			try {
 				// it tries to read user input without interrupting and to be interrupted
 				parseMessages();
-				//typeInputPrint();
+				if(printInput){
+					typeInputPrint();
+					printInput = false;
+				}
 				System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
-					drawProvisionalMap();
-					cliInput.setTimeout();
-					if(!cliInput.getUndo()){	//at the end of a 5 sec TIMER getUndo returns true if undo was written; if undo wasn't written I run the usual code || TODO: add if for particular gamephase if required
+					if(phase.getPhase() == Phase.PLAYERTURN){
+						drawProvisionalMap();
+						if(!cliInput.getUndo()){	//at the end of a 5 sec TIMER getUndo returns true if undo was written; if undo wasn't written I run the usual code || TODO: add if for particular gamephase if required
+							if (selectedMove != null) {
+								inputController.getCommand(currentCommand,phase.clone(),selectedMove);
+							} else if (selectedBuild != null) {
+								inputController.getCommand(currentCommand,phase.clone(),selectedBuild);
+							} else {
+								inputController.getCommand(currentCommand,phase.clone());
+							}
+							selectedMove = null;
+							selectedBuild = null;
+							sentCorrectMessage = true;
+						} else {	//otherwise I tell to rewrite the line and I restore the old netMap
+							netMap = oldNetMap;
+							System.out.println("You undid your action, insert again your command");
+							selectedMove = null;
+							selectedBuild = null;
+							sentCorrectMessage = false;
+						}
+					} else {
 						if (selectedMove != null) {
 							inputController.getCommand(currentCommand,phase.clone(),selectedMove);
 						} else if (selectedBuild != null) {
@@ -109,11 +132,6 @@ public class CliGame {
 						selectedMove = null;
 						selectedBuild = null;
 						sentCorrectMessage = true;
-					} else {	//otherwise I tell to rewrite the line
-						System.out.println("You undid your action, insert again your command");
-						selectedMove = null;
-						selectedBuild = null;
-						sentCorrectMessage = false;
 					}
 
 				} else {
@@ -247,13 +265,14 @@ public class CliGame {
 								return true;
 							}
 						}
-					} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE) || phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
-						// TODO: implement the state of gods chosen locally
+					} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE)) {
 						if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
-							if(gods.contains(command.getParameter(0).toUpperCase()) && !chosenGods.containsValue(command.getParameter(0).toUpperCase())) {
+							if (gods.contains(command.getParameter(0).toUpperCase()) && !chosenGods.containsValue(command.getParameter(0).toUpperCase())) {
 								return true;
 							}
-						} else if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
+						}
+					} else if (phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
+						if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
 							return true;
 						}
 					}
@@ -306,9 +325,9 @@ public class CliGame {
 													int y1 = Integer.parseInt(command.getParameter(3));
 
 													if(command.getParameter(0).equals("worker1")) {
-														activeWorkerID = player.hashCode() + 1;
+														activeWorkerID = findMyWorker(1);
 													} else {
-														activeWorkerID = player.hashCode() + 2;
+														activeWorkerID = findMyWorker(2);
 													}
 
 													if(command.getParameter(1).equals("dome")){
@@ -329,9 +348,9 @@ public class CliGame {
 											try {
 												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
 													if(command.getParameter(0).equals("worker1")){
-														selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+														selectedMove = new NetMove(findMyWorker(1), Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
 													} else if (command.getParameter(0).equals("worker2")){
-														selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+														selectedMove = new NetMove(findMyWorker(2), Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
 													}
 													if(netMoves.contains(selectedMove)) {
 														activeWorkerID = selectedMove.workerID;
@@ -504,9 +523,9 @@ public class CliGame {
 											try {
 												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
 													if(command.getParameter(0).equals("worker1")){
-														selectedMove = new NetMove(player.hashCode()+1, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+														selectedMove = new NetMove(findMyWorker(1), Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
 													} else if (command.getParameter(0).equals("worker2")){
-														selectedMove = new NetMove(player.hashCode()+2, Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
+														selectedMove = new NetMove(findMyWorker(2), Integer.parseInt(command.getParameter(1)), Integer.parseInt(command.getParameter(2)));
 													}
 													for(NetMove netM : netMoves) {
 														if(netM.isLike(selectedMove)){
@@ -529,9 +548,9 @@ public class CliGame {
 												if (0 <= Integer.parseInt(command.getParameter(1)) && Integer.parseInt(command.getParameter(1)) <= 4 && 0 <= Integer.parseInt(command.getParameter(2)) && Integer.parseInt(command.getParameter(2)) <= 4) {
 													if(!(chosenGods.get(player).equals(Constants.PROMETHEUS) && hasBuiltBefore)) {	//used for prometheus
 														if(command.getParameter(0).equals("worker1")){
-															activeWorkerID = player.hashCode() + 1;
+															activeWorkerID = findMyWorker(1);
 														} else if (command.getParameter(0).equals("worker2")){
-															activeWorkerID = player.hashCode() + 2;
+															activeWorkerID = findMyWorker(2);
 														}
 													}
 													hasBuiltBefore = false;
@@ -560,10 +579,11 @@ public class CliGame {
 	}
 
 	private void parseMessages(){
-		while(messages.size() != 0 && functioning){
+		while(messages.size() != 0/* && functioning*/){
 			parseMessage(messages.getFirst());
 			messages.remove();
 		}
+		oldNetMap = netMap;
 	}
 	// FIXME: this is a parsing function, this isn't a drawing or printing function, it should only parse the message
 
@@ -571,7 +591,7 @@ public class CliGame {
 		if (obj.message.equals(Constants.GENERAL_FATAL_ERROR) || obj.message.equals(Constants.GENERAL_SETUP_DISCONNECT)) {
 			printServerError(obj);
 			functioning = false;
-			messages.remove();
+			//messages.remove();
 		} else {
 			switch (phase.getPhase()) {
 				case COLORS:
@@ -599,18 +619,8 @@ public class CliGame {
 		switch (obj.message) {
 			//COLORS
 			case Constants.TURN_PLAYERTURN -> {
-				if (ncp.player.equals(player)) {
-					System.out.println("Insert the color you want with the following syntax \"color colorName\"");
-					System.out.print("Choose among: ");
-					if(!playerColors.containsValue(new Color("red")))	System.out.print("red ");
-					if(!playerColors.containsValue(new Color("green")))	System.out.print("green ");
-					if(!playerColors.containsValue(new Color("blue")))	System.out.print("blue");
-					System.out.print("\n");
-					System.out.print("Insert the color: ");
-				} else {
-					System.out.println(ncp.player+" is choosing a color.");
-				}
 				activePlayer = ncp.player;
+				printInput = true;
 			}
 
 			case Constants.COLOR_ERROR -> {
@@ -618,6 +628,7 @@ public class CliGame {
 			}
 
 			case Constants.COLOR_CHOICES -> {
+				playerColors.clear();
 				while(ncp != null) {
 					playerColors.put(ncp.player, ncp.color);
 					ncp = ncp.next;
@@ -642,77 +653,14 @@ public class CliGame {
 			}
 
 			case Constants.GODS_STARTER -> {
-				ndc = (NetDivinityChoice) obj;
 				starter = ndc.player;
 				activePlayer = players.get(players.indexOf(ndc.player));
-				System.out.println("This is the player who is going to start the game: " + ndc.player);
+				System.out.println("This is the player who is going to start the game: " + starter);
 			}
 
 			case Constants.TURN_PLAYERTURN -> {
 				activePlayer = ndc.player;
-				if (activePlayer.equals(player)) {
-					if (challenger) {
-						if (godsGoAlreadyCalled) {
-							if(chooseStarter) {
-								System.out.println("Insert the starter with this syntax \"starter playerName\"");
-								System.out.print("Choose the starter of the game among these: ");
-								if(players != null){
-									for(String player : players) {
-										System.out.print(player + " ");
-									}
-									System.out.print("\n");
-								}
-								System.out.print("Insert the starter: ");
-							} else {
-								System.out.println("Insert the god power you want to use with this syntax \"god godname\"");
-								System.out.print("Choose one god among these: ");
-								if(gods != null){
-									for(String x : gods) {
-										if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
-									}
-									System.out.print("\n");
-								} else {
-									System.out.println("Design error, no gods were found");
-								}
-								System.out.print("Insert the god: ");    //check god is ok in parsesyntax
-								chooseStarter = true;
-							}
-						} else {
-							System.out.println("Insert the gods you want to use with the following syntax \"gods godname1 godname2 godname3\"");
-							System.out.println("Choose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus");
-							System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
-							godsGoAlreadyCalled = true;
-						}
-					} else {
-						System.out.println("Insert the god power you want to use with this syntax \"god godname\"");
-						System.out.print("Choose one god among these: ");
-						if(gods != null){
-							for(String x : gods) {
-								if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
-							}
-							System.out.print("\n");
-						} else {
-							System.out.println("Design error, no gods were found");
-						}
-						System.out.print("Insert the god: ");    //check god is ok in parsesyntax
-					}
-				} else {
-
-					switch(phase.getGodsPhase()) {
-						case CHALLENGER_CHOICE :
-							System.out.println("The challenger "+activePlayer+" is choosing the gods for the game");
-							break;
-
-						case GODS_CHOICE :
-							System.out.println("The other player "+activePlayer+" is choosing his god");
-							break;
-
-						case STARTER_CHOICE :
-							System.out.println("The challenger "+activePlayer+" is now choosing the starter player");
-							break;
-					}
-
-				}
+				printInput = true;
 			}
 
 			case Constants.GODS_GODS -> {
@@ -725,6 +673,7 @@ public class CliGame {
 			}
 
 			case Constants.GODS_CHOICES -> {
+				chosenGods.clear();
 				while(ndc != null) {
 					chosenGods.put(ndc.player, ndc.divinity);
 					ndc = ndc.next;
@@ -744,16 +693,7 @@ public class CliGame {
 			//SETUP [WORKERS ON MAP]
 			case Constants.TURN_PLAYERTURN -> {
 				activePlayer = ngs.player;
-				if (activePlayer.equals(player)) {
-					if(starter.equals(player)) {
-						netMap = new NetMap(new it.polimi.ingsw.core.Map());
-						drawMap();
-					}
-					System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
-					System.out.print("Now place the workers on the map: ");		//check workers are ok in parsesyntax
-				} else {
-					System.out.println("The other player "+activePlayer+" is setting up the workers");
-				}
+				printInput = true;
 			}
 
 			case Constants.GAMESETUP_ERROR -> {
@@ -787,44 +727,20 @@ public class CliGame {
 									ng = (NetGaming) obj;
 									netBuilds = ng.availableBuildings.builds;
 									netMoves = ng.availablePositions.moves;
-									drawPossibilities();
-									System.out.println("Now you have to first build a building and then move. Or you can just move. Use the syntax \"build workerX building/dome x_coord y_coord\" or \"move workerX x_coord y_coord\"");
-									System.out.print("Now it's your turn: ");
 								}
 							}
 						}
 						case MOVE -> {
 							ng = (NetGaming) obj;
 							netMoves = ng.availablePositions.moves;
-							drawPossibilities();
-							System.out.println("Here is the map with the positions where you can move, marked with @");
-							System.out.println("Now it's your turn! Move one of your workers. Use the syntax \"move workerX x_coord y_coord\"");
-							System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
 						}
 						case BUILD -> {
 							ng = (NetGaming) obj;
 							netBuilds = ng.availableBuildings.builds;
-							drawPossibilities();
-							System.out.println("Here is the map with the position where you can build");
-							System.out.println("Now you have to build a building or a dome near the worker. Use the syntax \"build building/dome x_coord y_coord\"");
-							System.out.print("Now build: ");    //check the build is correct in parsesyntax
 						}
-					}
-				} else {
-					if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {	//if I'm in beforemove I show the message only if someone has prometheus
-						if(chosenGods.values().contains(Constants.PROMETHEUS)) {
-							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
-						}
-					} else if(phase.getGamePhase() == GamePhase.MOVE) {	//if I'm in move and the activePlayer has prometheus, I don't show it
-						if(!chosenGods.values().contains(Constants.PROMETHEUS)) {
-							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
-						} else if(chosenGods.get(activePlayer).equals(Constants.PROMETHEUS)) {
-							System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
-						}
-					} else {
-						System.out.println("You can only disconnect, it's "+ng.player+"'s turn.");
 					}
 				}
+				printInput = true;
 			}
 
 			case Constants.OTHERS_ERROR -> {
@@ -906,6 +822,58 @@ public class CliGame {
 				System.out.println("\n"+Constants.BG_CYAN+phase.getPhase()+" "+phase.getGodsPhase()+" "+phase.getGamePhase()+Constants.RESET+"\n");	//Only for debug purposes
 				printInitialPhase();
 				break;
+		}
+	}
+
+	private int findMyWorker(int num) throws AssertionError{
+		boolean toInitialize = true;
+		int worker1 = -1;
+		int worker2 = -1;
+		for (int i = 0; i < Constants.MAP_SIDE; i++) {
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if(netMap.getCell(i,j).worker != null && netMap.getCell(i,j).worker.owner.equals(player)) {
+					if(toInitialize || netMap.getCell(i,j).worker.workerID == worker1) {
+						worker1 = netMap.getCell(i,j).worker.workerID;
+						toInitialize = false;
+					} else {
+						worker2 = netMap.getCell(i,j).worker.workerID;
+					}
+				}
+			}
+		}
+
+		if(num == 1){
+			return Math.min(worker1, worker2);
+		} else if (num == 2) {
+			return Math.max(worker1, worker2);
+		} else {
+			throw new AssertionError("Wrong num");
+		}
+	}
+
+	private int findOwnerWorker(String owner, int num) throws AssertionError{
+		boolean toInitialize = true;
+		int worker1 = -1;
+		int worker2 = -1;
+		for (int i = 0; i < Constants.MAP_SIDE; i++) {
+			for (int j = 0; j < Constants.MAP_SIDE; j++) {
+				if(netMap.getCell(i,j).worker != null && netMap.getCell(i,j).worker.owner.equals(owner)) {
+					if(toInitialize || netMap.getCell(i,j).worker.workerID == worker1) {
+						worker1 = netMap.getCell(i,j).worker.workerID;
+						toInitialize = false;
+					} else {
+						worker2 = netMap.getCell(i,j).worker.workerID;
+					}
+				}
+			}
+		}
+
+		if(num == 1){
+			return Math.min(worker1, worker2);
+		} else if (num == 2) {
+			return Math.max(worker1, worker2);
+		} else {
+			throw new AssertionError("Wrong num");
 		}
 	}
 
@@ -1198,24 +1166,137 @@ public class CliGame {
 	private void typeInputPrint() {
 		if (player.equals(activePlayer)) {
 			switch (phase.getPhase()) {
-				case COLORS -> System.out.print("Type the color you want to use: ");
-				case GODS -> {
-					if (player.equals(players.get(0))) {
-						switch (phase.getGodsPhase()) {
-							case CHALLENGER_CHOICE -> System.out.print("Choose the gods for the game: ");
-							case GODS_CHOICE -> System.out.print("Choose your god for the game: ");
-							case STARTER_CHOICE -> System.out.print("Choose the starter player: ");
-						}
+				case COLORS -> {
+					if (activePlayer.equals(player)) {
+						System.out.println("Insert the color you want with the following syntax \"color colorName\"");
+						System.out.print("Choose among: ");
+						if(!playerColors.containsValue(new Color("red")))	System.out.print("red ");
+						if(!playerColors.containsValue(new Color("green")))	System.out.print("green ");
+						if(!playerColors.containsValue(new Color("blue")))	System.out.print("blue");
+						System.out.print("\n");
+						System.out.print("Insert the color: ");
 					} else {
-						System.out.print("Choose your god for the game: ");
+						System.out.println(activePlayer+" is choosing a color.");
 					}
 				}
-				case SETUP -> System.out.print("Place a worker on the map: ");
+				case GODS -> {
+					if (activePlayer.equals(player)) {
+						if (challenger) {
+							if (godsGoAlreadyCalled) {
+								if(chooseStarter) {
+									if(starter == null) {
+										System.out.println("Insert the starter with this syntax \"starter playerName\"");
+										System.out.print("Choose the starter of the game among these: ");
+										if(players != null){
+											for(String player : players) {
+												System.out.print(player + " ");
+											}
+											System.out.print("\n");
+										}
+										System.out.print("Insert the starter: ");
+									}
+								} else {
+									System.out.println("Insert the god power you want to use with this syntax \"god godname\"");
+									System.out.print("Choose one god among these: ");
+									if(gods != null){
+										for(String x : gods) {
+											if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
+										}
+										System.out.print("\n");
+									} else {
+										System.out.println("Design error, no gods were found");
+									}
+									System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+									chooseStarter = true;
+								}
+							} else {
+								System.out.println("Insert the gods you want to use with the following syntax \"gods godname1 godname2 godname3\"");
+								System.out.println("Choose among the following gods: apollo, artemis, athena, atlas, demeter, hephaestus, minotaur, pan, prometheus");
+								System.out.print("Insert the gods: ");    //check gods are ok in parsesyntax
+								godsGoAlreadyCalled = true;
+							}
+						} else {
+							System.out.println("Insert the god power you want to use with this syntax \"god godname\"");
+							System.out.print("Choose one god among these: ");
+							if(gods != null){
+								for(String x : gods) {
+									if(!chosenGods.containsValue(x))	System.out.print(x.toLowerCase() + " ");
+								}
+								System.out.print("\n");
+							} else {
+								System.out.println("Design error, no gods were found");
+							}
+							System.out.print("Insert the god: ");    //check god is ok in parsesyntax
+						}
+					} else {
+
+						switch(phase.getGodsPhase()) {
+							case CHALLENGER_CHOICE :
+								System.out.println("The challenger "+activePlayer+" is choosing the gods for the game");
+								break;
+
+							case GODS_CHOICE :
+								System.out.println("The other player "+activePlayer+" is choosing his god");
+								break;
+
+							case STARTER_CHOICE :
+								System.out.println("The challenger "+activePlayer+" is now choosing the starter player");
+								break;
+						}
+
+					}
+				}
+				case SETUP -> {
+					if (activePlayer.equals(player)) {
+						if(starter.equals(player)) {
+							netMap = new NetMap(new it.polimi.ingsw.core.Map());
+							drawMap();
+						}
+						System.out.println("Place the workers with the following syntax: position worker1 x_coord y_coord worker2 x_coord y_coord");
+						System.out.print("Now place the workers on the map: ");		//check workers are ok in parsesyntax
+					} else {
+						System.out.println("The other player "+activePlayer+" is setting up the workers");
+					}
+				}
 				case PLAYERTURN -> {
-					switch (phase.getGamePhase()) {
-						case BEFOREMOVE -> System.out.print("You can build before moving: ");
-						case MOVE -> System.out.print("Move a worker: ");
-						case BUILD -> System.out.print("Build in a place with the worker you used before: ");
+					if (activePlayer.equals(player)) {
+						switch (phase.getGamePhase()) {
+							case BEFOREMOVE -> {
+								if(chosenGods.containsValue("PROMETHEUS")) {
+									if(chosenGods.get(player).equals("PROMETHEUS")) {
+										drawPossibilities();
+										System.out.println("Now you have to first build a building and then move. Or you can just move. Use the syntax \"build workerX building/dome x_coord y_coord\" or \"move workerX x_coord y_coord\"");
+										System.out.print("Now it's your turn: ");
+									}
+								}
+							}
+							case MOVE -> {
+								drawPossibilities();
+								System.out.println("Here is the map with the positions where you can move, marked with @");
+								System.out.println("Now it's your turn! Move one of your workers. Use the syntax \"move workerX x_coord y_coord\"");
+								System.out.print("Move your worker: ");    //check the move is correct in parsesyntax
+							}
+							case BUILD -> {
+								drawPossibilities();
+								System.out.println("Here is the map with the position where you can build");
+								System.out.println("Now you have to build a building or a dome near the worker. Use the syntax \"build building/dome x_coord y_coord\"");
+								System.out.print("Now build: ");    //check the build is correct in parsesyntax
+							}
+						}
+					} else {
+						if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {	//if I'm in beforemove I show the message only if someone has prometheus
+							if(chosenGods.values().contains(Constants.PROMETHEUS)) {
+								System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
+							}
+						} else if(phase.getGamePhase() == GamePhase.MOVE) {	//if I'm in move and the activePlayer has prometheus, I don't show it
+							if(!chosenGods.values().contains(Constants.PROMETHEUS)) {
+								System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
+							} else if(chosenGods.get(activePlayer).equals(Constants.PROMETHEUS)) {
+								System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
+							}
+						} else {
+							System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
+						}
 					}
 				}
 			}
@@ -1285,6 +1366,7 @@ public class CliGame {
 		drawMap();
 	}
 	private void drawMap(){
+		//TODO: modify with for
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "       0      |      1      |      2      |      3      |      4       ");
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "+-------------+-------------+-------------+-------------+-------------+");
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "|" + drawSpaces(1, netMap.getCell(0,0)) + drawDome(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawDome(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawDome(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawDome(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawDome(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
@@ -1416,7 +1498,7 @@ public class CliGame {
 	}
 	public String drawWorker(NetCell netC){
 		if(netC.worker != null){
-			String playerNum = netC.worker.workerID == netC.worker.owner.hashCode() + 1 ? "1" : "2";
+			String playerNum = netC.worker.workerID == findOwnerWorker(netC.worker.owner, 1) ? "1" : "2";
 			if(playerColors.get(netC.worker.owner).equals(new Color("red"))) {
 				return (Constants.FG_RED + "W." + playerNum + Constants.RESET);
 			} else if(playerColors.get(netC.worker.owner).equals(new Color("green"))) {

@@ -18,7 +18,7 @@ public class Player {
 	// constructors
 	public Player(String playerName) {
 		this.playerName = playerName;
-		playerID = playerName.hashCode();
+		playerID = playerName.hashCode();	//TODO: remove hashcode and put something else!
 		worker1 = null;
 		worker2 = null;
 		activeWorker = null;
