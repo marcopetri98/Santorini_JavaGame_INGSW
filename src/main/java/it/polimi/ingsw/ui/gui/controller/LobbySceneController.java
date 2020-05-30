@@ -112,6 +112,13 @@ public class LobbySceneController implements SceneController {
 			}
 		}
 	}
+	/**
+	 *
+	 */
+	private void gameCantContinue() {
+		// TODO: print to the player that the server has crashed, in fact in lobby players can disconnect without causing the end of the lobby, game isn't started already
+		// 		 now a player can only quit and cannot do anything
+	}
 
 	/* **********************************************
 	 *												*
@@ -120,7 +127,7 @@ public class LobbySceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-
+		gameCantContinue();
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {

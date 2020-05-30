@@ -199,6 +199,7 @@ public class UserInputController {
 		} else if (!listener.getWantsToPlay()) {
 			throw new IllegalStateException();
 		}
+		gameView.setPlayerName(name);
 		this.playerName = name;
 		listener.sendMessage(new NetSetup(Constants.SETUP_IN_PARTICIPATE,playerName));
 	}

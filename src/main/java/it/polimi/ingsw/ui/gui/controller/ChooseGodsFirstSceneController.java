@@ -89,6 +89,7 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	private Scene previousScene;
 	private Scene nextScene;
 	private Stage currentStage;
+	private boolean finished = false;
 
 	// triggers for server messages
 	private GameState gameState;
@@ -291,12 +292,14 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
 
-		if (cardPressed != gameState.getPlayerNumber()) {
-			wrongSelectOfGods();
-		} else {
-			((ImageView)mouseEvent.getTarget()).getScene().setCursor(Cursor.WAIT);
-			NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_IN_GAME_GODS,gameState.getPlayer(),new ArrayList<>(godNamesSelected));
-			MainGuiController.getInstance().sendMessage(godsMessage);
+		if (!finished) {
+			if (cardPressed != gameState.getPlayerNumber()) {
+				wrongSelectOfGods();
+			} else {
+				((ImageView) mouseEvent.getTarget()).getScene().setCursor(Cursor.WAIT);
+				NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_IN_GAME_GODS, gameState.getPlayer(), new ArrayList<>(godNamesSelected));
+				MainGuiController.getInstance().sendMessage(godsMessage);
+			}
 		}
 	}
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
@@ -307,8 +310,10 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetDivinityChoice netSetup = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);
-		MainGuiController.getInstance().sendMessage(netSetup);
+		if (!finished) {
+			NetDivinityChoice netSetup = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);
+			MainGuiController.getInstance().sendMessage(netSetup);
+		}
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);
 		currentStage = (Stage) button_exit.getScene().getWindow();
@@ -323,6 +328,14 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	public void wrongSelectOfGods() {
 		// TODO: say to the user that he selected a wrong amount of gods
 	}
+	/**
+	 *
+	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
+	 */
+	private void gameCantContinue(int reason) {
+		// TODO: print to the player that the server has crashed or a player disconnected in the setup and the game cannot continue for this reason
+		// 		 now a player can only quit and cannot do anything
+	}
 
 	/* **********************************************
 	 *												*
@@ -331,7 +344,8 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: server has crashed, show it to the client
+		finished = true;
+		gameCantContinue(1);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
@@ -350,7 +364,8 @@ public class ChooseGodsFirstSceneController implements SceneController {
 				currentStage.setScene(nextScene);
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
-				// TODO: implement the disconnection shutdown after someone quit the game
+				finished = true;
+				gameCantContinue(0);
 			}
 		}
 	}

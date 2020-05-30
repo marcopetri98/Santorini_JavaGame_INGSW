@@ -18,6 +18,7 @@ public class ClientMessageListener extends Thread {
 	private boolean disconnected;
 	private boolean active;
 	private boolean wantsToPlay;
+	private boolean finished;
 	private final Object startLock, stateLock, inputLock, outputLock;
 
 	public ClientMessageListener(GraphicInterface controller) {
@@ -26,6 +27,7 @@ public class ClientMessageListener extends Thread {
 		active = true;
 		wantsToPlay = false;
 		disconnected = false;
+		finished = false;
 		startLock = new Object();
 		stateLock = new Object();
 		inputLock = new Object();
@@ -57,7 +59,8 @@ public class ClientMessageListener extends Thread {
 					setActive(false);
 				} catch (IOException e) {
 					setActive(false);
-					if (!disconnected) {
+					// if the server has disconnected there has been a connection error only if the player hasn't disconnected and the game hasn't finished
+					if (!disconnected && !finished) {
 						viewController.retrieveConnectionError();
 					}
 				}
@@ -68,6 +71,9 @@ public class ClientMessageListener extends Thread {
 					} else if (ingoingObject.message.equals(Constants.CHECK)) {
 						sendMessage(new NetObject(Constants.CHECK));
 					} else {
+						if (ingoingObject.message.equals(Constants.GENERAL_WINNER) || ingoingObject.message.equals(Constants.GENERAL_PLAYER_DISCONNECTED) || ingoingObject.message.equals(Constants.GENERAL_SETUP_DISCONNECT)) {
+							finished = true;
+						}
 						switch (currentPhase) {
 							case PRELOBBY:
 								if (ingoingObject instanceof NetSetup) {

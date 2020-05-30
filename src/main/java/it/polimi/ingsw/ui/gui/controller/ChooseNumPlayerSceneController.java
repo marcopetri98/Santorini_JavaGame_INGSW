@@ -129,6 +129,13 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	public void selectNumber() {
 		// TODO: error when user tries to go forward with next without having pressed buttons
 	}
+	/**
+	 *
+	 */
+	private void gameCantContinue() {
+		// TODO: print to the player that the server has crashed, in fact in lobby players can disconnect without causing the end of the lobby, game isn't started already
+		// 		 now a player can only quit and cannot do anything
+	}
 
 	/* **********************************************
 	 *												*
@@ -137,7 +144,7 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: what to do here?
+		gameCantContinue();
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {

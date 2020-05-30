@@ -324,7 +324,6 @@ public class MapSceneController implements SceneController {
 
 	}
 
-
 	private void timerInitialize(){
 		button_undo.toFront();
 		button_undo.setDisable(true);
@@ -584,7 +583,6 @@ public class MapSceneController implements SceneController {
 	public void mouseExitedGodCard(MouseEvent mouseEvent) {
 		slidingImage(description_god, descriptionGodCard(), 129, 125, 129, 400, 450);
 	}
-
 	public void mousePressedCell(MouseEvent mouseEvent) {
 		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
 
@@ -629,11 +627,9 @@ public class MapSceneController implements SceneController {
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
 	}
-
 	public void mousePressedWatch(MouseEvent mouseEvent) {
 		button_watch.setImage(buttonWatchPressed);
 	}
-
 	public void mouseReleasedWatch(MouseEvent mouseEvent) {
 		button_watch.setImage(buttonWatch);
 
@@ -641,14 +637,12 @@ public class MapSceneController implements SceneController {
 		slidingImage(icon_message, iconLost, 650, 325, 650, -350, 1250);
 		button_exit2.toFront();
 	}
-
 	public void mousePressedUndo(MouseEvent mouseEvent) {
 		if(button_undo.getImage().equals(buttonUndo5) || button_undo.getImage().equals(buttonUndo4) || button_undo.getImage().equals(buttonUndo3) || button_undo.getImage().equals(buttonUndo2) || button_undo.getImage().equals(buttonUndo1)) {
 			timeline.stop();
 			button_undo.setImage(buttonUndoPressed);
 		}
 	}
-
 	public void mouseReleasedUndo(MouseEvent mouseEvent) {
 		if(button_undo.getImage().equals(buttonUndoPressed)) {
 			button_undo.setImage(buttonUndoDisabled);
@@ -1304,6 +1298,14 @@ public class MapSceneController implements SceneController {
 			button_exit2.setImage(buttonExit);
 		}
 	}
+	/**
+	 *
+	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
+	 */
+	private void gameCantContinue(int reason) {
+		// TODO: print to the player that the server has crashed or a player disconnected in the setup and the game cannot continue for this reason
+		// 		 now a player can only quit and cannot do anything
+	}
 
 	/* **********************************************
 	 *												*
@@ -1312,7 +1314,8 @@ public class MapSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: what to do here?
+		finished = true;
+		gameCantContinue(1);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
@@ -1366,7 +1369,12 @@ public class MapSceneController implements SceneController {
 				updateMap();
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
-				// TODO: someone has disconnected and for this reason the game is finished because we're in the setup
+				finished = true;
+				button_build.setDisable(true);
+				button_dome.setDisable(true);
+				button_endTurn.setDisable(true);
+				button_undo.setDisable(true);
+				gameCantContinue(0);
 			}
 			case Constants.GENERAL_PLAYER_DISCONNECTED -> {
 				NetGaming netGaming = (NetGaming) message;
@@ -1375,6 +1383,7 @@ public class MapSceneController implements SceneController {
 				button_build.setDisable(true);
 				button_dome.setDisable(true);
 				button_endTurn.setDisable(true);
+				button_undo.setDisable(true);
 				playerDisconnected(netGaming.player);
 			}
 			case Constants.GENERAL_WINNER -> {
@@ -1383,6 +1392,7 @@ public class MapSceneController implements SceneController {
 				button_build.setDisable(true);
 				button_dome.setDisable(true);
 				button_endTurn.setDisable(true);
+				button_undo.setDisable(true);
 				playerWon(netGaming.player);
 			}
 			case Constants.GENERAL_DEFEATED -> {

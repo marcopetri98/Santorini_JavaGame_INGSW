@@ -56,6 +56,7 @@ public class ChooseColorSceneController implements SceneController {
 	private Stage currentStage;
 	private boolean redLocked = false, greenLocked = false, blueLocked = false;
 	private boolean challengerReceived = false;
+	private boolean finished = false;
 	private Color choice = null;
 
 	// triggers for server messages
@@ -132,7 +133,7 @@ public class ChooseColorSceneController implements SceneController {
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
 
-		if (choice != null) {
+		if (choice != null && !finished) {
 			if (!gameState.getPlayer().equals(gameState.getActivePlayer())) {
 				// user is trying to choose the color in others turn
 				chooseInYourTurnError();
@@ -152,8 +153,10 @@ public class ChooseColorSceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetColorPreparation netSetup = new NetColorPreparation(Constants.GENERAL_DISCONNECT);
-		MainGuiController.getInstance().sendMessage(netSetup);
+		if (!finished) {
+			NetColorPreparation netSetup = new NetColorPreparation(Constants.GENERAL_DISCONNECT);
+			MainGuiController.getInstance().sendMessage(netSetup);
+		}
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);
 		currentStage = (Stage) button_exit.getScene().getWindow();
@@ -172,6 +175,14 @@ public class ChooseColorSceneController implements SceneController {
 		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
 		text_player.setText(gameState.getActivePlayer());
 	}
+	/**
+	 *
+	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
+	 */
+	private void gameCantContinue(int reason) {
+		// TODO: print to the player that the server has crashed or a player disconnected in the setup and the game cannot continue for this reason
+		// 		 now a player can only quit and cannot do anything
+	}
 
 	/* **********************************************
 	 *												*
@@ -180,7 +191,8 @@ public class ChooseColorSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: server has crashed, show it to the client
+		finished = true;
+		gameCantContinue(1);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
@@ -239,7 +251,8 @@ public class ChooseColorSceneController implements SceneController {
 				}
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
-				// TODO: implement the disconnection shutdown after someone quit the game
+				finished = true;
+				gameCantContinue(0);
 			}
 		}
 	}

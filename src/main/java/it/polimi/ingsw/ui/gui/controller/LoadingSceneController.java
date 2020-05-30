@@ -91,6 +91,14 @@ public class LoadingSceneController implements SceneController {
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
 	}
+	/**
+	 *
+	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
+	 */
+	private void gameCantContinue(int reason) {
+		// TODO: print to the player that the server has crashed or a player disconnected in the setup and the game cannot continue for this reason
+		// 		 now a player can only quit and cannot do anything
+	}
 
 	/* **********************************************
 	 *												*
@@ -99,7 +107,7 @@ public class LoadingSceneController implements SceneController {
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: server has crashed, show it to the client
+		gameCantContinue(1);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
@@ -129,7 +137,7 @@ public class LoadingSceneController implements SceneController {
 				}
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
-				// TODO: implement the disconnection shutdown after someone quit the game
+				gameCantContinue(0);
 			}
 		}
 	}
