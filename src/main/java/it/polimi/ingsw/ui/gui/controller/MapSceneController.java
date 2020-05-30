@@ -623,6 +623,7 @@ public class MapSceneController implements SceneController {
 
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
+		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);

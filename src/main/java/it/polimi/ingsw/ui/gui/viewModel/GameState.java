@@ -35,6 +35,7 @@ public class GameState {
 		activePlayer = null;
 		playerNumber = 0;
 		players = new ArrayList<>();
+		godsName = new ArrayList<>();
 		gods = new LinkedHashMap<>();
 		colors = new LinkedHashMap<>();
 		turn = new Turn();
