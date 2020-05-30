@@ -189,6 +189,7 @@ public class CliInitial {
 					} else {
 						boolean error = false;
 						for (int i = 0; i < addressNumbers.length && !error; i++) {
+							// TODO: control that is a valid ip
 							if (!Constants.isNumber(addressNumbers[i])) {
 								error = true;
 							}

@@ -129,6 +129,7 @@ public class UserInputController {
 					listener.sendMessage(new NetGameSetup(Constants.GAMESETUP_IN_PLACE,playerName,new Pair<Integer,Integer>(Integer.parseInt(command.getParameter(1)),Integer.parseInt(command.getParameter(2))),new Pair<Integer,Integer>(Integer.parseInt(command.getParameter(4)),Integer.parseInt(command.getParameter(5)))));
 				}
 			}
+			// TODO: delete because of refactoring
 			case Constants.COMMAND_PASS -> {
 				if (turn.getPhase() != Phase.PLAYERTURN || turn.getGamePhase() != GamePhase.BEFOREMOVE) {
 					throw new IllegalStateException();

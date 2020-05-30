@@ -324,7 +324,9 @@ public class Game extends ObservableGame {
 	private synchronized void computeBuilds(Worker w) {
 		try {
 			playerPossibleBuilds.addAll(getPlayerTurn().getCard().checkBuild(map,w,turn));
-		} catch (NoBuildException ignore) {}
+		} catch (NoBuildException ignore) {
+			// TODO: verify why we can ignore this exception
+		}
 	}
 
 	/* **********************************************
@@ -467,6 +469,25 @@ public class Game extends ObservableGame {
 		}
 		notifyColors(colorInfo);
 	}
+	public synchronized void setGameGods(List<String> godNames) throws IllegalArgumentException, WrongPhaseException {
+		if (godNames == null || godNames.size() != players.size()) {
+			throw new IllegalArgumentException();
+		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
+			throw new WrongPhaseException();
+		} else {
+			for (String godName : godNames) {
+				if (!Constants.GODS_GOD_NAMES.contains(godName.toUpperCase())) {
+					throw new IllegalArgumentException();
+				}
+			}
+		}
+
+		for (int i = 0; i < godNames.size(); i++) {
+			GodCard godCreated = GodCardFactory.createGodCard(godNames.get(i).toUpperCase());
+			godCards.add(godCreated);
+		}
+		notifyGods(godCards);
+	}
 	/**
 	 * Sets the player's godCard
 	 * @param playerName
@@ -506,25 +527,6 @@ public class Game extends ObservableGame {
 			} catch (IllegalStateException e) {}
 		}
 		notifyGods(godsInfo);
-	}
-	public synchronized void setGameGods(List<String> godNames) throws IllegalArgumentException, WrongPhaseException {
-		if (godNames == null || godNames.size() != players.size()) {
-			throw new IllegalArgumentException();
-		} else if (turn.getPhase() != Phase.GODS && turn.getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {
-			throw new WrongPhaseException();
-		} else {
-			for (String godName : godNames) {
-				if (!Constants.GODS_GOD_NAMES.contains(godName.toUpperCase())) {
-					throw new IllegalArgumentException();
-				}
-			}
-		}
-
-		for (int i = 0; i < godNames.size(); i++) {
-			GodCard godCreated = GodCardFactory.createGodCard(godNames.get(i).toUpperCase());
-			godCards.add(godCreated);
-		}
-		notifyGods(godCards);
 	}
 	/**
 	 * It sets the starting player positioning it on the first position of the arrayList

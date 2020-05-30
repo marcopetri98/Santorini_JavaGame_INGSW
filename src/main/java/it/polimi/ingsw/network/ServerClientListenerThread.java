@@ -319,7 +319,7 @@ public class ServerClientListenerThread extends Thread {
 			disconnect();
 		} else {
 			// the user has sent a bad message
-			colorOutput = new NetColorPreparation(Constants.GENERAL_ERROR);
+			colorOutput = new NetColorPreparation(Constants.COLOR_ERROR);
 			sendMessage(colorOutput);
 		}
 	}
@@ -350,7 +350,7 @@ public class ServerClientListenerThread extends Thread {
 			disconnect();
 		} else {
 			// message isn't well formed ==> error message sent
-			divinityOutput = new NetDivinityChoice(Constants.GENERAL_ERROR);
+			divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
 			sendMessage(divinityOutput);
 		}
 	}
@@ -370,7 +370,7 @@ public class ServerClientListenerThread extends Thread {
 			disconnect();
 		} else {
 			// the message isn't well formed
-			gameSetupOutput = new NetGameSetup(Constants.GENERAL_ERROR);
+			gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);
 			sendMessage(gameSetupMessage);
 		}
 	}
@@ -393,8 +393,6 @@ public class ServerClientListenerThread extends Thread {
 					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);
 					sendMessage(gamingMsg);
 				}
-			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_PASS)) {
-				gameServer.handlePassRequest(gamingMsg);
 			} else if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {
 				// it disconnects the user from the lobby
 				disconnect();

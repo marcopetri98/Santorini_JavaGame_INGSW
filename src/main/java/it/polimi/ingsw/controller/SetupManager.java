@@ -44,7 +44,7 @@ public class SetupManager {
 		while (gamers.size() < playerNumber) {
 			if (temp.size() > 1) {
 				// find a random player to add to the gamers list
-				random = (int) (Math.random() * (double) temp.size()-1);
+				random = (int) (Math.random() * (double) temp.size());
 				gamers.add(temp.get(random));
 				temp.remove(random);
 			} else {
