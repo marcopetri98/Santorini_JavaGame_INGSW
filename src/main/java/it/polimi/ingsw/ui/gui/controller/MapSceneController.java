@@ -21,7 +21,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -29,9 +28,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 public class MapSceneController implements SceneController {
 	@FXML
@@ -271,7 +268,7 @@ public class MapSceneController implements SceneController {
 
 	ImageView workerSelected = null;
 
-	Timeline timeline; //for undo button
+	Timeline timeline = null; //for undo button
 
 	// objects used to change scene
 	private Parent previousFXML;
@@ -284,10 +281,14 @@ public class MapSceneController implements SceneController {
 	private GameState gameState;
 
 	// variables for gui
+	private NetMap beforeActionMap = null;
+	private NetBuild beforePerformedBuild = null;
+	private long actionTimestamp = 0;
 	private Pair<Integer,Integer> worker1StartingPos;
 	private Pair<Integer,Integer> worker2StartingPos;
 	private boolean finished = false;
 	private boolean waitingResponse = false;
+	private boolean hasMoved = false;
 	private boolean transitioningFromSetupToPlay = false;
 	private boolean hasBuilt = false;
 	private NetMove performedMove = null;
@@ -329,8 +330,10 @@ public class MapSceneController implements SceneController {
 		button_undo.setDisable(true);
 		fadeImage(button_undo, buttonUndoDisabled, 0, 1, 1);
 	}
-
 	private void timerCountdown(){
+		if (timeline != null) {
+			timeline.stop();
+		}
 		button_undo.setDisable(false);
 		timeline = new Timeline(
 				new KeyFrame(Duration.ZERO, new KeyValue(button_undo.imageProperty(), buttonUndo5)),
@@ -340,6 +343,7 @@ public class MapSceneController implements SceneController {
 				new KeyFrame(Duration.seconds(4), new KeyValue(button_undo.imageProperty(), buttonUndo1)),
 				new KeyFrame(Duration.seconds(5), new KeyValue(button_undo.imageProperty(), buttonUndoDisabled))
 		);
+		actionTimestamp = new Date().getTime();
 		timeline.play();
 	}
 
@@ -588,7 +592,7 @@ public class MapSceneController implements SceneController {
 
 		// TODO: maybe we can insert actions on cells also on others turn
 		// if the player is clicking a cell on its turn it active possible actions
-		if (gameState.getActivePlayer().equals(gameState.getPlayer()) && !waitingResponse && !finished) {
+		if (gameState.getActivePlayer().equals(gameState.getPlayer()) && !waitingResponse && !finished && !hasMoved) {
 			if (!pressedButtonDome && !pressedButtonBuild) {
 				if (colorPlayer().equals(workerRed)) {
 					movingWorker(pressedCell, workerRed, workerRedPressed, build1Red, build2Red, build3Red, build1RedPressed, build2RedPressed, build3RedPressed);
@@ -611,7 +615,16 @@ public class MapSceneController implements SceneController {
 	}
 	public void mouseReleasedEndTurn(MouseEvent mouseEvent) {
 		button_endTurn.setImage(buttonEndTurn);
-		sendWorkerBuild();
+		if (performedBuild != null) {
+			timeline.stop();
+			button_undo.setImage(buttonUndoDisabled);
+			sendWorkerBuild();
+		} else {
+			timeline.stop();
+			button_undo.setImage(buttonUndoDisabled);
+			sendWorkerMove(performedMove);
+			hasMoved = false;
+		}
 	}
 
 	public void mousePressedExit2(MouseEvent mouseEvent) throws IOException {
@@ -648,6 +661,37 @@ public class MapSceneController implements SceneController {
 		if(button_undo.getImage().equals(buttonUndoPressed)) {
 			button_undo.setImage(buttonUndoDisabled);
 			button_undo.setDisable(true);
+			if (new Date().getTime()-actionTimestamp <= 5000) {
+				boolean workerSelection = false;
+				if (performedMove != null) {
+					workerSelected = null;
+				}
+				performedMove = null;
+				hasMoved = false;
+				if (performedBuild != null) {
+					workerSelection = true;
+				}
+				performedBuild = beforePerformedBuild;
+				if (performedBuild == null) {
+					button_endTurn.setImage(buttonEndTurnDisabled);
+					button_endTurn.setDisable(true);
+				}
+				gameState.setMap(beforeActionMap);
+				updateMap();
+
+				if (workerSelection) {
+					NetCell workerSel = gameState.getMap().getCell(Integer.parseInt(workerSelected.getId().split("_")[1]),Integer.parseInt(workerSelected.getId().split("_")[2]));
+					if (workerSel.getBuilding().getLevel() == 0) {
+						workerSelected.setImage(colorPlayer().equals(workerRed) ? workerRedPressed : (colorPlayer().equals(workerGreen) ? workerGreenPressed : workerBluePressed));
+					} else if (workerSel.getBuilding().getLevel() == 1) {
+						workerSelected.setImage(colorPlayer().equals(workerRed) ? build1RedPressed : (colorPlayer().equals(workerGreen) ? build1GreenPressed: build1BluePressed));
+					} else if (workerSel.getBuilding().getLevel() == 2) {
+						workerSelected.setImage(colorPlayer().equals(workerRed) ? build2RedPressed : (colorPlayer().equals(workerGreen) ? build2GreenPressed : build2BluePressed));
+					} else if (workerSel.getBuilding().getLevel() == 3) {
+						workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
+					}
+				}
+			}
 		}
 	}
 
@@ -685,11 +729,13 @@ public class MapSceneController implements SceneController {
 
 				if (performedBuild == null) {
 					if (gameState.getPossibleBuilds().contains(wantedBuild)) {
+						beforePerformedBuild = null;
 						performedBuild = wantedBuild;
 						button_endTurn.setImage(buttonEndTurn);
 						button_endTurn.setDisable(false);
 
 						// player wants to build a building he can build, now the map is updated
+						beforeActionMap = gameState.getMap();
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
 						hasBuilt = true;
@@ -703,6 +749,7 @@ public class MapSceneController implements SceneController {
 						} else if (workerSel.getBuilding().getLevel() == 3) {
 							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
 						}
+						timerCountdown();
 					} else {
 						wrongAction(1);
 					}
@@ -710,10 +757,13 @@ public class MapSceneController implements SceneController {
 					// builds the NetBuild which is wanted to be performed by the player
 					complexBuild = performedBuild.appendOther(wantedBuild);
 					if (gameState.getPossibleBuilds().contains(complexBuild)) {
+						beforePerformedBuild = performedBuild;
 						performedBuild = complexBuild;
 						button_endTurn.setImage(buttonEndTurn);
+						button_endTurn.setDisable(false);
 
 						// player wants to build a building he can build, now the map is updated
+						beforeActionMap = gameState.getMap();
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setLevel(cellClicked.getBuilding().getLevel()+1)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
 						hasBuilt = true;
@@ -727,6 +777,7 @@ public class MapSceneController implements SceneController {
 						} else if (workerSel.getBuilding().getLevel() == 3) {
 							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
 						}
+						timerCountdown();
 					} else {
 						wrongAction(1);
 					}
@@ -743,11 +794,13 @@ public class MapSceneController implements SceneController {
 
 				if (performedBuild == null) {
 					if (gameState.getPossibleBuilds().contains(wantedBuild)) {
+						beforePerformedBuild = null;
 						performedBuild = wantedBuild;
 						button_endTurn.setImage(buttonEndTurn);
 						button_endTurn.setDisable(false);
 
 						// player wants to build a building he can build, now the map is updated
+						beforeActionMap = gameState.getMap();
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
 						hasBuilt = true;
@@ -761,6 +814,7 @@ public class MapSceneController implements SceneController {
 						} else if (workerSel.getBuilding().getLevel() == 3) {
 							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
 						}
+						timerCountdown();
 					} else {
 						wrongAction(1);
 					}
@@ -768,10 +822,13 @@ public class MapSceneController implements SceneController {
 					// builds the NetBuild which is wanted to be performed by the player
 					complexBuild = performedBuild.appendOther(wantedBuild);
 					if (gameState.getPossibleBuilds().contains(complexBuild)) {
+						beforePerformedBuild = performedBuild;
 						performedBuild = complexBuild;
 						button_endTurn.setImage(buttonEndTurn);
+						button_endTurn.setDisable(false);
 
 						// player wants to build a building he can build, now the map is updated
+						beforeActionMap = gameState.getMap();
 						gameState.setMap(map.changeCell(cellClicked.setBuilding(cellClicked.getBuilding().setDome(true)),map.getX(cellClicked),map.getY(cellClicked)));
 						updateMap();
 						hasBuilt = true;
@@ -785,6 +842,7 @@ public class MapSceneController implements SceneController {
 						} else if (workerSel.getBuilding().getLevel() == 3) {
 							workerSelected.setImage(colorPlayer().equals(workerRed) ? build3RedPressed : (colorPlayer().equals(workerGreen) ? build3GreenPressed : build3BluePressed));
 						}
+						timerCountdown();
 					} else {
 						wrongAction(1);
 					}
@@ -859,16 +917,16 @@ public class MapSceneController implements SceneController {
 						sendWorkerPositions();
 					}
 				} else if (performingMovement != null) {
-					//makeMove(performingMovement,cellPressed,worker,workerPressed,build1Worker,build1WorkerPressed,build2Worker,build2WorkerPressed,build3Worker,build3WorkerPressed);
+					beforeActionMap = gameState.getMap();
 					movingWorkerCell = gameState.getMap().getCell(Integer.parseInt(workerSelected.getId().split("_")[1]), Integer.parseInt(workerSelected.getId().split("_")[2]));
-					currentMove = performingMovement;
+					currentMove = performedMove;
 					List<Pair<Integer,Integer>> cellsChanged = new ArrayList<>();
 					while (currentMove != null) {
 						if (currentMove.other == null || currentMove.other.workerID == currentMove.workerID) {
 							// it performs a simple move
 							netMap = gameState.getMap();
 							netMap = netMap.changeCell(netMap.getCell(currentMove.cellX,currentMove.cellY).setWorker(movingWorkerCell.getWorker()),currentMove.cellX,currentMove.cellY);
-							if (!cellsChanged.contains(new Pair<>(currentMove.cellX,currentMove.cellY))) {
+							if (cellsChanged.isEmpty()) {
 								netMap = netMap.changeCell(movingWorkerCell.setWorker(null),Integer.parseInt(workerSelected.getId().split("_")[1]),Integer.parseInt(workerSelected.getId().split("_")[2]));
 							}
 							gameState.setMap(netMap);
@@ -881,8 +939,8 @@ public class MapSceneController implements SceneController {
 
 							netMap = gameState.getMap();
 							movingWorkerCell = netMap.getCell(currentMove.cellX,currentMove.cellY);
+							netMap = netMap.changeCell(nowMoving.setWorker(null),netMap.getX(nowMoving),netMap.getY(nowMoving));
 							netMap = netMap.changeCell(netMap.getCell(currentMove.cellX,currentMove.cellY).setWorker(nowMoving.getWorker()),currentMove.cellX,currentMove.cellY);
-							netMap = netMap.changeCell(movingWorkerCell.setWorker(null),currentMove.cellX,currentMove.cellY);
 							cellsChanged.add(new Pair<>(currentMove.cellX,currentMove.cellY));
 							gameState.setMap(netMap);
 
@@ -891,8 +949,10 @@ public class MapSceneController implements SceneController {
 						}
 					}
 					updateMap();
-					sendWorkerMove(performedMove);
-					performedMove = null;
+					hasMoved = true;
+					button_endTurn.setImage(buttonEndTurn);
+					button_endTurn.setDisable(false);
+					timerCountdown();
 				}
 			} else {
 				wrongAction(0);
@@ -994,8 +1054,6 @@ public class MapSceneController implements SceneController {
 			}
 		}
 	}
-
-
 
 	/* **********************************************
 	 *												*
@@ -1141,6 +1199,7 @@ public class MapSceneController implements SceneController {
 		NetGaming movePerformed = new NetGaming(Constants.PLAYER_IN_MOVE,gameState.getPlayer(),move);
 		MainGuiController.getInstance().sendMessage(movePerformed);
 		workerSelected = null;
+		performedMove = null;
 	}
 	private void sendWorkerBuild() {
 		button_exit.getScene().setCursor(Cursor.WAIT);
@@ -1149,6 +1208,7 @@ public class MapSceneController implements SceneController {
 		button_dome.setDisable(true);
 		NetGaming buildPerformed = new NetGaming(Constants.PLAYER_IN_BUILD,gameState.getPlayer(),performedBuild);
 		MainGuiController.getInstance().sendMessage(buildPerformed);
+		beforePerformedBuild = null;
 		performedBuild = null;
 		workerSelected = null;
 		pressedButtonDome = false;
@@ -1336,6 +1396,8 @@ public class MapSceneController implements SceneController {
 					button_dome.setDisable(false);
 					button_build.setDisable(false);
 				}
+				button_endTurn.setImage(buttonEndTurnDisabled);
+				button_endTurn.setDisable(true);
 			}
 			case Constants.TURN_PLAYERTURN -> {
 				button_exit.getScene().setCursor(Cursor.DEFAULT);
