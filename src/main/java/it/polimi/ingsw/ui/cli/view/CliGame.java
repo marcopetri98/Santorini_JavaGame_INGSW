@@ -1,6 +1,5 @@
 package it.polimi.ingsw.ui.cli.view;
 
-import it.polimi.ingsw.core.Move;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.GodsPhase;
 import it.polimi.ingsw.core.state.Phase;
@@ -24,7 +23,6 @@ public class CliGame {
 	private boolean challenger;
 	private Turn phase;
 	private List<String> players;
-	//private List<Color> playerColors;
 	private Map<String, Color> playerColors;
 	private List<String> gods;
 	private Map<String, String> chosenGods;
@@ -74,7 +72,9 @@ public class CliGame {
 		inputLock = new Object();
 	}
 
-	// start method which is the core of game cli class
+	/**
+	 * This is the start method which is the core of CliGame class: the while cycle goes on until the end of the game
+	 */
 	public void start() {
 		Command currentCommand;
 
@@ -103,7 +103,7 @@ public class CliGame {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
 					if(phase.getPhase() == Phase.PLAYERTURN){
 						drawProvisionalMap();
-						if(!cliInput.getUndo()){	//at the end of a 5 sec TIMER getUndo returns true if undo was written; if undo wasn't written I run the usual code || TODO: add if for particular gamephase if required
+						if(!cliInput.getUndo()){	//at the end of a 5 sec TIMER getUndo returns true if undo was written; if undo wasn't written I run the usual code
 							if (selectedMove != null) {
 								inputController.getCommand(currentCommand,phase.clone(),selectedMove);
 							} else if (selectedBuild != null) {
@@ -191,6 +191,10 @@ public class CliGame {
 		}
 		player = name;
 	}
+
+	/**
+	 * This method adds to the deque the messages. It is called from the MainCliController class
+	 */
 	public void addToQueue(NetObject message) {
 		System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
 		synchronized (messages) {
@@ -212,6 +216,11 @@ public class CliGame {
 	 * 												*
 	 ************************************************/
 
+	/**
+	 * This method checks the syntax of the command inserted by the user, and accordingly modifies CliGame state if needed, and prepares the data to send to the server
+	 * @param command represents the command inserted by the user
+	 * @return true if the command is correct
+	 */
 	private boolean parseSyntax(Command command) {
 		if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
 			functioning = false;
@@ -578,6 +587,9 @@ public class CliGame {
 		return false;
 	}
 
+	/**
+	 * This method cycles over every message in deque: when the parsing is done, the message is deleted
+	 */
 	private void parseMessages(){
 		while(messages.size() != 0/* && functioning*/){
 			parseMessage(messages.getFirst());
@@ -585,8 +597,11 @@ public class CliGame {
 		}
 		oldNetMap = netMap;
 	}
-	// FIXME: this is a parsing function, this isn't a drawing or printing function, it should only parse the message
 
+	/**
+	 * This method parses the messages sent by the server and stored in the the deque according to the particular gamephase in which the state is. Some messages have to be parsed anyway
+	 * @param obj the message in the deque
+	 */
 	private void parseMessage(NetObject obj){
 		if (obj.message.equals(Constants.GENERAL_FATAL_ERROR) || obj.message.equals(Constants.GENERAL_SETUP_DISCONNECT)) {
 			printServerError(obj);
@@ -614,6 +629,11 @@ public class CliGame {
 
 		parseOther(obj);
 	}
+
+	/**
+	 * This method parses the messages in the color phase, casting the NetObject to a NetColorPreparation, and modifying the state of the class according to the message type
+	 * @param obj the message in the deque
+	 */
 	private void parseColors(NetObject obj) {
 		NetColorPreparation ncp = (NetColorPreparation) obj;
 		switch (obj.message) {
@@ -640,8 +660,12 @@ public class CliGame {
 				printServerError(obj);
 			}
 		}
-
 	}
+
+	/**
+	 * This method parses the messages in the gods phase, casting the NetObject to a NetDivinityChoice, and modifying the state of the class according to the message type
+	 * @param obj the message in the deque
+	 */
 	private void parseGods(NetObject obj){
 		NetDivinityChoice ndc = (NetDivinityChoice) obj;
 		switch (ndc.message) {
@@ -685,8 +709,12 @@ public class CliGame {
 				printServerError(obj);
 			}
 		}
-
 	}
+
+	/**
+	 * This method parses the messages in the setup phase, casting the NetObject to a NetGameSetup, and modifying the state of the class according to the message type
+	 * @param obj the message in the deque
+	 */
 	private void parseSetup(NetObject obj){
 		NetGameSetup ngs = (NetGameSetup)obj;
 		switch (obj.message) {
@@ -706,6 +734,11 @@ public class CliGame {
 			}
 		}
 	}
+
+	/**
+	 * This method parses the messages in the playerturn phase, casting the NetObject to a NetGaming, and modifying the state of the class according to the message type
+	 * @param obj the message in the deque
+	 */
 	private void parsePlayerTurn(NetObject obj){
 		NetGaming ng = (NetGaming) obj;
 		switch (obj.message) {
@@ -748,6 +781,11 @@ public class CliGame {
 			}
 		}
 	}
+
+	/**
+	 * This method parses the generic messages, casting the NetObject to a NetGameSetup or a NetGaming based on the message itself, and modifying the state of the class according to the message type
+	 * @param obj the message in the deque
+	 */
 	private void parseOther(NetObject obj) {
 		NetGaming ng;
 		NetGameSetup ngs;
@@ -825,6 +863,10 @@ public class CliGame {
 		}
 	}
 
+	/**
+	 * This method finds the workerID of the current player, given only the number of the worker
+	 * @param num the number of the worker
+	 */
 	private int findMyWorker(int num) throws AssertionError{
 		boolean toInitialize = true;
 		int worker1 = -1;
@@ -851,6 +893,11 @@ public class CliGame {
 		}
 	}
 
+	/**
+	 * This method finds the workerID of specified player, given the owner and the number of the worker
+	 * @param owner the name of the player
+	 * @param num the number of the worker
+	 */
 	private int findOwnerWorker(String owner, int num) throws AssertionError{
 		boolean toInitialize = true;
 		int worker1 = -1;
@@ -887,6 +934,10 @@ public class CliGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method prints the name of the phase every time is needed (when it changes)
+	 */
 	private void printInitialPhase() {
 		switch (phase.getPhase()) {
 			case COLORS -> {
@@ -1099,6 +1150,9 @@ public class CliGame {
 		}
 	}
 
+	/**
+	 * This method prints the error in case the command was not correctly written
+	 */
 	private void printError() {
 		if(printedGuide) {
 			printedGuide = false;
@@ -1163,6 +1217,10 @@ public class CliGame {
 			}
 		}
 	}
+
+	/**
+	 * This method prints the commands that the user has to write, helping the player in every phase of the game, based on the particular phase and the activeplayer
+	 */
 	private void typeInputPrint() {
 		if (player.equals(activePlayer)) {
 			switch (phase.getPhase()) {
@@ -1305,6 +1363,9 @@ public class CliGame {
 		}
 	}
 
+	/**
+	 * This method creates and then prints the provisional map after a change is done, before the player can call the UNDO function
+	 */
 	private void drawProvisionalMap() {
 		if(selectedMove != null) {
 			NetMove netMove = selectedMove;
@@ -1317,13 +1378,11 @@ public class CliGame {
 						xFound = x;
 						yFound = y;
 						tmpWorker = netMap.getCell(x, y).worker;
-
 					}
 					if (netMove.other != null && netMap.getCell(x, y).worker != null && netMap.getCell(x, y).worker.workerID == netMove.other.workerID) {
 						xFoundOther = x;
 						yFoundOther = y;
 						tmpWorkerOther = netMap.getCell(x, y).worker;
-
 					}
 				}
 			}
@@ -1339,32 +1398,32 @@ public class CliGame {
 			if(xFoundOther != -1) {
 				netMap = netMap.changeCell(netMap.getCell(netMove.other.cellX,netMove.other.cellY).setWorker(tmpWorkerOther), netMove.other.cellX, netMove.other.cellY);	//sets other worker in the new place
 			}
-
 			drawMap();
-
 		}
 		if(selectedBuild != null) {
 			NetBuild netBuild = selectedBuild;
-
 			NetBuilding netBuilding = new NetBuilding(netBuild);
 			netMap = netMap.changeCell(netMap.getCell(netBuild.cellX,netBuild.cellY).setBuilding(netBuilding), netBuild.cellX, netBuild.cellY);	//sets the new build
 			if(netBuild.other != null) {
 				netBuilding = new NetBuilding(netBuild.other);
 				netMap = netMap.changeCell(netMap.getCell(netBuild.other.cellX,netBuild.other.cellY).setBuilding(netBuilding), netBuild.other.cellX, netBuild.other.cellY);	//sets the new other build
 			}
-
-
 			drawMap();
-
-
 		}
 	}
 
 	// DRAWING FUNCTIONS
+	/**
+	 * This method prints the map with the drawPoss boolean that is true: in this way, the drawMap will also draw the possible moves or builds the player can do
+	 */
 	private void drawPossibilities(){
 		drawPoss = true;
 		drawMap();
 	}
+
+	/**
+	 * This method actually draws the map, and after that prints all the relevant information
+	 */
 	private void drawMap(){
 		//TODO: modify with for
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \t" + "       0      |      1      |      2      |      3      |      4       ");
@@ -1393,8 +1452,11 @@ public class CliGame {
 		writeAllInfo();
 
 		drawPoss = false;
-		//System.out.println('\u0905');
 	}
+
+	/**
+	 * This method is called in the drawMap for drawing the spaces: they can be blank or have some "@" that identify the cells where the player can move or build
+	 */
 	public String drawSpaces(int type, NetCell netC){
 		if(drawPoss){
 			if(phase.getGamePhase() == GamePhase.MOVE){
@@ -1422,7 +1484,6 @@ public class CliGame {
 								x = x.other;
 							}
 						}
-
 					}
 				}
 				if (type == 0) {
@@ -1437,7 +1498,6 @@ public class CliGame {
 					cellToFill = false;
 					return "     ";
 				}
-
 			}
 			else if(phase.getGamePhase() == GamePhase.BEFOREMOVE || phase.getGamePhase() == GamePhase.BUILD){
 				if(netBuilds != null){
@@ -1461,7 +1521,6 @@ public class CliGame {
 								}
 								x = x.other;
 							}
-
 						}
 					}
 				}
@@ -1478,7 +1537,6 @@ public class CliGame {
 					return "     ";
 				}
 			}
-
 		}
 		else{
 			if (type == 0) {
@@ -1496,6 +1554,10 @@ public class CliGame {
 		}
 		return "ERROR";
 	}
+
+	/**
+	 * This method is called in the drawMap for drawing the workers: they are displayed with the notation W.worker_number
+	 */
 	public String drawWorker(NetCell netC){
 		if(netC.worker != null){
 			String playerNum = netC.worker.workerID == findOwnerWorker(netC.worker.owner, 1) ? "1" : "2";
@@ -1506,7 +1568,7 @@ public class CliGame {
 			} else if(playerColors.get(netC.worker.owner).equals(new Color("blue"))) {
 				return Constants.FG_BLUE + "W." + playerNum + Constants.RESET;
 			} else {
-				return "WWW";
+				return "ERROR";	//should never be returned
 			}
 		}
 		if(drawPoss && cellToFill) {
@@ -1515,6 +1577,10 @@ public class CliGame {
 			return "   ";
 		}
 	}
+
+	/**
+	 * This method is called in the drawMap for drawing the domes: they are displayed with the notation D if necessary
+	 */
 	public String drawDome(NetCell netC){
 		if (netC.building.dome) {
 			if(drawPoss && cellToFill) {
@@ -1529,6 +1595,10 @@ public class CliGame {
 			return "   ";
 		}
 	}
+
+	/**
+	 * This method is called in the drawMap for drawing the buildings: they are displayed with the notation B.building_height
+	 */
 	public String drawBuilding(NetCell netC){
 		if (netC.building.level == 3) {
 			return "B:3";
@@ -1546,15 +1616,18 @@ public class CliGame {
 		}
 	}
 
+	/**
+	 * This method is called in the drawMap for drawing the additional info, as the color of the players and the gods they have
+	 */
 	public void writeAllInfo(){
 		/*for (int y = 0; y < 5; y++) {
 			for(int x = 0; x < 5; x++){
 				NetWorker myWorker = netMap.getCell(x,y).worker;
 				if(myWorker != null){
 					System.out.print("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + "The ");
-					if(myWorker.workerID == myWorker.owner.hashCode() + 1) {
+					if(myWorker.workerID == findOwnerWorker(myWorker.owner, 1)) {
 						System.out.print("worker1");
-					} else if(myWorker.workerID == myWorker.owner.hashCode() + 2) {
+					} else if(myWorker.workerID == findOwnerWorker(myWorker.owner, 1)) {
 						System.out.print("worker2");
 					} else {
 						System.out.print(myWorker.workerID);
