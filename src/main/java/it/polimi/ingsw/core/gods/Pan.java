@@ -77,7 +77,7 @@ public class Pan extends GodCard {
 									if (m.getCell(x, y).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() >= 2) {
 										//Check height difference is at least 2 levels (moving down) and adds type 3 move
 										moves.add(new Move(TypeMove.VICTORY_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
-									} else {
+									} else if(m.getCell(x1, y1).getBuilding().getLevel() - m.getCell(x, y).getBuilding().getLevel() <= 1){	//Checks that the height difference is less than 1
 										//else adds type 0 [simple] move, still doable
 										moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));
 									}

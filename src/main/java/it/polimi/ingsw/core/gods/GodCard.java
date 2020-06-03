@@ -30,7 +30,7 @@ public abstract class GodCard {
 
 				if(x != x1 || y != y1){ //I shall not move where I am already
 					if(0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4){   //Check that I am inside the map
-						if(gameMap.getCell(x1, y1).getBuilding().getLevel() - gameMap.getCell(x, y).getBuilding().getLevel() <= 1){
+						if(gameMap.getCell(x1, y1).getBuilding().getLevel() - gameMap.getCell(x, y).getBuilding().getLevel() <= 1){	//Checks that the height difference is less than 1
 							if(!gameMap.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 								if (gameMap.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 									moves.add(new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(x, y), gameMap.getCell(x1, y1), w));
@@ -90,7 +90,7 @@ public abstract class GodCard {
 
 				if(x != x1 || y != y1){ //I shall not move where I am already
 					if(0 <= x1 && x1 <= 4 && 0 <= y1 && y1 <= 4){   //Check that I am inside the map
-						if(gameMap.getCell(x1, y1).getBuilding().getLevel() - gameMap.getCell(x, y).getBuilding().getLevel() <= 1){
+						if(gameMap.getCell(x1, y1).getBuilding().getLevel() - gameMap.getCell(x, y).getBuilding().getLevel() <= 1){	//Checks that the height difference is less than 1
 							if(!gameMap.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 								if (gameMap.getCell(x1, y1).getWorker() == null) {   //Check there isn't any worker on the cell
 									moves.add(new Move(TypeMove.SIMPLE_MOVE, gameMap.getCell(x, y), gameMap.getCell(x1, y1), w));
