@@ -49,6 +49,9 @@ public class CliGame {
 	private boolean cellToFill = false;
 	private boolean hasBuiltBefore = false;	//for prometheus
 
+	/**
+	 * Constructor of CliGame class
+	 */
 	public CliGame(CliInput inputGetter) {
 		messages = new ArrayDeque<>();
 		cliInput = inputGetter;
@@ -97,7 +100,7 @@ public class CliGame {
 					typeInputPrint();
 					printInput = false;
 				}
-				System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
+				//System.out.println("\n"+Constants.BG_CYAN+activePlayer+Constants.RESET+"\n");	//Only for debug purposes
 				currentCommand = cliInput.getInput();
 				if (parseSyntax(currentCommand)) {
 					// the user wrote a correct message that can be wrote in the current phase, so this is sent to the view controller
@@ -155,12 +158,27 @@ public class CliGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * Phase getter
+	 * @return phase of CliGame (which is synchronized with Game's one)
+	 */
 	public Turn getPhase(){
 		return phase.clone();
 	}
+
+	/**
+	 * Phase getter
+	 * @return phase of CliGame (which is synchronized with Game's one)
+	 */
 	public Turn getPhasePointer() {
 		return phase;
 	}
+
+	/**
+	 * Players getter
+	 * @return and arraylist of the players
+	 */
 	public List<String> getPlayers() {
 		return new ArrayList<>(players);
 	}
@@ -175,9 +193,16 @@ public class CliGame {
 	 * 												*
 	 ************************************************/
 	// SETTERS
+	/**
+	 * Setter: sets the UserInputController
+	 */
 	public void setInputController(UserInputController inputController) {
 		this.inputController = inputController;
 	}
+
+	/**
+	 * Setter: adds the players to the arraylist, so that CliGame knows who is playing
+	 */
 	public void setPlayers(NetLobbyPreparation lobbyMsg) {
 		players = new ArrayList<>(players);
 		while (lobbyMsg != null) {
@@ -185,6 +210,10 @@ public class CliGame {
 			lobbyMsg = lobbyMsg.next;
 		}
 	}
+
+	/**
+	 * Setter: sets the name of this player
+	 */
 	public void setPlayerName(String name) throws NullPointerException {
 		if (name == null) {
 			throw new NullPointerException();
@@ -196,7 +225,7 @@ public class CliGame {
 	 * This method adds to the deque the messages. It is called from the MainCliController class
 	 */
 	public void addToQueue(NetObject message) {
-		System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
+		//System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -857,7 +886,7 @@ public class CliGame {
 
 			case Constants.GENERAL_PHASE_UPDATE:
 				phase.advance();
-				System.out.println("\n"+Constants.BG_CYAN+phase.getPhase()+" "+phase.getGodsPhase()+" "+phase.getGamePhase()+Constants.RESET+"\n");	//Only for debug purposes
+				//System.out.println("\n"+Constants.BG_CYAN+phase.getPhase()+" "+phase.getGodsPhase()+" "+phase.getGamePhase()+Constants.RESET+"\n");	//Only for debug purposes
 				printInitialPhase();
 				break;
 		}
@@ -1004,6 +1033,9 @@ public class CliGame {
 		}
 	}
 
+	/**
+	 * This method prints the Victory screen whenever the victory message is parsed
+	 */
 	private void printVictory() {
 		System.out.println("``   ```.\"^riyyv*}y\\`      -    `:,.  `_:~^T>`=:_-_:\".'       `^Ywlx}cr^=^xxiv^:::,-~xYREOgPq9#@#QZd0#@@@@@@@@@@@@#B$RgQDQ$dEIT;:~*?x*\"'~  `!            ':~!,:,,:=-`*!`                             .`           \n" +
 				"```     `_~^*\\uVw3I*`       `          `   `<v,_::_``        `!xT}xL?l|u3OdGV*~^rv)*|(vZ$QbE8######BBBQQ$8gQ##@@#Q0d5M0QQ8EMDWyx>'``-!==*  ,=                      -!`               `              ``            \n" +
@@ -1035,6 +1067,9 @@ public class CliGame {
 		System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  You won! Good job!");
 	}
 
+	/**
+	 * This method prints the Guide if the player asks for it
+	 */
 	private void printGuide() {
 		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t**************************** ~ Welcome to Santorini's guide! ~ ****************************" + Constants.RESET);
 		System.out.println("Here you'll be told how to play, and what commands to use to do it properly.\n");
@@ -1053,6 +1088,9 @@ public class CliGame {
 		System.out.println("\n\n");
 	}
 
+	/**
+	 * This method prints the Gods Guide if the player asks for it, based on the divinity he wants to know the power of
+	 */
 	private void printGodGuide(String godName) {
 		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t************************* ~ Welcome to the Gods info paragraph! ~ *************************" + Constants.RESET);
 		System.out.print("You selected ");
@@ -1185,6 +1223,10 @@ public class CliGame {
 			}
 		}
 	}
+
+	/**
+	 * This method prints some generic errors
+	 */
 	private void printServerError(NetObject obj) {
 		switch (obj.message) {
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
