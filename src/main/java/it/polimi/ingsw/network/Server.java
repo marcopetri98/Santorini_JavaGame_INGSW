@@ -5,7 +5,6 @@ import it.polimi.ingsw.controller.ServerController;
 import it.polimi.ingsw.core.Game;
 import it.polimi.ingsw.network.objects.NetLobbyPreparation;
 import it.polimi.ingsw.util.Constants;
-import it.polimi.ingsw.util.MultipleList;
 import it.polimi.ingsw.util.exceptions.AlreadyStartedException;
 import it.polimi.ingsw.util.exceptions.FirstPlayerException;
 
@@ -14,10 +13,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 
 /**
- * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby
+ * This class is the server class and it never ends, it manages the lobby creation and creation of threads which duty is to manage games, it creates ServerClientListenerThread class to communicate with clients and this class expose Thread safe method to modify the state of the lobby.
  */
 public class Server implements Runnable {
 	private final Map<ServerClientListenerThread, String> lobbyClients;
@@ -65,7 +63,7 @@ public class Server implements Runnable {
 		}
 	}
 
-	/** This method adds a player to the lobby if the lobby already exists, if not it creates the lobby with temporary dimension of 1 and throws a FirstPlayerException which says to the executing thread that is has to ask to the player
+	/** This method adds a player to the lobby if the lobby already exists, if not it creates the lobby with temporary dimension of 1 and throws a FirstPlayerException which says to the executing thread that is has to ask to the player.
 	 * @param name it is the name that the player would like to use in this game
 	 * @param handler it is the client messages handler
 	 * @return 0 if the player can't be added because there is already a player with the same name or name parameter is null, 1 if the player has been added to a match, 2 the game is starting
@@ -111,7 +109,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * This function is intended to update players about the number of players inside the lobby, this is done informing all
+	 *It updates players about the current number of players inside the lobby.
 	 */
 	public void updatePlayerInLobby() {
 		synchronized (lobbyClients) {
@@ -133,7 +131,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * It saves in a list that this handler of a client is now prepared for the game creation
+	 * It store the handler in a list of prepared handlers, it means that the handler and the player connected to it are ready to start a game.
 	 * @param handler an handler of a client that is now prepared
 	 * @throws IllegalCallerException if the handler is not an handler of a player of the game
 	 * @throws IllegalStateException if the handler is already saved in the preparedListeners list
@@ -154,7 +152,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * This method remove a player because it has gone offline for some reason and isn't connected
+	 * This method remove a player because it has gone offline for some reason or it has disconnected.
 	 * @param name it is the name that the player would like to use in this game
 	 * @param handler it is the client messages handler
 	 * @throws AlreadyStartedException if the match is already started this exception is thrown
@@ -197,7 +195,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * It sets the number of player of the game chosen by the first player who connected to the server
+	 * It sets the number of players of the game chosen by the first player who connected to the server, it can only be called by the handler of the first player of the lobby.
 	 * @param dimension This is the number of player for the game
 	 * @param handler This is the thread that is calling the function
 	 * @throws IllegalCallerException The thread that called this method isn't the one that hold the connection for the first player
@@ -224,7 +222,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * This function return the client position in the lobby
+	 * Returns the client position in the lobby
 	 * @param handler This is the handler for a client
 	 * @return return the position in the lobby for that client
 	 * @throws IllegalCallerException The thread that called this method isn't a thread which represent a client
@@ -238,7 +236,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * This function return if the lobby needs the user input for the player number
+	 * Returns if the lobby needs the user input for the player number
 	 * @return return true if the lobby needs the user input for the player number
 	 */
 	public boolean getToBeCreated() {
@@ -248,7 +246,7 @@ public class Server implements Runnable {
 	}
 
 	/**
-	 * This function returns the dimension of the lobby
+	 * Returns the dimension of the lobby
 	 * @return dimension of the lobby
 	 */
 	public int getLobbyDimension() {
@@ -257,7 +255,7 @@ public class Server implements Runnable {
 		}
 	}
 	/**
-	 * This method create a game where player are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
+	 * This method create a game where players are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
 	 */
 	private void createGame() {
 		int lobbySize;

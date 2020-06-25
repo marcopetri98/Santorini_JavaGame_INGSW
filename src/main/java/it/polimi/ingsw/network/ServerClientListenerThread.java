@@ -11,7 +11,7 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * This class is the base class for Server and client communication, it receives client input and send to the client server output regarding to the match the client's playing.
+ * This class is the class for Server and Client communication, it receives client input using socket with classes of the package {@link it.polimi.ingsw.network.objects} and {@link it.polimi.ingsw.network.game} and is used to send input to the client.
  */
 public class ServerClientListenerThread extends Thread {
 	/**
@@ -51,6 +51,9 @@ public class ServerClientListenerThread extends Thread {
 			}
 		}
 
+		/**
+		 * This function disconnects the server listener from the client and make its thread to stop to execute.
+		 */
 		private void destroyListener() {
 			if (playerName != null) {
 				disconnect();
@@ -59,6 +62,9 @@ public class ServerClientListenerThread extends Thread {
 				verifyClient = false;
 			}
 		}
+		/**
+		 * Sets a flag which says that a ping message arrived from the client.
+		 */
 		private void setReceivedPing() {
 			receivedPing = true;
 		}
@@ -78,7 +84,7 @@ public class ServerClientListenerThread extends Thread {
 	private static long thread_number;
 
 	/**
-	 * The constructor initialize a listener for client's messages in the setup stage, this server listens for messages of setup until the games start, when it starts it changes the gamePhase and listen to other messages, depending on the game phase
+	 * The constructor initialize a listener for client's messages in the setup stage.
 	 * @param server This parameter is the reference to the server object
 	 * @param clientSocket This parameter is the client's socket which this object listen
 	 */
@@ -117,6 +123,9 @@ public class ServerClientListenerThread extends Thread {
 		connectionListener = new ClientConnection();
 	}
 
+	/**
+	 * Overrides the Thread run method, it listens for {@link it.polimi.ingsw.network.objects.NetObject} objects on the socket and analyze with the current phase. If the message is dynamically (meaning that its dynamic type is the type needed for the current phase) it passes it to the parsing method for that phase.
+	 */
 	@Override
 	public void run() {
 		NetObject ingoingObject;
@@ -215,7 +224,7 @@ public class ServerClientListenerThread extends Thread {
 	 ************************************************/
 	/**
 	 * This function parses the input that arrives from the client before being inside a lobby, it calls methods on the server to add the player on a lobby, if there isn't a lobby it catches the FirstPlayerException and asks to the player the number of player that the game should have because he is the first and should create a lobby.
-	 * @param setupMessage the message sent by the client
+	 * @param setupMessage is the message sent by the client
 	 * @throws AssertionError if this object has passed wrong parameters to the server functions
 	 */
 	// TODO: control that every msg.player is not null and all null pointers
@@ -296,6 +305,11 @@ public class ServerClientListenerThread extends Thread {
 			throw new AssertionError("Dimension of the game passed to the server was wrong");
 		}
 	}
+
+	/**
+	 * This function parses the input that arrives from the client in the lobby phase of the game, here the client can only disconnect from the lobby.
+	 * @param lobbyMessage is the message sent by the client
+	 */
 	private void parseLobbyInput(NetLobbyPreparation lobbyMessage) {
 		NetLobbyPreparation lobbyOutput;
 
@@ -308,6 +322,10 @@ public class ServerClientListenerThread extends Thread {
 			sendMessage(lobbyOutput);
 		}
 	}
+	/**
+	 * This function parses the input that arrives from the client in the color choice phase, if the client has sent a color of the game it calls the {@link it.polimi.ingsw.network.RemoteView} handling method.
+	 * @param colorMessage is the message sent by the client
+	 */
 	private void parseColorInput(NetColorPreparation colorMessage) {
 		NetColorPreparation colorOutput;
 
@@ -323,6 +341,10 @@ public class ServerClientListenerThread extends Thread {
 			sendMessage(colorOutput);
 		}
 	}
+	/**
+	 * This function parses the input that arrives from the client in the gods phase, in this phase the client can choose a god, game gods or the starter (or also disconnect). In all cases if the message is correctly formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
+	 * @param divinityMessage is the message sent by the client
+	 */
 	private void parseDivinityInput(NetDivinityChoice divinityMessage) {
 		NetDivinityChoice divinityOutput;
 
@@ -354,6 +376,10 @@ public class ServerClientListenerThread extends Thread {
 			sendMessage(divinityOutput);
 		}
 	}
+	/**
+	 * This function parses the input that arrives from the client in the game setup phase, in this phase the player can send its workers position on the game table or disconnect, if the message id well formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
+	 * @param gameSetupMessage is the message sent by the client
+	 */
 	private void parseGameSetupInput(NetGameSetup gameSetupMessage) {
 		NetGameSetup gameSetupOutput;
 
@@ -374,6 +400,10 @@ public class ServerClientListenerThread extends Thread {
 			sendMessage(gameSetupMessage);
 		}
 	}
+	/**
+	 * This function parses the input that arrives from the client in the gaming phase, in this phase a player can move, build or disconnect, if the message is well formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
+	 * @param gamingMsg is the message sent by the client
+	 */
 	private void parseGamingInput(NetGaming gamingMsg) {
 		NetGaming playerTurnOutput;
 		NetworkPhase currentPhase = getGamePhase();
@@ -430,27 +460,47 @@ public class ServerClientListenerThread extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * It sets the player's name.
+	 * @param name is player's name
+	 */
 	private void setPlayerName(String name) {
 		synchronized (playerNameLock) {
 			playerName = name;
 		}
 	}
+	/**
+	 * It sets the remote view connected to this client.
+	 * @param gameServer is the remote view component of the server which is connected to this client
+	 */
 	public void setGameServer(RemoteView gameServer) {
 		synchronized (scopeLock) {
 			this.gameServer = gameServer;
 			scopeLock.notifyAll();
 		}
 	}
+	/**
+	 * It sets the current thread to {@code active} value, if it is set to false the thread is going to terminate, instead the thread is going to continue its normal work.
+	 * @param active
+	 */
 	public void setActive(boolean active) {
 		synchronized (stateLock) {
 			this.active = active;
 		}
 	}
+	/**
+	 * It sets the network game phase.
+	 * @param gamePhase is the game network phase
+	 */
 	public void setGamePhase(NetworkPhase gamePhase) {
 		synchronized (stateLock) {
 			this.gamePhase = gamePhase;
 		}
 	}
+	/**
+	 * It writes the message on the output stream and send it to the client, after sending the message it is called a {@code output.reset()} method to reset the output stream.
+	 * @param object is the {@link it.polimi.ingsw.network.objects.NetObject} to send to the client
+	 */
 	public void sendMessage(NetObject object) {
 		synchronized (output) {
 			try {
@@ -463,10 +513,16 @@ public class ServerClientListenerThread extends Thread {
 			}
 		}
 	}
+	/**
+	 * It sends a general error to the client to make it know that an unknown error occurred.
+	 */
 	public void sendGeneralError() {
 		NetObject object = new NetObject(Constants.GENERAL_ERROR);
 		sendMessage(object);
 	}
+	/**
+	 * It closes the socket and calls {@code setActive(false);}.
+	 */
 	public void closeSocketAndTerminate() {
 		try {
 			clientSocket.close();
@@ -485,11 +541,19 @@ public class ServerClientListenerThread extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * Gets game phase.
+	 * @return game phase
+	 */
 	public NetworkPhase getGamePhase() {
 		synchronized (stateLock) {
 			return gamePhase;
 		}
 	}
+	/**
+	 * Gets player name.
+	 * @return player name
+	 */
 	public String getPlayerName() {
 		synchronized (playerNameLock) {
 			return playerName;
@@ -506,7 +570,7 @@ public class ServerClientListenerThread extends Thread {
 	 * 												*
 	 ************************************************/
 	/**
-	 * This method calls the remote view method that notifies the gaming controller that the player has disconnected
+	 * This method calls the remote view method which handles the disconnection of the client.
 	 */
 	public void notifyDisconnection() {
 		gameServer.notifyQuit(playerName);
@@ -515,7 +579,7 @@ public class ServerClientListenerThread extends Thread {
 
 	// METHODS CALLED THAT CHANGES THE STATE OF THE LISTENER THREAD
 	/**
-	 * This is a class used to communicate to the client that the server had a fatal error and the code is probably wrong
+	 * This method is called when a programming error occurred, it sends a message to the client to notify it that this game has crashed and throws an AssertionError on the server.
 	 * @throws AssertionError always thrown because the server had an error due to incorrect calls to methods
 	 */
 	public void fatalError(String info) {
@@ -527,7 +591,7 @@ public class ServerClientListenerThread extends Thread {
 		throw new AssertionError("A fatal error occurred and these are the info about it: "+info);
 	}
 	/**
-	 * This method disconnects the user and set the active flag to false to terminate the thread
+	 * This method disconnects the user.
 	 */
 	public void disconnect() {
 		if (gamePhase == NetworkPhase.LOBBY || gamePhase == NetworkPhase.PRELOBBY) {

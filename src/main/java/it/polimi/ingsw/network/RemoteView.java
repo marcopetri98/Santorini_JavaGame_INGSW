@@ -24,24 +24,26 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * This class is the class which receives input from client's view and forward these commands to the controller, after the controller changed something (on the model) this class is notified cause it observes the model and it notifies its observers. It is observed by the controller, this means that when it receives a valid message from the client it notifies the controller 'cause something is changed (also if none of its attributes is changed, it's changed the status) and it will do what it is programmed to.
+ * This class is the remote view class of the Distributed MVC pattern, it receives input from client's view and forward these commands to the controller with light controls. After the controller has changed something (on the model) this class is notified because it observes the model and the model notifies its observers. It is observed by the controller, this means that when it receives a valid message from the client it notifies the controller because something is changed (also if none of its attributes is changed, it's changed the status).
  */
 public class RemoteView extends ObservableRemoteView implements ObserverRemoteView {
 	private final ServerClientListenerThread clientHandler;
-	// FIXME: i'm useless (maybe)
-	private int playersNum;
 
+	/**
+	 * It creates a new remote view connected with the passed server handler for the client.
+	 * @param handler is the server handler for the client
+	 * @throws NullPointerException it handler is null
+	 */
 	public RemoteView(ServerClientListenerThread handler) throws NullPointerException {
 		if (handler == null) {
 			throw new NullPointerException();
 		}
 		clientHandler = handler;
-		playersNum = 1;
 	}
 
 	// METHODS USED TO INFORM THE PLAYER ABOUT AN ERROR
 	/**
-	 * This function is called from the controller when user send a well formed request he cannot send for some reason: it isn't its turn or he cannot because of game state
+	 * This function is called from the controller when user send a well formed request he cannot send for some reason: it isn't its turn or he cannot perform this command because of game state.
 	 */
 	public void communicateError() {
 		switch (clientHandler.getGamePhase()) {
@@ -64,7 +66,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 ************************************************/
 	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
 	/**
-	 * It receiver a well formed request of color, meaning that the color is one of the three available colors, the remote view cannot know if the color is already owned by another player or not, for this reason notifies the ServerController. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
+	 * It receives a well formed request of color, meaning that the color is one of the three available colors, the remote view cannot know if the color is already owned by another player or not, for this reason notifies the ServerController. If it may receive a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
 	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
 	 */
@@ -100,17 +102,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 * It receives a request of passing the turn, if the player is in the correct phase (BEFORE MOVE phase) he can and the request is sent to the controller
-	 * @param req
-	 */
-	public void handlePassRequest(NetGaming req) {
-		if (askPhase().getGamePhase() != GamePhase.BEFOREMOVE) {
-			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));
-		} else {
-			notifyPass(clientHandler.getPlayerName());
-		}
-	}
-	/**
 	 * It receives a well formed request of a move, well formed means that the cell is inside the map, it is needed to check worker and if is possible to move there. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn't do that action.
 	 * @param req represent the message sent by the client
 	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
@@ -135,7 +126,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 *
+	 * A player that is an observer has sent a request to quit the game, the request is forwarded to the controller.
 	 */
 	public void handleObserverQuit() {
 		if (clientHandler.getGamePhase() != NetworkPhase.OBSERVER) {
@@ -156,6 +147,11 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 * 												*
 	 ************************************************/
 	// METHODS USED TO INFORM THE CONTROLLER ABOUT A REQUEST OF THE CLIENT
+	/**
+	 * This method sends the message of defeat to the player connected with this remote view.
+	 * @param observed is the observable game
+	 * @param playerDefeated is the player defeated
+	 */
 	@Override
 	public synchronized void updateDefeat(ObservableGame observed, String playerDefeated) {
 		if (observed == null || playerDefeated == null) {
@@ -163,13 +159,17 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		} else {
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_DEFEATED, playerDefeated);
 			clientHandler.sendMessage(yourMessage);
-			playersNum--;
 
 			if (clientHandler.getPlayerName().equals(playerDefeated)) {
 				clientHandler.setGamePhase(NetworkPhase.OBSERVER);
 			}
 		}
 	}
+	/**
+	 * This method sends the message of win to the player connected with this remote view.
+	 * @param observed is the observable game
+	 * @param playerWinner is the winner player
+	 */
 	@Override
 	public synchronized void updateWinner(ObservableGame observed, String playerWinner) {
 		if (observed == null || playerWinner == null) {
@@ -183,8 +183,8 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 * It receives the change of the game state, it receives the order and communicate it to the client
-	 * @param observed observable game that called this method
+	 * This method sends the message with the order of play.
+	 * @param observed is the observable game
 	 * @param order an array with players' order
 	 */
 	@Override
@@ -192,7 +192,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		if (observed == null || order == null || clientHandler.getGamePhase() != NetworkPhase.LOBBY) {
 			clientHandler.fatalError("It has been called the notify of player's order in the wrong phase or maybe with a null parameter");
 		} else {
-			playersNum = order.length;
 			NetLobbyPreparation sendOrder = null;
 			// builds the sequence object of players to send to player
 			for (int i = 0; i < order.length; i++) {
@@ -208,7 +207,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	}
 	/**
 	 * When this method is called it informs the player about the color chosen by the other players, if all players have chosen card it change the handler phase and says to the client that he enters in the god selection phase
-	 * @param observed observable game that called this method
+	 * @param observed is the observable game
 	 * @param playerColors an HashMap that matches every player with the selected color
 	 */
 	@Override
@@ -232,7 +231,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	}
 	/**
 	 * This function says to all players the gods chosen by the challenger for this game
-	 * @param observed observable game that called this method
+	 * @param observed is the observable game
 	 * @param godsInfo it represent the list of gods that are chosen by the challenger
 	 */
 	@Override
@@ -250,7 +249,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	}
 	/**
 	 * This function says to the player all gods selected till now by the players
-	 * @param observed observable game that called this method
+	 * @param observed is the observable game
 	 * @param godsInfo it represent the gods chosen by the current player turn
 	 */
 	@Override
@@ -274,7 +273,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	}
 	/**
 	 * This function says to the player the player who starts to position its workers on the game board
-	 * @param observed observable game that called this method
+	 * @param observed is the observable game
 	 * @param godsInfo it contains the information about the player that start to position workers
 	 */
 	@Override
@@ -287,10 +286,10 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 *
-	 * @param observed
-	 * @param gameMap
-	 * @param finished
+	 * This method sends a message to the client with the information about the updated map.
+	 * @param observed is the observable game
+	 * @param gameMap is the game map
+	 * @param finished is a boolean which says if the position phase is finished
 	 */
 	@Override
 	public synchronized void updatePositions(ObservableGame observed, Map gameMap, boolean finished) {
@@ -302,9 +301,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 *
-	 * @param observed
-	 * @param netMap
+	 * This method sends a message to the client with the information about the updated map.
+	 * @param observed is the observable game
+	 * @param netMap is the game map
 	 */
 	@Override
 	public synchronized void updateMove(ObservableObject observed, Map netMap) {
@@ -316,9 +315,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 *
-	 * @param observed
-	 * @param netMap
+	 * This method sends a message to the client with the information about the updated map.
+	 * @param observed is the observable game
+	 * @param netMap is the game map
 	 */
 	// TODO: eliminate duplicate
 	@Override
@@ -331,9 +330,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 *
-	 * @param observed
-	 * @param playerName
+	 * Sends the information to the client about a player that has disconnected.
+	 * @param observed is the observable game
+	 * @param playerName is the name of the player who quit the game
 	 */
 	@Override
 	public synchronized void updateQuit(ObservableObject observed, String playerName) {
@@ -342,13 +341,12 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		} else {
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_PLAYER_DISCONNECTED, playerName);
 			clientHandler.sendMessage(yourMessage);
-			playersNum--;
 		}
 	}
 	/**
-	 *
-	 * @param observed
-	 * @param turn
+	 * This method sends the information about the current game phase.
+	 * @param observed is the observable game
+	 * @param turn is the current game turn
 	 */
 	@Override
 	public void updatePhaseChange(ObservableGame observed, Turn turn) {
@@ -391,10 +389,10 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	}
 
 	/**
-	 *
-	 * @param observed
-	 * @param moves
-	 * @param builds
+	 * This method sends the information about the possible action of the current player in this game phase.
+	 * @param observed is the observable game
+	 * @param moves is a list of moves
+	 * @param builds is a list of builds
 	 */
 	@Override
 	public void updatePossibleActions(ObservableGame observed, List<Move> moves, List<Build> builds) {
@@ -410,8 +408,8 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	}
 
 	/**
-	 * This function contacts the player to say him he must perform an action because is its turn
-	 * @param observed observable game that called this method
+	 * This method sends the information about the active player turn and changes the network phase of the ServerClientListenerThread.
+	 * @param observed is the observable game
 	 * @param playerName the name of the player that should play at this moment of the game
 	 */
 	@Override
@@ -445,8 +443,8 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 		}
 	}
 	/**
-	 * This methods get the information that the game finished because someone disconnected during the setup
-	 * @param observed observable game that called this method
+	 * This method sends the message to the client that the game is finished because someone has disconnected during the setup.
+	 * @param observed is the observable game
 	 */
 	@Override
 	public void updateGameFinished(ObservableGame observed) {

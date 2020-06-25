@@ -4,8 +4,7 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.network.Server;
 
 /**
- * This class is the base App class for servers, it starts the server as
- * an object, the server stand up for the whole execution.
+ * This class is the base App class for servers, it starts the server as a Thread, the server stand up for the whole execution.
  */
 public class ServerApp {
 	public static void main(String[] args) {

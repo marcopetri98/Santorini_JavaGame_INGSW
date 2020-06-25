@@ -2,6 +2,9 @@ package it.polimi.ingsw.util;
 
 import java.io.Serializable;
 
+/**
+ * This is a class which represent a rgb color.
+ */
 public class Color implements Serializable {
 	public static final Color BLACK = new Color(0,0,0);
 	public static final Color WHITE = new Color(255,255,255);
@@ -12,11 +15,22 @@ public class Color implements Serializable {
 	private final int g;
 	private final int b;
 
+	/**
+	 * Creates a rgb color with given parameters.
+	 * @param r red
+	 * @param g green
+	 * @param b blue
+	 */
 	public Color(int r, int g, int b) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
 	}
+	/**
+	 * Creates a color with the given color name if it is supported.
+	 * @param colorName color name
+	 * @throws IllegalArgumentException if the color name is not supported
+	 */
 	public Color(String colorName) throws IllegalArgumentException {
 		switch (colorName.toUpperCase()) {
 			case "BLACK" -> {

@@ -8,7 +8,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
+/**
+ * This class is the base network class of the client that is intended to communicate with the server, it is used by a CLI client or by a GUI client.
+ */
 public class ClientMessageListener extends Thread {
 	private GraphicInterface viewController;
 	private Socket serverSocket;
@@ -21,6 +25,10 @@ public class ClientMessageListener extends Thread {
 	private boolean finished;
 	private final Object startLock, stateLock, inputLock, outputLock;
 
+	/**
+	 * It creates a client message listener for the graphic interface controller passed as parameter.
+	 * @param controller is the graphic interface controller
+	 */
 	public ClientMessageListener(GraphicInterface controller) {
 		super("ClientMessageListener");
 		viewController = controller;
@@ -35,6 +43,9 @@ public class ClientMessageListener extends Thread {
 		currentPhase = NetworkPhase.PRELOBBY;
 	}
 
+	/**
+	 * This method listen for messages from the server and analyzes it and pass it to the parsing method for the current network phase.
+	 */
 	@Override
 	public void run() {
 		NetObject ingoingObject = null;
@@ -126,36 +137,60 @@ public class ClientMessageListener extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * This method parses the setup messages sending them to the controller and it changes the network phase id a specific message arrives.
+	 * @param msg is the message arrived from the server
+	 */
 	private void parseSetupInput(NetSetup msg) {
 		if (msg.message.equals(Constants.SETUP_CREATE_WORKED) || msg.message.equals(Constants.SETUP_OUT_CONNWORKED) || msg.message.equals(Constants.SETUP_OUT_CONNFINISH)) {
 			currentPhase = NetworkPhase.LOBBY;
 		}
 		viewController.retrieveConnectionMsg(msg);
 	}
+	/**
+	 * This method parses the lobby messages sending them to the controller and it changes the network phase id a specific message arrives.
+	 * @param msg is the message arrived from the server
+	 */
 	private void parseLobbyInput(NetLobbyPreparation msg) {
 		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {
 			currentPhase = NetworkPhase.COLORS;
 		}
 		viewController.retrieveLobbyMsg(msg);
 	}
+	/**
+	 * This method parses the color messages sending them to the controller and it changes the network phase id a specific message arrives.
+	 * @param msg is the message arrived from the server
+	 */
 	private void parseColorInput(NetColorPreparation msg) {
 		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {
 			currentPhase = NetworkPhase.GODS;
 		}
 		viewController.retrieveColorMsg(msg);
 	}
+	/**
+	 * This method parses the gods phase messages sending them to the controller and it changes the network phase id a specific message arrives.
+	 * @param msg is the message arrived from the server
+	 */
 	private void parseDivinityInput(NetDivinityChoice msg) {
 		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE) && msg.godsEnd) {
 			currentPhase = NetworkPhase.SETUP;
 		}
 		viewController.retrieveGodsMsg(msg);
 	}
+	/**
+	 * This method parses the game setup messages sending to the controller and it changes the network phase if a specific message arrives.
+	 * @param msg is the message arrived from the server
+	 */
 	private void parseGameSetupInput(NetGameSetup msg) {
 		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {
 			currentPhase = NetworkPhase.PLAYERTURN;
 		}
 		viewController.retrieveGameSetupMsg(msg);
 	}
+	/**
+	 * This method parses the gaming messages.
+	 * @param msg is the message arrived from the server
+	 */
 	private void parseGamingInput(NetGaming msg) {
 		viewController.retrieveGamingMsg(msg);
 	}
@@ -169,18 +204,32 @@ public class ClientMessageListener extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * This methods try to connect the client with the specified server, it returns a boolean to indicate if the operation succeeded.
+	 * @param address is the server address
+	 * @return true if it succeed in connecting to the server
+	 */
 	public boolean connectToServer(String address) {
 		try {
-			serverSocket = new Socket(address,21005);
+			serverSocket = new Socket(address, 21005);
+			System.out.println("\n\n\t\tConnected or not connected to server\n\n");
 			output = new ObjectOutputStream(serverSocket.getOutputStream());
 			input = new ObjectInputStream(serverSocket.getInputStream());
 			currentPhase = NetworkPhase.PRELOBBY;
 			return true;
+		} catch (UnknownHostException e) {
+			viewController.retrieveConnectionError();
+			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			viewController.retrieveConnectionError();
 			return false;
 		}
 	}
+	/**
+	 * It sends a message to the server writing to the output stream and after this it resets the stream.
+	 * @param message is a {@link it.polimi.ingsw.network.objects.NetObject} to send to the server
+	 */
 	public void sendMessage(NetObject message) {
 		synchronized (outputLock) {
 			try {
@@ -197,6 +246,7 @@ public class ClientMessageListener extends Thread {
 			}
 		}
 	}
+	// TODO: maybe unnecessary
 	public void closeSocketAndTerminate() {
 		try {
 			serverSocket.close();
@@ -215,6 +265,10 @@ public class ClientMessageListener extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * Sets a value used by the client message listener to compute if it must terminate the thread or if it must continue to work.
+	 * @param value is a boolean value which represent if the client message listener is functioning
+	 */
 	public void setActive(boolean value) {
 		synchronized (stateLock) {
 			active = value;
@@ -225,12 +279,19 @@ public class ClientMessageListener extends Thread {
 			}
 		}
 	}
+	/**
+	 * Sets a flag inside the client message listener which indicate that the player want or does not want to play.
+	 * @param value is the boolean value indicating if the player wants to play
+	 */
 	public void setWantsToPlay(boolean value) {
 		synchronized (startLock) {
 			wantsToPlay = value;
 			startLock.notifyAll();
 		}
 	}
+	/**
+	 * It reset the listening putting the flag which indicated if the player wants to play to false and the active variable to true.
+	 */
 	public void resetListening() {
 		synchronized (startLock) {
 			wantsToPlay = false;
@@ -248,11 +309,10 @@ public class ClientMessageListener extends Thread {
 	 * 												*
 	 * 												*
 	 ************************************************/
-	public boolean getActive() {
-		synchronized (stateLock) {
-			return active;
-		}
-	}
+	/**
+	 * Gets a value that represents if the client wants to play.
+	 * @return true if the player wants to play, false instead
+	 */
 	public boolean getWantsToPlay() {
 		synchronized (startLock) {
 			return wantsToPlay;

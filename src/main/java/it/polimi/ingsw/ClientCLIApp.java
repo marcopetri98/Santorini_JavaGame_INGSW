@@ -8,7 +8,7 @@ import it.polimi.ingsw.ui.cli.view.CliInitial;
 import it.polimi.ingsw.ui.cli.view.CliInput;
 
 /**
- * This class is the base App class for CLI clients, it starts the CLI client, the client lives until the player doesn't close the game.
+ * This class is the base App class for CLI clients, it starts the CLI client, the client lives until the player doesn't close the game. It loops for an execution until the game does not quit the game.
  */
 public class ClientCLIApp {
 	public static void main(String[] args) {
