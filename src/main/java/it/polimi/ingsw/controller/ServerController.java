@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This is the main class for the controller of the game, it is the controller for the Distributed MVC pattern. It owns the game and other controllers and manage the all execution, it calls other controllers when specific actions must be controlled and eventually modifies the game if needed.
+ */
 public class ServerController implements ObserverController {
 	private final Game observedModel;
 	private final Mover moveController;
@@ -37,6 +40,11 @@ public class ServerController implements ObserverController {
 	private final SetupManager setupController;
 
 	// constructors and setters for this class
+	/**
+	 * Creates a {@code ServerController} with the game to control.
+	 * @param g is the game to control
+	 * @throws NullPointerException if {@code g} is null
+	 */
 	public ServerController(Game g) throws NullPointerException {
 		if (g == null) throw new NullPointerException();
 		moveController = new Mover(g);
@@ -48,14 +56,25 @@ public class ServerController implements ObserverController {
 	}
 
 	// actions called by the players or the server
+	/**
+	 * Calls the generate order function.
+	 */
 	public void generateOrder() {
 		setupController.generateOrder();
 	}
 
 	// support methods
+	/**
+	 * Checks if the current phase is a phase where can be performed a move.
+	 * @return true if a move can be performed, otherwise false
+	 */
 	private boolean isMovablePhase() {
 		return observedModel.getPhase().getGamePhase() == GamePhase.MOVE || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE;
 	}
+	/**
+	 * Checks if the current phase is a phase where can be performed a build.
+	 * @return true if a build can be performed, otherwise false
+	 */
 	private boolean isBuildablePhase() {
 		if (observedModel.getPhase().getGamePhase() == GamePhase.BUILD || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {
 			return true;
@@ -64,6 +83,11 @@ public class ServerController implements ObserverController {
 	}
 
 	// OVERRIDDEN METHODS FROM THE OBSERVER
+	/**
+	 * This method receives a request from a client through its {@link it.polimi.ingsw.network.RemoteView} and analyze if it's the player's turn and if it is the correct phase (the color phase), if this conditions are all true then the method calls the {@link it.polimi.ingsw.controller.SetupManager}, otherwise it calls the error handling method of the {@link it.polimi.ingsw.network.RemoteView}.
+	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+	 * @param playerColors is the {@link it.polimi.ingsw.network.objects.NetColorPreparation} message sent from the player
+	 */
 	@Override
 	public synchronized void updateColors(ObservableObject observed, NetColorPreparation playerColors) {
 		// it controls if the player which sent the request is in its turn and can choose a color
@@ -82,6 +106,11 @@ public class ServerController implements ObserverController {
 			}
 		}
 	}
+	/**
+	 * This method receives a request from a client through its {@link it.polimi.ingsw.network.RemoteView} and analyze if it's the player's turn and if it is the correct phase (the gods phase), if this conditions are all true then the method calls the {@link it.polimi.ingsw.controller.SetupManager}, otherwise it calls the error handling method of the {@link it.polimi.ingsw.network.RemoteView}.
+	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+	 * @param playerGods is the {@link it.polimi.ingsw.network.objects.NetDivinityChoice} message sent from the player
+	 */
 	@Override
 	public synchronized void updateGods(ObservableObject observed, NetDivinityChoice playerGods) {
 		// it controls if the player which sent the request is in its turn and can choose a color
@@ -98,6 +127,11 @@ public class ServerController implements ObserverController {
 			}
 		}
 	}
+	/**
+	 * This method receives a request from a client through its {@link it.polimi.ingsw.network.RemoteView} and analyze if it's the player's turn and if it is the correct phase (the positioning workers on game map phase), if this conditions are all true then the method calls the {@link it.polimi.ingsw.controller.SetupManager}, otherwise it calls the error handling method of the {@link it.polimi.ingsw.network.RemoteView}.
+	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+	 * @param netObject is the {@link it.polimi.ingsw.network.objects.NetGameSetup} message sent from the player
+	 */
 	@Override
 	public synchronized void updatePositions(ObservableObject observed, NetGameSetup netObject) {
 		// it controls if the player which sent the request is in its turn and can choose a color
@@ -124,24 +158,9 @@ public class ServerController implements ObserverController {
 		}
 	}
 	/**
-	 * The player can pass the turn if he doesn't want to use the power in the before move phase, this happens when he has prometheus and he doesn't want to build before moving
-	 * @param observed
-	 */
-	// TODO: maybe unnecessary with the last refactoring
-	@Override
-	public void updatePass(ObservableRemoteView observed, String playerName) {
-		RemoteView caller = (RemoteView) observed;
-		String activePlayer = observedModel.getPlayerTurn().getPlayerName();
-		if (observedModel.isFinished() || !activePlayer.equals(playerName) || observedModel.getPhase().getGamePhase() != GamePhase.BEFOREMOVE) {
-			caller.communicateError();
-		} else {
-			observedModel.changeTurn();
-		}
-	}
-	/**
-	 * This function is called when a player can move and want to perform a certain move, if it can't move this function will never be called
-	 * @param observed
-	 * @param moveMessage
+	 * This function is called when a player can move and want to perform a certain move, if it can't move this method is going to call the error handling method of the {@link it.polimi.ingsw.network.RemoteView} and stops.
+	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+	 * @param moveMessage is the {@link it.polimi.ingsw.network.objects.NetGaming} message sent from the player
 	 */
 	@Override
 	public synchronized void updateMove(ObservableObject observed, NetGaming moveMessage) {
@@ -223,9 +242,9 @@ public class ServerController implements ObserverController {
 		}
 	}
 	/**
-	 * This method is called when a client send a build command to the server, if so it is possible for it to build somewhere, if not it is a loser and this function will never be called.
-	 * @param observed
-	 * @param buildMessage
+	 * This method is called when a client wants to perform a certain build, if the player cannot perform a build because the indicated one is forbidden or because it isn't its turn or it is the wrong phase, this method is going to call the error handling method of the {@link it.polimi.ingsw.network.RemoteView} and stops.
+	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+	 * @param buildMessage is the {@link it.polimi.ingsw.network.objects.NetGaming} message sent from the player
 	 */
 	@Override
 	public synchronized void updateBuild(ObservableObject observed, NetGaming buildMessage) {
@@ -290,6 +309,11 @@ public class ServerController implements ObserverController {
 			}
 		}
 	}
+	/**
+	 * This method is called when a player wants to quit the game, it make it quit and changes the model, if the player isn't inside the game this method is going to call the error handling method of the {@link it.polimi.ingsw.network.RemoteView} and stops.
+	 * @param observed is the observable object
+	 * @param playerName is the player's name
+	 */
 	@Override
 	public synchronized void updateQuit(ObservableObject observed, String playerName) {
 		// it controls if the player which sent the request is in its turn and can choose a color
@@ -301,6 +325,10 @@ public class ServerController implements ObserverController {
 			observedModel.applyDisconnection(playerName);
 		}
 	}
+	/**
+	 * This method is called when a player which is only observing the match wants to quit the game, it make it quit and changes the model, if the player isn't inside the game as observer an {@code AssertionError} is thrown because there has been an error on handling the observers.
+	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObservableRemoteView} which called this method
+	 */
 	@Override
 	public synchronized void observerQuit(ObservableRemoteView observed) {
 		try {

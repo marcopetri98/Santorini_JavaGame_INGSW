@@ -249,24 +249,6 @@ public class ServerControllerTest {
 //	}
 
 	@Test
-	public void updatePass() {
-		gameStub.setPhase(GamePhase.BEFOREMOVE);
-		gameStub.setActivePlayer("Ezio Auditore");
-
-		serverController.updatePass(remoteViewDriver,"Ezio Auditore");
-		assertTrue(gameStub.isChangeTurnCalled());
-		assertFalse(remoteViewDriver.isCommunicateErrorCalled());
-		gameStub.resetCounters();
-		remoteViewDriver.resetCalls();
-
-		serverController.updatePass(remoteViewDriver,"Connor");
-		assertFalse(gameStub.isChangeTurnCalled());
-		assertTrue(remoteViewDriver.isCommunicateErrorCalled());
-		gameStub.resetCounters();
-		remoteViewDriver.resetCalls();
-	}
-
-	@Test
 	public void updateMove() throws IllegalAccessException, NoSuchFieldException, WrongPhaseException {
 		NetGaming gamingMsg;
 		NetMove move;

@@ -27,13 +27,6 @@ public interface ObserverController extends ObserverObject {
 	 * @param netObject is the {@link it.polimi.ingsw.network.objects.NetGameSetup} message sent from the player
 	 */
 	void updatePositions(ObservableObject observed, NetGameSetup netObject);
-	// TODO: maybe the pass is unnecessary
-	/**
-	 * Updates the observer when the observer calls this method when a player passes the turn.
-	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
-	 * @param playerName is the name of the player
-	 */
-	void updatePass(ObservableRemoteView observed, String playerName);
 	/**
 	 * Updates the observer when the observer calls this method because someone wants to move.
 	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method

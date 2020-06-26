@@ -20,7 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-
+/**
+ * This class is the main class for the model in the Distributed MVC pattern, this class is one of the few accessible classes of the core (the model) package, it expose some methods accessible from the outside classes which can be used to change the values of the game.
+ */
 public class Game extends ObservableGame {
 	private Player activePlayer; //the player who has to move and build in the turn considered.
 	private List<Player> players;
@@ -33,6 +35,10 @@ public class Game extends ObservableGame {
 	private List<Move> playerPossibleMoves;
 	private List<Build> playerPossibleBuilds;
 
+	/**
+	 * Creates the game given an array of players' names.
+	 * @param names players' names
+	 */
 	public Game(String[] names) {
 		players = new ArrayList<>();
 		godCards = new ArrayList<>();
@@ -59,6 +65,12 @@ public class Game extends ObservableGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method applies a move moving the workers on the map using the all information inside the {@link it.polimi.ingsw.core.Move} object.
+	 * @param move the object representing the move
+	 * @throws NullPointerException if {@code move} is null
+	 */
 	public synchronized void applyMove(Move move) throws NullPointerException {
 		if (move == null) {
 			throw new NullPointerException();
@@ -68,8 +80,9 @@ public class Game extends ObservableGame {
 		notifyMove(getMap());
 	}
 	/**
-	 * This function applies the construction in the map.
-	 * @param build is the construction checked by the controller.
+	 * This method applies the construction on the map performed by the player the information all present in the {@link it.polimi.ingsw.core.Build} object.
+	 * @param build is the build to be performed
+	 * @throws NullPointerException if {@code build} is null
 	 */
 	public synchronized void applyBuild(Build build) throws NullPointerException {
 		if (build == null) {
@@ -81,8 +94,9 @@ public class Game extends ObservableGame {
 		notifyBuild(getMap());
 	}
 	/**
-	 * If this function is called, there is a winner!
+	 * This method creates a winner and notifies it to all observers.
 	 * @param player is the winner
+	 * @throws IllegalArgumentException if {@code player} is not a player of the game
 	 */
 	public synchronized void applyWin(Player player) throws IllegalArgumentException {
 		if (!players.contains(player)) {
@@ -95,8 +109,9 @@ public class Game extends ObservableGame {
 		notifyWinner(player.playerName);
 	}
 	/**
-	 * The function manages the defeat of a player
-	 * @param player is the looser
+	 * This method creates a loser and notifies it to all observers.
+	 * @param player is the loser
+	 * @throws IllegalArgumentException if {@code player} is not a player of the game
 	 */
 	public synchronized void applyDefeat(Player player) throws IllegalArgumentException {
 		if (!players.contains(player)) {
@@ -131,6 +146,11 @@ public class Game extends ObservableGame {
 			}
 		}
 	}
+	/**
+	 * This method close the game because a player has disconnected.
+	 * @param playerName the disconnected player
+	 * @throws IllegalArgumentException if {@code playerName} is null
+	 */
 	public synchronized void applyDisconnection(String playerName) throws IllegalArgumentException {
 		if (playerName == null) {
 			throw new IllegalArgumentException();
@@ -149,6 +169,12 @@ public class Game extends ObservableGame {
 			removeAllObservers();
 		}
 	}
+	/**
+	 * This method lock the worker for the active player.
+	 * @param player the player to lock the worker
+	 * @param worker worker to lock
+	 * @throws IllegalArgumentException if {@code player} is null or isn't a player of the game or if {@code worker} isn't 2 or 3
+	 */
 	public synchronized void applyWorkerLock(Player player, int worker) throws IllegalArgumentException {
 		if (player == null || !players.contains(player) || (worker != 1 && worker != 2)) {
 			throw new IllegalArgumentException();
@@ -156,7 +182,7 @@ public class Game extends ObservableGame {
 		player.chooseWorker(worker);
 	}
 	/**
-	 * This function handles the advancing of the turn, it means that it checks if it is needed only to advance the subphase (for god setup: challenger choice, gods choice and starter choice, for game turn: before move (which is also the start of the turn), move, before build, build, end turn) of the current phase or if is needed also to change the active player.
+	 * This method handles the advancing of the turn, it means that it checks if it is needed only to advance the subphase (for god setup: challenger choice, gods choice and starter choice, for game turn: before move (which is also the start of the turn), move, before build, build, end turn) of the current phase or if is needed also to change the active player.
 	 */
 	public synchronized void changeTurn() {  //active Player become the next one
 		if (turn.getPhase() == Phase.LOBBY) {
@@ -200,7 +226,7 @@ public class Game extends ObservableGame {
 		}
 	}
 	/**
-	 * This function is called whenever there is a change of game phase
+	 * This method is called whenever there is a change of game phase where the active player should change, it changes the active player and notifies all observers.
 	 */
 	private synchronized void changeActivePlayer() {
 		if (players.size() == 2) {
@@ -218,6 +244,10 @@ public class Game extends ObservableGame {
 		}
 		notifyActivePlayer(activePlayer.getPlayerName());
 	}
+	/**
+	 * This methods removes a player from the player list.
+	 * @param player the {@link it.polimi.ingsw.core.Player} to be removed
+	 */
 	private synchronized void removePlayer(Player player) {
 		players.remove(player);
 		defeatedPlayers.add(player);
@@ -226,6 +256,11 @@ public class Game extends ObservableGame {
 		player.getWorker2().getPos().setWorker(null);
 		player.getWorker2().setPos(null);
 	}
+	/**
+	 * This method moves worker on the map from a given {@link it.polimi.ingsw.core.Move}.
+	 * @param move a {@link it.polimi.ingsw.core.Move} saying where to move workers
+	 * @param conditioned says if the move is conditioned
+	 */
 	private synchronized void moveWorkers(Move move, boolean conditioned) {
 		if (!conditioned) {
 			move.prev.setWorker(null);
@@ -236,6 +271,10 @@ public class Game extends ObservableGame {
 			moveWorkers(move.getOther(), true);
 		}
 	}
+	/**
+	 * This method builds on the map from a given {@link it.polimi.ingsw.core.Build}.
+	 * @param build a {@link it.polimi.ingsw.core.Build} saying where to build
+	 */
 	private synchronized void buildBuildings(Build build) {
 		if (build.dome) {
 			build.getCell().getBuilding().setDome();
@@ -247,11 +286,9 @@ public class Game extends ObservableGame {
 		}
 	}
 	/**
-	 * This function computes only the moves and the builds which the player can perform in its turn, if the player can perform a move or a build it returns true, otherwise false
-	 * @return true if player can perform an action, false instead
+	 * This method computes only the moves and the builds which the player can perform in its turn.
 	 */
-	// TODO: maybe can be void
-	public synchronized boolean computeActions() {
+	public synchronized void computeActions() {
 		playerPossibleMoves = new ArrayList<>();
 		playerPossibleBuilds = new ArrayList<>();
 
@@ -267,12 +304,12 @@ public class Game extends ObservableGame {
 			computeBuilds(getPlayerTurn().getActiveWorker());
 		}
 		notifyPossibleActions(playerPossibleMoves,playerPossibleBuilds);
-		if (playerPossibleMoves.size() != 0 || playerPossibleBuilds.size() != 0) {
-			return true;
-		} else {
-			return false;
-		}
 	}
+	/**
+	 * Computes the workers moves.
+	 * @param w the {@link it.polimi.ingsw.core.Worker} which moves are computed
+	 * @param move a boolean which says if the phase is move of beforemove
+	 */
 	private synchronized void computeMoves(Worker w, boolean move) {
 		try {
 			if (getPlayerTurn().getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {
@@ -321,6 +358,10 @@ public class Game extends ObservableGame {
 		}
 		playerPossibleMoves = DefeatManager.filterMoves(playerPossibleMoves);
 	}
+	/**
+	 * Computes the workers builds.
+	 * @param w the {@link it.polimi.ingsw.core.Worker} which builds are computed
+	 */
 	private synchronized void computeBuilds(Worker w) {
 		try {
 			playerPossibleBuilds.addAll(getPlayerTurn().getCard().checkBuild(map,w,turn));
@@ -338,9 +379,19 @@ public class Game extends ObservableGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * Gets the parameter {@link #map}.
+	 * @return value of {@link #map}
+	 */
 	public synchronized Map getMap() {
 		return map;
 	}
+	/**
+	 * Get a player inside the game which the name is specified by the parameter.
+	 * @param name player's name
+	 * @return a {@link it.polimi.ingsw.core.Player} whose name is {@code name}
+	 * @throws IllegalArgumentException if the player doesn't exist
+	 */
 	public synchronized Player getPlayerByName(String name) throws IllegalArgumentException {
 		for (Player p : players) {
 			if (p.getPlayerName().equals(name)) {
@@ -349,27 +400,59 @@ public class Game extends ObservableGame {
 		}
 		throw new IllegalArgumentException();
 	}
+	/**
+	 * Gets the parameter {@link #players}.
+	 * @return value of {@link #players}
+	 */
 	public synchronized List<Player> getPlayers() {
 		return new ArrayList<>(players);
 	}
+	/**
+	 * Gets the parameter {@link #godCards}.
+	 * @return value of {@link #godCards}
+	 */
 	public synchronized List<GodCard> getGods() {
 		return new ArrayList<>(godCards);
 	}
+	/**
+	 * Gets the parameter {@link #activePlayer}.
+	 * @return value of {@link #activePlayer}
+	 */
 	public synchronized Player getPlayerTurn() {
 		return activePlayer;
 	}
+	/**
+	 * Gets the parameter {@link #winner}.
+	 * @return value of {@link #winner}
+	 */
 	public synchronized Player getWinner() {
 		return winner;
 	}
+	/**
+	 * Gets the parameter {@link #isFinished}.
+	 * @return value of {@link #isFinished}
+	 */
 	public synchronized boolean isFinished() {
 		return isFinished;
 	}
+	/**
+	 * Gets the parameter {@link #playerPossibleMoves}.
+	 * @return value of {@link #playerPossibleMoves}
+	 */
 	public synchronized List<Move> getPlayerPossibleMoves() {
 		return new ArrayList<>(playerPossibleMoves);
 	}
+	/**
+	 * Gets the parameter {@link #playerPossibleBuilds}.
+	 * @return value of {@link #playerPossibleBuilds}
+	 */
 	public synchronized List<Build> getPlayerPossibleBuilds() {
 		return new ArrayList<>(playerPossibleBuilds);
 	}
+	/**
+	 * Gets a copy of the attribute {@link #playerPossibleMoves} for the second worker.
+	 * @return value of {@link #playerPossibleMoves} where worker is 1
+	 */
 	public synchronized List<Move> getPlayerPossibleMovesWorker1() {
 		List<Move> worker1Moves = new ArrayList<>();
 
@@ -380,6 +463,10 @@ public class Game extends ObservableGame {
 		}
 		return worker1Moves;
 	}
+	/**
+	 * Gets a copy of the attribute {@link #playerPossibleMoves} for the first worker.
+	 * @return value of {@link #playerPossibleMoves} where worker is 2
+	 */
 	public synchronized List<Move> getPlayerPossibleMovesWorker2() {
 		List<Move> worker2Moves = new ArrayList<>();
 
@@ -400,9 +487,8 @@ public class Game extends ObservableGame {
 	 * 												*
 	 * 												*
 	 ************************************************/
-	// TODO: [maybe done? change turn is present in controller?] in all methods call the notify active player when the active player change and REFACTOR the communication of the active players on the RemoteView
 	/**
-	 * This method receives a list of player's names and set the order sorting the players arrayList
+	 * This method receives a list of player's names and set the order sorting the players arrayList.
 	 * @param playerOrder is the ordered list of players turn sequence
 	 * @throws IllegalArgumentException it is thrown if playerOrder is null or if it doesn't represent a permutation of players arrayList
 	 * @throws WrongPhaseException is thrown if this method is called on a different phase from the start
@@ -436,7 +522,7 @@ public class Game extends ObservableGame {
 		notifyOrder((String[])playerOrder.toArray(new String[0]));
 	}
 	/**
-	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap<String,Color> with player names and color chosen
+	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap<String,Color> with player names and color chosen.
 	 * @param player is the player which the color has to be set
 	 * @param color the color chosen by the player
 	 * @throws IllegalArgumentException if color or player is null or if it is trying to set the color of a player which isn't the active player
@@ -469,6 +555,12 @@ public class Game extends ObservableGame {
 		}
 		notifyColors(colorInfo);
 	}
+	/**
+	 * The methods sets the game gods passed in the list using the {@link it.polimi.ingsw.core.gods.GodCardFactory} class.
+	 * @param godNames a list of the gods' names
+	 * @throws IllegalArgumentException if {@code godNames} is null or its size is different from the number of players
+	 * @throws WrongPhaseException if it isn't the gods phase
+	 */
 	public synchronized void setGameGods(List<String> godNames) throws IllegalArgumentException, WrongPhaseException {
 		if (godNames == null || godNames.size() != players.size()) {
 			throw new IllegalArgumentException();
@@ -489,11 +581,11 @@ public class Game extends ObservableGame {
 		notifyGods(godCards);
 	}
 	/**
-	 * Sets the player's godCard
-	 * @param playerName
-	 * @param god
-	 * @throws IllegalArgumentException
-	 * @throws WrongPhaseException
+	 * Sets the player's godCard.
+	 * @param playerName player's name
+	 * @param god god's name
+	 * @throws IllegalArgumentException if {@code playerName} or {@code god} are null or if {@code god} is not a game god or is already selected by another player
+	 * @throws WrongPhaseException if it isn't the gods selection phase
 	 */
 	public synchronized void setPlayerGod(String playerName, String god) throws IllegalArgumentException, WrongPhaseException {
 		int x, godIndex = 0;
@@ -529,10 +621,10 @@ public class Game extends ObservableGame {
 		notifyGods(godsInfo);
 	}
 	/**
-	 * It sets the starting player positioning it on the first position of the arrayList
-	 * @param starterName
-	 * @throws IllegalStateException
-	 * @throws WrongPhaseException
+	 * It sets the starting player positioning it on the first position of the arrayList.
+	 * @param starterName starter's name
+	 * @throws IllegalStateException if {@code starterName} is null or the player doesn't exist
+	 * @throws WrongPhaseException if it isn't the starter phase
 	 */
 	public synchronized void setStarter(String starterName) throws IllegalStateException, WrongPhaseException {
 		Player starter = null;
@@ -566,6 +658,12 @@ public class Game extends ObservableGame {
 		activePlayer = players.get(players.size()-1);
 		notifyGods(starterName);
 	}
+	/**
+	 * Sets the player's workers on the game map if the cells specified are free.
+	 * @param req is the player's request
+	 * @throws IllegalArgumentException it {@code req} is null or the positions aren't valid
+	 * @throws WrongPhaseException if it isn't the worker position phase
+	 */
 	public synchronized void setWorkerPositions(NetGameSetup req) throws IllegalArgumentException, WrongPhaseException {
 		if (req == null || !req.isWellFormed()) {
 			throw new IllegalArgumentException();
@@ -593,6 +691,10 @@ public class Game extends ObservableGame {
 	}
 
 	// GETTERS USED ON THE BEGINNING
+	/**
+	 * Gets a copy of the current turn.
+	 * @return copy of {@link #turn}
+	 */
 	public synchronized Turn getPhase() {
 		return turn.clone();
 	}
