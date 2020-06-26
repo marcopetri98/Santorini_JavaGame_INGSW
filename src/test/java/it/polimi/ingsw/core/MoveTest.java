@@ -43,5 +43,7 @@ public class MoveTest {
 		Move move5 = new Move(typeMove, map.getCell(0, 0), map.getCell(1, 1), player1.getWorker2());
 		assertNotEquals(move5, move1); //different worker
 
+		String otherObject = "Viva la carbonara";
+		assertNotEquals(move1,otherObject);
 	}
 }

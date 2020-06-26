@@ -40,11 +40,40 @@ public class PlayerTest {
 		assertNotEquals(player1.getWorker1(), player1.getActiveWorker());
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void chooseWorkerExceptionTest() {
+		player1.chooseWorker(112);
+	}
+
 	@Test
 	public void setGodCardTest() {
 		player1 = new Player("Aldo");
 		player1.setGodCard(new Apollo());
 		assertNotNull(player1.getCard());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void setGodCardExceptionTest() {
+		Player playerTest = new Player("Synergo");
+		playerTest.setGodCard(null);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void getNotExistingWorker1Test() {
+		Player playerTest = new Player("Marco Montemagno");
+		playerTest.getWorker1();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void getNotExistingWorker2Test() {
+		Player playerTest = new Player("Marco Montemagno");
+		playerTest.getWorker2();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void getNotExistingActiveWorkerTest() {
+		Player playerTest = new Player("Marco Montemagno");
+		playerTest.getActiveWorker();
 	}
 
 	@Test

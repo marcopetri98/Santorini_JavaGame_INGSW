@@ -25,10 +25,16 @@ import static org.junit.Assert.*;
 public class GameTest {
 	private Game game;
 	private RemoteViewGameDriver remoteViewDriver;
+	private boolean threePlayersSetup = true;
 
 	@Before
 	public void reset() throws IOException {
-		String[] playerNames = new String[]{"Price", "Ghost", "Soap"};
+		String[] playerNames;
+		if (threePlayersSetup) {
+			playerNames = new String[]{"Price", "Ghost", "Soap"};
+		} else {
+			playerNames = new String[]{"Price", "Ghost"};
+		}
 		game = new Game(playerNames);
 		remoteViewDriver = new RemoteViewGameDriver(new ServerListenerDriver());
 		game.addObserver(remoteViewDriver);
@@ -70,34 +76,55 @@ public class GameTest {
 	private void completeSetup() throws NoSuchFieldException, IllegalAccessException, WrongPhaseException, IOException {
 		List<String> gods = new ArrayList<>();
 		gods.add("apollo");
-		gods.add("artemis");
-		gods.add("atlas");
+		gods.add("athena");
+		if (threePlayersSetup) {
+			gods.add("prometheus");
+		}
 
 		reset();
-		setPhase(Phase.COLORS);
-		setActivePlayer("Price");
+		game.changeTurn();
+		// current phase is COLORS
+		// the active player is Price
 		game.setPlayerColor("Price",new Color(255,0,0));
-		setActivePlayer("Ghost");
+		game.changeTurn();
+		// the active player is Ghost
 		game.setPlayerColor("Ghost",new Color(0,255,0));
-		setActivePlayer("Soap");
-		game.setPlayerColor("Soap",new Color(0,0,255));
-		setPhase(GodsPhase.CHALLENGER_CHOICE);
+		if (threePlayersSetup) {
+			game.changeTurn();
+			// the active player is Soap
+			game.setPlayerColor("Soap", new Color(0, 0, 255));
+		}
+		game.changeTurn();
+		// current phase is CHALLENGER_CHOICE
 		game.setGameGods(gods);
-		setPhase(GodsPhase.GODS_CHOICE);
+		game.changeTurn();
+		// current phase is GODS_CHOICE and active player is Price
 		game.setPlayerGod("Price","APOLLO");
-		game.setPlayerGod("Ghost","ARTEMIS");
-		game.setPlayerGod("Soap","ATLAS");
-		setPhase(Phase.SETUP);
-		setActivePlayer("Price");
+		game.changeTurn();
+		game.setPlayerGod("Ghost","ATHENA");
+		if (threePlayersSetup) {
+			game.changeTurn();
+			game.setPlayerGod("Soap", "PROMETHEUS");
+		}
+		game.changeTurn();
+		game.setStarter("Price");
+		game.changeTurn();
+		// we're in SETUP phase with Price active turn
 		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(0,0),new Pair<Integer,Integer>(1,0));
 		game.setWorkerPositions(setupMsg);
-		setActivePlayer("Ghost");
+		game.changeTurn();
+		// the active player is Ghost
 		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Ghost",new Pair<Integer,Integer>(0,1),new Pair<Integer,Integer>(1,1));
 		game.setWorkerPositions(setupMsg);
-		setActivePlayer("Soap");
-		setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Soap",new Pair<Integer,Integer>(0,2),new Pair<Integer,Integer>(1,2));
-		game.setWorkerPositions(setupMsg);
-		setPhase(GamePhase.MOVE);
+		game.changeTurn();
+		if (threePlayersSetup) {
+			// the active player is Soap
+			setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE, "Soap", new Pair<Integer, Integer>(0, 2), new Pair<Integer, Integer>(1, 2));
+			game.setWorkerPositions(setupMsg);
+		}
+		game.changeTurn();
+		game.changeTurn();
+		// current phase is MOVE
 		remoteViewDriver.resetCalled();
 	}
 
@@ -492,14 +519,15 @@ public class GameTest {
 		cellWorker2 = defeatedWorker2.getPos();
 		game.applyDefeat(game.getPlayerByName("Ghost"));
 		assertFalse(game.isFinished());
-		//assertFalse(game.getPlayers().contains(defeatedPlayer));
-		//assertEquals(game.getPlayers().size(),2);
+		assertFalse(game.getPlayers().contains(defeatedPlayer));
+		assertEquals(game.getPlayers().size(),2);
 		assertEquals(game.getPlayerTurn(),game.getPlayerByName("Price"));
-		//assertNull(defeatedWorker1.getPos());
-		//assertNull(defeatedWorker2.getPos());
-		//assertNull(cellWorker1.getWorker());
-		//assertNull(cellWorker2.getWorker());
-		assertTrue(remoteViewDriver.isUpdateDefeatCalled());
+		assertNull(defeatedWorker1.getPos());
+		assertNull(defeatedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.updateDefeatCalled);
+		assertTrue(remoteViewDriver.updateMoveCalled);
 		remoteViewDriver.resetCalled();
 
 		// someone has been defeated and there is a winner for this reason
@@ -510,15 +538,15 @@ public class GameTest {
 		cellWorker1 = defeatedWorker1.getPos();
 		cellWorker2 = defeatedWorker2.getPos();
 		game.applyDefeat(game.getPlayerByName("Soap"));
-//		assertEquals(game.getWinner().getPlayerName(),"Price");
-//		//assertTrue(game.isFinished());
-//		assertFalse(game.getPlayers().contains(defeatedPlayer));
-//		assertNull(defeatedWorker1.getPos());
-//		assertNull(defeatedWorker2.getPos());
-//		assertNull(cellWorker1.getWorker());
-//		assertNull(cellWorker2.getWorker());
-//		assertTrue(remoteViewDriver.updateDefeatCalled);
-//		assertTrue(remoteViewDriver.updateWinnerCalled);
+		assertEquals(game.getWinner().getPlayerName(),"Price");
+		assertTrue(game.isFinished());
+		assertFalse(game.getPlayers().contains(defeatedPlayer));
+		assertNull(defeatedWorker1.getPos());
+		assertNull(defeatedWorker2.getPos());
+		assertNull(cellWorker1.getWorker());
+		assertNull(cellWorker2.getWorker());
+		assertTrue(remoteViewDriver.updateDefeatCalled);
+		assertTrue(remoteViewDriver.updateWinnerCalled);
 		remoteViewDriver.resetCalled();
 	}
 
@@ -528,6 +556,7 @@ public class GameTest {
 		Worker removedWorker1, removedWorker2;
 		Cell cellWorker1, cellWorker2;
 
+		// disconnection during the setup makes the game finish
 		setPhase(Phase.LOBBY);
 		game.applyDisconnection("Price");
 		assertTrue(game.isFinished());
@@ -558,21 +587,10 @@ public class GameTest {
 		setPhase(Phase.PLAYERTURN);
 		setActivePlayer("Price");
 		removedPlayer = game.getPlayerByName("Price");
-		removedWorker1 = removedPlayer.getWorker1();
-		removedWorker2 = removedPlayer.getWorker2();
-		cellWorker1 = removedWorker1.getPos();
-		cellWorker2 = removedWorker2.getPos();
 		game.applyDisconnection("Price");
 		assertFalse(game.getPlayers().contains(removedPlayer));
-		//assertFalse(game.isFinished());
-		//assertEquals(game.getPlayerByName("Ghost"),game.getPlayerTurn());
-		assertEquals(game.getPlayers().size(),2);
-		assertNull(removedWorker1.getPos());
-		assertNull(removedWorker2.getPos());
-		assertNull(cellWorker1.getWorker());
-		assertNull(cellWorker2.getWorker());
-		assertTrue(remoteViewDriver.updateQuitCalled);
-		//assertTrue(remoteViewDriver.updateActivePlayerCalled);
+		assertTrue(game.isFinished());
+		assertTrue(remoteViewDriver.isUpdateQuitCalled());
 		remoteViewDriver.resetCalled();
 
 		// call the setup
@@ -582,15 +600,24 @@ public class GameTest {
 		setPhase(Phase.PLAYERTURN);
 		setActivePlayer("Price");
 		removedPlayer = game.getPlayerByName("Ghost");
+		game.applyDisconnection("Ghost");
+		assertFalse(game.getPlayers().contains(removedPlayer));
+		assertTrue(game.isFinished());
+		assertTrue(remoteViewDriver.isUpdateQuitCalled());
+		remoteViewDriver.resetCalled();
+
+		// now a player disconnect when there are only 2 players
+		threePlayersSetup = false;
+		completeSetup();
+		setActivePlayer("Price");
+		removedPlayer = game.getPlayerByName("Ghost");
 		removedWorker1 = removedPlayer.getWorker1();
 		removedWorker2 = removedPlayer.getWorker2();
 		cellWorker1 = removedWorker1.getPos();
 		cellWorker2 = removedWorker2.getPos();
 		game.applyDisconnection("Ghost");
 		assertFalse(game.getPlayers().contains(removedPlayer));
-		//assertFalse(game.isFinished());
-		assertEquals(game.getPlayerByName("Price"),game.getPlayerTurn());
-		assertEquals(game.getPlayers().size(),2);
+		assertTrue(game.isFinished());
 		assertNull(removedWorker1.getPos());
 		assertNull(removedWorker2.getPos());
 		assertNull(cellWorker1.getWorker());
@@ -598,23 +625,7 @@ public class GameTest {
 		assertTrue(remoteViewDriver.isUpdateQuitCalled());
 		remoteViewDriver.resetCalled();
 
-		// now a player disconnect when there are only 2 players
-		setActivePlayer("Price");
-		removedPlayer = game.getPlayerByName("Soap");
-		removedWorker1 = removedPlayer.getWorker1();
-		removedWorker2 = removedPlayer.getWorker2();
-		cellWorker1 = removedWorker1.getPos();
-		cellWorker2 = removedWorker2.getPos();
-		game.applyDisconnection("Soap");
-		assertFalse(game.getPlayers().contains(removedPlayer));
-		assertTrue(game.isFinished());
-		assertNull(removedWorker1.getPos());
-		assertNull(removedWorker2.getPos());
-		assertNull(cellWorker1.getWorker());
-		assertNull(cellWorker2.getWorker());
-		//assertTrue(remoteViewDriver.updateQuitCalled);
-		//assertTrue(remoteViewDriver.updateWinnerCalled);
-		remoteViewDriver.resetCalled();
+		threePlayersSetup = true;
 	}
 
 	@Test
@@ -628,5 +639,210 @@ public class GameTest {
 		game.getPlayerByName("Price").resetLocking();
 		game.applyWorkerLock(game.getPlayerByName("Price"),2);
 		assertEquals(game.getPlayerByName("Price").getWorker2(), game.getPlayerByName("Price").getActiveWorker());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void applyMoveExceptionTest() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyMove(null);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void applyBuildExceptionTest() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyBuild(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void applyWinExceptionTest() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyWin(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void applyDefeatExceptionTest() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyDefeat(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void applyDisconnectionExceptionTest() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyDisconnection(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void applyWorkerLockExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyWorkerLock(null,2);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void applyWorkerLockExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.applyWorkerLock(game.getPlayerTurn(),55);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void getPlayerByNameExceptionTest() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.getPlayerByName("Non esisto ahah");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setOrderExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setOrder(null);
+	}
+
+	@Test(expected = WrongPhaseException.class)
+	public void setOrderExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		List<String> testList = new ArrayList<>();
+		testList.add("ahahah");
+		testList.add("eheheh");
+		testList.add("ihihih");
+
+		game.setOrder(testList);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setOrderExceptionTest3() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		List<String> testList = new ArrayList<>();
+		testList.add("ahahah");
+		testList.add("eheheh");
+		testList.add("ihihih");
+
+		setPhase(Phase.LOBBY);
+		game.setOrder(testList);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setPlayerColorExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setPlayerColor(null,null);
+	}
+
+	@Test(expected = WrongPhaseException.class)
+	public void setPlayerColorExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setPlayerColor("Price",new Color(0,0,0));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setPlayerColorExceptionTest3() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		setPhase(Phase.COLORS);
+		game.setPlayerColor("Non esisto",new Color(0,0,0));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setGameGodsExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setGameGods(null);
+	}
+
+	@Test(expected = WrongPhaseException.class)
+	public void setGameGodsExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		List<String> testList = new ArrayList<>();
+		testList.add("ahahah");
+		testList.add("eheheh");
+		testList.add("ihihih");
+
+		game.setGameGods(testList);
+	}
+	@Test(expected = IllegalArgumentException.class)
+	public void setGameGodsExceptionTest3() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		List<String> testList = new ArrayList<>();
+		testList.add("ahahah");
+		testList.add("eheheh");
+		testList.add("ihihih");
+
+		setPhase(GodsPhase.CHALLENGER_CHOICE);
+		game.setGameGods(testList);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setPlayerGodExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setPlayerGod(null,null);
+	}
+
+	@Test(expected = WrongPhaseException.class)
+	public void setPlayerGodExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setPlayerGod("Price","ATHENA");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setPlayerGodExceptionTest3() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		setPhase(GodsPhase.GODS_CHOICE);
+		game.setPlayerGod("Price","San Paolo");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setStarterExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setStarter(null);
+	}
+
+	@Test(expected = WrongPhaseException.class)
+	public void setStarterExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setStarter("Ghost");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setStarterExceptionTest3() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		setPhase(GodsPhase.STARTER_CHOICE);
+		game.setStarter("Non esisto ahah");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setWorkerPositionsExceptionTest1() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+
+		game.setWorkerPositions(null);
+	}
+
+	@Test(expected = WrongPhaseException.class)
+	public void setWorkerPositionsExceptionTest2() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(0,0),new Pair<Integer,Integer>(1,0));
+
+		game.setWorkerPositions(setupMsg);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setWorkerPositionsExceptionTest3() throws IOException, WrongPhaseException, IllegalAccessException, NoSuchFieldException {
+		completeSetup();
+		NetGameSetup setupMsg = new NetGameSetup(Constants.GAMESETUP_IN_PLACE,"Price",new Pair<Integer,Integer>(0,0),new Pair<Integer,Integer>(1,0));
+
+		setPhase(Phase.SETUP);
+		game.setWorkerPositions(setupMsg);
 	}
 }

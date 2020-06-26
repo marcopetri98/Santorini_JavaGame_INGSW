@@ -112,10 +112,6 @@ public class ServerControllerStub extends ServerController {
 		updatePositionsCalled = true;
 	}
 	@Override
-	public void updatePass(ObservableRemoteView observed, String playerName) {
-		updatePassCalled = true;
-	}
-	@Override
 	public synchronized void updateMove(ObservableObject observed, NetGaming moveMessage) {
 		updateMoveCalled = true;
 	}

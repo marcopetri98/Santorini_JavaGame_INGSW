@@ -33,6 +33,7 @@ public class GameStub extends Game {
 	private boolean setPlayerGodCalled;
 	private boolean setStarterCalled;
 	private boolean setWorkerPositionsCalled;
+	private boolean computeActionsCalled;
 	private Player activePlayer;
 	private List<Player> players;
 	private List<GodCard> godCards;
@@ -55,6 +56,7 @@ public class GameStub extends Game {
 		setPlayerGodCalled = false;
 		setStarterCalled = false;
 		setWorkerPositionsCalled = false;
+		computeActionsCalled = false;
 		players = new ArrayList<>();
 		godCards = new ArrayList<>();
 		map = new Map();
@@ -190,6 +192,9 @@ public class GameStub extends Game {
 		}
 		setWorkerPositionsCalled = true;
 	}
+	public synchronized void computeActions() {
+		computeActionsCalled = true;
+	}
 
 	// stub getters
 	public synchronized Map getMap() {
@@ -261,6 +266,7 @@ public class GameStub extends Game {
 		setPlayerGodCalled = false;
 		setStarterCalled = false;
 		setWorkerPositionsCalled = false;
+		computeActionsCalled = false;
 	}
 	public void setPhase(Phase ph) {
 		while (turn.getPhase() != ph) {
@@ -382,5 +388,8 @@ public class GameStub extends Game {
 	}
 	public boolean isSetWorkerPositionsCalled() {
 		return setWorkerPositionsCalled;
+	}
+	public boolean isComputeActionsCalled() {
+		return computeActionsCalled;
 	}
 }

@@ -101,15 +101,4 @@ public class Player {
 		}
 		return false;
 	}
-
-	// TODO: eliminate if possible
-	@Override
-	public Player clone() {	//TODO: doesn't make the previuos positions the same!! Should not be a problem though
-		Player newPlayer = new Player(playerName);
-		newPlayer.setPlayerColor(worker1.color);
-		newPlayer.worker1.setPos(this.worker1.getPos());
-		newPlayer.worker2.setPos(this.worker2.getPos());
-		newPlayer.setGodCard(this.card);
-		return newPlayer;
-	}
 }

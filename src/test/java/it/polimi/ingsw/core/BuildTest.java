@@ -47,5 +47,7 @@ public class BuildTest {
 		Build build6 = new Build(player1.getWorker2(), map.getCell(1,1), false, typeBuild);
 		assertFalse(build6.equals(build1)); //different player worker
 
+		String otherObject = "Viva la pizza Romana";
+		assertNotEquals(build1,otherObject);
 	}
 }

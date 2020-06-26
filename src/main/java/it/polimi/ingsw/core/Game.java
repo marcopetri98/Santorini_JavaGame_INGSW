@@ -122,7 +122,7 @@ public class Game extends ObservableGame {
 		notifyDefeat(player.getPlayerName());
 		if(this.players.size() == 2) {
 			removePlayer(player);
-			applyWin(players.get(players.indexOf(player) == 1 ? 0 : 1));
+			applyWin(players.get(0));
 		} else {
 			if (activePlayer == player) {
 				int playerIndex = players.indexOf(player);
@@ -143,6 +143,9 @@ public class Game extends ObservableGame {
 					changeTurn();
 					computeActions();
 				}
+			} else {
+				removePlayer(player);
+				notifyMove(getMap());
 			}
 		}
 	}
@@ -533,16 +536,16 @@ public class Game extends ObservableGame {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.COLORS) {
 			throw new WrongPhaseException();
-		}
-		int i;
-		boolean found = false;
-		for (i = 0; i < players.size() && !found; i++) {
-			if (players.get(i).getPlayerName().equals(player)) {
-				found = true;
+		} else {
+			boolean found = false;
+			for (int i = 0; i < players.size() && !found; i++) {
+				if (players.get(i).getPlayerName().equals(player)) {
+					found = true;
+				}
 			}
-		}
-		if (!found) {
-			throw new IllegalArgumentException();
+			if (!found) {
+				throw new IllegalArgumentException();
+			}
 		}
 
 		// now that I'm sure that the player is present it sets the color
@@ -623,13 +626,13 @@ public class Game extends ObservableGame {
 	/**
 	 * It sets the starting player positioning it on the first position of the arrayList.
 	 * @param starterName starter's name
-	 * @throws IllegalStateException if {@code starterName} is null or the player doesn't exist
+	 * @throws IllegalArgumentException if {@code starterName} is null or the player doesn't exist
 	 * @throws WrongPhaseException if it isn't the starter phase
 	 */
-	public synchronized void setStarter(String starterName) throws IllegalStateException, WrongPhaseException {
+	public synchronized void setStarter(String starterName) throws IllegalArgumentException, WrongPhaseException {
 		Player starter = null;
 		if (starterName == null) {
-			throw new IllegalStateException();
+			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.GODS || (turn.getPhase() == Phase.GODS && turn.getGodsPhase() != GodsPhase.STARTER_CHOICE)) {
 			throw new WrongPhaseException();
 		} else {
@@ -641,7 +644,7 @@ public class Game extends ObservableGame {
 				}
 			}
 			if (!found) {
-				throw new IllegalStateException();
+				throw new IllegalArgumentException();
 			}
 		}
 
