@@ -8,11 +8,11 @@ import it.polimi.ingsw.network.objects.*;
  */
 public interface GraphicInterface {
 	/**
-	 * When this method is called there has been an error and the information.
+	 * When this method is called there has been an error and the information is handled depending on the client implementation.
 	 */
 	void retrieveError();
 	/**
-	 * When this method is called there has been a connection error and the information.
+	 * When this method is called there has been a connection error and the information is handled depending on the client implementation.
 	 */
 	void retrieveConnectionError();
 	/**
