@@ -6,6 +6,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * This class is a class used to get the input of the client with a interruptible style which permits to the application to be more responsive when a server message arrives and to reduce unwanted graphical bugs.
+ */
 public class CliInput {
 	private int timePassed;
 	private final int timeout = 1000;
@@ -13,6 +16,9 @@ public class CliInput {
 	private boolean timeoutActive;
 	private final Object timeoutLock;
 
+	/**
+	 * It creates a Cli input getter without a timeout active.
+	 */
 	public CliInput() {
 		timePassed = 0;
 		timeoutActive = false;
@@ -20,6 +26,9 @@ public class CliInput {
 	}
 
 	// setters
+	/**
+	 * It sets the timeout.
+	 */
 	public void setTimeout() {
 		synchronized (timeoutLock) {
 			timeoutActive = true;
@@ -28,8 +37,10 @@ public class CliInput {
 
 	//eventually setters and getters; constructor
 	/**
-	 * It resets the input inserted when the used shouldn't write on the cli and gets the next input without interrupting the thread forever
-	 * @return
+	 * This method gets the input of the user when it writes it and enter \n
+	 * @return the command inserted by the user
+	 * @throws UserInputTimeoutException if the user hasn't written something when there is a server message to read
+	 * @throws IOException if there has been an error to access stdin
 	 */
 	public Command getInput() throws UserInputTimeoutException, IOException {
 		//TODO: vedere altre classi per evitare buffering
@@ -70,6 +81,11 @@ public class CliInput {
 		}
 	}
 
+	/**
+	 * This method gets the user undo it writes it and enter \n
+	 * @return the command inserted by the user
+	 * @throws IOException if there has been an error to access stdin
+	 */
 	public boolean getUndo() throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = null;
@@ -107,12 +123,19 @@ public class CliInput {
 	}
 
 	// support methods
+	/**
+	 * It deletes the current timeout active for this input getter.
+	 */
 	private void dropTimeout() {
 		synchronized (timeoutLock) {
 			timePassed = 0;
 			timeoutActive = false;
 		}
 	}
+	/**
+	 * It deletes every input sent by the user to the Cli when he shouldn't do it.
+	 * @throws IOException if there has been an error to access stdin
+	 */
 	private void resetInsertedInput() throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		while (reader.ready()) {

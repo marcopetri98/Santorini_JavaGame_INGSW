@@ -4,10 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class is the class used to get commands of the user with the CLI.
+ */
 public class Command {
 	public String commandType;
 	private String[] otherValues;
 
+	/**
+	 * It creates a command with the given words
+	 * @param words words wrote by the user
+	 */
 	public Command(String[] words) {
 		if (words == null) {
 			commandType = null;
@@ -25,7 +32,10 @@ public class Command {
 		}
 	}
 
-	//eventually setters and getters; constructor...
+	/**
+	 * It returns the number of the parameters of the command
+	 * @return the number of parameters of the command
+	 */
 	public int getNumParameters() {
 		if (otherValues == null) {
 			return 0;
@@ -33,6 +43,12 @@ public class Command {
 			return otherValues.length;
 		}
 	}
+	/**
+	 * It returns the parameter with the index specified in the parameter
+	 * @param i an integer greater than 0
+	 * @return the parameter at that index
+	 * @throws IndexOutOfBoundsException if {@code i} is less than 0 or greater than the index of the last element
+	 */
 	public String getParameter(int i) {
 		if (i < otherValues.length) {
 			return otherValues[i];
@@ -40,6 +56,10 @@ public class Command {
 			throw new IndexOutOfBoundsException();
 		}
 	}
+	/**
+	 * This methods converts parameters of the commands to a list and returns it.
+	 * @return list of parameters
+	 */
 	public List<String> getParameterList() {
 		List<String> returnList = new ArrayList<>();
 		for (int i = 0; i < otherValues.length; i++) {

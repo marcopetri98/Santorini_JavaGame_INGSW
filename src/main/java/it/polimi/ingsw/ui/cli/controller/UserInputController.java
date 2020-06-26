@@ -15,29 +15,49 @@ import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
 import it.polimi.ingsw.util.Pair;
 
+/**
+ * This class is used by the Cli to send the input that the client insert to the server, it receives a command and translate it in a network message to pass to the {@link it.polimi.ingsw.network.ClientMessageListener} to send to the server.
+ */
 public class UserInputController {
 	private CliGame gameView;
 	private ClientMessageListener listener;
 	private NetMap gameMap;
 	private String playerName;
 
+	/**
+	 * It creates a user input controller with the given listener ad argument.
+	 * @param listener a {@link it.polimi.ingsw.network.ClientMessageListener}
+	 */
 	public UserInputController(ClientMessageListener listener) {
 		this.listener = listener;
 	}
 
+	/**
+	 * Sets the current map.
+	 * @param map a {@link it.polimi.ingsw.network.game.NetMap}
+	 */
 	public void setMap(NetMap map) {
 		gameMap = map;
 	}
+	/**
+	 * Sets the name of the player.
+	 * @param name the player's name
+	 */
 	public void setPlayerName(String name) {
 		playerName = name;
 	}
+	/**
+	 * Sets the game view where to get commands.
+	 * @param view a {@link it.polimi.ingsw.ui.cli.view.CliGame}
+	 */
 	public void setGameView(CliGame view) {
 		gameView = view;
 	}
 
 	/**
-	 * This class builds a network message from the command given by the users and uses the listener to send it invoking its methods, it is called only from lobby to the next phases of the game and it consider the command given correct because controlled by the caller.
-	 * @param command which will be translated in a massage the server can read
+	 * This method builds a network message from the command given by the users and uses the listener to send it invoking its methods, it is called only from lobby to the next phases of the game and it consider the command given correct because controlled by the caller.
+	 * @param command the command inserted by the client
+	 * @param turn the current phase of the game
 	 * @throws IllegalStateException when it is called with a phase that isn't a message of the phase considered
 	 */
 	public void getCommand(Command command, Turn turn) throws IllegalStateException, IllegalArgumentException {
@@ -139,6 +159,14 @@ public class UserInputController {
 			}
 		}
 	}
+	/**
+	 * This method builds a network message of move from the given command.
+	 * @param command the command inserted by the client
+	 * @param turn the current phase of the game
+	 * @param move the {@link it.polimi.ingsw.network.game.NetMove} that the player wants to perform
+	 * @throws IllegalStateException if the phase is wrong of if it isn't the player's turn
+	 * @throws IllegalArgumentException if the command is wrong or if the parameter is not well formed
+	 */
 	public void getCommand(Command command, Turn turn, NetMove move) throws IllegalStateException, IllegalArgumentException {
 		if (!command.commandType.equals(Constants.COMMAND_MOVE)) {
 			throw new IllegalArgumentException();
@@ -152,35 +180,48 @@ public class UserInputController {
 			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_MOVE,playerName,move));
 		}
 	}
+	/**
+	 * This method builds a network message of build from the given command.
+	 * @param command the command inserted by the client
+	 * @param turn the current phase of the game
+	 * @param build the {@link it.polimi.ingsw.network.game.NetBuild} that the player wants to perform
+	 * @throws IllegalStateException if the phase is wrong of if it isn't the player's turn
+	 * @throws IllegalArgumentException if the command is wrong or if the parameter is null
+	 */
 	public void getCommand(Command command, Turn turn, NetBuild build) throws IllegalStateException, IllegalArgumentException {
 		if (!command.commandType.equals(Constants.COMMAND_BUILD)) {
 			throw new IllegalArgumentException();
 		} else if (turn.getPhase() != Phase.PLAYERTURN || (turn.getPhase() == Phase.PLAYERTURN && turn.getGamePhase() == GamePhase.MOVE)) {
 			throw new IllegalStateException();
-		} else if (/*command.getNumParameters() != 5 || */build == null) {
+		} else if (build == null) {
 			throw new IllegalArgumentException();
-		} /*else if (!Constants.isNumber(command.getParameter(2)) || !Constants.isNumber(command.getParameter(3)) || !Constants.isNumber(command.getParameter(4)) || (!command.getParameter(1).equals(Constants.COMMAND_BUILD_DOME) && !command.getParameter(1).equals(Constants.COMMAND_BUILD_BUILDING))) {
-			throw new IllegalArgumentException();
-		} */else {
+		} else {
 			listener.sendMessage(new NetGaming(Constants.PLAYER_IN_BUILD,playerName,build));
 		}
 	}
+	/**
+	 * It sends to the server the wanted dimension for the lobby because the player is the first player of the game.
+	 * @param num an integer representing the number of players of the lobby
+	 * @throws IllegalArgumentException if {@code num} isn't 2 or 3
+	 */
 	public void getCommand(int num) throws IllegalArgumentException {
 		if (num != 2 && num != 3) {
 			throw new IllegalArgumentException();
 		}
 		listener.sendMessage(new NetSetup(Constants.SETUP_IN_SETUPNUM,playerName,num));
 	}
+	/**
+	 * It disconnects the user.
+	 */
 	public void disconnect() {
 		listener.resetListening();
 		listener.sendMessage(new NetSetup(Constants.GENERAL_DISCONNECT));
 	}
 	/**
-	 *
-	 * @param playerName
-	 * @param serverAddress
-	 * @throws NullPointerException
-	 * @throws IllegalArgumentException
+	 * It tries to connect to the game server with the specified nickname.
+	 * @param playerName the player's name
+	 * @param serverAddress the server's address
+	 * @throws IllegalArgumentException is {@code playerName} or {@code serverAddress} is null
 	 */
 	public void connect(String playerName, String serverAddress) throws IllegalArgumentException {
 		if (playerName == null || serverAddress == null) {
@@ -193,6 +234,12 @@ public class UserInputController {
 			listener.sendMessage(new NetSetup(Constants.SETUP_IN_PARTICIPATE,playerName));
 		}
 	}
+	/**
+	 * It sends another message to the server trying to gain this other name because the previous wasn't possible to use.
+	 * @param name new player's name
+	 * @throws IllegalArgumentException if {@code name} is null
+	 * @throws IllegalStateException if the message listener thinks the player doesn't want to play
+	 */
 	public void tryAnotherName(String name) throws IllegalArgumentException, IllegalStateException {
 		if (playerName == null) {
 			throw new IllegalArgumentException();

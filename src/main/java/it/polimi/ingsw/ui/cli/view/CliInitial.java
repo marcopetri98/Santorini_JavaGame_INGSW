@@ -1,6 +1,5 @@
 package it.polimi.ingsw.ui.cli.view;
 
-import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.objects.NetLobbyPreparation;
 import it.polimi.ingsw.network.objects.NetObject;
@@ -13,7 +12,13 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+/**
+ * This class is the class which creates and manages the lobby and the menu of the Santorini video game.
+ */
 public class CliInitial {
+	/**
+	 * This enum represent the phase of input taken by the cli from the player
+	 */
 	private enum MenuPhase {
 		START, NAME, SERVERADDRESS, PLAYERNUMBER, QUITTING
 	}
@@ -72,7 +77,7 @@ public class CliInitial {
 		return returnValue;
 	}
 	/**
-	 *
+	 * This functions asks to the client if he wants to disconnect of if it wants to wait and when the message of the game start arrives it ends.
 	 * @return 0 if the game is starting, 1 if the client wants to quit the lobby, -1 if there was an error
 	 */
 	public int lobbyCli() {
@@ -118,19 +123,34 @@ public class CliInitial {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * Sets the user input controller to use to send the input to the server when the player insert a certain command.
+	 * @param userInputController the {@link it.polimi.ingsw.ui.cli.controller.UserInputController}
+	 */
 	public void setUserInputController(UserInputController userInputController) {
 		this.userInputController = userInputController;
 	}
+	/**
+	 * Add a message to the messages queue.
+	 * @param msg the message to queue
+	 */
 	public void queueMessage(NetObject msg) {
 		synchronized (messages) {
 			messages.add(msg);
 		}
 	}
+	/**
+	 * It notifies all threads waiting on the messages queue.
+	 */
 	public void notifyPregameCli() {
 		synchronized (messages){
 			messages.notifyAll();
 		}
 	}
+	/**
+	 * Says if the Cli Initial is in the menu phase.
+	 * @return true if is the menu phase
+	 */
 	public boolean isMenuPhase() {
 		return menuPhase;
 	}
@@ -144,6 +164,10 @@ public class CliInitial {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * This method parses the commands given by the user while using the cli version of the game. It checks the command validity and eventually advance phase if it is correct or it can use the {@link it.polimi.ingsw.ui.cli.controller.UserInputController} to send a message to the server indicated by the user.
+	 * @param command the command inserted by the user
+	 */
 	private void parseMenuCommands(Command command) {
 		switch (stage) {
 			case START -> {
@@ -235,6 +259,9 @@ public class CliInitial {
 			}
 		}
 	}
+	/**
+	 * This method parses messages arrived from the server.
+	 */
 	private void parseMenuMessages() {
 		NetSetup netSetup = (NetSetup) messages.pop();
 		switch (netSetup.message) {
@@ -258,6 +285,10 @@ public class CliInitial {
 			}
 		}
 	}
+	/**
+	 * This method parses the commands given by the user while using the cli version of the game. It checks the command validity and eventually send a message to the server indicated by the user.
+	 * @param command the command inserted by the user
+	 */
 	private void parseLobbyCommands(Command command) {
 		if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
 			userInputController.getCommand(command,new Turn());
@@ -266,6 +297,9 @@ public class CliInitial {
 			printError(6);
 		}
 	}
+	/**
+	 * This method parses messages arrived from the server.
+	 */
 	private void parseLobbyMessages() {
 		NetLobbyPreparation netLobbyPreparation;
 		synchronized (messages) {
@@ -299,6 +333,10 @@ public class CliInitial {
 	 * 												*
 	 * 												*
 	 ************************************************/
+	/**
+	 * It prints the list of all players inside the lobby.
+	 * @param netLobby lobby message with player information
+	 */
 	private void printPlayers(NetLobbyPreparation netLobby) {
 		System.out.println("Players and their order turn are displayed below:");
 		while(netLobby != null) {
@@ -306,9 +344,16 @@ public class CliInitial {
 			netLobby = netLobby.next;
 		}
 	}
+	/**
+	 * It says to the user that the game is starting.
+	 */
 	private void printGameStarting() {
 		System.out.println("The game is starting...");
 	}
+	/**
+	 * It prints a graphical message to show that the phase changed depending on the parameter.
+	 * @param i an integer
+	 */
 	private void printMenuMessage(int i) {
 		switch (i) {
 			case 1 -> {
@@ -326,6 +371,9 @@ public class CliInitial {
 			}
 		}
 	}
+	/**
+	 * It prints the question that make the client understand what he must write depending on current phase.
+	 */
 	private void printMenuQuestion() {
 		switch (stage) {
 			case START -> System.out.print("Insert a number: ");
@@ -334,12 +382,15 @@ public class CliInitial {
 			case PLAYERNUMBER -> System.out.print("Choose the number of the player for the game (a game can have 2 or 3 players): ");
 		}
 	}
+	/**
+	 * It prints to the user that he can only disconnect.
+	 */
 	private void printLobbyQuestion() {
 		System.out.println("You can type \"disconnect\" at any time to quit the game. Otherwise wait for the start. You can also type \"help\" in-game, to visualize the English version of the guide");
 		System.out.print("Waiting for other players to join...\n\n");
 	}
 	/**
-	 *
+	 * Prints an error.
 	 * @param value indicates a certain error: depending on it, it will print a certain error message.
 	 */
 	private void printError(int value) {
@@ -392,6 +443,9 @@ public class CliInitial {
 				break;
 		}
 	}
+	/**
+	 * Draws the initial menu
+	 */
 	private void drawMenu(){
 		System.out.println("\n\n\n\n");
 		System.out.println("                     /hmd-            :                                /MMN-              .-::///-        :s+.              mmho:.                smmddddh.`.:.                .   .hmdddddy ");
