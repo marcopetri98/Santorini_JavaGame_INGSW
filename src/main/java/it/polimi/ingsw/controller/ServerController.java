@@ -309,8 +309,4 @@ public class ServerController implements ObserverController {
 			throw new AssertionError("The server controller has been called to remove an observer that doesn't exist");
 		}
 	}
-	@Override
-	public Turn givePhase() {
-		return observedModel.getPhase();
-	}
 }

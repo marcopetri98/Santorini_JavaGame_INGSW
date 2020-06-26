@@ -131,8 +131,4 @@ public class ServerControllerStub extends ServerController {
 	public synchronized void observerQuit(ObservableRemoteView observed) {
 		observerQuitCalled = true;
 	}
-	@Override
-	public Turn givePhase() {
-		return turn.clone();
-	}
 }
