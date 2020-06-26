@@ -9,7 +9,6 @@ import java.util.List;
 
 public class Builder {
 	private Game observedModel;
-	private NetBuild netBuild;
 
 	// constructor for this class
 	public Builder(Game g) {

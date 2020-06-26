@@ -16,7 +16,6 @@ public class Mover {
 		observedModel = g;
 	}
 
-
 	/**
 	 * The function checks if the NetMove returned by the client is indeed possible, and if it is, it applies it
 	 * @param netmove the move returned by the client
@@ -39,19 +38,4 @@ public class Mover {
 		}
 		return false;
 	}
-
-	// TODO: maybe necessary to be used?
-	/*private List<Move> filterMoves(List<Move> possibilities) {
-		List<Move> newList = new ArrayList<>(possibilities);
-		for (int i = 0; i < possibilities.size(); i++) {
-			for (int j = 0; j < possibilities.size(); j++) {
-				if (possibilities.get(i).typeMove == TypeMove.FORBIDDEN_MOVE && possibilities.get(j).typeMove == TypeMove.VICTORY_MOVE && possibilities.get(i).getCellNext() == possibilities.get(j).getCellNext() && possibilities.get(i).getCellPrev() == possibilities.get(j).getCellPrev() && possibilities.get(i).getWorker() == possibilities.get(j).getWorker()) {
-					if (newList.contains(possibilities.get(i))) {
-						newList.remove(possibilities.get(i));
-					}
-				}
-			}
-		}
-		return newList;
-	}*/
 }

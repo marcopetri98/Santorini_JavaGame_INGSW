@@ -1,10 +1,14 @@
 package it.polimi.ingsw.network.objects;
 
-// necessary imports of Java SE
-import it.polimi.ingsw.core.gods.GodCard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * This class is a class used to exchange messages between clients and server in the gods phase of the game where challenger chooses gods and the starter and players choose a god. More information about game phase can be found on {@link it.polimi.ingsw.core.state} package.
+ */
 public class NetDivinityChoice extends NetObject {
 	public final String divinity;
 	public final String challenger;
@@ -12,6 +16,11 @@ public class NetDivinityChoice extends NetObject {
 	public final NetDivinityChoice next;
 	public final boolean godsEnd;
 
+	/**
+	 * Creates a standard message and only calls the super constructor.
+	 * @param msg is the message to be sent
+	 * @throws NullPointerException if {@code msg} is null
+	 */
 	public NetDivinityChoice(String msg) throws NullPointerException {
 		super(msg);
 		divinity = null;
@@ -20,6 +29,12 @@ public class NetDivinityChoice extends NetObject {
 		next = null;
 		godsEnd = false;
 	}
+	/**
+	 * Creates a message with a boolean which says that the gods phase ended.
+	 * @param msg is the message to be sent
+	 * @param godsEnd indicates that the gods phase ended
+	 * @throws NullPointerException if {@code msg} is null
+	 */
 	public NetDivinityChoice(String msg, boolean godsEnd) throws NullPointerException {
 		super(msg);
 		divinity = null;
@@ -28,6 +43,12 @@ public class NetDivinityChoice extends NetObject {
 		next = null;
 		this.godsEnd = godsEnd;
 	}
+	/**
+	 * Creates a message with a player's name.
+	 * @param msg is the message to be sent
+	 * @param value is the player's name
+	 * @throws NullPointerException if {@code msg} is null
+	 */
 	public NetDivinityChoice(String msg, String value) throws NullPointerException {
 		super(msg);
 		challenger = null;
@@ -36,6 +57,14 @@ public class NetDivinityChoice extends NetObject {
 		divinity = null;
 		godsEnd = false;
 	}
+	/**
+	 * Creates a message of a gods choice or the starter choice from the challenger depending on the parameters passed.
+	 * @param msg is the message to be sent
+	 * @param player is the player's name if the player isn't the challenger while choosing the starter
+	 * @param other is the starter to select or the divinity chosen by the player
+	 * @param start indicated is the phase is the starter selection phase
+	 * @throws NullPointerException if {@code msg} is null or {@code player} is null or {@code other} is null
+	 */
 	public NetDivinityChoice(String msg, String player, String other, boolean start) throws NullPointerException {
 		super(msg);
 		if (player == null || other == null) {
@@ -47,6 +76,14 @@ public class NetDivinityChoice extends NetObject {
 		divinity = start ? null : other.toUpperCase();
 		godsEnd = false;
 	}
+	/**
+	 * Creates a message indicating the choices of gods from the players till now.
+	 * @param msg is the message to be sent
+	 * @param name is the player's name
+	 * @param god is the god's name
+	 * @param next is the next message to concatenate
+	 * @throws NullPointerException if {@code msg} is null or {@code name} is null
+	 */
 	public NetDivinityChoice(String msg, String name, String god, NetDivinityChoice next) throws NullPointerException {
 		super(msg);
 		if (name == null) {
@@ -58,6 +95,12 @@ public class NetDivinityChoice extends NetObject {
 		this.next = next;
 		godsEnd = false;
 	}
+	/**
+	 * Creates a message from the server to the client with the list of gods chosen by the challenger for this game.
+	 * @param msg is the message to be sent
+	 * @param divinities is the list of gods
+	 * @throws NullPointerException if {@code msg} is null or {@code divinities} is null
+	 */
 	public NetDivinityChoice(String msg, List<String> divinities) throws NullPointerException {
 		super(msg);
 		if (divinities == null) {
@@ -75,6 +118,13 @@ public class NetDivinityChoice extends NetObject {
 		challenger = null;
 		godsEnd = false;
 	}
+	/**
+	 * Creates a message from the client to the server indicating the gods it has chosen for the game.
+	 * @param msg is the message to be sent
+	 * @param player is the challenger's name
+	 * @param divinities is the list of game's gods
+	 * @throws NullPointerException if {@code msg} is null or {@code divinities} is null
+	 */
 	public NetDivinityChoice(String msg, String player, List<String> divinities) throws NullPointerException {
 		super(msg);
 		if (divinities == null) {
@@ -94,12 +144,24 @@ public class NetDivinityChoice extends NetObject {
 	}
 
 	// getters
+	/**
+	 * Gets the parameter {@link #divinity}.
+	 * @return value of {@link #divinity}
+	 */
 	public String getDivinity() {
 		return divinity;
 	}
+	/**
+	 * Gets the parameter {@link #player}.
+	 * @return value of {@link #player}
+	 */
 	public String getPlayer() {
 		return player;
 	}
+	/**
+	 * Builds a map with the association between the players (keys) and the gods they have chosen (values) inside this structure.
+	 * @return a map of god's players' choice
+	 */
 	public Map<String,String> getPlayerGodMap() {
 		Map<String,String> list = new LinkedHashMap<>();
 		if (player != null && divinity != null) {
@@ -110,22 +172,10 @@ public class NetDivinityChoice extends NetObject {
 		}
 		return list;
 	}
-	/*public List<String> getDivinities() {
-		if (divinity == null) {
-			return null;
-		} else {
-			List<String> divinityNames = new ArrayList<>();
-			if (next != null) {
-				divinityNames.addAll(next.getDivinities());
-			}
-			if (!divinityNames.contains(divinity)) {
-				divinityNames.add(divinity);
-			}
-
-			return divinityNames;
-		}
-	}*/
-
+	/**
+	 * Builds a list of the divinities inside this structure.
+	 * @return a list of divinities' names
+	 */
 	public List<String> getDivinities() {
 		if (divinity == null) {
 			return null;

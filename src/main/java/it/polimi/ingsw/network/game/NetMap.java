@@ -10,9 +10,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the network class that represent the server game map, it is a fully map with all the needed information using other network classes like {@link it.polimi.ingsw.network.game.NetCell} directly and indirectly through the previous cited: {@link it.polimi.ingsw.network.game.NetWorker}, {@link it.polimi.ingsw.network.game.NetBuilding}.
+ */
 public class NetMap implements Serializable {
 	public final List<List<NetCell>> cells;
 
+	/**
+	 * Creates a map from a {@link it.polimi.ingsw.core.Cell} copying it in the network version.
+	 * @param map a {@link it.polimi.ingsw.core.Map}
+	 */
 	public NetMap(Map map) {
 		cells = new ArrayList<>();
 		for (int x = 0; x <= 4; x++) {
@@ -22,6 +29,13 @@ public class NetMap implements Serializable {
 			}
 		}
 	}
+	/**
+	 * Modifies a network map changing a cell on it, without modifying other values.
+	 * @param netMap the network map to modify
+	 * @param cell cell to insert
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 */
 	private NetMap(NetMap netMap, NetCell cell, int x, int y) {
 		cells = new ArrayList<>();
 		for (int i = 0; i <= 4; i++) {
@@ -41,6 +55,13 @@ public class NetMap implements Serializable {
 	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
 	 * 												*
 	 ************************************************/
+	/**
+	 * Changes the current map changin a cell in the specified cartesian coordinates.
+	 * @param newCell the new cell to insert in the map
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @return the new modified map
+	 */
 	public NetMap changeCell(NetCell newCell, int x, int y) {
 		return new NetMap(this,newCell,x,y);
 	}
@@ -50,12 +71,25 @@ public class NetMap implements Serializable {
 	 * GETTERS AND METHODS WHICH DON'T CHANGE STATE	*
 	 * 												*
 	 ************************************************/
+	/**
+	 * It gets a cell of the current map given some cartesian coordinates.
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @return the {@link it.polimi.ingsw.network.game.NetCell} at the given coordinates
+	 * @throws IllegalArgumentException if the coordinates aren't inside the map
+	 */
 	public NetCell getCell(int x, int y) throws IllegalArgumentException {
 		if (x < 0 || y < 0 || x >= Constants.MAP_SIDE || y >= Constants.MAP_SIDE) {
 			throw new IllegalArgumentException();
 		}
 		return cells.get(x).get(y);
 	}
+	/**
+	 * Gets the x cartesian coordinate of a given cell of the map.
+	 * @param c is the cell to search for
+	 * @return an integer representing its x coordinate
+	 * @throws IllegalArgumentException if the {@link it.polimi.ingsw.network.game.NetCell} doesn't exists
+	 */
 	public int getX(NetCell c) throws IllegalArgumentException {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
 			for (int j = 0; j < Constants.MAP_SIDE; j++) {
@@ -66,6 +100,12 @@ public class NetMap implements Serializable {
 		}
 		throw new IllegalArgumentException();
 	}
+	/**
+	 * Gets the y cartesian coordinate of a given cell of the map.
+	 * @param c is the cell to search for
+	 * @return an integer representing its y coordinate
+	 * @throws IllegalArgumentException if the {@link it.polimi.ingsw.network.game.NetCell} doesn't exists
+	 */
 	public int getY(NetCell c) throws IllegalArgumentException  {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
 			for (int j = 0; j < Constants.MAP_SIDE; j++) {
@@ -76,6 +116,11 @@ public class NetMap implements Serializable {
 		}
 		throw new IllegalArgumentException();
 	}
+	/**
+	 * Checks if the given cell is inside the current map.
+	 * @param cell a {@link it.polimi.ingsw.network.game.NetCell}
+	 * @return true if the cell is contained, false instead
+	 */
 	public boolean contains(NetCell cell) {
 		for (int x = 0; x < cells.size(); x++) {
 			if (cells.get(x).contains(cell)) {
@@ -83,29 +128,5 @@ public class NetMap implements Serializable {
 			}
 		}
 		return false;
-	}
-
-	// TODO: are these really necessary?
-	// security check methods
-	public boolean containWorker(NetWorker worker) {
-		for (int i = 0; i < cells.size(); i++) {
-			for (int j = 0; j < cells.get(i).size(); j++) {
-				if (cells.get(i).get(j).worker == worker) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	private int numberOfCell(NetCell cell) {
-		int number = 0;
-		for (int x = 0; x < cells.size(); x++) {
-			for (int y = 0; y < cells.get(x).size(); y++) {
-				if (cells.get(x).get(y) == cell) {
-					number++;
-				}
-			}
-		}
-		return number;
 	}
 }

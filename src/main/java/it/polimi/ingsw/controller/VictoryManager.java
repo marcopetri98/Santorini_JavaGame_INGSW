@@ -15,24 +15,6 @@ public class VictoryManager {
 	public VictoryManager(Game g) {
 		observedModel = g;
 	}
-
-	//Controllare che after è dentro lista move(nb non lìha messo, si è dimenticata..), se no controllo condizione standard (adiacente etc..) e chiama applywin in game (da aggiungere... mette il stringa playerwinner (che inizio è NULL) a true e fo notifywinner passando la stringa del player che ha vinto).
-
-//	/**
-//	 *
-//	 * @param possibleCells the list of possible moves returned by the God's checkMove function.
-//	 * @return a list containing only winning moves due to God's power.
-//	 */
-//	private List<Move> filterMoves(List<Move> possibleCells) {
-//		List<Move> moves = new ArrayList<>();
-//		for (Move m : possibleCells) {
-//			if (m.typeMove == TypeMove.VICTORY_MOVE) { //due to winning condition of a God's power.
-//				moves.add(m);
-//			}
-//		}
-//		return moves;
-//	}
-
 	/**
 	 * The function checks if the standard condition of winning is respected: if it is respected, it calls applyWin function in Game class.
 	 * Also, it checks if the move is a VICTORY_MOVE: if it is true, it calls applyWin function in Game class.
