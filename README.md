@@ -6,8 +6,8 @@ The first thing to do to install Santorini software is to install java 14 versio
 
 ### Documentation
 Documentation for this software comes with this file readme and two different UML file that can be found in the following unordered list, one of this UML files is a general representation about the structure of the program and the other is the definitive UML containing every elements of the application (apart some utility objects used by a lot of class of the software, them are not present because it would generate disorder with a huge number of arrows).
-- [General UML](link to be inserted)
-- [Detailed UML](link to be inserted)
+- [General UML](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/UML/UML_Generic.pdf)
+- [Detailed UML](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/UML/UML_Final.pdf)
 #### Compiling the application using maven
 Software is developed with maven and this software is the one we use to deploy the application. To deploy the application using maven....
 
