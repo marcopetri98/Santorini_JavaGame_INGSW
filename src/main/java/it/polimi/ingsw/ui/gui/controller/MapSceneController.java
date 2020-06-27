@@ -1469,6 +1469,4 @@ public class MapSceneController implements SceneController {
 			}
 		}
 	}
-
-
 }

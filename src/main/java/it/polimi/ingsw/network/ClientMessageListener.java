@@ -246,15 +246,6 @@ public class ClientMessageListener extends Thread {
 			}
 		}
 	}
-	// TODO: maybe unnecessary
-	public void closeSocketAndTerminate() {
-		try {
-			serverSocket.close();
-			setActive(false);
-		} catch (IOException e2) {
-			setActive(false);
-		}
-	}
 
 	/* **********************************************
 	 *												*

@@ -32,7 +32,6 @@ public class Build {
 	public boolean isSameAs(NetBuild playerBuild) {
 		return cell.map.getY(cell) == playerBuild.cellY && cell.map.getX(cell) == playerBuild.cellX && worker.workerID == playerBuild.workerID && ((cell.getBuilding().getLevel() == playerBuild.level-1 && cell.getBuilding().getLevel() < 3) || dome == playerBuild.dome) && ((other == null && playerBuild.other == null) || (other != null && playerBuild.other != null && other.isSameAs(playerBuild.other)));
 	}
-
 	public Build copy(){
 		return new Build(this.getWorker(), this.getCell(), this.isDome(), this.getTypeBuild());
 	}

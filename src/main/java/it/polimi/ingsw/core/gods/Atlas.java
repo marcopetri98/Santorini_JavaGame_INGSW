@@ -77,7 +77,10 @@ public class Atlas extends GodCard {
 									if (m.getCell(x1, y1).getBuilding().getLevel() <= 3) { //Check height building is <=3
 										//don't need to check else, because Atlas can build Dome at any level
 										builds.add(new Build(w, m.getCell(x1, y1), true, TypeBuild.SIMPLE_BUILD));
-										builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));	//adds the possibility to build another generic building [no dome]
+										if (m.getCell(x1, y1).getBuilding().getLevel() < 3) {
+											//adds the possibility to build another generic building [no dome]
+											builds.add(new Build(w, m.getCell(x1, y1), false, TypeBuild.SIMPLE_BUILD));
+										}
 									}
 								}
 							}

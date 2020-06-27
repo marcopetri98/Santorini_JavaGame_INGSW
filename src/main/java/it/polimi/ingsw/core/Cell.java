@@ -1,7 +1,6 @@
 package it.polimi.ingsw.core;
 
 public class Cell {
-	// FIXME: the map isn't part of the cell state
 	public final Map map;
 	private final int x;
 	private final int y;
