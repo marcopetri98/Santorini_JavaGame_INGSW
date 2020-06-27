@@ -39,9 +39,7 @@ public class ServerClientListenerThread extends Thread {
 					}
 				}
 				try {
-					// TODO: this MUST MUST MUST MUST MUST MUST be 5000
-					// FIXME: this MUST MUST MUST MUST MUST MUST be 5000
-					Thread.sleep(5000000);
+					Thread.sleep(5000);
 					if (!receivedPing) {
 						destroyListener();
 					}
@@ -526,8 +524,10 @@ public class ServerClientListenerThread extends Thread {
 	public void closeSocketAndTerminate() {
 		try {
 			clientSocket.close();
+			playerName = null;
 			setActive(false);
 		} catch (IOException e2) {
+			playerName = null;
 			setActive(false);
 		}
 	}
