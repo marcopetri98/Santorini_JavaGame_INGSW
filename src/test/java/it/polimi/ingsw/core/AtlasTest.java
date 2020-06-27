@@ -107,7 +107,7 @@ public class AtlasTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(6, atlas.checkBuild(map, player.getWorker1(), turn).size());
+		assertEquals(5, atlas.checkBuild(map, player.getWorker1(), turn).size());
 
 		i=0; j=0;
 		Build newBuild = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
@@ -120,10 +120,6 @@ public class AtlasTest {
 		i=1; j=0;
 		Build newBuild2= new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
 		assertTrue(atlas.checkBuild(map, player.getWorker1(), turn).contains(newBuild2));
-
-		i=1; j=0;
-		Build newBuild3 = new Build(player.getWorker1(), map.getCell(i, j), false, TypeBuild.SIMPLE_BUILD);
-		assertTrue(atlas.checkBuild(map, player.getWorker1(), turn).contains(newBuild3));
 
 		i=0; j=2;
 		Build newBuild4 = new Build(player.getWorker1(), map.getCell(i, j), true, TypeBuild.SIMPLE_BUILD);
