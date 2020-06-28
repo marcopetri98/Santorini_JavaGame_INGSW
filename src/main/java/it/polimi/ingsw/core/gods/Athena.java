@@ -95,7 +95,10 @@ public class Athena extends GodCard implements Observer {
 		Cell[] positions = (Cell[]) arg;
 		if(modifiedWorker == owner.getWorker1() || modifiedWorker == owner.getWorker2()){	//Then the worker returned as argument of the update method is held by the owner of Athena
 			if ((positions[0] == null && positions[1] != null && positions[1].getBuilding().getLevel() >= 1) || (positions[0] != null && positions[1] != null && positions[1].getBuilding().getLevel() - positions[0].getBuilding().getLevel() >= 1)) {
-				wentUp = true;
+				// athena power is active only if the worker moves up in the player's turn
+				if (modifiedWorker.owner.isWorkerLocked()) {
+					wentUp = true;
+				}
 			} else {
 				wentUp = false;
 			}

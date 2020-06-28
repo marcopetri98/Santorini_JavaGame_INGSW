@@ -227,7 +227,6 @@ public class ServerController implements ObserverController {
 						caller.communicateError();
 					} else {
 						victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);
-						observedModel.applyWorkerLock(movingPlayer,selectedWorker.workerID-movingPlayer.getPlayerID());
 
 						// if a player with prometheus moved without building before the game must go from before move phase to build phase (2 step on phase advance)
 						if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {

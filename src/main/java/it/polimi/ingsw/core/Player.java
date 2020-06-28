@@ -85,6 +85,7 @@ public class Player {
 	 */
 	void resetLocking() {
 		workerLocked = false;
+		activeWorker = null;
 	}
 
 	// CLASSES GETTERS

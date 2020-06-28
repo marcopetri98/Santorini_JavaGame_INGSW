@@ -35,10 +35,12 @@ public class Mover {
 		if (netmove == null || possibilities == null) {
 			throw new NullPointerException();
 		}
+		List<Move> filteredMoves = DefeatManager.filterMoves(possibilities);
 
-		for(Move move : possibilities){
+		for(Move move : filteredMoves) {
 			if(move.isSameAs(netmove)) {
 				if(move.typeMove == TypeMove.SIMPLE_MOVE || move.typeMove == TypeMove.CONDITIONED_MOVE || move.typeMove == TypeMove.VICTORY_MOVE){
+					observedModel.applyWorkerLock(move.worker.owner,move.worker.workerID-move.worker.owner.getPlayerID());
 					observedModel.applyMove(move);
 					return true;
 				}

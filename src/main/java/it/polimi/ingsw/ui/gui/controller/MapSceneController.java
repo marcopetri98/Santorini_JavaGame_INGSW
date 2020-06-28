@@ -1390,9 +1390,9 @@ public class MapSceneController implements SceneController {
 	 *
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
-	private void gameCantContinue(int reason) {
+	private void gameCantContinue(int reason, String playerName) {
 		if(reason == 0){
-			playerDisconnected(null); //FIXME: give it the name...
+			playerDisconnected(playerName);
 		} else {
 			fadeImage(BG_message, errorFatalBG, 0, 1, 1);
 			slidingImage(icon_message, errorFatal, 650, 0, 650, 325, 1250);
@@ -1413,7 +1413,7 @@ public class MapSceneController implements SceneController {
 	@Override
 	public void fatalError() {
 		finished = true;
-		gameCantContinue(1);
+		gameCantContinue(1,null);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
@@ -1469,12 +1469,13 @@ public class MapSceneController implements SceneController {
 				updateMap();
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
+				NetGameSetup currentMsg = (NetGameSetup)message;
 				finished = true;
 				button_build.setDisable(true);
 				button_dome.setDisable(true);
 				button_endTurn.setDisable(true);
 				button_undo.setDisable(true);
-				gameCantContinue(0);
+				gameCantContinue(0,currentMsg.player);
 			}
 			case Constants.GENERAL_PLAYER_DISCONNECTED -> {
 				NetGaming netGaming = (NetGaming) message;

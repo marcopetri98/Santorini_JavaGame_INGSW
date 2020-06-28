@@ -26,6 +26,7 @@ public class GameStub extends Game {
 	private boolean applyWinCalled;
 	private boolean applyDefeatCalled;
 	private boolean applyDisconnectionCalled;
+	private boolean applyWorkerLockCalled;
 	private boolean changeTurnCalled;
 	private boolean setOrderCalledCorrectly;
 	private boolean setPlayerColorCalled;
@@ -49,6 +50,7 @@ public class GameStub extends Game {
 		applyWinCalled = false;
 		applyDefeatCalled = false;
 		applyDisconnectionCalled = false;
+		applyWorkerLockCalled = false;
 		changeTurnCalled = false;
 		setOrderCalledCorrectly = false;
 		setPlayerColorCalled = false;
@@ -101,6 +103,12 @@ public class GameStub extends Game {
 		}
 		Player player = getPlayerByName(playerName);
 		applyDisconnectionCalled = true;
+	}
+	public synchronized void applyWorkerLock(Player player, int worker) throws IllegalArgumentException {
+		if (player == null || !players.contains(player) || (worker != 1 && worker != 2)) {
+			throw new IllegalArgumentException();
+		}
+		applyWorkerLockCalled = true;
 	}
 	public void changeTurn() {
 		changeTurnCalled = true;
@@ -259,6 +267,7 @@ public class GameStub extends Game {
 		applyWinCalled = false;
 		applyDefeatCalled = false;
 		applyDisconnectionCalled = false;
+		applyWorkerLockCalled = false;
 		changeTurnCalled = false;
 		setOrderCalledCorrectly = false;
 		setPlayerColorCalled = false;

@@ -2,11 +2,9 @@ package it.polimi.ingsw.ui.cli.view;
 
 import it.polimi.ingsw.util.exceptions.UserInputTimeoutException;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Scanner;
-import java.util.concurrent.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * This class is a class used to get the input of the client with a interruptible style which permits to the application to be more responsive when a server message arrives and to reduce unwanted graphical bugs.
@@ -45,32 +43,16 @@ public class CliInput {
 	 * @throws IOException if there has been an error to access stdin
 	 */
 	public Command getInput() throws UserInputTimeoutException, IOException {
+		//TODO: vedere altre classi per evitare buffering
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = null;
 		boolean foundSomething = false;
 		resetInsertedInput();
 		dropTimeout();
 
-		ExecutorService myService = Executors.newSingleThreadExecutor();
-		Future<String> executingThread = myService.submit(new Callable<String>() {
-			@Override
-			public String call() throws Exception {
-				Scanner reader = new Scanner(System.in);
-				return reader.nextLine();
-			}
-		});
-
 		// waits until the user hasn't wrote something
 		while (timePassed < timeout && !foundSomething) {
-			if (executingThread.isDone()) {
-				try {
-					userInput = executingThread.get();
-					foundSomething = true;
-				} catch (InterruptedException e) {
-					throw new AssertionError("Someone interrupted the executing thread");
-				} catch (ExecutionException e) {
-					throw new IOException();
-				}
-			} else {
+			if (!reader.ready()) {
 				try {
 					synchronized (timeoutLock) {
 						if (timeoutActive) {
@@ -81,12 +63,14 @@ public class CliInput {
 				} catch (InterruptedException e) {
 					throw new AssertionError("Someone interrupted the executing thread");
 				}
+			} else {
+				userInput = reader.readLine();
+				foundSomething = true;
 			}
 		}
 
 		if (userInput == null) {
 			// if there was a timeout it throws an exception
-			myService.shutdownNow();
 			dropTimeout();
 			System.out.print("\n");
 			throw new UserInputTimeoutException();
@@ -103,37 +87,23 @@ public class CliInput {
 	 * @throws IOException if there has been an error to access stdin
 	 */
 	public boolean getUndo() throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in),128);
 		String userInput = null;
 		boolean foundSomething = false;
 		resetInsertedInput();
 
-		ExecutorService myService = Executors.newSingleThreadExecutor();
-		Future<String> executingThread = myService.submit(new Callable<String>() {
-			@Override
-			public String call() throws Exception {
-				Scanner reader = new Scanner(System.in);
-				return reader.nextLine();
-			}
-		});
-
 		// waits until the user hasn't wrote something
 		while (timePassed < timeoutUndo && !foundSomething) {
-			if (executingThread.isDone()) {
-				try {
-					userInput = executingThread.get();
-					foundSomething = true;
-				} catch (InterruptedException e) {
-					throw new AssertionError("Someone interrupted the executing thread");
-				} catch (ExecutionException e) {
-					throw new IOException();
-				}
-			} else {
+			if (!reader.ready()) {
 				try {
 					timePassed += 200;
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					throw new AssertionError("Someone interrupted the executing thread");
 				}
+			} else {
+				userInput = reader.readLine();
+				foundSomething = true;
 			}
 		}
 
@@ -141,7 +111,6 @@ public class CliInput {
 		if (userInput == null) {
 			// if there was a timeout it throws an exception
 			System.out.print("\n");
-			myService.shutdownNow();
 			return false;
 		} else {
 			// it resets the time passed for the next input call

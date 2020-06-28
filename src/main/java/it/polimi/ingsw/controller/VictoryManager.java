@@ -39,7 +39,7 @@ public class VictoryManager {
 		}
 
 		for(Move m: possibleCells){
-			if (m.prev.equals(before) && m.next.equals(after) && m.next.building.getLevel() == 3) { //check the standard condition of winning: a Player's worker moved up (only 1 level) to a building level 3 during his own turn.
+			if (m.prev.equals(before) && m.next.equals(after) && m.next.building.getLevel() == 3 && before.getBuilding().getLevel() != 3) { //check the standard condition of winning: a Player's worker moved up (only 1 level) to a building level 3 during his own turn.
 				observedModel.applyWin(observedModel.getPlayerTurn());
 			} else if(m.typeMove == TypeMove.VICTORY_MOVE && m.prev.equals(before) && m.next.equals(after)){ //the move from "before" to "after" is a VICTORY_MOVE
 				observedModel.applyWin(observedModel.getPlayerTurn());
