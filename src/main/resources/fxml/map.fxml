@@ -11,43 +11,6 @@
 
 <AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.ui.gui.controller.MapSceneController">
    <children>
-      <ImageView fx:id="icon_error" fitHeight="389.0" fitWidth="330.0" layoutX="913.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/error_wait.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="clouds_left" fitHeight="789.0" fitWidth="943.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/map/clouds_left.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="clouds_right" fitHeight="756.0" fitWidth="802.0" layoutX="478.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/map/clouds_right.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="BG_message" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <image>
-            <Image url="@../img/passiveWatchFilter.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="icon_message" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <image>
-            <Image url="@../img/message_lost.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="button_watch" fitHeight="104.0" fitWidth="156.0" layoutX="1114.0" layoutY="616.0" onMousePressed="#mousePressedWatch" onMouseReleased="#mouseReleasedWatch" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/button_watch.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="button_exit2" fitHeight="98.0" fitWidth="156.0" layoutX="7.0" layoutY="616.0" onMousePressed="#mousePressedExit2" onMouseReleased="#mouseReleasedExit2" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../img/home_exit_btn.png" />
-         </image>
-      </ImageView>
-      <Text fx:id="text_playerMessage" layoutX="489.0" layoutY="466.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="330.0" />
-      <Text fx:id="text_playerMessageLost" layoutX="489.0" layoutY="428.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="330.0" />
       <ImageView fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
             <Image url="@../img/map/map_background.png" />
@@ -330,5 +293,42 @@
             <Image url="@../img/map/box_info.png" />
          </image>
       </ImageView>
+      <ImageView fx:id="icon_error" fitHeight="389.0" fitWidth="330.0" layoutX="913.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/error_wait.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="clouds_left" fitHeight="789.0" fitWidth="943.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/clouds_left.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="clouds_right" fitHeight="756.0" fitWidth="802.0" layoutX="478.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/clouds_right.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="BG_message" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/passiveWatchFilter.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_message" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/message_lost.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_watch" fitHeight="104.0" fitWidth="156.0" layoutX="1114.0" layoutY="616.0" onMousePressed="#mousePressedWatch" onMouseReleased="#mouseReleasedWatch" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/button_watch.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="button_exit2" fitHeight="98.0" fitWidth="156.0" layoutX="7.0" layoutY="616.0" onMousePressed="#mousePressedExit2" onMouseReleased="#mouseReleasedExit2" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/home_exit_btn.png" />
+         </image>
+      </ImageView>
+      <Text fx:id="text_playerMessage" layoutX="489.0" layoutY="466.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="330.0" />
+      <Text fx:id="text_playerMessageLost" layoutX="489.0" layoutY="428.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="330.0" />
    </children>
 </AnchorPane>
