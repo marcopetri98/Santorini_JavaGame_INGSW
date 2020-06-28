@@ -74,7 +74,7 @@ public class AtlasTest {
 	}
 
 	/**
-	 * Worker1 in (1,1) (level 2) and Worker2 in (1,2), opponent worker1 in (2,2) (level 3) and worker2 in (2,1) (level 1), building with dome in (2,0), building level 3 in (1,0), building level 1 in (0,0), dome only in (0,1): it should return only 6 cells (3 cells repeated two times) which I compare "manually" with the returned arrayList of the checkBuild
+	 * Worker1 in (1,1) (level 2) and Worker2 in (1,2), opponent worker1 in (2,2) (level 3) and worker2 in (2,1) (level 1), building with dome in (2,0), building level 1 in (0,0), dome only in (0,1): it should return only 5 cells which I compare "manually" with the returned arrayList of the checkBuild
 	 */
 	@Test
 	public void checkBuildTestGeneral() throws NoBuildException {

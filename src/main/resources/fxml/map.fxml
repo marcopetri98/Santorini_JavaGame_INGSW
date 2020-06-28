@@ -283,7 +283,7 @@
             <Image url="@../img/map/button_endTurn.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="icon_error" fitHeight="430.0" fitWidth="395.0" layoutX="884.0" layoutY="252.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="icon_error" fitHeight="389.0" fitWidth="330.0" layoutX="913.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/error_wait.png" />
          </image>

@@ -221,7 +221,6 @@ public class ChooseColorSceneController implements SceneController {
 						greenLocked = true;
 					}
 				}
-				button_next.getScene().setCursor(Cursor.WAIT);
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {
 				gameState.advancePhase();

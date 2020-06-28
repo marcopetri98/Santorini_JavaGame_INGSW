@@ -265,6 +265,8 @@ public class MapSceneController implements SceneController {
 	Image buttonUndo3 = new Image("/img/map/button_undo3.png");
 	Image buttonUndo2 = new Image("/img/map/button_undo2.png");
 	Image buttonUndo1 = new Image("/img/map/button_undo1.png");
+	Image errorFatalBG = new Image("/img/errorFatal_background.png");
+	Image errorFatal = new Image("/img/error_fatal.png");
 
 	ImageView workerSelected = null;
 
@@ -715,6 +717,8 @@ public class MapSceneController implements SceneController {
 			unPressWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
 		} else if (!cellPressed.getImage().equals(buildDome)) {
 			placeWorker(cellPressed, worker, workerPressed, build1Worker, build1WorkerPressed, build2Worker, build2WorkerPressed, build3Worker, build3WorkerPressed);
+		} else if (cellPressed.getImage().equals(buildDome)){
+			wrongAction(0);
 		}
 	}
 	private void buildOnCell(ImageView cellPressed, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
@@ -1288,13 +1292,13 @@ public class MapSceneController implements SceneController {
 	private void wrongAction(int i) {
 		if(i == 0){
 			icon_error.toFront();
-			moveImage(icon_error, errorMove, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+			moveImage(icon_error, errorMove, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		} else if(i == 1) {
 			icon_error.toFront();
-			moveImage(icon_error, errorBuild, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+			moveImage(icon_error, errorBuild, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		} else {
 			icon_error.toFront();
-			moveImage(icon_error, errorSelectWorker, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+			moveImage(icon_error, errorSelectWorker, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		}
 	}
 	/**
@@ -1303,7 +1307,7 @@ public class MapSceneController implements SceneController {
 	 */
 	private void waitAction(int i) {
 		icon_error.toFront();
-		moveImage(icon_error, errorWait, 600, 212, 198, 212, 198, 212, 220, 212, 220, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		moveImage(icon_error, errorWait, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		icon_error.toBack();
 	}
 	private void playerLost(String name) {
@@ -1336,9 +1340,13 @@ public class MapSceneController implements SceneController {
 			icon_message.toFront();
 			button_exit2.toFront();
 		} else {
+			button_watch.toBack();
 			fadeImage(BG_message, BGwatch, 0, 1, 1);
-			fadeImage(icon_message, iconOtherWon, 0, 1, 1);
+			slidingImage(icon_message, iconOtherWon, 650, 0, 650, 360, 1250);
 			fadeImage(button_exit2, buttonExit, 0, 1, 1);
+			BG_message.toFront();
+			icon_message.toFront();
+			button_exit2.toFront();
 			text_playerMessage.toFront();
 			fadeText(text_playerMessage, 0, 1);
 			text_playerMessage.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
@@ -1364,8 +1372,18 @@ public class MapSceneController implements SceneController {
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
 	private void gameCantContinue(int reason) {
-		// TODO: print to the player that the server has crashed or a player disconnected in the setup and the game cannot continue for this reason
-		// 		 now a player can only quit and cannot do anything
+		if(reason == 0){
+			playerDisconnected(null); //FIXME: give it the name...
+		} else {
+			fadeImage(BG_message, errorFatalBG, 0, 1, 1);
+			slidingImage(icon_message, errorFatal, 650, 0, 650, 325, 1250);
+			BG_message.toFront();
+			icon_message.toFront();
+			button_exit.toFront();
+
+			button_exit2.toFront();
+			button_exit2.setImage(buttonExit);
+		}
 	}
 
 	/* **********************************************
