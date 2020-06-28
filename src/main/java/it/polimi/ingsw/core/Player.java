@@ -16,9 +16,9 @@ public class Player {
 	private GodCard card;
 
 	// constructors
-	public Player(String playerName) {
+	public Player(String playerName, int order) {
 		this.playerName = playerName;
-		playerID = playerName.hashCode();	//TODO: remove hashcode and put something else!
+		playerID = order;
 		worker1 = null;
 		worker2 = null;
 		activeWorker = null;

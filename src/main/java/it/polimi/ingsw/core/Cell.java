@@ -26,7 +26,7 @@ public class Cell {
 	}
 	public Worker getWorker(){ return worker; }
 
-	// OVERRIDDEN METHODS //TODO: really necessary to override?!?!
+	// OVERRIDDEN METHODS
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Cell) {

@@ -212,7 +212,6 @@ public class ClientMessageListener extends Thread {
 	public boolean connectToServer(String address) {
 		try {
 			serverSocket = new Socket(address, 21005);
-			System.out.println("\n\n\t\tConnected or not connected to server\n\n");
 			output = new ObjectOutputStream(serverSocket.getOutputStream());
 			input = new ObjectInputStream(serverSocket.getInputStream());
 			currentPhase = NetworkPhase.PRELOBBY;

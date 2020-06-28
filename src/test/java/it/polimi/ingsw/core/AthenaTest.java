@@ -25,9 +25,9 @@ public class AthenaTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		player = new Player("Pippo");
+		player = new Player("Pippo",0);
 		player.setPlayerColor(Color.RED);
-		opponent = new Player("Pluto");
+		opponent = new Player("Pluto",50);
 		opponent.setPlayerColor(Color.BLACK);
 		athena = new Athena(player);
 		turn = new Turn();

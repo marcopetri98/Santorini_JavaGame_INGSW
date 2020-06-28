@@ -68,7 +68,7 @@ public class GameStub extends Game {
 			Method playerGod = Player.class.getDeclaredMethod("setGodCard", GodCard.class);
 			playerGod.setAccessible(true);
 			for (int i = 0; i < names.length; i++) {
-				players.add(new Player(names[i]));
+				players.add(new Player(names[i],i*50));
 				if (setColors) {
 					playerColor.invoke(players.get(i), Constants.COLOR_COLORS.get(i));
 				}

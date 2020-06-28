@@ -45,8 +45,8 @@ public class Game extends ObservableGame {
 		defeatedPlayers = new ArrayList<>();
 		map = new Map();
 		turn = new Turn();
-		for (String name : names) {
-			players.add(new Player(name));
+		for (int i = 0; i < names.length; i++) {
+			players.add(new Player(names[i],i*50));
 		}
 		activePlayer = players.get(0);
 		winner = null;

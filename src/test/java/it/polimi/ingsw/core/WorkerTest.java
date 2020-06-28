@@ -17,7 +17,7 @@ public class WorkerTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		player = new Player("Erwin");
+		player = new Player("Erwin",0);
 		player.setPlayerColor(Color.RED);
 	}
 
@@ -49,13 +49,13 @@ public class WorkerTest {
 
 	@Test
 	public void equalsCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		Player erwin = new Player("Erwin");
+		Player erwin = new Player("Erwin",0);
 		erwin.setPlayerColor(Color.RED);
-		Player erwin2 = new Player("Erwin");
+		Player erwin2 = new Player("Erwin",0);
 		erwin2.setPlayerColor(Color.RED);
-		Player paolo = new Player("Paolo");
+		Player paolo = new Player("Paolo",20);
 		paolo.setPlayerColor(Color.RED);
-		Player blue = new Player("BLUE");
+		Player blue = new Player("BLUE",30);
 		blue.setPlayerColor(Color.BLUE);
 		Worker worker1 = player.getWorker1();
 		Worker erwinWorker1 = erwin.getWorker1();

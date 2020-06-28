@@ -21,7 +21,7 @@ public class CellTest {
 	@Test
 	public void setWorker() {
 		Cell cell = map1.getCell(0,0);
-		Player p = new Player("Sheldon Cooper");
+		Player p = new Player("Sheldon Cooper",0);
 		Worker w = new Worker(Color.RED,p,1);
 
 		assertNull(cell.getWorker());
@@ -31,7 +31,7 @@ public class CellTest {
 
 	@Test
 	public void testEquals() {
-		Player p = new Player("Sheldon Cooper");
+		Player p = new Player("Sheldon Cooper",0);
 		Worker w1 = new Worker(Color.RED,p,1);
 		Worker w2 = new Worker(Color.RED,p,2);
 

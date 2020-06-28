@@ -16,7 +16,7 @@ public class BuildTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		player1 = new Player("Pippo");
+		player1 = new Player("Pippo",0);
 		player1.setPlayerColor(Color.RED);
 		typeBuild = TypeBuild.SIMPLE_BUILD;
 		build1 = new Build(player1.getWorker1(), map.getCell(0,0), false, typeBuild);

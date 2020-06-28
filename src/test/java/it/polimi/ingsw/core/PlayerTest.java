@@ -17,7 +17,7 @@ public class PlayerTest {
 
 	@Before
 	public void testSetup(){
-		player1 = new Player("Topolino");
+		player1 = new Player("Topolino",0);
 		player1.setPlayerColor(Color.RED);
 		GodCard card = new Apollo();
 		player1.setGodCard(card);
@@ -47,58 +47,58 @@ public class PlayerTest {
 
 	@Test
 	public void setGodCardTest() {
-		player1 = new Player("Aldo");
+		player1 = new Player("Aldo",0);
 		player1.setGodCard(new Apollo());
 		assertNotNull(player1.getCard());
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void setGodCardExceptionTest() {
-		Player playerTest = new Player("Synergo");
+		Player playerTest = new Player("Synergo",0);
 		playerTest.setGodCard(null);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void getNotExistingWorker1Test() {
-		Player playerTest = new Player("Marco Montemagno");
+		Player playerTest = new Player("Marco Montemagno",0);
 		playerTest.getWorker1();
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void getNotExistingWorker2Test() {
-		Player playerTest = new Player("Marco Montemagno");
+		Player playerTest = new Player("Marco Montemagno",0);
 		playerTest.getWorker2();
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void getNotExistingActiveWorkerTest() {
-		Player playerTest = new Player("Marco Montemagno");
+		Player playerTest = new Player("Marco Montemagno",0);
 		playerTest.getActiveWorker();
 	}
 
 	@Test
 	public void setPlayerColor() {
-		player1 = new Player("Aldo");
+		player1 = new Player("Aldo",0);
 		player1.setPlayerColor(Color.RED);
 		assertNotNull(player1.getWorker1());
 	}
 
 	@Test
 	public void resetLocking() {
-		player1 = new Player("Aldo");
+		player1 = new Player("Aldo",0);
 		player1.resetLocking();
 		assertFalse(player1.isWorkerLocked());
 	}
 
 	@Test
 	public void equalsTest(){
-		player1 = new Player("Aldo");
+		player1 = new Player("Aldo",0);
 		player1.setPlayerColor(Color.GREEN);
 		player1.setGodCard(new Apollo());
-		player2 = new Player("Aldo");
+		player2 = new Player("Aldo",0);
 		player2.setPlayerColor(Color.GREEN);
 		player2.setGodCard(new Apollo());
-		player3 = new Player("Aldo");
+		player3 = new Player("Aldo",0);
 		player3.setPlayerColor(Color.GREEN);
 		player3.setGodCard(new Apollo());
 
@@ -113,13 +113,13 @@ public class PlayerTest {
 		// compare with null return false
 		assertFalse(player1.equals(null));
 
-		player2 = new Player("Giovanni");
+		player2 = new Player("Giovanni",0);
 		player2.setPlayerColor(Color.GREEN);
 		assertFalse(player1.equals(player2));
-		player2 = new Player("Aldo");
+		player2 = new Player("Aldo",10);
 		player2.setPlayerColor(Color.RED);
 		assertFalse(player1.equals(player2));
-		player2 = new Player("Aldo");
+		player2 = new Player("Aldo",20);
 		player2.setPlayerColor(Color.GREEN);
 		player2.setGodCard(new Prometheus());
 		assertFalse(player1.equals(player2));

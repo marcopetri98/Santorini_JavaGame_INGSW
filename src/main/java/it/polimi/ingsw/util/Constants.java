@@ -288,7 +288,7 @@ public final class Constants {
 	public static final String BG_CYAN = "\u001B[46m";
 
 	/* Constants used by static methods */
-	public static final int MAX_NICKNAME_LEN = 20;
+	public static final int MAX_NICKNAME_LEN = 15;
 	public static final int MIN_NICKNAME_LEN = 5;
 	private static final List<Character> number_chars = List.of('0','1','2','3','4','5','6','7','8','9');
 

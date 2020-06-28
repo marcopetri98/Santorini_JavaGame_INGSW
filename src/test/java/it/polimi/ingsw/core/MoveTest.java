@@ -18,7 +18,7 @@ public class MoveTest {
 	public void testSetup() {
 		typeMove = TypeMove.SIMPLE_MOVE;
 		map = new Map();
-		player1 = new Player("Pippo");
+		player1 = new Player("Pippo",0);
 		player1.setPlayerColor(Color.RED);
 		player1.getWorker1().setPos(map.getCell(0, 0));
 		map.getCell(0, 0).setWorker(player1.getWorker1());

@@ -26,9 +26,9 @@ public class DemeterTest {
 	@Before
 	public void testSetup(){
 		map = new Map();
-		player = new Player("Pippo");
+		player = new Player("Pippo",0);
 		player.setPlayerColor(Color.RED);
-		opponent = new Player("Pluto");
+		opponent = new Player("Pluto",50);
 		opponent.setPlayerColor(Color.BLACK);
 		demeter = new Demeter(player);
 		turn = new Turn();
