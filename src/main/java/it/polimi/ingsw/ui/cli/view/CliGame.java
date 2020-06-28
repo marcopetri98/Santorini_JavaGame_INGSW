@@ -14,6 +14,9 @@ import it.polimi.ingsw.util.Color;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This class interfaces with the user through the cli
+ */
 public class CliGame {
 	// other view object and attributes relative to the connection with server
 	private final Deque<NetObject> messages;
@@ -51,6 +54,7 @@ public class CliGame {
 
 	/**
 	 * Constructor of CliGame class
+	 * @param inputGetter the scanner of the input
 	 */
 	public CliGame(CliInput inputGetter) {
 		messages = new ArrayDeque<>();
@@ -119,6 +123,7 @@ public class CliGame {
 							sentCorrectMessage = true;
 						} else {	//otherwise I tell to rewrite the line and I restore the old netMap
 							netMap = oldNetMap;
+							drawPossibilities();
 							System.out.println("You undid your action, insert again your command");
 							selectedMove = null;
 							selectedBuild = null;
@@ -193,8 +198,10 @@ public class CliGame {
 	 * 												*
 	 ************************************************/
 	// SETTERS
+
 	/**
 	 * Setter: sets the UserInputController
+	 * @param inputController the controller for the cli
 	 */
 	public void setInputController(UserInputController inputController) {
 		this.inputController = inputController;
@@ -202,6 +209,7 @@ public class CliGame {
 
 	/**
 	 * Setter: adds the players to the arraylist, so that CliGame knows who is playing
+	 * @param lobbyMsg the message from the server
 	 */
 	public void setPlayers(NetLobbyPreparation lobbyMsg) {
 		players = new ArrayList<>(players);
@@ -213,6 +221,8 @@ public class CliGame {
 
 	/**
 	 * Setter: sets the name of this player
+	 * @param name the name of this player
+	 * @throws NullPointerException
 	 */
 	public void setPlayerName(String name) throws NullPointerException {
 		if (name == null) {
@@ -223,9 +233,14 @@ public class CliGame {
 
 	/**
 	 * This method adds to the deque the messages. It is called from the MainCliController class
+	 * @param message the message to enqueue
+	 * @throws NullPointerException
 	 */
 	public void addToQueue(NetObject message) {
 		//System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
+		if(message == null) {
+			throw new NullPointerException();
+		}
 		synchronized (messages) {
 			messages.add(message);
 		}
@@ -892,9 +907,12 @@ public class CliGame {
 		}
 	}
 
+
 	/**
 	 * This method finds the workerID of the current player, given only the number of the worker
 	 * @param num the number of the worker
+	 * @return the worker name
+	 * @throws AssertionError if the num is not compatible
 	 */
 	private int findMyWorker(int num) throws AssertionError{
 		boolean toInitialize = true;
@@ -926,6 +944,8 @@ public class CliGame {
 	 * This method finds the workerID of specified player, given the owner and the number of the worker
 	 * @param owner the name of the player
 	 * @param num the number of the worker
+	 * @return the worker name
+	 * @throws AssertionError if the num is not compatible
 	 */
 	private int findOwnerWorker(String owner, int num) throws AssertionError{
 		boolean toInitialize = true;
@@ -1226,6 +1246,7 @@ public class CliGame {
 
 	/**
 	 * This method prints some generic errors
+	 * @param obj the NetObject taken from the deque
 	 */
 	private void printServerError(NetObject obj) {
 		switch (obj.message) {
@@ -1498,6 +1519,9 @@ public class CliGame {
 
 	/**
 	 * This method is called in the drawMap for drawing the spaces: they can be blank or have some "@" that identify the cells where the player can move or build
+	 * @param type the type of the space to be written
+	 * @param netC the cell of the map that calls the drawSpaces
+	 * @return the symbol to be drawn
 	 */
 	public String drawSpaces(int type, NetCell netC){
 		if(drawPoss){
@@ -1598,7 +1622,12 @@ public class CliGame {
 	}
 
 	/**
+	 *
+	 */
+	/**
 	 * This method is called in the drawMap for drawing the workers: they are displayed with the notation W.worker_number
+	 * @param netC the cell of the map that calls the drawSpaces
+	 * @return the symbol to be drawn
 	 */
 	public String drawWorker(NetCell netC){
 		if(netC.worker != null){
@@ -1622,6 +1651,8 @@ public class CliGame {
 
 	/**
 	 * This method is called in the drawMap for drawing the domes: they are displayed with the notation D if necessary
+	 * @param netC the cell of the map that calls the drawSpaces
+	 * @return the symbol to be drawn
 	 */
 	public String drawDome(NetCell netC){
 		if (netC.building.dome) {
@@ -1640,6 +1671,8 @@ public class CliGame {
 
 	/**
 	 * This method is called in the drawMap for drawing the buildings: they are displayed with the notation B.building_height
+	 * @param netC the cell of the map that calls the drawSpaces
+	 * @return the symbol to be drawn
 	 */
 	public String drawBuilding(NetCell netC){
 		if (netC.building.level == 3) {

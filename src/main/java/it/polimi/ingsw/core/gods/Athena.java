@@ -1,5 +1,4 @@
 package it.polimi.ingsw.core.gods;
-
 import it.polimi.ingsw.core.*;
 import it.polimi.ingsw.core.state.GamePhase;
 import it.polimi.ingsw.core.state.Turn;
@@ -11,38 +10,68 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * This is Athena GodCard, it has the specific implementation of the methods to calculate the moves and builds that each worker can do
+ */
 public class Athena extends GodCard implements Observer {
 
-	//CODICE ATHENA
+	//ATHENA CODE
 	private Player owner;
 	public final TypeGod typeGod = TypeGod.OTHER_TURN_GOD;
 	public final List<Integer> numPlayer = List.of(2,3,4);
 	public final String name = "Athena";
 	public final String description = "Opponent’s Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn.";
 
+	/**
+	 * Constructor of the class
+	 * @param player the owner of the card
+	 */
 	public Athena(Player player) { this.owner = player; }
 
+	/**
+	 * Empty constructor of the class
+	 */
 	public Athena(){
 		this.owner = null;
 	}
 
 	//GETTERS
+	/**
+	 * Getter of the number of players that can play if this card is used
+	 * @return the number of players
+	 */
 	public List<Integer> getNumPlayer(){
 		return numPlayer;
 	}
 
+	/**
+	 * Getter of the owner of the card
+	 * @return the owner of the card
+	 */
 	public Player getOwner(){
 		return owner;
 	}
 
+	/**
+	 * Getter of the type of god:
+	 * @return the typeGod
+	 */
 	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 
+	/**
+	 * Getter of the name of the card
+	 * @return the name of the GodCard
+	 */
 	public String getName(){
 		return name;
 	}
 
+	/**
+	 * Getter of the description
+	 * @return the GodCard description
+	 */
 	public String getDescription(){
 		return description;
 	}
@@ -56,7 +85,11 @@ public class Athena extends GodCard implements Observer {
 		this.wentUp = wentUp;
 	}
 
-	//Overridden update method of the Observer
+	/**
+	 * Overridden update method of the Observer, it is the core of Athena's power
+	 * @param obs the observable object
+	 * @param arg the cells where Athena was and will be
+	 */
 	public void update(Observable obs, Object arg){
 		Worker modifiedWorker = (Worker) obs;
 		Cell[] positions = (Cell[]) arg;
@@ -71,9 +104,12 @@ public class Athena extends GodCard implements Observer {
 
 	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
+	 * This is the specific implementation of the movement option for this GodCard
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
-	 * @return the cells where the Player's Worker can't move up
+	 * @param turn the phase of the game
+	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
+	 * @throws NoMoveException if the phase is wrong
 	 */
 	@Override
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {

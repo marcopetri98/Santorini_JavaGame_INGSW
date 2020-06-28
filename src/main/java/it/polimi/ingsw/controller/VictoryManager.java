@@ -8,15 +8,25 @@ import it.polimi.ingsw.core.TypeMove;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the controller part dedicated to checking the victory of any player
+ */
 public class VictoryManager {
 	private Game observedModel;
 
-	// constructor for this class
+	// CONSTRUCTOR
+
+	/**
+	 * This is the constructor of the class
+	 * @param g the {@link Game}
+	 */
 	public VictoryManager(Game g) {
 		observedModel = g;
 	}
+
+
 	/**
-	 * The function checks if the standard condition of winning is respected: if it is respected, it calls applyWin function in Game class.
+	 * The method checks if the standard condition of winning is respected: if it is respected, it calls applyWin function in Game class.
 	 * Also, it checks if the move is a VICTORY_MOVE: if it is true, it calls applyWin function in Game class.
 	 * @param before the origin cell of the worker.
 	 * @param after the cell where the worker is moving to.

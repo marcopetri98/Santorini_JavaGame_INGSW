@@ -6,10 +6,16 @@ import it.polimi.ingsw.util.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the map of the game
+ */
 public class Map {
 	private final List<List<Cell>> cells;
 
-	// constructors and setters for this class
+
+	/**
+	 * Empty constructor of this class
+	 */
 	public Map() {
 		cells = new ArrayList<>();
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
@@ -20,10 +26,23 @@ public class Map {
 		}
 	}
 
-	// getters and other functions which doesn't change the structure of the class
-	public Cell getCell(int X, int Y){
+	// GETTERS OF THE CLASS
+
+	/**
+	 * Getter of the {@link Cell} given the coordinates
+	 * @param X,Y the coordinates of the {@link Cell}
+	 * @return the {@link Cell} with these coordinates
+	 */
+	public Cell getCell(int X, int Y) {
 		return cells.get(X).get(Y);
 	}
+
+	/**
+	 * Getter of the X coordinate of a {@link Cell}
+	 * @param c the {@link Cell}
+	 * @return the X coordinate of the {@link Cell}
+	 * @throws IllegalArgumentException
+	 */
 	public int getX(Cell c) throws IllegalArgumentException {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
 			for (int j = 0; j < Constants.MAP_SIDE; j++) {
@@ -34,6 +53,13 @@ public class Map {
 		}
 		throw new IllegalArgumentException();
 	}
+
+	/**
+	 * Getter of the Y coordinate of a {@link Cell}
+	 * @param c the {@link Cell}
+	 * @return the Y coordinate of a {@link Cell}
+	 * @throws IllegalArgumentException
+	 */
 	public int getY(Cell c) throws IllegalArgumentException  {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
 			for (int j = 0; j < Constants.MAP_SIDE; j++) {
@@ -45,7 +71,13 @@ public class Map {
 		throw new IllegalArgumentException();
 	}
 
-	// here there are methods which must be overridden
+	// OVERRIDDEN METHODS
+
+	/**
+	 * Overridden equals method
+	 * @param obj the object to check
+	 * @return true if they are the same
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Map) {

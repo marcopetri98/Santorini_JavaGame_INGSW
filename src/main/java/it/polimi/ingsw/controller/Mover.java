@@ -8,16 +8,24 @@ import it.polimi.ingsw.network.game.NetMove;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the controller part dedicated to applying the moves
+ */
 public class Mover {
 	private Game observedModel;
 
-	// constructor for this class
+	// CONSTRUCTOR
+
+	/**
+	 * This is the constructor of the class
+	 * @param g the {@link Game}
+	 */
 	public Mover(Game g) {
 		observedModel = g;
 	}
 
 	/**
-	 * The function checks if the NetMove returned by the client is indeed possible, and if it is, it applies it
+	 * The method checks if the {@link NetMove} returned by the client is indeed possible, and if it is, it applies it
 	 * @param netmove the move returned by the client
 	 * @param possibilities the possible moves of the active player
 	 * @return true if the NetMove is contained in the possibilities list

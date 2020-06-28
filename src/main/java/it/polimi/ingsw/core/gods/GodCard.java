@@ -8,12 +8,24 @@ import it.polimi.ingsw.util.exceptions.NoMoveException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the GodCard class. Every other GodCard inherits from this class
+ */
 public abstract class GodCard {
 	public abstract List<Integer> getNumPlayer();
 	public abstract Player getOwner();
 	public abstract TypeGod getTypeGod();
 	public abstract String getName();
 	public abstract String getDescription();
+
+	/**
+	 * This is the generic implementation of the movement option for every GodCard, overridden by every specific card in its code
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param turn the phase of the game
+	 * @return the cells where the Player's Worker may move according to the general game rules
+	 * @throws NoMoveException if the phase is wrong
+	 */
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {
 		if (turn.getGamePhase() != GamePhase.MOVE) {
 			throw new NoMoveException();
@@ -43,6 +55,15 @@ public abstract class GodCard {
 		}
 		return moves;
 	}
+
+	/**
+	 * This is the generic implementation of the building option for every GodCard, overridden by every specific card in its code
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param turn the phase of the game
+	 * @return the cells where the Player's Worker may build according to the general game rules
+	 * @throws NoBuildException if you can't build because of a wrong phase
+	 */
 	public List<Build> checkBuild(Map m, Worker w, Turn turn) throws NoBuildException {
 		if (turn.getGamePhase() != GamePhase.BUILD) {
 			throw new NoBuildException();
@@ -74,6 +95,15 @@ public abstract class GodCard {
 		}
 		return builds;
 	}
+
+	/**
+	 * This is the generic implementation of the movement option for every GodCard - never overridden by the specific cards
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param turn the phase of the game
+	 * @return the cells where the Player's Worker may move according to the general game rules
+	 * @throws NoMoveException if the phase is wrong
+	 */
 	public static List<Move> standardMoves(Map m, Worker w, Turn turn) {
 		if (turn.getGamePhase() != GamePhase.MOVE) {
 			return null;
@@ -103,6 +133,15 @@ public abstract class GodCard {
 		}
 		return moves;
 	}
+
+	/**
+	 * This is the generic implementation of the building option for every GodCard - never overridden by the specific cards
+	 * @param m represents the map
+	 * @param w represents the worker moved by the player during this turn
+	 * @param turn the phase of the game
+	 * @return the cells where the Player's Worker may build according to the general game rules
+	 * @throws NoBuildException if you can't build because of a wrong phase
+	 */
 	public static List<Build> standardBuilds(Map m, Worker w, Turn turn) {
 		if (turn.getGamePhase() != GamePhase.BUILD) {
 			return null;

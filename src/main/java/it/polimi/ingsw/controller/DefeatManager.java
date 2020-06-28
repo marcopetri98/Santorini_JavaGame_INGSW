@@ -5,16 +5,24 @@ import it.polimi.ingsw.core.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the controller part dedicated to checking the defeat of any player
+ */
 public class DefeatManager {
 	private Game observedModel;
 
-	// constructor for this class
+	// CONSTRUCTOR
+
+	/**
+	 * This is the constructor of the class
+	 * @param g the {@link Game}
+	 */
 	public DefeatManager(Game g) {
 		observedModel = g;
 	}
 
 	/**
-	 * The function checks if the standard condition of defeat (with respect to the move phase) is respected: if it is, it calls applyDefeat method in Game class
+	 * The method checks if the standard condition of defeat (with respect to the move phase) is respected: if it is, it calls applyDefeat method in Game class
 	 * @param worker1_possible_moves the possible moves of the first worker of the active player
 	 * @param worker2_possible_moves the possible moves of the second worker of the active player
 	 * @throws NullPointerException if the parameter is null
@@ -35,7 +43,7 @@ public class DefeatManager {
 	}
 
 	/**
-	 * The function checks if the standard condition of defeat (with respect to the build phase) is respected: if it is, it calls applyDefeat method in Game class
+	 * The method checks if the standard condition of defeat (with respect to the build phase) is respected: if it is, it calls applyDefeat method in Game class
 	 * @param worker_possible_builds the possible builds of the active worker of the active player
 	 * @throws NullPointerException if the parameter is null
 	 */

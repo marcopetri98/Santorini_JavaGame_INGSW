@@ -8,40 +8,70 @@ import it.polimi.ingsw.util.exceptions.NoMoveException;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * This is Pan GodCard, it has the specific implementation of the methods to calculate the moves and builds that each worker can do
+ */
 public class Pan extends GodCard {
 
-	//CODICE PAN
+	//PAN CODE
 	private Player owner;
 	public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	public final List<Integer> numPlayer = List.of(2,3,4);
 	public final String name = "Pan";
 	public final String description = "Win Condition: You also win if your Worker moves down two or more levels.";
 
+	/**
+	 * Constructor of the class
+	 * @param player the owner of the card
+	 */
 	public Pan(Player player){
 		this.owner = player;
 	}
 
+	/**
+	 * Empty constructor of the class
+	 */
 	public Pan(){
 		this.owner = null;
 	}
 
 	//GETTERS
+	/**
+	 * Getter of the number of players that can play if this card is used
+	 * @return the number of players
+	 */
 	public List<Integer> getNumPlayer(){
 		return numPlayer;
 	}
 
+	/**
+	 * Getter of the owner of the card
+	 * @return the owner of the card
+	 */
 	public Player getOwner(){
 		return owner;
 	}
 
+	/**
+	 * Getter of the type of god:
+	 * @return the typeGod
+	 */
 	public TypeGod getTypeGod(){
 		return typeGod;
 	}
 
+	/**
+	 * Getter of the name of the card
+	 * @return the name of the GodCard
+	 */
 	public String getName(){
 		return name;
 	}
 
+	/**
+	 * Getter of the description
+	 * @return the GodCard description
+	 */
 	public String getDescription(){
 		return description;
 	}
@@ -50,9 +80,12 @@ public class Pan extends GodCard {
 
 	//CARD-SPECIFIC IMPLEMENTATION OF CHECKBUILD AND CHECKMOVE
 	/**
+	 * This is the specific implementation of the movement option for this GodCard
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
+	 * @param turn the phase of the game
 	 * @return the cells where the Player's Worker may move according to general game rules and his GodCard power
+	 * @throws NoMoveException if the phase is wrong
 	 */
 	@Override
 	public List<Move> checkMove(Map m, Worker w, Turn turn) throws NoMoveException {   //worker->activeworker

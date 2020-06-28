@@ -6,6 +6,9 @@ import it.polimi.ingsw.core.gods.GodCard;
 
 import it.polimi.ingsw.util.Color;
 
+/**
+ * This class stores the information about each player in the game
+ */
 public class Player {
 	public final int playerID;
 	public final String playerName;
@@ -15,7 +18,13 @@ public class Player {
 	private boolean workerLocked;
 	private GodCard card;
 
-	// constructors
+	// CONSTRUCTORS
+
+	/**
+	 * Constructor of the class
+	 * @param playerName the name of the {@link Player}
+	 * @param order the order of this player among the others
+	 */
 	public Player(String playerName, int order) {
 		this.playerName = playerName;
 		playerID = order;
@@ -27,6 +36,12 @@ public class Player {
 	}
 
 	// STATE CHANGER METHODS
+
+	/**
+	 * Sets the correct {@code activeWorker} based on its number
+	 * @param chosen the number of the worker
+	 * @throws IllegalArgumentException
+	 */
 	void chooseWorker(int chosen) throws IllegalArgumentException {
 		if (chosen == 1) {
 			this.activeWorker = worker1;
@@ -38,6 +53,12 @@ public class Player {
 			throw new IllegalArgumentException();
 		}
 	}
+
+	/**
+	 * Sets the {@link GodCard} of this player
+	 * @param card1 the {@link GodCard}
+	 * @throws NullPointerException
+	 */
 	void setGodCard(GodCard card1) throws NullPointerException {
 		if (card1 == null) {
 			throw new NullPointerException();
@@ -49,51 +70,104 @@ public class Player {
 			worker2.addObserver((Athena) card);
 		}
 	}
+
+	/**
+	 * Sets the color chosen by the player
+	 * @param color the chosen color
+	 */
 	void setPlayerColor(Color color) {
 		worker1 = new Worker(color,this,1);
 		worker2 = new Worker(color,this,2);
 	}
+
+	/**
+	 * Resets the lock
+	 */
 	void resetLocking() {
 		workerLocked = false;
 	}
 
 	// CLASSES GETTERS
+
+	/**
+	 * Getter of the {@code playerID}
+	 * @return the {@code playerID}
+	 */
 	public int getPlayerID() {
 		return playerID;
 	}
+
+	/**
+	 * Getter of the {@code playerName}
+	 * @return the {@code playerName}
+	 */
 	public String getPlayerName() {
 		return playerName;
 	}
+
+	/**
+	 * Getter of the first {@link Worker} or this player
+	 * @return the first {@link Worker}
+	 * @throws IllegalStateException if there is no first {@link Worker}
+	 */
 	public Worker getWorker1() throws IllegalStateException {
 		if (worker1 == null) {
 			throw new IllegalStateException();
 		}
 		return worker1;
 	}
+
+	/**
+	 * Getter of the second {@link Worker} or this player
+	 * @return the second {@link Worker}
+	 * @throws IllegalStateException if there is no second {@link Worker}
+	 */
 	public Worker getWorker2() throws IllegalStateException {
 		if (worker2 == null) {
 			throw new IllegalStateException();
 		}
 		return worker2;
 	}
+
+	/**
+	 * Getter of the active {@link Worker} or this player
+	 * @return the active {@link Worker}
+	 * @throws IllegalStateException if there is no active {@link Worker}
+	 */
 	public Worker getActiveWorker() throws IllegalStateException {
 		if (activeWorker == null) {
 			throw new IllegalStateException();
 		}
 		return activeWorker;
 	}
+
+	/**
+	 * Getter of the heir of the {@link GodCard} of this player
+	 * @return the coorect heir of the {@link GodCard}
+	 * @throws IllegalStateException if {@code card} is null
+	 */
 	public GodCard getCard()  throws IllegalStateException {
 		if (card == null) {
 			throw new IllegalStateException();
 		}
 		return card;
 	}
+
+	/**
+	 * method that checks if the {@link Worker} is locked
+	 * @return true if the {@link Worker} is locked
+	 */
 	public boolean isWorkerLocked() {
 		return workerLocked;
 	}
 
 	// OVERRIDDEN METHODS
-	@Override
+
+	/**
+	 * Overridden equals method
+	 * @param obj the object to check
+	 * @return true if they are the same
+	 */	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Player) {
 			Player other = (Player)obj;
