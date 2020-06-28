@@ -9,7 +9,11 @@ Documentation for this software comes with this file readme and two different UM
 - [General UML](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/UML/UML_Generic.pdf)
 - [Detailed UML](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/UML/UML_Final.pdf)
 #### Compiling the application using maven
-Software is developed with maven and this software is the one we use to deploy the application. To deploy the application using maven....
+This software is developed with Maven, which has to be used to deploy the application too. To compile the application run this command:
+```
+mvn clean package
+```
+The "clean" command deletes any precedent build, while the "package" command actually creates the new .jar packages.
 
 ### Running the application
 #### Launching the server
