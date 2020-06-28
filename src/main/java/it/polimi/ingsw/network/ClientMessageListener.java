@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import com.sun.source.tree.AssertTree;
 import it.polimi.ingsw.network.objects.*;
 import it.polimi.ingsw.ui.GraphicInterface;
 import it.polimi.ingsw.util.Constants;
@@ -9,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.*;
 
 /**
  * This class is the base network class of the client that is intended to communicate with the server, it is used by a CLI client or by a GUI client.
@@ -210,19 +212,41 @@ public class ClientMessageListener extends Thread {
 	 * @return true if it succeed in connecting to the server
 	 */
 	public boolean connectToServer(String address) {
+		ExecutorService myService = Executors.newSingleThreadExecutor();
+		Future<Integer> executingThread = myService.submit(new Callable<Integer>() {
+			@Override
+			public Integer call() throws Exception {
+				try {
+					serverSocket = new Socket(address, 21005);
+					output = new ObjectOutputStream(serverSocket.getOutputStream());
+					input = new ObjectInputStream(serverSocket.getInputStream());
+				} catch (UnknownHostException e) {
+					return 1;
+				} catch (IOException e) {
+					return 2;
+				}
+				return 0;
+			}
+		});
+
+		int returnValue;
 		try {
-			serverSocket = new Socket(address, 21005);
-			output = new ObjectOutputStream(serverSocket.getOutputStream());
-			input = new ObjectInputStream(serverSocket.getInputStream());
+			returnValue = executingThread.get(1000, TimeUnit.MILLISECONDS);
+			myService.shutdownNow();
+		} catch (TimeoutException timedOut) {
+			viewController.retrieveConnectionError();
+			return false;
+		} catch (CancellationException | InterruptedException | ExecutionException e) {
+			viewController.retrieveError();
+			return false;
+		}
+
+		if (returnValue == 1 || returnValue == 2) {
+			viewController.retrieveConnectionError();
+			return false;
+		} else {
 			currentPhase = NetworkPhase.PRELOBBY;
 			return true;
-		} catch (UnknownHostException e) {
-			viewController.retrieveConnectionError();
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			viewController.retrieveConnectionError();
-			return false;
 		}
 	}
 	/**
