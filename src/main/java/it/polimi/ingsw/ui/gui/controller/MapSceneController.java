@@ -185,6 +185,10 @@ public class MapSceneController implements SceneController {
 	private Text text_playerMessageLost;
 	@FXML
 	private ImageView button_undo;
+	@FXML
+	private ImageView button_info;
+	@FXML
+	private ImageView box_info;
 
 
 	private boolean pressedIconExit = false;
@@ -267,6 +271,8 @@ public class MapSceneController implements SceneController {
 	Image buttonUndo1 = new Image("/img/map/button_undo1.png");
 	Image errorFatalBG = new Image("/img/errorFatal_background.png");
 	Image errorFatal = new Image("/img/error_fatal.png");
+	Image buttonInfo = new Image("/img/map/button_info.png");
+	Image boxInfo = new Image("/img/map/box_info.png");
 
 	ImageView workerSelected = null;
 
@@ -324,7 +330,10 @@ public class MapSceneController implements SceneController {
 		BG_message.setImage(null);
 		button_watch.setImage(null);
 		button_exit2.setImage(null);
-
+		box_info.toBack();
+		box_info.setImage(null);
+		button_info.toFront();
+		button_info.setImage(null);
 	}
 
 	private void timerInitialize(){
@@ -440,6 +449,7 @@ public class MapSceneController implements SceneController {
 		slidingImage(card_god, godPlayer(), 40, -500, 40, 52, 3300);
 		slidingImage(clouds_left, cloudsLeft, 350, 359, -600, 359, 3200);
 		slidingImage(clouds_right, cloudsRight, 400, 359, 1200, 359, 3200);
+		fadeImage(button_info, buttonInfo, 0, 1, 1);
 	}
 	private void initializeCells() {
 		cell_0_0.setImage(blank);
@@ -695,6 +705,15 @@ public class MapSceneController implements SceneController {
 				}
 			}
 		}
+	}
+
+	public void MouseEnteredInfo(MouseEvent mouseEvent) {
+		box_info.toFront();
+		slidingImage(box_info, boxInfo, 345, 400, 345, 130, 450);
+	}
+
+	public void MouseExitedInfo(MouseEvent mouseEvent) {
+		slidingImage(box_info, boxInfo, 345, 130, 345, 400, 450);
 	}
 
 	/* **********************************************
@@ -1487,4 +1506,5 @@ public class MapSceneController implements SceneController {
 			}
 		}
 	}
+
 }
