@@ -3,6 +3,7 @@ Project's aim is to develop an online distributed version of the table game Sant
 
 ### Software requirements
 The first thing to do to install Santorini software is to install java 14 version, it is downloadable from oracle website (https://www.oracle.com/java/technologies/javase-jdk14-downloads.html), no other software is needed to run the application.
+The project uses maven to deploy, build and test with JUnit, this is the reason why these two components for java must be installed in your computer before deploying or testing the application.
 
 ### Documentation
 Documentation for this software comes with this file readme and two different UML file that can be found in the following unordered list, one of this UML files is a general representation about the structure of the program and the other is the definitive UML containing every elements of the application (apart some utility objects used by a lot of class of the software, them are not present because it would generate disorder with a huge number of arrows).
@@ -13,7 +14,8 @@ This software is developed with Maven, which has to be used to deploy the applic
 ```
 mvn clean package
 ```
-The "clean" command deletes any precedent build, while the "package" command actually creates the new .jar packages.
+The "clean" command deletes any precedent build, while the "package" command actually creates the new .jar packages.<br/>
+**Note that** to correctly deploy jars you need to deploy the application using the right operating system, this means that if you deploy the application using windows you can't use the generated jars on Linux. To deploy jars for Linux and MacOs you need to deploy jars from these operating systems.
 
 ### Running the application
 #### Launching the server
@@ -42,3 +44,11 @@ We developed every asked functionalities to arrive to the last row of the evalua
 * GUI Client
 * Socket
 * 2 Advanced functionalities
+
+### Tests
+Here there are the results obtained from the tests that habe been done on our project using JUnit. An important note should be done about the gods tests, all significant methods are tested with a 98/100% of coverage, the problem is that god's classes are short and getters haven't been tested, this is the reason why tests are under 90% of coverage.
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/Tests/tests_1.PNG)
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/Tests/tests_2.PNG)
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/Tests/tests_3.PNG)
+
