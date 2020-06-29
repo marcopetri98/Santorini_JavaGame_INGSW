@@ -75,30 +75,6 @@ public class NicknameServerAddressSceneController implements SceneController {
 		icon_errorFatal.setDisable(true);
 	}
 
-	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
-		imageView.setImage(image);
-		Line line = new Line();
-		line.setStartX(x1);
-		line.setStartY(y1);
-		line.setEndX(x2);
-		line.setEndY(y2);
-		PathTransition transition = new PathTransition();
-		transition.setNode(imageView);
-		transition.setDuration(Duration.millis(duration));
-		transition.setPath(line);
-		transition.setCycleCount(1);
-		transition.play();
-	}
-
-	private void fadeImage(ImageView imageView, Image image){
-		imageView.setImage(image);
-		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
-		ft.setFromValue(0);
-		ft.setToValue(1);
-		ft.setCycleCount(1);
-		ft.play();
-	}
-
 	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
 		line.setStartX(x1);
 		line.setStartY(y1);
@@ -241,16 +217,11 @@ public class NicknameServerAddressSceneController implements SceneController {
 	/* **********************************************
 	 *												*
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
-	 * 												*
+	 * 												*fad
 	 ************************************************/
 	@Override
 	public void fatalError() {
-		// TODO: move in other scenes
-		/*fadeImage(icon_errorFatalBG, errorFatalBG);
-		slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);
-		icon_errorFatalBG.toFront();
-		icon_errorFatal.toFront();
-		button_exit.toFront();*/
+
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {

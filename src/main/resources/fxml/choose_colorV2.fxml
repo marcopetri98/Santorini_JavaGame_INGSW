@@ -15,17 +15,17 @@
             <Image url="@../img/choose_color_background.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_red" fitHeight="165.0" fitWidth="273.0" layoutX="187.0" layoutY="293.0" onMousePressed="#mousePressedColor" onMouseReleased="#mouseReleasedColor" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_red" fitHeight="165.0" fitWidth="273.0" layoutX="187.0" layoutY="293.0" onMousePressed="#mousePressedColor" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/color_red_btn.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_green" fitHeight="164.0" fitWidth="328.0" layoutX="503.0" layoutY="294.0" onMousePressed="#mousePressedColor" onMouseReleased="#mouseReleasedColor" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_green" fitHeight="164.0" fitWidth="328.0" layoutX="503.0" layoutY="294.0" onMousePressed="#mousePressedColor" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/color_green_btn.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="button_blue" fitHeight="164.0" fitWidth="351.0" layoutX="819.0" layoutY="292.0" onMousePressed="#mousePressedColor" onMouseReleased="#mouseReleasedColor" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="button_blue" fitHeight="164.0" fitWidth="351.0" layoutX="819.0" layoutY="292.0" onMousePressed="#mousePressedColor" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/color_blue_btn.png" />
          </image>
@@ -45,5 +45,20 @@
             <Font name="Agency FB" size="35.0" />
          </font>
       </Text>
+      <ImageView fx:id="icon_errorFatalBG" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/errorFatal_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_errorFatal" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/error_fatal.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_error" fitHeight="430.0" fitWidth="395.0" layoutX="914.0" layoutY="262.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/error_waitTurn.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

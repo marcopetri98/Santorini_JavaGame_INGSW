@@ -6,7 +6,10 @@ import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Color;
 import it.polimi.ingsw.util.Constants;
+import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.Transition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -43,6 +46,12 @@ public class ChooseGodsSceneController implements SceneController {
 	private HBox god_cards_list;
 	@FXML
 	private Text text_player;
+	@FXML
+	private ImageView icon_errorFatalBG;
+	@FXML
+	private ImageView icon_errorFatal;
+	@FXML
+	private ImageView icon_error;
 
 	Image cardApollo = new Image("/img/gods/card_apollo.png");
 	Image cardApolloPressed = new Image("/img/gods/card_apollo_pressed.png");
@@ -85,6 +94,10 @@ public class ChooseGodsSceneController implements SceneController {
 	Image buttonNext = new Image("/img/home_next_btn.png");
 	Image buttonExitPressed = new Image("/img/home_exit_btn_pressed.png");
 	Image buttonExit = new Image("/img/home_exit_btn.png");
+	Image errorFatalBG = new Image("/img/errorFatal_background.png");
+	Image errorFatal = new Image("/img/error_fatal.png");
+	Image errorSomeoneDisconnected = new Image("/img/message_someoneDisconnected.png");
+	Image errorChooseGod = new Image("/img/error_chooseGod.png");
 
 	// objects used to change scene
 	private Parent previousFXML;
@@ -109,6 +122,12 @@ public class ChooseGodsSceneController implements SceneController {
 		description.setImage(null);
 		setChoosingPlayer();
 		parsingPlayersCard();
+
+		icon_errorFatal.toBack();
+		icon_errorFatalBG.toBack();
+		icon_errorFatal.setImage(null);
+		icon_error.toBack();
+		icon_error.setImage(null);
 	}
 
 	public void parsingPlayersCard() {
@@ -119,6 +138,56 @@ public class ChooseGodsSceneController implements SceneController {
 		} else {
 			god_cards_list.getChildren().remove(card_3);
 		}
+	}
+
+	private void fadeImage(ImageView imageView, Image image){
+		imageView.setImage(image);
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
+		ft.setFromValue(0);
+		ft.setToValue(1);
+		ft.setCycleCount(1);
+		ft.play();
+	}
+
+	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
+		imageView.setImage(image);
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
+	}
+
+	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
+		imageView.setImage(image);
+
+		Line line1 = new Line();
+		Line line2 = new Line();
+		Line line3 = new Line();
+		Line line4 = new Line();
+
+		SequentialTransition sequential = new SequentialTransition(setLine(imageView, line1, x1_1, y1_1, x2_1, y2_1, duration1), setLine(imageView, line2, x1_2, y1_2, x2_2, y2_2, duration2), setLine(imageView, line3, x1_3, y1_3, x2_3, y2_3, duration3), setLine(imageView, line4, x1_4, y1_4, x2_4, y2_4, duration4));
+		sequential.play();
+	}
+
+	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+
+		return transition;
 	}
 
 	/* **********************************************
@@ -336,7 +405,9 @@ public class ChooseGodsSceneController implements SceneController {
 	 * 												*
 	 ************************************************/
 	public void wrongSelectOfGod() {
-		// TODO: say to the user that he has not selected a god
+		icon_error.toFront();
+		moveImage(icon_error, errorChooseGod, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
+		button_next.toFront();
 	}
 	public void setChoosingPlayer() {
 		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
@@ -459,8 +530,19 @@ public class ChooseGodsSceneController implements SceneController {
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
 	private void gameCantContinue(int reason) {
-		// TODO: print to the player that the server has crashed or a player disconnected in the setup and the game cannot continue for this reason
-		// 		 now a player can only quit and cannot do anything
+		if(reason == 0){
+			fadeImage(icon_errorFatalBG, errorFatalBG);
+			slidingImage(icon_errorFatal, errorSomeoneDisconnected, 650, 0, 650, 325, 1250);
+			icon_errorFatalBG.toFront();
+			icon_errorFatal.toFront();
+			button_exit.toFront();
+		} else {
+			fadeImage(icon_errorFatalBG, errorFatalBG);
+			slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);
+			icon_errorFatalBG.toFront();
+			icon_errorFatal.toFront();
+			button_exit.toFront();
+		}
 	}
 
 	/* **********************************************

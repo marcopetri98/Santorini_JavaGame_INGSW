@@ -19,8 +19,6 @@ public class MenuSceneController {
 	@FXML
 	private ImageView button_exit;
 	@FXML
-	private ImageView menu_background;
-	@FXML
 	private ImageView logo_santorini;
 	@FXML
 	private ImageView button_play;
@@ -36,7 +34,7 @@ public class MenuSceneController {
 	/**
 	 * moving santorini_logo
 	 */
-	public void initialize() {     //TODO: clouds and gods moving (optional)
+	public void initialize() {
 		PathTransition transition = new PathTransition();
 		transition.setNode(logo_santorini);
 		transition.setDuration(Duration.millis(3500));
@@ -66,16 +64,5 @@ public class MenuSceneController {
 		nextStage.close();
 		System.exit(0);
 	}
-
-
-
-	//TODO: (optional) background movement
-
-//	TODO: (optional) change cursor when: & changing button color (?)
-//	public void mouseEnteredPlay(MouseEvent mouseEvent) {
-//	}
-//
-//	public void mouseExitedPlay(MouseEvent mouseEvent) {
-//	}
 
 }

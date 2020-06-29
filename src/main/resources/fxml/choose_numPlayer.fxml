@@ -34,5 +34,20 @@
             <Image url="@../img/num3_btn.png" />
          </image>
       </ImageView>
+      <ImageView fx:id="icon_errorFatal" fitHeight="720.0" fitWidth="1280.0" layoutX="11.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/error_fatal.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_errorFatalBG" fitHeight="720.0" fitWidth="1280.0" layoutX="20.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@../img/errorFatal_background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="icon_error" fitHeight="430.0" fitWidth="395.0" layoutX="877.0" layoutY="282.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/error_waitTurn.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

@@ -6,6 +6,8 @@ import it.polimi.ingsw.network.objects.NetObject;
 import it.polimi.ingsw.network.objects.NetSetup;
 import it.polimi.ingsw.ui.gui.viewModel.GameState;
 import it.polimi.ingsw.util.Constants;
+import javafx.animation.FadeTransition;
+import javafx.animation.PathTransition;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -34,12 +37,18 @@ public class LobbySceneController implements SceneController {
 	private Text text_2;
 	@FXML
 	private Text text_3;
+	@FXML
+	private ImageView icon_errorFatalBG;
+	@FXML
+	private ImageView icon_errorFatal;
 
 	private int numPlayer;
 
 
 	private Image buttonExitPressed = new Image("/img/home_exit_btn_pressed.png");
 	private Image buttonExit = new Image("/img/home_exit_btn.png");
+	private Image errorFatalBG = new Image("/img/errorFatal_background.png");
+	private Image errorFatal = new Image("/img/error_fatal.png");
 
 	// objects used to change scene
 	private Parent previousFXML;
@@ -61,6 +70,33 @@ public class LobbySceneController implements SceneController {
 			player_3rd.setVisible(false);
 		}
 		setupNames(false);
+
+		icon_errorFatal.toBack();
+		icon_errorFatalBG.toBack();
+	}
+
+	private void fadeImage(ImageView imageView, Image image){
+		imageView.setImage(image);
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
+		ft.setFromValue(0);
+		ft.setToValue(1);
+		ft.setCycleCount(1);
+		ft.play();
+	}
+
+	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
+		imageView.setImage(image);
+		Line line = new Line();
+		line.setStartX(x1);
+		line.setStartY(y1);
+		line.setEndX(x2);
+		line.setEndY(y2);
+		PathTransition transition = new PathTransition();
+		transition.setNode(imageView);
+		transition.setDuration(Duration.millis(duration));
+		transition.setPath(line);
+		transition.setCycleCount(1);
+		transition.play();
 	}
 
 	/* **********************************************
@@ -116,8 +152,11 @@ public class LobbySceneController implements SceneController {
 	 *
 	 */
 	private void gameCantContinue() {
-		// TODO: print to the player that the server has crashed, in fact in lobby players can disconnect without causing the end of the lobby, game isn't started already
-		// 		 now a player can only quit and cannot do anything
+		fadeImage(icon_errorFatalBG, errorFatalBG);
+		slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);
+		icon_errorFatalBG.toFront();
+		icon_errorFatal.toFront();
+		button_exit.toFront();
 	}
 
 	/* **********************************************

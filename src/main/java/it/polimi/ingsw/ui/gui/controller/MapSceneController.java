@@ -196,7 +196,6 @@ public class MapSceneController implements SceneController {
 	private boolean pressedButtonDome = false;
 	private int setWorkers = 0;
 
-	// TODO: are necessary?
 	private boolean pressedWorker1 = false;
 	private boolean pressedWorker2 = false;
 
@@ -273,6 +272,7 @@ public class MapSceneController implements SceneController {
 	Image errorFatal = new Image("/img/error_fatal.png");
 	Image buttonInfo = new Image("/img/map/button_info.png");
 	Image boxInfo = new Image("/img/map/box_info.png");
+	Image errorSomeoneDisconnected = new Image("/img/message_someoneDisconnected.png");
 
 	ImageView workerSelected = null;
 
@@ -1390,9 +1390,15 @@ public class MapSceneController implements SceneController {
 	 *
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
-	private void gameCantContinue(int reason, String playerName) {
+	private void gameCantContinue(int reason) {
 		if(reason == 0){
-			playerDisconnected(playerName);
+			fadeImage(BG_message, errorFatalBG, 0, 1, 1);
+			slidingImage(icon_message, errorSomeoneDisconnected, 650, 0, 650, 325, 1250);
+			BG_message.toFront();
+			icon_message.toFront();
+			button_exit.toFront();
+			button_exit2.toFront();
+			button_exit2.setImage(buttonExit);
 		} else {
 			fadeImage(BG_message, errorFatalBG, 0, 1, 1);
 			slidingImage(icon_message, errorFatal, 650, 0, 650, 325, 1250);
@@ -1413,7 +1419,7 @@ public class MapSceneController implements SceneController {
 	@Override
 	public void fatalError() {
 		finished = true;
-		gameCantContinue(1,null);
+		gameCantContinue(1);
 	}
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
@@ -1475,7 +1481,7 @@ public class MapSceneController implements SceneController {
 				button_dome.setDisable(true);
 				button_endTurn.setDisable(true);
 				button_undo.setDisable(true);
-				gameCantContinue(0,currentMsg.player);
+				gameCantContinue(0);
 			}
 			case Constants.GENERAL_PLAYER_DISCONNECTED -> {
 				NetGaming netGaming = (NetGaming) message;
