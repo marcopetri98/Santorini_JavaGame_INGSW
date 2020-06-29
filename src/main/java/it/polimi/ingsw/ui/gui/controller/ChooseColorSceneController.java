@@ -108,6 +108,24 @@ public class ChooseColorSceneController implements SceneController {
 		ft.setCycleCount(1);
 		ft.play();
 	}
+	/**
+	 * This method creates a fade transition of an image.
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
+	private void fadeImage(ImageView imageView, Image image, int from, int to, int flag){
+		imageView.setImage(image);
+		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
+		ft.setFromValue(from);
+		ft.setToValue(to);
+		ft.setCycleCount(1);
+		if(flag == 1){
+			imageView.toFront();
+		} else {
+			imageView.toBack();
+		}
+		ft.play();
+	}
 
 	/**
 	 * This method creates a slide transition of an image.
@@ -398,6 +416,9 @@ public class ChooseColorSceneController implements SceneController {
 						button_green.setImage(buttonColorDisabled);
 						greenLocked = true;
 					}
+				}
+				if (gameState.getColors().containsKey(gameState.getPlayer())) {
+					fadeImage(button_next,buttonNext,1,0,1);
 				}
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {

@@ -195,7 +195,7 @@ public class NetBuild implements Serializable {
 		}
 	}
 	/**
-	 * This method checks if two different {@code NetBuild} are similar, this means that they point to the same cell with same attributes having the same worker selected.
+	 * This method checks if two different {@code NetBuild} are similar, this means that they point to the same cell with same attributes (except level) having the same worker selected.
 	 * @param obj the other object to compare
 	 * @return true if {@code obj} is a {@code NetBuild} and is similar to this
 	 */
@@ -203,6 +203,23 @@ public class NetBuild implements Serializable {
 		if(obj instanceof NetBuild){
 			NetBuild b = (NetBuild) obj;
 			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.dome == b.dome) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	/**
+	 * This method checks if two different {@code NetBuild} are similar, this means that they point to the same cell with same attributes having the same worker selected.
+	 * @param obj the other object to compare
+	 * @return true if {@code obj} is a {@code NetBuild} and is similar to this
+	 */
+	public boolean isLikeStrong(Object obj){
+		if(obj instanceof NetBuild){
+			NetBuild b = (NetBuild) obj;
+			if (this.workerID == b.workerID && this.cellX == b.cellX && this.cellY == b.cellY && this.level == b.level && this.dome == b.dome) {
 				return true;
 			} else {
 				return false;

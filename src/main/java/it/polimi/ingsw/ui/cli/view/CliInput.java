@@ -43,7 +43,6 @@ public class CliInput {
 	 * @throws IOException if there has been an error to access stdin
 	 */
 	public Command getInput() throws UserInputTimeoutException, IOException {
-		//TODO: vedere altre classi per evitare buffering
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = null;
 		boolean foundSomething = false;
@@ -139,7 +138,6 @@ public class CliInput {
 	private void resetInsertedInput() throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		while (reader.ready()) {
-			// TODO: maybe the last line isn't deleted
 			reader.readLine();
 		}
 	}

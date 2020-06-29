@@ -1,8 +1,5 @@
 package it.polimi.ingsw.ui.gui.viewModel;
 
-import it.polimi.ingsw.core.state.GamePhase;
-import it.polimi.ingsw.core.state.GodsPhase;
-import it.polimi.ingsw.core.state.Phase;
 import it.polimi.ingsw.core.state.Turn;
 import it.polimi.ingsw.network.game.NetBuild;
 import it.polimi.ingsw.network.game.NetMap;

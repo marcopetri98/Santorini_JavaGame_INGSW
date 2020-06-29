@@ -56,6 +56,7 @@ public class LoadingSceneController implements SceneController {
 	Image errorSomeoneDisconnected = new Image("/img/message_someoneDisconnected.png");
 
 	// objects used to change scene
+	private boolean serverOffline = false;
 	private Parent previousFXML;
 	private Parent nextFXML;
 	private Scene previousScene;
@@ -154,8 +155,10 @@ public class LoadingSceneController implements SceneController {
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
-		NetDivinityChoice netSetup = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);
-		MainGuiController.getInstance().sendMessage(netSetup);
+		if (!serverOffline) {
+			NetDivinityChoice netSetup = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);
+			MainGuiController.getInstance().sendMessage(netSetup);
+		}
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);
 		currentStage = (Stage) button_exit.getScene().getWindow();
@@ -229,6 +232,7 @@ public class LoadingSceneController implements SceneController {
 				}
 			}
 			case Constants.GENERAL_SETUP_DISCONNECT -> {
+				serverOffline = true;
 				gameCantContinue(0);
 			}
 		}

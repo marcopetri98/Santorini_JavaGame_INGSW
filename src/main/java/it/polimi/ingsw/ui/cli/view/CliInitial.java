@@ -180,7 +180,7 @@ public class CliInitial {
 				}
 			}
 			case NAME -> {
-				if (command.commandType.length() < 5 || command.getNumParameters() != 0) {
+				if (command.commandType.length() < Constants.MIN_NICKNAME_LEN || command.commandType.length() > Constants.MAX_NICKNAME_LEN || command.getNumParameters() != 0) {
 					printError(1);
 				} else {
 					// if the user is trying another name because there is already a player with that name, it immediately tries to participate to a lobby
@@ -210,10 +210,13 @@ public class CliInitial {
 					String[] addressNumbers = command.commandType.split("\\.");
 					if (addressNumbers.length != 4) {
 						printError(3);
+					} else if (!Constants.isNumber(addressNumbers[0]) || !Constants.isNumber(addressNumbers[1]) || !Constants.isNumber(addressNumbers[2]) || !Constants.isNumber(addressNumbers[3])) {
+						printError(3);
+					} else if (Integer.parseInt(addressNumbers[0]) < 0 || Integer.parseInt(addressNumbers[0]) > 255 || Integer.parseInt(addressNumbers[1]) < 0 || Integer.parseInt(addressNumbers[1]) > 255 || Integer.parseInt(addressNumbers[2]) < 0 || Integer.parseInt(addressNumbers[2]) > 255 || Integer.parseInt(addressNumbers[3]) < 0 || Integer.parseInt(addressNumbers[3]) > 255) {
+						printError(3);
 					} else {
 						boolean error = false;
 						for (int i = 0; i < addressNumbers.length && !error; i++) {
-							// TODO: control that is a valid ip
 							if (!Constants.isNumber(addressNumbers[i])) {
 								error = true;
 							}
@@ -400,7 +403,7 @@ public class CliInitial {
 				break;
 
 			case 1:
-				System.out.println("You inserted an invalid name, it must not contain spaces and it must be at least 5 characters.");
+				System.out.println("You inserted an invalid name, it must not contain spaces and it must be at least 5 characters and no more than 15.");
 				break;
 
 			case 2 :

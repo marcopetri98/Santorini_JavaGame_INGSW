@@ -319,7 +319,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 * @param observed is the observable game
 	 * @param netMap is the game map
 	 */
-	// TODO: eliminate duplicate
 	@Override
 	public synchronized void updateBuild(ObservableObject observed, Map netMap) {
 		if (observed == null || netMap == null) {
