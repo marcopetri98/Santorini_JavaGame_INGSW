@@ -29,6 +29,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
+/**
+ * This class implements the choosing color scene of the GUI.
+ */
 public class ChooseGodsSceneController implements SceneController {
 	@FXML
 	private ImageView button_exit;
@@ -130,6 +133,9 @@ public class ChooseGodsSceneController implements SceneController {
 		icon_error.setImage(null);
 	}
 
+	/**
+	 * This method handles the number of card to be displayed: 2 or 3 according to the number of players.
+	 */
 	public void parsingPlayersCard() {
 		setGodImage(card_1,gameState.getGodsName().get(0));
 		setGodImage(card_2,gameState.getGodsName().get(1));
@@ -140,6 +146,11 @@ public class ChooseGodsSceneController implements SceneController {
 		}
 	}
 
+	/**
+	 * This method creates a fade transition of an image.
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
 	private void fadeImage(ImageView imageView, Image image){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -149,6 +160,16 @@ public class ChooseGodsSceneController implements SceneController {
 		ft.play();
 	}
 
+	/**
+	 * This method creates a slide transition of an image.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 */
 	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
 		imageView.setImage(image);
 		Line line = new Line();
@@ -164,6 +185,31 @@ public class ChooseGodsSceneController implements SceneController {
 		transition.play();
 	}
 
+	/**
+	 * This method is a combination of slide transition (4 transition: to left, then to right, then to left, then to right) to simulate a cloud fluctuation
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1_1 first transition initial x coordinate.
+	 * @param y1_1 first transition initial y coordinate.
+	 * @param x2_1 first transition final x coordinate.
+	 * @param y2_1 first transition final y coordinate.
+	 * @param x1_2 second transition initial x coordinate.
+	 * @param y1_2 second transition initial x coordinate.
+	 * @param x2_2 second transition final x coordinate.
+	 * @param y2_2 second transition final x coordinate.
+	 * @param x1_3 third transition initial x coordinate.
+	 * @param y1_3 third transition initial x coordinate.
+	 * @param x2_3 third transition final x coordinate.
+	 * @param y2_3 third transition final x coordinate.
+	 * @param x1_4 fourth transition initial x coordinate.
+	 * @param y1_4 fourth transition initial x coordinate.
+	 * @param x2_4 fourth transition final x coordinate.
+	 * @param y2_4 fourth transition final x coordinate.
+	 * @param duration1 duration of the first transition.
+	 * @param duration2 duration of the first transition.
+	 * @param duration3 duration of the first transition.
+	 * @param duration4 duration of the first transition.
+	 */
 	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
 		imageView.setImage(image);
 
@@ -176,6 +222,17 @@ public class ChooseGodsSceneController implements SceneController {
 		sequential.play();
 	}
 
+	/**
+	 * This method creates the line path for a slide transition.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param line the default line path.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 * @return the line transition.
+	 */
 	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
 		line.setStartX(x1);
 		line.setStartY(y1);
@@ -195,6 +252,11 @@ public class ChooseGodsSceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the mouse entry on a god card, sliding up the description of that god.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseEnteredCard(MouseEvent mouseEvent) {
 		ImageView entered = (ImageView) mouseEvent.getTarget();
 
@@ -206,9 +268,19 @@ public class ChooseGodsSceneController implements SceneController {
 			mouseEnterCard(description, parsingCard(card_3));
 		}
 	}
+
+	/**
+	 * This method handles the mouse entry on a god card, sliding down the description of that god.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseExitedCard(MouseEvent mouseEvent) {
 		mouseExitCard(description);
 	}
+
+	/**
+	 * This method handles the mouse click on a god card, choosing that card.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedCard(MouseEvent mouseEvent) {
 		ImageView card = (ImageView) mouseEvent.getTarget();
 		if (!pressed) {
@@ -289,9 +361,19 @@ public class ChooseGodsSceneController implements SceneController {
 			}
 		}
 	}
+
+	/**
+	 * This method handles the mouse click on a next button, making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNextPressed);
 	}
+
+	/**
+	 * This method handles the mouse release on a next button: making it unpressed and changing the scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
 
@@ -306,11 +388,21 @@ public class ChooseGodsSceneController implements SceneController {
 			}
 		}
 	}
+
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
@@ -323,6 +415,12 @@ public class ChooseGodsSceneController implements SceneController {
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
 	}
+
+	/**
+	 * This method creates the sliding up transition of the god card description
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
 	private void mouseEnterCard(ImageView imageView, Image image){
 		imageView.setImage(image);
 		Line line = new Line();
@@ -337,6 +435,11 @@ public class ChooseGodsSceneController implements SceneController {
 		transition.setCycleCount(1);
 		transition.play();
 	}
+
+	/**
+	 * This method creates the sliding down transition of the god card description
+	 * @param imageView the ImageView that has to be faded.
+	 */
 	private void mouseExitCard(ImageView imageView){
 		Line line = new Line();
 		line.setStartX(182);
@@ -377,6 +480,12 @@ public class ChooseGodsSceneController implements SceneController {
 		}
 		return null;
 	}
+
+	/**
+	 * This method set the correct god image according to the parameter godName.
+	 * @param card the ImageView interested.
+	 * @param godName the name of the god.
+	 */
 	private void setGodImage(ImageView card, String godName) {
 		if (godName.equals(Constants.APOLLO)) {
 			card.setImage(cardApollo);
@@ -404,15 +513,28 @@ public class ChooseGodsSceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method displays a pop up message which notify the player to choose the correct number of god cards.
+	 */
 	public void wrongSelectOfGod() {
 		icon_error.toFront();
 		moveImage(icon_error, errorChooseGod, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		button_next.toFront();
 	}
+
+	/**
+	 * This method displays the name of the player who is choosing a color.
+	 */
 	public void setChoosingPlayer() {
 		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 34));
 		text_player.setText(gameState.getActivePlayer());
 	}
+
+	/**
+	 * This method set a grey scale god card image if it's is already chosen.
+	 * @param name the god name already chosen.
+	 */
 	public void disableGod(String name) {
 		switch (name.toUpperCase()){
 			case Constants.APOLLO -> {
@@ -525,8 +647,9 @@ public class ChooseGodsSceneController implements SceneController {
 			}
 		}
 	}
+
 	/**
-	 *
+	 * This method displays a pop up message which notify the player according to notify parameter.
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
 	private void gameCantContinue(int reason) {
@@ -550,11 +673,21 @@ public class ChooseGodsSceneController implements SceneController {
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This methods handles an error from the server.
+	 */
 	@Override
 	public void fatalError() {
 		finished = true;
 		gameCantContinue(1);
 	}
+
+	/**
+	 * This methods handles messages from the server.
+	 * @param message is the message arrived from the server
+	 * @throws IOException if there has been an error handling the message
+	 */
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {

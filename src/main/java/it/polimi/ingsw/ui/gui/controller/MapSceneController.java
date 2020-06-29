@@ -30,6 +30,10 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.*;
 
+
+/**
+ * This class implements the choosing color map of the GUI.
+ */
 public class MapSceneController implements SceneController {
 	@FXML
 	private ImageView box_workers;
@@ -336,11 +340,18 @@ public class MapSceneController implements SceneController {
 		button_info.setImage(null);
 	}
 
+	/**
+	 * This method initialize the undo button on the screen.
+	 */
 	private void timerInitialize(){
 		button_undo.toFront();
 		button_undo.setDisable(true);
 		fadeImage(button_undo, buttonUndoDisabled, 0, 1, 1);
 	}
+
+	/**
+	 * This method handles the 5 second countdown displayed on the undo button.
+	 */
 	private void timerCountdown(){
 		if (timeline != null) {
 			timeline.stop();
@@ -358,6 +369,11 @@ public class MapSceneController implements SceneController {
 		timeline.play();
 	}
 
+	/**
+	 * This method creates a fade transition of an image.
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
 	private void fadeImage(ImageView imageView, Image image, int from, int to, int flag){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -372,19 +388,15 @@ public class MapSceneController implements SceneController {
 		ft.play();
 	}
 
-	private Transition setFadeImage(ImageView imageView, Image image, int from, int to, int flag){
-		imageView.setImage(image);
-		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
-		ft.setFromValue(from);
-		ft.setToValue(to);
-		ft.setCycleCount(1);
-		if(flag == 1){
-			imageView.toFront();
-		} else {
-			imageView.toBack();
-		}
-		return ft;
-	}
+	/**
+	 * This method creates a fade transition on a text.
+	 * @param text the Text object interested.
+	 * @param from the initial fading percentage
+	 * @param to the final fading percentage
+	 * @param flag is 1 when the text has to be displayed on top of the screen, 1 if it has to be hidden.
+	 * @param duration the duration of the transition.
+	 * @return the transition.
+	 */
 	private Transition setFadeText(Text text, int from, int to, int flag, int duration){
 		FadeTransition ft = new FadeTransition(Duration.millis(duration), text);
 		ft.setFromValue(from);
@@ -398,6 +410,12 @@ public class MapSceneController implements SceneController {
 		return ft;
 	}
 
+	/**
+	 * This method creates a fade transition on a text.
+	 * @param text the Text object interested.
+	 * @param from the initial fading percentage
+	 * @param to the final fading percentage
+	 */
 	private void fadeText(Text text, int from, int to){
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), text);
 		ft.setFromValue(from);
@@ -406,6 +424,17 @@ public class MapSceneController implements SceneController {
 		ft.play();
 	}
 
+	/**
+	 * This method creates the line path for a slide transition.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param line the default line path.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 * @return the line transition.
+	 */
 	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
 		line.setStartX(x1);
 		line.setStartY(y1);
@@ -420,6 +449,31 @@ public class MapSceneController implements SceneController {
 		return transition;
 	}
 
+	/**
+	 * This method is a combination of slide transition (4 transition: to left, then to right, then to left, then to right) to simulate a cloud fluctuation
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1_1 first transition initial x coordinate.
+	 * @param y1_1 first transition initial y coordinate.
+	 * @param x2_1 first transition final x coordinate.
+	 * @param y2_1 first transition final y coordinate.
+	 * @param x1_2 second transition initial x coordinate.
+	 * @param y1_2 second transition initial x coordinate.
+	 * @param x2_2 second transition final x coordinate.
+	 * @param y2_2 second transition final x coordinate.
+	 * @param x1_3 third transition initial x coordinate.
+	 * @param y1_3 third transition initial x coordinate.
+	 * @param x2_3 third transition final x coordinate.
+	 * @param y2_3 third transition final x coordinate.
+	 * @param x1_4 fourth transition initial x coordinate.
+	 * @param y1_4 fourth transition initial x coordinate.
+	 * @param x2_4 fourth transition final x coordinate.
+	 * @param y2_4 fourth transition final x coordinate.
+	 * @param duration1 duration of the first transition.
+	 * @param duration2 duration of the first transition.
+	 * @param duration3 duration of the first transition.
+	 * @param duration4 duration of the first transition.
+	 */
 	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
 		imageView.setImage(image);
 
@@ -432,6 +486,9 @@ public class MapSceneController implements SceneController {
 		sequential.play();
 	}
 
+	/**
+	 * This method handles all the inital backgorund animations.
+	 */
 	private void initializeAnimations() {
 		slidingImage(box_exit, boxExit, 300, 47, 300, 47, 500);
 		slidingImage(button_exit, buttonExit, 200, 24, 200, 24, 500);
@@ -451,6 +508,10 @@ public class MapSceneController implements SceneController {
 		slidingImage(clouds_right, cloudsRight, 400, 359, 1200, 359, 3200);
 		fadeImage(button_info, buttonInfo, 0, 1, 1);
 	}
+
+	/**
+	 * This method initilizes null all the cell imageView
+	 */
 	private void initializeCells() {
 		cell_0_0.setImage(blank);
 		cell_1_0.setImage(blank);
@@ -479,7 +540,10 @@ public class MapSceneController implements SceneController {
 		cell_4_4.setImage(blank);
 	}
 
-	// initialize method
+	/**
+	 *
+	 * @return the color of the player.
+	 */
 	public Image colorPlayer() {
 		if (gameState.getColors().get(gameState.getPlayer()).equals(Color.BLUE)) {
 			return workerBlue;
@@ -489,7 +553,11 @@ public class MapSceneController implements SceneController {
 			return workerRed;
 		}
 	}
-	// active player information data
+
+	/**
+	 *
+	 * @return the godcard of the player.
+	 */
 	public Image godPlayer() {
 		if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.APOLLO)) {
 			return new Image("/img/gods/card_apollo.png");
@@ -511,6 +579,11 @@ public class MapSceneController implements SceneController {
 			return new Image("/img/gods/card_prometheus.png");
 		}
 	}
+
+	/**
+	 *
+	 * @return the description of the god card.
+	 */
 	public Image descriptionGodCard() {
 		if (gameState.getGods().get(gameState.getActivePlayer()).equals(Constants.APOLLO)) {
 			return new Image("/img/gods/description_apollo.png");
@@ -538,6 +611,11 @@ public class MapSceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the mouse click on the little exit button: making appear the exit button or making disappear it.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedIconExit(MouseEvent mouseEvent) {
 		if (!pressedIconExit) {
 			button_exit.toFront();
@@ -556,11 +634,21 @@ public class MapSceneController implements SceneController {
 			pressedIconExit = false;
 		}
 	}
+
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
@@ -571,6 +659,11 @@ public class MapSceneController implements SceneController {
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
 	}
+
+	/**
+	 * This method handles the mouse release on the block button: making it pressed or unpressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedBuild(MouseEvent mouseEvent) {
 		if (!pressedButtonBuild) {
 			button_build.setImage(buttonBuildPressed);
@@ -582,6 +675,11 @@ public class MapSceneController implements SceneController {
 			pressedButtonBuild = false;
 		}
 	}
+
+	/**
+	 * This method handles the mouse release on the dome button: making it pressed or unpressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedDome(MouseEvent mouseEvent) {
 		if (!pressedButtonDome) {
 			button_dome.setImage(buttonDomePressed);
@@ -593,16 +691,30 @@ public class MapSceneController implements SceneController {
 			button_build.setDisable(false);
 		}
 	}
+
+	/**
+	 * This method handles the mouse entry on a god card, sliding up the description of that god.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseEnteredGodCard(MouseEvent mouseEvent) {
 		slidingImage(description_god, descriptionGodCard(), 129, 400, 129, 125, 450);
 	}
+
+	/**
+	 * This method handles the mouse entry on a god card, sliding down the description of that god.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseExitedGodCard(MouseEvent mouseEvent) {
 		slidingImage(description_god, descriptionGodCard(), 129, 125, 129, 400, 450);
 	}
+
+	/**
+	 * This method handles the mouse click on a cell of the map.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedCell(MouseEvent mouseEvent) {
 		ImageView pressedCell = (ImageView) mouseEvent.getTarget();
 
-		// TODO: maybe we can insert actions on cells also on others turn
 		// if the player is clicking a cell on its turn it active possible actions
 		if (gameState.getActivePlayer().equals(gameState.getPlayer()) && !waitingResponse && !finished && !hasMoved) {
 			if (!pressedButtonDome && !pressedButtonBuild) {
@@ -622,9 +734,19 @@ public class MapSceneController implements SceneController {
 			waitAction(1);
 		}
 	}
+
+	/**
+	 * This method handles the mouse release on the end turn button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedEndTurn(MouseEvent mouseEvent) {
 		button_endTurn.setImage(buttonEndTurnPressed);
 	}
+
+	/**
+	 * This method handles the mouse release on the end turn button: making it unpressed and changing the phase turn or the turn.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedEndTurn(MouseEvent mouseEvent) {
 		button_endTurn.setImage(buttonEndTurn);
 		if (performedBuild != null) {
@@ -639,10 +761,18 @@ public class MapSceneController implements SceneController {
 		}
 	}
 
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit2(MouseEvent mouseEvent) throws IOException {
 		button_exit2.setImage(buttonExitPressed);
-
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit2(MouseEvent mouseEvent) throws IOException {
 		button_exit2.setImage(buttonExit);
 
@@ -653,9 +783,19 @@ public class MapSceneController implements SceneController {
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
 	}
+
+	/**
+	 * This method handles the mouse click on the watch button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedWatch(MouseEvent mouseEvent) {
 		button_watch.setImage(buttonWatchPressed);
 	}
+
+	/**
+	 * This method handles the mouse click on the watch button: allowing a player who has lost to watch the match
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedWatch(MouseEvent mouseEvent) {
 		button_watch.setImage(buttonWatch);
 
@@ -663,12 +803,22 @@ public class MapSceneController implements SceneController {
 		slidingImage(icon_message, iconLost, 650, 325, 650, -350, 1250);
 		button_exit2.toFront();
 	}
+
+	/**
+	 * This method handles the mouse click on the undo button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click.
+	 */
 	public void mousePressedUndo(MouseEvent mouseEvent) {
 		if(button_undo.getImage().equals(buttonUndo5) || button_undo.getImage().equals(buttonUndo4) || button_undo.getImage().equals(buttonUndo3) || button_undo.getImage().equals(buttonUndo2) || button_undo.getImage().equals(buttonUndo1)) {
 			timeline.stop();
 			button_undo.setImage(buttonUndoPressed);
 		}
 	}
+
+	/**
+	 * This method handles the mouse click on the undo button: allowing a player to undo the action he has just did.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedUndo(MouseEvent mouseEvent) {
 		if(button_undo.getImage().equals(buttonUndoPressed)) {
 			button_undo.setImage(buttonUndoDisabled);
@@ -707,11 +857,19 @@ public class MapSceneController implements SceneController {
 		}
 	}
 
+	/**
+	 * This method handles the mouse entry on the info button: sliding up the possibles actions info box.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void MouseEnteredInfo(MouseEvent mouseEvent) {
 		box_info.toFront();
 		slidingImage(box_info, boxInfo, 345, 400, 345, 130, 450);
 	}
 
+	/**
+	 * This method handles the mouse entry on the info button: sliding down the possibles actions info box.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void MouseExitedInfo(MouseEvent mouseEvent) {
 		slidingImage(box_info, boxInfo, 345, 130, 345, 400, 450);
 	}
@@ -721,6 +879,19 @@ public class MapSceneController implements SceneController {
 	 *			METHODS FOR USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the move action of a worker.
+	 * @param cellPressed the ImageView of the cell where the player wants to move his worker.
+	 * @param worker Image of the worker.
+	 * @param workerPressed Image of the pressed worker.
+	 * @param build1Worker Image of the level 1 block with a worker on it.
+	 * @param build2Worker Image of the level 2 block with a worker on it.
+	 * @param build3Worker Image of the level 3 block with a worker on it.
+	 * @param build1WorkerPressed Image of the level 1 block with a worker pressed on it.
+	 * @param build2WorkerPressed Image of the level 2 block with a worker pressed on it.
+	 * @param build3WorkerPressed Image of the level 3 block with a worker pressed on it.
+	 */
 	private void movingWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build2Worker, Image build3Worker, Image build1WorkerPressed, Image build2WorkerPressed, Image build3WorkerPressed){
 		if (cellPressed.getImage().equals(worker) || cellPressed.getImage().equals(build1Worker) || cellPressed.getImage().equals(build2Worker) || cellPressed.getImage().equals(build3Worker)) {
 			if (!pressedButtonBuild && !pressedButtonDome) {
@@ -740,6 +911,20 @@ public class MapSceneController implements SceneController {
 			wrongAction(0);
 		}
 	}
+
+	/**
+	 * This method handles the build action on a cell.
+	 * @param cellPressed the imageView of the cell interested.
+	 * @param blank a blank image used to initialize a cell.
+	 * @param build1 Image of the level 1 block with
+	 * @param build2 Image of the level 2 block with
+	 * @param build3 Image of the level 3 block with
+	 * @param buildDome Image of a building with a dome
+	 * @param button_build ImageView of the block button.
+	 * @param buttonBuild Image of th block button.
+	 * @param button_dome ImageView of the dome button.
+	 * @param buttonDome Image of th dome button.
+	 */
 	private void buildOnCell(ImageView cellPressed, Image blank, Image build1, Image build2, Image build3, Image buildDome, ImageView button_build, Image buttonBuild, ImageView button_dome, Image buttonDome) {
 		if (workerSelected != null && (pressedButtonBuild || pressedButtonDome)) {
 			// player is trying to build
@@ -877,6 +1062,19 @@ public class MapSceneController implements SceneController {
 			}
 		}
 	}
+
+	/**
+	 * This method handles the general move action of a worker.
+	 * @param cellPressed the ImageView of the cell where the player wants to move his worker.
+	 * @param worker Image of the worker.
+	 * @param workerPressed Image of the pressed worker.
+	 * @param build1Worker Image of the level 1 block with a worker on it.
+	 * @param build2Worker Image of the level 2 block with a worker on it.
+	 * @param build3Worker Image of the level 3 block with a worker on it.
+	 * @param build1WorkerPressed Image of the level 1 block with a worker pressed on it.
+	 * @param build2WorkerPressed Image of the level 2 block with a worker pressed on it.
+	 * @param build3WorkerPressed Image of the level 3 block with a worker pressed on it.
+	 */
 	private void placeWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		boolean possibleToPerform = false;
 		NetCell netCellPressed, netWorkerCell, movingWorkerCell;
@@ -992,6 +1190,19 @@ public class MapSceneController implements SceneController {
 	 *		CHANGES TO THE GAME MAP IMAGES			*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the move action of a worker in a cell where is another worker.
+	 * @param cellPressed the ImageView of the cell where the player wants to move his worker.
+	 * @param worker Image of the worker.
+	 * @param workerPressed Image of the pressed worker.
+	 * @param build1Worker Image of the level 1 block with a worker on it.
+	 * @param build2Worker Image of the level 2 block with a worker on it.
+	 * @param build3Worker Image of the level 3 block with a worker on it.
+	 * @param build1WorkerPressed Image of the level 1 block with a worker pressed on it.
+	 * @param build2WorkerPressed Image of the level 2 block with a worker pressed on it.
+	 * @param build3WorkerPressed Image of the level 3 block with a worker pressed on it.
+	 */
 	private void swapWorkers(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		if (workerSelected.getImage().equals(workerPressed)) {
 			workerSelected.setImage(worker);
@@ -1014,6 +1225,19 @@ public class MapSceneController implements SceneController {
 			workerSelected.setImage(build3WorkerPressed);
 		}
 	}
+
+	/**
+	 * This method handles the selection of a worker, making it pressed or unpressed.
+	 * @param cellPressed the ImageView of the cell where the player wants to move his worker.
+	 * @param worker Image of the worker.
+	 * @param workerPressed Image of the pressed worker.
+	 * @param build1Worker Image of the level 1 block with a worker on it.
+	 * @param build2Worker Image of the level 2 block with a worker on it.
+	 * @param build3Worker Image of the level 3 block with a worker on it.
+	 * @param build1WorkerPressed Image of the level 1 block with a worker pressed on it.
+	 * @param build2WorkerPressed Image of the level 2 block with a worker pressed on it.
+	 * @param build3WorkerPressed Image of the level 3 block with a worker pressed on it.
+	 */
 	private void pressWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		if (cellPressed.getImage().equals(worker)) {
 			workerSelected = cellPressed;
@@ -1029,6 +1253,19 @@ public class MapSceneController implements SceneController {
 			workerSelected.setImage(build3WorkerPressed);
 		}
 	}
+
+	/**
+	 * This method handles the selection of a worker, making it unpressed.
+	 * @param cellPressed the ImageView of the cell where the player wants to move his worker.
+	 * @param worker Image of the worker.
+	 * @param workerPressed Image of the pressed worker.
+	 * @param build1Worker Image of the level 1 block with a worker on it.
+	 * @param build2Worker Image of the level 2 block with a worker on it.
+	 * @param build3Worker Image of the level 3 block with a worker on it.
+	 * @param build1WorkerPressed Image of the level 1 block with a worker pressed on it.
+	 * @param build2WorkerPressed Image of the level 2 block with a worker pressed on it.
+	 * @param build3WorkerPressed Image of the level 3 block with a worker pressed on it.
+	 */
 	private void unPressWorker(ImageView cellPressed, Image worker, Image workerPressed, Image build1Worker, Image build1WorkerPressed, Image build2Worker, Image build2WorkerPressed, Image build3Worker, Image build3WorkerPressed) {
 		if (cellPressed.getImage().equals(workerPressed)) {
 			workerSelected = cellPressed;
@@ -1083,16 +1320,16 @@ public class MapSceneController implements SceneController {
 	 *		ANIMATIONS FOR THE GAME MAP				*
 	 * 												*
 	 ************************************************/
+
 	/**
-	 * This function moves through a line path an image.
-	 *
-	 * @param imageView the imageView I want to move
-	 * @param image     the png of the imageView
-	 * @param x1        the x coordinate at the beginning
-	 * @param y1        the y coordinate at the beginning
-	 * @param x2        the x coordinate at the end
-	 * @param y2        the y coordinate at the end
-	 * @param duration  time of the transition, in milliseconds
+	 * This method creates a slide transition of an image.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
 	 */
 	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
 		imageView.setImage(image);
@@ -1109,6 +1346,17 @@ public class MapSceneController implements SceneController {
 		transition.play();
 	}
 
+	/**
+	 * This method creates a slide transition of an image.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 * @return the sliding transition
+	 */
 	private Transition setSlidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration){
 		imageView.setImage(image);
 		Line line = new Line();
@@ -1124,6 +1372,15 @@ public class MapSceneController implements SceneController {
 		return transition;
 	}
 
+	/**
+	 * This method creates a slide transition of the name player text.
+	 * @param text the Text object of the name player.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 */
 	private void slidingText(Text text, int x1, int y1, int x2, int y2, int duration) {
 		Line line = new Line();
 		line.setStartX(x1);
@@ -1151,6 +1408,13 @@ public class MapSceneController implements SceneController {
 		// TODO: implement the possibility to create complex builds
 		return false;
 	}
+
+	/**
+	 * This method get the imageview of the cel required.
+	 * @param x the x coordinate of the cell.
+	 * @param y the y coordinate of the cell.
+	 * @return the imageview of the cell required.
+	 */
 	private ImageView getCell(int x, int y) {
 		switch (x) {
 			case 0 -> {
@@ -1248,10 +1512,16 @@ public class MapSceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method displays the name of the active player.
+	 */
 	private void setActivePlayer() {
 		text_player.setFont(Font.loadFont(getClass().getResourceAsStream("/fonts/LillyBelle.ttf"), 18));
 		text_player.setText(gameState.getActivePlayer());
 	}
+
+
 	private void updateMap() {
 		NetMap map = gameState.getMap();
 
@@ -1305,7 +1575,7 @@ public class MapSceneController implements SceneController {
 		}
 	}
 	/**
-	 *
+	 * This method displays a pop up message which notify the player according to "i" parameter.
 	 * @param i 0 if it is a wrong move, 1 if is a wrong build, 2 user is trying to build without selecting a worker.
 	 */
 	private void wrongAction(int i) {
@@ -1321,7 +1591,7 @@ public class MapSceneController implements SceneController {
 		}
 	}
 	/**
-	 *
+	 *This method displays a pop up message which notify the player according to "i" parameter.
 	 * @param i 1 if he must wait its turn, 0 if he must wait server response
 	 */
 	private void waitAction(int i) {
@@ -1329,6 +1599,11 @@ public class MapSceneController implements SceneController {
 		moveImage(icon_error, errorWait, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		icon_error.toBack();
 	}
+
+	/**
+	 * This method displays on all client screens who has lost.
+	 * @param name the name of the looser.
+	 */
 	private void playerLost(String name) {
 		if (gameState.getPlayer().equals(name)) {
 			fadeImage(BG_message, BGwatch, 0, 1, 0);
@@ -1350,6 +1625,11 @@ public class MapSceneController implements SceneController {
 			text_playerMessageLost.setText(name);
 		}
 	}
+
+	/**
+	 * This method displays on all the client screens who has won.
+	 * @param name the name of the winner.
+	 */
 	private void playerWon(String name) {
 		if (gameState.getPlayer().equals(name)) {
 			fadeImage(BG_message, BGwatch, 0, 1, 0);
@@ -1372,6 +1652,11 @@ public class MapSceneController implements SceneController {
 			text_playerMessage.setText(name);
 		}
 	}
+
+	/**
+	 * This method displays on all the client screens who has disconnected.
+	 * @param name the name of the player disconnected.
+	 */
 	private void playerDisconnected(String name) {
 		if (!gameState.getPlayer().equals(name)) {
 			fadeImage(BG_message, BGwatch, 0, 1, 1);
@@ -1386,8 +1671,9 @@ public class MapSceneController implements SceneController {
 			button_exit2.setImage(buttonExit);
 		}
 	}
+
 	/**
-	 *
+	 * This method displays a pop up message which notify the player according to notify parameter.
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
 	private void gameCantContinue(int reason) {
@@ -1416,11 +1702,21 @@ public class MapSceneController implements SceneController {
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This methods handles an error from the server.
+	 */
 	@Override
 	public void fatalError() {
 		finished = true;
 		gameCantContinue(1);
 	}
+
+	/**
+	 * This methods handles messages from the server.
+	 * @param message is the message arrived from the server
+	 * @throws IOException if there has been an error handling the message
+	 */
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {

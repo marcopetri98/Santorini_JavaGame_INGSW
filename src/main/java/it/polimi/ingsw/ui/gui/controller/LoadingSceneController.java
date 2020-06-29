@@ -25,6 +25,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
+/**
+ * This class implements the loading scenes of the GUI.
+ */
 public class LoadingSceneController implements SceneController {
 	@FXML
 	private ImageView icon;
@@ -89,7 +92,11 @@ public class LoadingSceneController implements SceneController {
 		icon_error.toBack();
 	}
 
-
+	/**
+	 * This method creates a fade transition of an image.
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
 	private void fadeImage(ImageView imageView, Image image){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -99,6 +106,16 @@ public class LoadingSceneController implements SceneController {
 		ft.play();
 	}
 
+	/**
+	 * This method creates a slide transition of an image.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 */
 	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
 		imageView.setImage(image);
 		Line line = new Line();
@@ -119,11 +136,21 @@ public class LoadingSceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
@@ -134,8 +161,9 @@ public class LoadingSceneController implements SceneController {
 		currentStage = (Stage) button_exit.getScene().getWindow();
 		currentStage.setScene(previousScene);
 	}
+
 	/**
-	 *
+	 * This method displays a pop up message which notify the player according to notify parameter.
 	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
 	 */
 	private void gameCantContinue(int reason) {
@@ -159,10 +187,20 @@ public class LoadingSceneController implements SceneController {
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This methods handles an error from the server.
+	 */
 	@Override
 	public void fatalError() {
 		gameCantContinue(1);
 	}
+
+	/**
+	 * This methods handles messages from the server.
+	 * @param message is the message arrived from the server
+	 * @throws IOException if there has been an error handling the message
+	 */
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {

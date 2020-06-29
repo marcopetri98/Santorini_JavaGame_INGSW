@@ -23,6 +23,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
+/**
+ * This class implements the choosing number of players scene of the GUI.
+ */
 public class ChooseNumPlayerSceneController implements SceneController {
 	@FXML
 	private ImageView button_2;
@@ -82,6 +85,11 @@ public class ChooseNumPlayerSceneController implements SceneController {
 		icon_error.setImage(null);
 	}
 
+	/**
+	 * This method creates a fade transition of an image.
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
 	private void fadeImage(ImageView imageView, Image image){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -91,6 +99,16 @@ public class ChooseNumPlayerSceneController implements SceneController {
 		ft.play();
 	}
 
+	/**
+	 * This method creates a slide transition of an image.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 */
 	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
 		imageView.setImage(image);
 		Line line = new Line();
@@ -106,6 +124,31 @@ public class ChooseNumPlayerSceneController implements SceneController {
 		transition.play();
 	}
 
+	/**
+	 * This method is a combination of slide transition (4 transition: to left, then to right, then to left, then to right) to simulate a cloud fluctuation
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1_1 first transition initial x coordinate.
+	 * @param y1_1 first transition initial y coordinate.
+	 * @param x2_1 first transition final x coordinate.
+	 * @param y2_1 first transition final y coordinate.
+	 * @param x1_2 second transition initial x coordinate.
+	 * @param y1_2 second transition initial x coordinate.
+	 * @param x2_2 second transition final x coordinate.
+	 * @param y2_2 second transition final x coordinate.
+	 * @param x1_3 third transition initial x coordinate.
+	 * @param y1_3 third transition initial x coordinate.
+	 * @param x2_3 third transition final x coordinate.
+	 * @param y2_3 third transition final x coordinate.
+	 * @param x1_4 fourth transition initial x coordinate.
+	 * @param y1_4 fourth transition initial x coordinate.
+	 * @param x2_4 fourth transition final x coordinate.
+	 * @param y2_4 fourth transition final x coordinate.
+	 * @param duration1 duration of the first transition.
+	 * @param duration2 duration of the first transition.
+	 * @param duration3 duration of the first transition.
+	 * @param duration4 duration of the first transition.
+	 */
 	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
 		imageView.setImage(image);
 
@@ -118,6 +161,17 @@ public class ChooseNumPlayerSceneController implements SceneController {
 		sequential.play();
 	}
 
+	/**
+	 * This method creates the line path for a slide transition.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param line the default line path.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 * @return the line transition.
+	 */
 	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
 		line.setStartX(x1);
 		line.setStartY(y1);
@@ -136,6 +190,11 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the mouse click on the button "2", selecting two players.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedButton2(MouseEvent mouseEvent) {
 		if (button_2.getImage().equals(button2)) {
 			numPlayers = 2;
@@ -146,8 +205,11 @@ public class ChooseNumPlayerSceneController implements SceneController {
 			button_2.setImage(button2);
 		}
 	}
-	public void mouseReleasedButton2(MouseEvent mouseEvent) {
-	}
+
+	/**
+	 * This method handles the mouse click on the button "3", selecting two players.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedButton3(MouseEvent mouseEvent) {
 		if (button_3.getImage().equals(button3)) {
 			numPlayers = 3;
@@ -158,11 +220,19 @@ public class ChooseNumPlayerSceneController implements SceneController {
 			button_3.setImage(button3);
 		}
 	}
-	public void mouseReleasedButton3(MouseEvent mouseEvent) {
-	}
+
+	/**
+	 * This method handles the mouse click on a next button, making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedNext(MouseEvent mouseEvent) throws IOException {
 		button_next.setImage(buttonNextPressed);
 	}
+
+	/**
+	 * This method handles the mouse release on a next button: making it unpressed and changing the scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
 
@@ -174,11 +244,21 @@ public class ChooseNumPlayerSceneController implements SceneController {
 			MainGuiController.getInstance().sendMessage(netSetup);
 		}
 	}
+
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
@@ -195,13 +275,18 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method displays a pop up message which notify the player to choose a number.
+	 */
 	public void selectNumber() {
 		icon_error.toFront();
 		moveImage(icon_error, errorNumPlayer, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);
 		button_next.toFront();
 	}
+
 	/**
-	 *
+	 * This method displays a pop up message which notify the player that the server has crashed
 	 */
 	private void gameCantContinue() {
 		fadeImage(icon_errorFatalBG, errorFatalBG);
@@ -216,10 +301,20 @@ public class ChooseNumPlayerSceneController implements SceneController {
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This methods handles an error from the server.
+	 */
 	@Override
 	public void fatalError() {
 		gameCantContinue();
 	}
+
+	/**
+	 * This methods handles messages from the server.
+	 * @param message is the message arrived from the server
+	 * @throws IOException if there has been an error handling the message
+	 */
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {

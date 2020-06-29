@@ -15,6 +15,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
+/**
+ * This class implements the menu scene of the GUI.
+ */
 public class MenuSceneController {
 	@FXML
 	private ImageView button_exit;
@@ -43,9 +46,18 @@ public class MenuSceneController {
 		transition.play();
 	}
 
+	/**
+	 * This method handles the mouse click on a play button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedPlay(MouseEvent mouseEvent) {
 		button_play.setImage(buttonPlayPressed);
 	}
+
+	/**
+	 * This method handles the mouse release on a play button: making it unpressed and changing the scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedPlay(MouseEvent mouseEvent) throws IOException {
 		button_play.setImage(buttonPlay);
 
@@ -55,10 +67,19 @@ public class MenuSceneController {
 		nextStage.setScene(nextScene);
 	}
 
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExitPressed);
 		nextStage = (Stage) ((Node)mouseEvent.getTarget()).getScene().getWindow();
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 		nextStage.close();

@@ -1,5 +1,8 @@
 package it.polimi.ingsw.core;
 
+/**
+ * This is the Cell class, which implement a single cell on the map.
+ */
 public class Cell {
 	public final Map map;
 	private final int x;

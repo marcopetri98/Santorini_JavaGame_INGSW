@@ -26,6 +26,9 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * This class implements the lobby scene of the GUI.
+ */
 public class LobbySceneController implements SceneController {
 	@FXML
 	private ImageView button_exit;
@@ -75,6 +78,11 @@ public class LobbySceneController implements SceneController {
 		icon_errorFatalBG.toBack();
 	}
 
+	/**
+	 * This method creates a fade transition of an image.
+	 * @param imageView the ImageView that has to be faded.
+	 * @param image the Image to set in the ImageView.
+	 */
 	private void fadeImage(ImageView imageView, Image image){
 		imageView.setImage(image);
 		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);
@@ -84,6 +92,16 @@ public class LobbySceneController implements SceneController {
 		ft.play();
 	}
 
+	/**
+	 * This method creates a slide transition of an image.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 */
 	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
 		imageView.setImage(image);
 		Line line = new Line();
@@ -104,11 +122,21 @@ public class LobbySceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
@@ -125,6 +153,11 @@ public class LobbySceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method displays the players entered in the lobby
+	 * @param finished
+	 */
 	private void setupNames(boolean finished) {
 		List<String> playerNames = gameState.getPlayers();
 
@@ -148,8 +181,9 @@ public class LobbySceneController implements SceneController {
 			}
 		}
 	}
+
 	/**
-	 *
+	 * This method displays a pop up message which notify the player that the server has crashed
 	 */
 	private void gameCantContinue() {
 		fadeImage(icon_errorFatalBG, errorFatalBG);
@@ -164,10 +198,20 @@ public class LobbySceneController implements SceneController {
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This methods handles an error from the server.
+	 */
 	@Override
 	public void fatalError() {
 		gameCantContinue();
 	}
+
+	/**
+	 * This methods handles messages from the server.
+	 * @param message is the message arrived from the server
+	 * @throws IOException if there has been an error handling the message
+	 */
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {

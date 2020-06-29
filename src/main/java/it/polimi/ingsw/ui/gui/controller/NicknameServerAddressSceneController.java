@@ -22,6 +22,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
+/**
+ * This class implements the nickname and ip address scene of the GUI.
+ */
 public class NicknameServerAddressSceneController implements SceneController {
 	@FXML
 	private TextField textField_nickname;
@@ -75,6 +78,17 @@ public class NicknameServerAddressSceneController implements SceneController {
 		icon_errorFatal.setDisable(true);
 	}
 
+	/**
+	 * This method creates the line path for a slide transition.
+	 * @param imageView the ImageView that has to be slided.
+	 * @param line the default line path.
+	 * @param x1 initial x coordinate.
+	 * @param y1 initial y coordinate.
+	 * @param x2 final x coordinate.
+	 * @param y2 final y coordinate.
+	 * @param duration duration of the transtion.
+	 * @return the line transition.
+	 */
 	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
 		line.setStartX(x1);
 		line.setStartY(y1);
@@ -89,6 +103,31 @@ public class NicknameServerAddressSceneController implements SceneController {
 		return transition;
 	}
 
+	/**
+	 * This method is a combination of slide transition (4 transition: to left, then to right, then to left, then to right) to simulate a cloud fluctuation
+	 * @param imageView the ImageView that has to be slided.
+	 * @param image the Image to set in the ImageView.
+	 * @param x1_1 first transition initial x coordinate.
+	 * @param y1_1 first transition initial y coordinate.
+	 * @param x2_1 first transition final x coordinate.
+	 * @param y2_1 first transition final y coordinate.
+	 * @param x1_2 second transition initial x coordinate.
+	 * @param y1_2 second transition initial x coordinate.
+	 * @param x2_2 second transition final x coordinate.
+	 * @param y2_2 second transition final x coordinate.
+	 * @param x1_3 third transition initial x coordinate.
+	 * @param y1_3 third transition initial x coordinate.
+	 * @param x2_3 third transition final x coordinate.
+	 * @param y2_3 third transition final x coordinate.
+	 * @param x1_4 fourth transition initial x coordinate.
+	 * @param y1_4 fourth transition initial x coordinate.
+	 * @param x2_4 fourth transition final x coordinate.
+	 * @param y2_4 fourth transition final x coordinate.
+	 * @param duration1 duration of the first transition.
+	 * @param duration2 duration of the first transition.
+	 * @param duration3 duration of the first transition.
+	 * @param duration4 duration of the first transition.
+	 */
 	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
 		imageView.setImage(image);
 
@@ -107,9 +146,19 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 *			HANDLERS OF USER INTERACTION		*
 	 * 												*
 	 ************************************************/
+
+	/**
+	 * This method handles the mouse click on a next button, making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedNext(MouseEvent mouseEvent) throws IOException {
 		button_next.setImage(buttonNextPressed);
 	}
+
+	/**
+	 * This method handles the mouse release on a next button: making it unpressed and changing the scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNext);
 
@@ -151,11 +200,21 @@ public class NicknameServerAddressSceneController implements SceneController {
 			}
 		}
 	}
+
+	/**
+	 * This method handles the mouse click on a exit button: making it pressed.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 	}
+
+	/**
+	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 */
 	public void mouseReleasedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExit);
 
@@ -169,8 +228,9 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 *		EVENTS AFTER SERVER MESSAGE				*
 	 * 												*
 	 ************************************************/
+
 	/**
-	 *
+	 * This method displays a pop up message which notify the player according to the type parameter.
 	 * @param type 0 if it receives an error from the gui, 1 if it receives an error from the server
 	 */
 	public void nicknameError(int type) {
@@ -189,6 +249,11 @@ public class NicknameServerAddressSceneController implements SceneController {
 		}
 		messageCanBeSent = true;
 	}
+
+	/**
+	 * This method displays a pop up message which notify the player according to the "i"" parameter.
+	 * @param i is 0 if there is a semantic error of the address, 1 if it's impossible to support that address.
+	 */
 	public void serverAddressError(int i) {
 		icon_errorFatal.setDisable(false);
 		if (i == 0) {
@@ -203,6 +268,10 @@ public class NicknameServerAddressSceneController implements SceneController {
 			textField_address.toFront();
 		}
 	}
+
+	/**
+	 * This method displays a pop up message which notify the player he has to wait.
+	 */
 	public void waitError() {
 		icon_errorFatalBG.setDisable(false);
 		icon_errorFatal.setDisable(false);
@@ -217,12 +286,22 @@ public class NicknameServerAddressSceneController implements SceneController {
 	/* **********************************************
 	 *												*
 	 *		METHODS CALLED BY MAIN CONTROLLER		*
-	 * 												*fad
+	 * 												*
 	 ************************************************/
+
+	/**
+	 * This methods handles an error from the server.
+	 */
 	@Override
 	public void fatalError() {
 
 	}
+
+	/**
+	 * This methods handles messages from the server.
+	 * @param message is the message arrived from the server
+	 * @throws IOException if there has been an error handling the message
+	 */
 	@Override
 	public void deposeMessage(NetObject message) throws IOException {
 		switch (message.message) {
