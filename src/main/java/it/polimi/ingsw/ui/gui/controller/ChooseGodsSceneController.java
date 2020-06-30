@@ -721,6 +721,7 @@ public class ChooseGodsSceneController implements SceneController {
 				}
 				if (gameState.getGods().containsKey(gameState.getPlayer())) {
 					fadeImage(button_next,buttonNext,1,0,1);
+					button_next.setDisable(true);
 				}
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {

@@ -419,6 +419,7 @@ public class ChooseColorSceneController implements SceneController {
 				}
 				if (gameState.getColors().containsKey(gameState.getPlayer())) {
 					fadeImage(button_next,buttonNext,1,0,1);
+					button_next.setDisable(true);
 				}
 			}
 			case Constants.GENERAL_PHASE_UPDATE -> {
