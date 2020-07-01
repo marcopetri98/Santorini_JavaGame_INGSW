@@ -193,6 +193,8 @@ public class MapSceneController implements SceneController {
 	private ImageView button_info;
 	@FXML
 	private ImageView box_info;
+	@FXML
+	private ImageView info_colorPlayer;
 
 
 	private boolean pressedIconExit = false;
@@ -508,10 +510,11 @@ public class MapSceneController implements SceneController {
 		slidingImage(clouds_left, cloudsLeft, 350, 359, -600, 359, 3200);
 		slidingImage(clouds_right, cloudsRight, 400, 359, 1200, 359, 3200);
 		fadeImage(button_info, buttonInfo, 0, 1, 1);
+		slidingImage(info_colorPlayer, colorActivePlayer(), 52, -500, 52, 52, 3300);
 	}
 
 	/**
-	 * This method initilizes null all the cell imageView
+	 * This method initializes null all the cell imageView
 	 */
 	private void initializeCells() {
 		cell_0_0.setImage(blank);
@@ -549,6 +552,20 @@ public class MapSceneController implements SceneController {
 		if (gameState.getColors().get(gameState.getPlayer()).equals(Color.BLUE)) {
 			return workerBlue;
 		} else if (gameState.getColors().get(gameState.getPlayer()).equals(Color.GREEN)) {
+			return workerGreen;
+		} else {
+			return workerRed;
+		}
+	}
+
+	/**
+	 *
+	 * @return the color of the active player.
+	 */
+	public Image colorActivePlayer() {
+		if (gameState.getColors().get(gameState.getActivePlayer()).equals(Color.BLUE)) {
+			return workerBlue;
+		} else if (gameState.getColors().get(gameState.getActivePlayer()).equals(Color.GREEN)) {
 			return workerGreen;
 		} else {
 			return workerRed;
@@ -2005,6 +2022,7 @@ public class MapSceneController implements SceneController {
 				setActivePlayer();
 				button_endTurn.setImage(buttonEndTurnDisabled);
 				card_god.setImage(godPlayer());
+				info_colorPlayer.setImage(colorActivePlayer());
 			}
 			case Constants.GENERAL_GAMEMAP_UPDATE -> {
 				button_exit.getScene().setCursor(Cursor.DEFAULT);

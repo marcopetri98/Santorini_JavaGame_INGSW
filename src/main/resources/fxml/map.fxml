@@ -272,7 +272,7 @@
             <Image url="@../img/map/worker_red.png" />
          </image>
       </ImageView>
-      <Text fx:id="text_player" layoutX="94.0" layoutY="184.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="155.826171875" />
+      <Text fx:id="text_player" layoutX="94.0" layoutY="123.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="155.826171875" />
       <ImageView fx:id="button_undo" fitHeight="131.0" fitWidth="105.0" layoutX="1038.0" layoutY="214.0" onMousePressed="#mousePressedUndo" onMouseReleased="#mouseReleasedUndo" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/map/button_undo.png" />
@@ -291,6 +291,11 @@
       <ImageView fx:id="box_info" fitHeight="249.0" fitWidth="689.0" layoutX="287.0" layoutY="468.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/map/box_info.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="info_colorPlayer" fitHeight="137.0" fitWidth="105.0" layoutX="119.0" layoutY="144.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/map/worker_blue.png" />
          </image>
       </ImageView>
       <ImageView fx:id="icon_error" fitHeight="389.0" fitWidth="330.0" layoutX="913.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">

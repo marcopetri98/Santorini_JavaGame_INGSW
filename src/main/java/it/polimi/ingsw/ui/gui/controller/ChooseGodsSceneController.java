@@ -56,6 +56,7 @@ public class ChooseGodsSceneController implements SceneController {
 	@FXML
 	private ImageView icon_error;
 
+
 	Image cardApollo = new Image("/img/gods/card_apollo.png");
 	Image cardApolloPressed = new Image("/img/gods/card_apollo_pressed.png");
 	Image descriptionApollo = new Image("/img/gods/description_apollo.png");
@@ -131,6 +132,7 @@ public class ChooseGodsSceneController implements SceneController {
 		icon_errorFatal.setImage(null);
 		icon_error.toBack();
 		icon_error.setImage(null);
+
 	}
 
 	/**
