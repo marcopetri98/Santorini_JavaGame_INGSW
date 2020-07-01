@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class Artemis extends GodCard {
 
 	//ARTEMIS CODE
-	private Player owner;
+	private final Player owner;
 	public final TypeGod typeGod = TypeGod.SIMPLE_GOD;
 	public final List<Integer> numPlayer = List.of(2,3,4);
 	public final String name = "Artemis";
@@ -152,7 +152,6 @@ public class Artemis extends GodCard {
 										if (m.getCell(x2, y2).getWorker() == null) {   //Check there is no worker on cell
 											//Adds a move with another linked move
 											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x2, y2), w);
-											//firstMove.setCondition(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x1, y1), m.getCell(x2, y2), w));
 											moves.add(firstMove);
 										}
 									}

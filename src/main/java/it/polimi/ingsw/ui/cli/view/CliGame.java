@@ -20,15 +20,15 @@ import java.util.*;
 public class CliGame {
 	// other view object and attributes relative to the connection with server
 	private final Deque<NetObject> messages;
-	private CliInput cliInput;
+	private final CliInput cliInput;
 	private UserInputController inputController;
 	// state attributes that are used to represent the view
 	private boolean challenger;
-	private Turn phase;
+	private final Turn phase;
 	private List<String> players;
-	private Map<String, Color> playerColors;
-	private List<String> gods;
-	private Map<String, String> chosenGods;
+	private final Map<String, Color> playerColors;
+	private final List<String> gods;
+	private final Map<String, String> chosenGods;
 	private String player;
 	private String activePlayer;
 	private String starter;
@@ -93,7 +93,7 @@ public class CliGame {
 					try{
 						inputLock.wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace(); //TODO: change action
+						throw new AssertionError("Error: something interrupted the executing thread");
 					}
 				}
 			}
@@ -288,9 +288,7 @@ public class CliGame {
 				//syntax: color colorname
 				case COLORS -> {
 					if (command.commandType.equals(Constants.COMMAND_COLOR_CHOICE) && command.getNumParameters() == 1 && Constants.COMMAND_COLOR_COLORS.contains(command.getParameter(0).toUpperCase())) {
-						if(!playerColors.containsValue(new Color(command.getParameter(0)))){
-							return true;
-						}
+						return !playerColors.containsValue(new Color(command.getParameter(0)));
 					}
 					return false;
 				}
@@ -314,20 +312,14 @@ public class CliGame {
 									}
 								}
 							}
-							if (j == command.getNumParameters()) {
-								return true;
-							}
+							return j == command.getNumParameters();
 						}
 					} else if (phase.getGodsPhase().equals(GodsPhase.GODS_CHOICE)) {
 						if (command.commandType.equals(Constants.COMMAND_GODS_CHOOSE) && command.getNumParameters() == 1 && Constants.GODS_GOD_NAMES.contains(command.getParameter(0).toUpperCase())) {
-							if (gods.contains(command.getParameter(0).toUpperCase()) && !chosenGods.containsValue(command.getParameter(0).toUpperCase())) {
-								return true;
-							}
+							return gods.contains(command.getParameter(0).toUpperCase()) && !chosenGods.containsValue(command.getParameter(0).toUpperCase());
 						}
 					} else if (phase.getGodsPhase().equals(GodsPhase.STARTER_CHOICE)) {
-						if (command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger) {
-							return true;
-						}
+						return command.commandType.equals(Constants.COMMAND_GODS_STARTER) && command.getNumParameters() == 1 && players.contains(command.getParameter(0)) && challenger;
 					}
 					return false;
 				}
@@ -866,9 +858,6 @@ public class CliGame {
 				for (String p : players) {
 					if (ng.player != null && ng.player.equals(p) && !player.equals(ng.player)) {
 						System.out.println(ng.player + " just lost");
-						/*if(players.size() == 2) {
-							printVictory();
-						}*/
 						break;
 					}
 				}
@@ -1407,11 +1396,11 @@ public class CliGame {
 						}
 					} else {
 						if(phase.getGamePhase() == GamePhase.BEFOREMOVE) {	//if I'm in beforemove I show the message only if someone has prometheus
-							if(chosenGods.values().contains(Constants.PROMETHEUS)) {
+							if(chosenGods.containsValue(Constants.PROMETHEUS)) {
 								System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
 							}
 						} else if(phase.getGamePhase() == GamePhase.MOVE) {	//if I'm in move and the activePlayer has prometheus, I don't show it
-							if(!chosenGods.values().contains(Constants.PROMETHEUS)) {
+							if(!chosenGods.containsValue(Constants.PROMETHEUS)) {
 								System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
 							} else if(chosenGods.get(activePlayer).equals(Constants.PROMETHEUS)) {
 								System.out.println("You can only disconnect, it's "+activePlayer+"'s turn.");
@@ -1489,7 +1478,6 @@ public class CliGame {
 	 * This method actually draws the map, and after that prints all the relevant information
 	 */
 	private void drawMap(){
-		//TODO: modify with for
 		System.out.println("\t  " + "       0      |      1      |      2      |      3      |      4       ");
 		System.out.println("\t  " + "+-------------+-------------+-------------+-------------+-------------+");
 		System.out.println("\t  " + "|" + drawSpaces(1, netMap.getCell(0,0)) + drawDome(netMap.getCell(0,0)) + drawSpaces(1, netMap.getCell(0,0)) + "|" + drawSpaces(1, netMap.getCell(1,0)) + drawDome(netMap.getCell(1,0)) + drawSpaces(1, netMap.getCell(1,0)) + "|" + drawSpaces(1, netMap.getCell(2,0)) + drawDome(netMap.getCell(2,0)) + drawSpaces(1, netMap.getCell(2,0)) + "|" + drawSpaces(1, netMap.getCell(3,0)) + drawDome(netMap.getCell(3,0)) + drawSpaces(1, netMap.getCell(3,0)) + "|" + drawSpaces(1, netMap.getCell(4,0)) + drawDome(netMap.getCell(4,0)) + drawSpaces(1, netMap.getCell(4,0)) + "|");
