@@ -85,6 +85,7 @@ public class ServerClientListenerThread extends Thread {
 	 * The constructor initialize a listener for client's messages in the setup stage.
 	 * @param server This parameter is the reference to the server object
 	 * @param clientSocket This parameter is the client's socket which this object listen
+	 * @throws IOException if the socket can't be accessed
 	 */
 	public ServerClientListenerThread(Socket clientSocket, Server server) throws IOException {
 		super("ServerClientListenerThread_"+thread_number);
@@ -479,7 +480,7 @@ public class ServerClientListenerThread extends Thread {
 	}
 	/**
 	 * It sets the current thread to {@code active} value, if it is set to false the thread is going to terminate, instead the thread is going to continue its normal work.
-	 * @param active
+	 * @param active true if the thread must be operate, false otherwise
 	 */
 	public void setActive(boolean active) {
 		synchronized (stateLock) {
@@ -580,6 +581,7 @@ public class ServerClientListenerThread extends Thread {
 	// METHODS CALLED THAT CHANGES THE STATE OF THE LISTENER THREAD
 	/**
 	 * This method is called when a programming error occurred, it sends a message to the client to notify it that this game has crashed and throws an AssertionError on the server.
+	 * @param info information about the error
 	 * @throws AssertionError always thrown because the server had an error due to incorrect calls to methods
 	 */
 	public void fatalError(String info) {

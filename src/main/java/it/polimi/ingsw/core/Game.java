@@ -525,7 +525,7 @@ public class Game extends ObservableGame {
 		notifyOrder((String[])playerOrder.toArray(new String[0]));
 	}
 	/**
-	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap<String,Color> with player names and color chosen.
+	 * Sets the player's color indicated and updates the remote views about the colors actually chosen by the players sending an HashMap&lt;String,Color&gt; with player names and color chosen.
 	 * @param player is the player which the color has to be set
 	 * @param color the color chosen by the player
 	 * @throws IllegalArgumentException if color or player is null or if it is trying to set the color of a player which isn't the active player

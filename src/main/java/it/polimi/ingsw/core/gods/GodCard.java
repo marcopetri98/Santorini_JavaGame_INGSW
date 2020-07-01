@@ -102,7 +102,6 @@ public abstract class GodCard {
 	 * @param w represents the worker moved by the player during this turn
 	 * @param turn the phase of the game
 	 * @return the cells where the Player's Worker may move according to the general game rules
-	 * @throws NoMoveException if the phase is wrong
 	 */
 	public static List<Move> standardMoves(Map m, Worker w, Turn turn) {
 		if (turn.getGamePhase() != GamePhase.MOVE) {
@@ -140,7 +139,6 @@ public abstract class GodCard {
 	 * @param w represents the worker moved by the player during this turn
 	 * @param turn the phase of the game
 	 * @return the cells where the Player's Worker may build according to the general game rules
-	 * @throws NoBuildException if you can't build because of a wrong phase
 	 */
 	public static List<Build> standardBuilds(Map m, Worker w, Turn turn) {
 		if (turn.getGamePhase() != GamePhase.BUILD) {

@@ -12,6 +12,7 @@ public class BadRequestException extends Exception {
 	}
 	/**
 	 * It creates a {@code BadRequestException} with msg message.
+	 * @param msg the message of the exception
 	 */
 	public BadRequestException(String msg) {
 		super(msg);

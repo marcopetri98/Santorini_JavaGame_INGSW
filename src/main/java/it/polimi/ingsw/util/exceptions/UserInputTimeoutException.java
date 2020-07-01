@@ -12,6 +12,7 @@ public class UserInputTimeoutException extends Exception {
 	}
 	/**
 	 * It creates a {@code UserInputTimeoutException} with msg message.
+	 * @param msg the message of the exception
 	 */
 	public UserInputTimeoutException(String msg) {
 		super(msg);

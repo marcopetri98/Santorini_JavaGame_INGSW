@@ -126,6 +126,7 @@ public class LobbySceneController implements SceneController {
 	/**
 	 * This method handles the mouse click on a exit button: making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
@@ -156,7 +157,7 @@ public class LobbySceneController implements SceneController {
 
 	/**
 	 * This method displays the players entered in the lobby
-	 * @param finished
+	 * @param finished if the game is finished
 	 */
 	private void setupNames(boolean finished) {
 		List<String> playerNames = gameState.getPlayers();

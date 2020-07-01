@@ -57,6 +57,7 @@ public class MenuSceneController {
 	/**
 	 * This method handles the mouse release on a play button: making it unpressed and changing the scene.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mouseReleasedPlay(MouseEvent mouseEvent) throws IOException {
 		button_play.setImage(buttonPlay);

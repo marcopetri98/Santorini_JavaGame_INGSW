@@ -376,6 +376,9 @@ public class MapSceneController implements SceneController {
 	 * This method creates a fade transition of an image.
 	 * @param imageView the ImageView that has to be faded.
 	 * @param image the Image to set in the ImageView.
+	 * @param from initial fade percentage
+	 * @param to final fade percentage
+	 * @param flag if 1 the image is set to top otherwise back
 	 */
 	private void fadeImage(ImageView imageView, Image image, int from, int to, int flag){
 		imageView.setImage(image);
@@ -656,6 +659,7 @@ public class MapSceneController implements SceneController {
 	/**
 	 * This method handles the mouse click on a exit button: making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
@@ -800,13 +804,14 @@ public class MapSceneController implements SceneController {
 	 * This method handles the mouse click on a exit button: making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
 	 */
-	public void mousePressedExit2(MouseEvent mouseEvent) throws IOException {
+	public void mousePressedExit2(MouseEvent mouseEvent) {
 		button_exit2.setImage(buttonExitPressed);
 	}
 
 	/**
 	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mouseReleasedExit2(MouseEvent mouseEvent) throws IOException {
 		button_exit2.setImage(buttonExit);

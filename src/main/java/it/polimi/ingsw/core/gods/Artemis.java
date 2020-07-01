@@ -127,8 +127,10 @@ public class Artemis extends GodCard {
 	 * This method adds the other cells of the Artemis power to the list moves
 	 * @param m represents the map
 	 * @param w represents the worker moved by the player during this turn
-	 * @param x1,y1 represent the coordinates of the cell where the player may move
-	 * @param x,y represent the coordinates of the cell where the worker is
+	 * @param x1 represent x the coordinate of the cell where the player may move
+	 * @param y1 represent y the coordinate of the cell where the player may move
+	 * @param x represent x the coordinate of the cell where the worker is
+	 * @param y represent y the coordinate of the cell where the worker is
 	 * @param moves the list of the moves found before the addCell is called
 	 */
 	private void addCell(Map m, Worker w, int x1, int y1, int x, int y, List<Move> moves) {

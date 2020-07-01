@@ -10,6 +10,7 @@ public class NoMoveException extends Exception {
 	public NoMoveException() {super();}
 	/**
 	 * It creates a {@code NoMoveException} with msg message.
+	 * @param msg the message of the exception
 	 */
 	public NoMoveException(String msg) {super(msg);}
 }

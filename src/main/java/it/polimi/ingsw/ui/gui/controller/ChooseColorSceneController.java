@@ -108,10 +108,14 @@ public class ChooseColorSceneController implements SceneController {
 		ft.setCycleCount(1);
 		ft.play();
 	}
+
 	/**
 	 * This method creates a fade transition of an image.
 	 * @param imageView the ImageView that has to be faded.
 	 * @param image the Image to set in the ImageView.
+	 * @param from initial fade percentage
+	 * @param to final fade percentage
+	 * @param flag if 1 the image is set to top otherwise back
 	 */
 	private void fadeImage(ImageView imageView, Image image, int from, int to, int flag){
 		imageView.setImage(image);
@@ -303,6 +307,7 @@ public class ChooseColorSceneController implements SceneController {
 	/**
 	 * This method handles the mouse click on a exit button: making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);

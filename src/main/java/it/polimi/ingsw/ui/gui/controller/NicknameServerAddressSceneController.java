@@ -151,7 +151,7 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 * This method handles the mouse click on a next button, making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
 	 */
-	public void mousePressedNext(MouseEvent mouseEvent) throws IOException {
+	public void mousePressedNext(MouseEvent mouseEvent) {
 		button_next.setImage(buttonNextPressed);
 	}
 
@@ -204,6 +204,7 @@ public class NicknameServerAddressSceneController implements SceneController {
 	/**
 	 * This method handles the mouse click on a exit button: making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);
@@ -215,7 +216,7 @@ public class NicknameServerAddressSceneController implements SceneController {
 	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
 	 */
-	public void mouseReleasedExit(MouseEvent mouseEvent) throws IOException {
+	public void mouseReleasedExit(MouseEvent mouseEvent) {
 		button_exit.setImage(buttonExit);
 
 		MainGuiController.getInstance().setSceneController(null);

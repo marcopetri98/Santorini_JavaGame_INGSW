@@ -30,7 +30,8 @@ public class Map {
 
 	/**
 	 * Getter of the {@link Cell} given the coordinates
-	 * @param X,Y the coordinates of the {@link Cell}
+	 * @param X the x coordinate of the {@link Cell}
+	 * @param Y the y coordinate of the {@link Cell}
 	 * @return the {@link Cell} with these coordinates
 	 */
 	public Cell getCell(int X, int Y) {
@@ -41,7 +42,7 @@ public class Map {
 	 * Getter of the X coordinate of a {@link Cell}
 	 * @param c the {@link Cell}
 	 * @return the X coordinate of the {@link Cell}
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException if the cell doesn't exist
 	 */
 	public int getX(Cell c) throws IllegalArgumentException {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {
@@ -58,7 +59,7 @@ public class Map {
 	 * Getter of the Y coordinate of a {@link Cell}
 	 * @param c the {@link Cell}
 	 * @return the Y coordinate of a {@link Cell}
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException if the cells doesn't exist
 	 */
 	public int getY(Cell c) throws IllegalArgumentException  {
 		for (int i = 0; i < Constants.MAP_SIDE; i++) {

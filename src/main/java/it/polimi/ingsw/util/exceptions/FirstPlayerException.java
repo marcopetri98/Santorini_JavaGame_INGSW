@@ -12,6 +12,7 @@ public class FirstPlayerException extends Exception {
 	}
 	/**
 	 * It creates a {@code FirstPlayerException} with msg message.
+	 * @param msg the message of the exception
 	 */
 	public FirstPlayerException(String msg) {
 		super(msg);

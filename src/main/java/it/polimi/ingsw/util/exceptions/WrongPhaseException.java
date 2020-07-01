@@ -12,6 +12,7 @@ public class WrongPhaseException extends Exception {
 	}
 	/**
 	 * It creates a {@code WrongPhaseException} with msg message.
+	 * @param msg the message of the exception
 	 */
 	public WrongPhaseException(String msg) {
 		super(msg);

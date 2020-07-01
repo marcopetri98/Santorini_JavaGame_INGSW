@@ -40,7 +40,7 @@ public class Player {
 	/**
 	 * Sets the correct {@code activeWorker} based on its number
 	 * @param chosen the number of the worker
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException if chosen isn't 2 or 3
 	 */
 	void chooseWorker(int chosen) throws IllegalArgumentException {
 		if (chosen == 1) {
@@ -57,7 +57,7 @@ public class Player {
 	/**
 	 * Sets the {@link GodCard} of this player
 	 * @param card1 the {@link GodCard}
-	 * @throws NullPointerException
+	 * @throws NullPointerException if card1 is null
 	 */
 	void setGodCard(GodCard card1) throws NullPointerException {
 		if (card1 == null) {

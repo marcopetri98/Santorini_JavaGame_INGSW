@@ -14,7 +14,8 @@ public class Cell {
 	/**
 	 * Constructor of this class
 	 * @param m a {@link Map}
-	 * @param x,y the coordinates of the {@link Cell}
+	 * @param x the x coordinate of the {@link Cell}
+	 * @param y the y coordinate of the {@link Cell}
 	 */
 	public Cell(Map m, int x, int y) {
 		this.building = new Building();

@@ -26,6 +26,7 @@ public class DefeatManager {
 	 * @param worker1_possible_moves the possible moves of the first worker of the active player
 	 * @param worker2_possible_moves the possible moves of the second worker of the active player
 	 * @throws NullPointerException if the parameter is null
+	 * @return true if the player has been defeated
 	 */
 	public boolean moveDefeat(List<Move> worker1_possible_moves, List<Move> worker2_possible_moves) throws NullPointerException {
 		if(worker1_possible_moves == null || worker2_possible_moves == null){
@@ -46,6 +47,7 @@ public class DefeatManager {
 	 * The method checks if the standard condition of defeat (with respect to the build phase) is respected: if it is, it calls applyDefeat method in Game class
 	 * @param worker_possible_builds the possible builds of the active worker of the active player
 	 * @throws NullPointerException if the parameter is null
+	 * @return true if the player has been defeated
 	 */
 	public boolean buildDefeat(List<Build> worker_possible_builds) throws NullPointerException {
 		if(worker_possible_builds == null) {
@@ -61,8 +63,8 @@ public class DefeatManager {
 
 	/**
 	 * It receives a list of moves where can be present only moves that can be applied
-	 * @param list
-	 * @return
+	 * @param list a list of moves
+	 * @return a list of only possible moves eliminating forbidden ones
 	 */
 	public static List<Move> filterMoves(List<Move> list) {
 		List<Move> newList = new ArrayList<>();

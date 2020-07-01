@@ -473,6 +473,7 @@ public class ChooseGodsFirstSceneController implements SceneController {
 	/**
 	 * This method handles the mouse click on a exit button: making it pressed.
 	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+	 * @throws IOException if the fxml file can't be loaded
 	 */
 	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
 		button_exit.setImage(buttonExitPressed);

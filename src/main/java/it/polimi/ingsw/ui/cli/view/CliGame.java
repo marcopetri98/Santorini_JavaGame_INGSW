@@ -222,7 +222,7 @@ public class CliGame {
 	/**
 	 * Setter: sets the name of this player
 	 * @param name the name of this player
-	 * @throws NullPointerException
+	 * @throws NullPointerException if name is null
 	 */
 	public void setPlayerName(String name) throws NullPointerException {
 		if (name == null) {
@@ -234,7 +234,7 @@ public class CliGame {
 	/**
 	 * This method adds to the deque the messages. It is called from the MainCliController class
 	 * @param message the message to enqueue
-	 * @throws NullPointerException
+	 * @throws NullPointerException if message is null
 	 */
 	public void addToQueue(NetObject message) {
 		//System.out.println("\n"+Constants.FG_RED+message.message+Constants.RESET+"\n");	//Only for debug purposes
@@ -1110,6 +1110,7 @@ public class CliGame {
 
 	/**
 	 * This method prints the Gods Guide if the player asks for it, based on the divinity he wants to know the power of
+	 * @param godName is the god's name
 	 */
 	private void printGodGuide(String godName) {
 		System.out.println(Constants.FG_RED + "\n\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t************************* ~ Welcome to the Gods info paragraph! ~ *************************" + Constants.RESET);

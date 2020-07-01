@@ -12,6 +12,7 @@ public class AlreadyStartedException extends Exception {
 	}
 	/**
 	 * It creates an {@code AlreadyStartedException} with msg message.
+	 * @param msg the message of the exception
 	 */
 	public AlreadyStartedException(String msg) {
 		super(msg);

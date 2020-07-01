@@ -1,0 +1,16 @@
+it.polimi.ingsw
+it.polimi.ingsw.controller
+it.polimi.ingsw.core
+it.polimi.ingsw.core.gods
+it.polimi.ingsw.core.state
+it.polimi.ingsw.network
+it.polimi.ingsw.network.game
+it.polimi.ingsw.network.objects
+it.polimi.ingsw.ui
+it.polimi.ingsw.ui.cli.controller
+it.polimi.ingsw.ui.cli.view
+it.polimi.ingsw.ui.gui.controller
+it.polimi.ingsw.ui.gui.viewModel
+it.polimi.ingsw.util
+it.polimi.ingsw.util.exceptions
+it.polimi.ingsw.util.observers

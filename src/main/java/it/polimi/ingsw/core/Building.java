@@ -29,7 +29,7 @@ public class Building {
 
 	/**
 	 * Method used to increment the height of a building (from 0 to 3 in steps of 1)
-	 * @throws IllegalStateException
+	 * @throws IllegalStateException is the current level is 3
 	 */
 	void incrementLevel() throws IllegalStateException {
 		if (level <= 2) {
