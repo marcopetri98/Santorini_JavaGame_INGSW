@@ -725,7 +725,7 @@ public class ChooseGodsSceneController implements SceneController {
 					}
 					disableGod(god);
 				}
-				if (gameState.getGods().containsKey(gameState.getPlayer())) {
+				if (gameState.getGods().containsKey(gameState.getPlayer()) && !button_next.isDisabled()) {
 					fadeImage(button_next,buttonNext,1,0,1);
 					button_next.setDisable(true);
 				}

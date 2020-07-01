@@ -429,7 +429,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					NetGameSetup setupPhase = new NetGameSetup(Constants.TURN_PLAYERTURN, playerName);
 					clientHandler.sendMessage(setupPhase);
 				}
-				case PLAYERTURN, OTHERTURN -> {
+				case PLAYERTURN, OTHERTURN, OBSERVER -> {
 					if (clientHandler.getPlayerName().equals(playerName)) {
 						clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
 					} else {
