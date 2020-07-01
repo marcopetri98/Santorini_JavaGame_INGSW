@@ -226,7 +226,6 @@ public class ServerClientListenerThread extends Thread {
 	 * @param setupMessage is the message sent by the client
 	 * @throws AssertionError if this object has passed wrong parameters to the server functions
 	 */
-	// TODO: control that every msg.player is not null and all null pointers
 	private void parseSetupInput(NetSetup setupMessage) {
 		NetSetup setupOutput;
 		String nameReceived;
@@ -298,7 +297,6 @@ public class ServerClientListenerThread extends Thread {
 			setupOutput = new NetSetup(Constants.SETUP_CREATE);
 			sendMessage(setupOutput);
 		} catch (IllegalCallerException ex) {
-			// TODO: this has been thrown while creating a lobby with a gui client, exiting with x during color phase and after joining with needed players and make them quit
 			throw new AssertionError("A thread called getClientPosition() or setPlayerNumber() without representing a client");
 		} catch (IllegalArgumentException ex) {
 			throw new AssertionError("Dimension of the game passed to the server was wrong");
@@ -328,7 +326,7 @@ public class ServerClientListenerThread extends Thread {
 	private void parseColorInput(NetColorPreparation colorMessage) {
 		NetColorPreparation colorOutput;
 
-		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) && colorMessage.player.equals(playerName) && Constants.COLOR_COLORS.contains(colorMessage.getColor())) {
+		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) && colorMessage.player != null && colorMessage.player.equals(playerName) && Constants.COLOR_COLORS.contains(colorMessage.getColor())) {
 			// the user is trying to choose the color with a well formed message, this is sent to the remoteView
 			gameServer.handleColorRequest(colorMessage,false);
 		} else if (colorMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
@@ -347,7 +345,7 @@ public class ServerClientListenerThread extends Thread {
 	private void parseDivinityInput(NetDivinityChoice divinityMessage) {
 		NetDivinityChoice divinityOutput;
 
-		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS) && divinityMessage.player.equals(playerName)) {
+		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS) && divinityMessage.player != null && divinityMessage.player.equals(playerName)) {
 			// if the player has sent a well formed message with gods that has to be in the game it sends this to the remote view
 			if ((divinityMessage.getDivinities().size() == 2 || divinityMessage.getDivinities().size() == 3) && Constants.GODS_GOD_NAMES.containsAll(divinityMessage.getDivinities())) {
 				gameServer.handleDivinityRequest(divinityMessage,false);
@@ -355,7 +353,7 @@ public class ServerClientListenerThread extends Thread {
 				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
 				sendMessage(divinityOutput);
 			}
-		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE) && divinityMessage.player.equals(playerName)) {
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE) && divinityMessage.player != null && divinityMessage.player.equals(playerName)) {
 			// if the player chose a divinity it sends the message to the remote view
 			if (Constants.GODS_GOD_NAMES.contains(divinityMessage.getDivinity())) {
 				gameServer.handleDivinityRequest(divinityMessage,false);
@@ -363,7 +361,7 @@ public class ServerClientListenerThread extends Thread {
 				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);
 				sendMessage(divinityOutput);
 			}
-		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.challenger.equals(playerName) && divinityMessage.player != null) {
+		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) && divinityMessage.player != null && divinityMessage.challenger != null && divinityMessage.challenger.equals(playerName)) {
 			// if the player is trying to select a start player with a well formed message it sends the message to the remote view
 			gameServer.handleDivinityRequest(divinityMessage,false);
 		} else if (divinityMessage.message.equals(Constants.GENERAL_DISCONNECT)) {
@@ -382,7 +380,7 @@ public class ServerClientListenerThread extends Thread {
 	private void parseGameSetupInput(NetGameSetup gameSetupMessage) {
 		NetGameSetup gameSetupOutput;
 
-		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE) && gameSetupMessage.player.equals(playerName)) {
+		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE) && gameSetupMessage.player != null && gameSetupMessage.player.equals(playerName)) {
 			if (gameSetupMessage.worker1.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker1.getFirst() >= 0 && gameSetupMessage.worker1.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker1.getSecond() >= 0 && gameSetupMessage.worker2.getFirst() < Constants.MAP_SIDE && gameSetupMessage.worker2.getFirst() >= 0 && gameSetupMessage.worker2.getSecond() < Constants.MAP_SIDE && gameSetupMessage.worker2.getSecond() >= 0 && !gameSetupMessage.worker1.equals(gameSetupMessage.worker2) && gameSetupMessage.worker1.getFirst() != null && gameSetupMessage.worker1.getSecond() != null && gameSetupMessage.worker2.getFirst() != null && gameSetupMessage.worker2.getSecond() != null) {
 				// the user is sending coordinates of the map where it want to put workers (not on the same cell)
 				gameServer.handlePositionRequest(gameSetupMessage,false);
@@ -408,14 +406,14 @@ public class ServerClientListenerThread extends Thread {
 		NetworkPhase currentPhase = getGamePhase();
 
 		if (currentPhase == NetworkPhase.PLAYERTURN) {
-			if (gamingMsg.message.equals(Constants.PLAYER_IN_MOVE) && gamingMsg.player.equals(playerName)) {
+			if (gamingMsg.message.equals(Constants.PLAYER_IN_MOVE) && gamingMsg.player != null && gamingMsg.player.equals(playerName)) {
 				if (gamingMsg.move != null && gamingMsg.move.isWellFormed()) {
 					gameServer.handleMoveRequest(gamingMsg, false);
 				} else {
 					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);
 					sendMessage(gamingMsg);
 				}
-			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_BUILD) && gamingMsg.player.equals(playerName)) {
+			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_BUILD) && gamingMsg.player != null && gamingMsg.player.equals(playerName)) {
 				if (gamingMsg.build != null && gamingMsg.build.isWellFormed()) {
 					gameServer.handleBuildRequest(gamingMsg, false);
 				} else {

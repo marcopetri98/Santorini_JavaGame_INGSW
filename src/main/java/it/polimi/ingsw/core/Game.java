@@ -369,7 +369,7 @@ public class Game extends ObservableGame {
 		try {
 			playerPossibleBuilds.addAll(getPlayerTurn().getCard().checkBuild(map,w,turn));
 		} catch (NoBuildException ignore) {
-			// TODO: verify why we can ignore this exception
+
 		}
 	}
 

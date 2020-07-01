@@ -77,7 +77,6 @@ public class Server implements Runnable {
 				try {
 					lobbyClients.wait();
 				} catch (InterruptedException e) {
-					//TODO: see every interrupted exception and implement a more elegant way to handle them
 					throw new AssertionError("Thread was interrupted and the code never interrupts it");
 				}
 			}
@@ -168,7 +167,6 @@ public class Server implements Runnable {
 					try {
 						lobbyClients.wait();
 					} catch (InterruptedException e) {
-						//TODO: see every interrupted exception and implement a more elegant way to handle them
 						throw new AssertionError("Thread was interrupted and the code never interrupts it");
 					}
 					throw new AlreadyStartedException();
@@ -266,7 +264,6 @@ public class Server implements Runnable {
 				try {
 					preparedListeners.wait();
 				} catch (InterruptedException e) {
-					//TODO: see every interrupted exception and implement a more elegant way to handle them
 					throw new AssertionError("Thread was interrupted while waiting for all threads to be ready");
 				}
 			}
