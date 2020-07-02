@@ -268,7 +268,7 @@ public class CliGame {
 	private boolean parseSyntax(Command command) {
 		if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
 			functioning = false;
-			inputController.disconnect(phase);
+			inputController.getCommand(command,phase);
 			return true;
 		}
 

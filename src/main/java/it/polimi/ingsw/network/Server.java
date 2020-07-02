@@ -137,7 +137,9 @@ public class Server implements Runnable {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
 				// someone accessed illegally the server, a refresh is needed
-				resetStatus();
+				if (lobbyDimension == -1) {
+					resetStatus();
+				}
 				throw new IllegalCallerException();
 			}
 		}
@@ -203,7 +205,9 @@ public class Server implements Runnable {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler) || creator != handler) {
 				// someone accessed illegally the server, a refresh is needed
-				resetStatus();
+				if (lobbyDimension == -1) {
+					resetStatus();
+				}
 				throw new IllegalCallerException();
 			} else if (lobbyDimension == 2 || lobbyDimension == 3) {
 				throw new IllegalStateException();
@@ -231,7 +235,9 @@ public class Server implements Runnable {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
 				// someone accessed illegally the server, a refresh is needed
-				resetStatus();
+				if (lobbyDimension == -1) {
+					resetStatus();
+				}
 				throw new IllegalCallerException();
 			}
 			return new ArrayList<>(lobbyClients.keySet()).indexOf(handler);

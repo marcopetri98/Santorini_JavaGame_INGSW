@@ -431,8 +431,8 @@ public class ChooseGodsSceneController implements SceneController {
 		button_exit.setImage(buttonExit);
 
 		if (!finished) {
-			NetSetup netSetup = new NetSetup(Constants.GENERAL_DISCONNECT);
-			MainGuiController.getInstance().sendMessage(netSetup);
+			NetDivinityChoice netDivinity = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);
+			MainGuiController.getInstance().sendMessage(netDivinity);
 		}
 		MainGuiController.getInstance().refresh();
 		MainGuiController.getInstance().setSceneController(null);

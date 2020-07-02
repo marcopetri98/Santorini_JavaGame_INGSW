@@ -458,7 +458,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 				case SETUP -> clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_SETUP_DISCONNECT));
 			}
 			clientHandler.closeSocketAndTerminate();
-			observed.removeObserver(this);
 		}
 	}
 }
