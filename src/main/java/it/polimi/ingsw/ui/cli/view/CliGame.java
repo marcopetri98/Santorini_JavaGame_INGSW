@@ -268,6 +268,7 @@ public class CliGame {
 	private boolean parseSyntax(Command command) {
 		if (command.commandType.equals(Constants.COMMAND_DISCONNECT)) {
 			functioning = false;
+			inputController.disconnect(phase);
 			return true;
 		}
 
@@ -642,7 +643,6 @@ public class CliGame {
 		if (obj.message.equals(Constants.GENERAL_FATAL_ERROR) || obj.message.equals(Constants.GENERAL_SETUP_DISCONNECT)) {
 			printServerError(obj);
 			functioning = false;
-			//messages.remove();
 		} else {
 			switch (phase.getPhase()) {
 				case COLORS:

@@ -20,7 +20,7 @@ import it.polimi.ingsw.util.Pair;
  */
 public class UserInputController {
 	private CliGame gameView;
-	private ClientMessageListener listener;
+	private final ClientMessageListener listener;
 	private NetMap gameMap;
 	private String playerName;
 
@@ -205,6 +205,20 @@ public class UserInputController {
 	/**
 	 * It disconnects the user.
 	 */
+	public void disconnect(Turn phase) {
+		listener.resetListening();
+		if(phase.getPhase().equals(Phase.COLORS)){
+			listener.sendMessage(new NetColorPreparation(Constants.GENERAL_DISCONNECT));
+		}
+		if(phase.getPhase().equals(Phase.GODS)){
+			listener.sendMessage(new NetSetup(Constants.GENERAL_DISCONNECT));
+		}
+		if(phase.getPhase().equals(Phase.SETUP)){
+			listener.sendMessage(new NetSetup(Constants.GENERAL_DISCONNECT));
+		}
+		//listener.sendMessage(new NetSetup(Constants.GENERAL_DISCONNECT));
+	}
+
 	public void disconnect() {
 		listener.resetListening();
 		listener.sendMessage(new NetSetup(Constants.GENERAL_DISCONNECT));
