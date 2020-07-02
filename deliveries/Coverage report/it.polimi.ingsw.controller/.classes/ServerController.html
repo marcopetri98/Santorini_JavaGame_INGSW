@@ -58,10 +58,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.1%
+    79.6%
   </span>
   <span class="absValue">
-    (117/ 146)
+    (117/ 147)
   </span>
 </td>
 </tr>
@@ -363,8 +363,8 @@
 <b class="fc"><i>289</i>&nbsp;							if (observedModel.getPlayerPossibleBuilds().size() == 0) {</b>
 <b class="fc"><i>290</i>&nbsp;								observedModel.changeTurn();</b>
 <b class="fc"><i>291</i>&nbsp;								observedModel.computeActions();</b>
-<b class="fc"><i>292</i>&nbsp;								defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());</b>
-<i>293</i>&nbsp;							}
+<i>292</i>&nbsp;							}
+<b class="fc"><i>293</i>&nbsp;							defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());</b>
 <i>294</i>&nbsp;						}
 <i>295</i>&nbsp;					} else {
 <b class="nc"><i>296</i>&nbsp;						caller.communicateError();</b>
@@ -407,16 +407,17 @@
 <i>333</i>&nbsp;		try {
 <b class="fc"><i>334</i>&nbsp;			observedModel.removeObserver((ObserverRemoteView)observed);</b>
 <b class="nc"><i>335</i>&nbsp;		} catch (IllegalArgumentException e) {</b>
-<b class="nc"><i>336</i>&nbsp;			throw new AssertionError(&quot;The server controller has been called to remove an observer that doesn&#39;t exist&quot;);</b>
-<b class="fc"><i>337</i>&nbsp;		}</b>
-<b class="fc"><i>338</i>&nbsp;	}</b>
-<i>339</i>&nbsp;}
+<b class="nc"><i>336</i>&nbsp;			System.err.println(&quot;A strange event happened, however it has been blocked: The server controller has been called to remove an observer that doesn&#39;t exist. Here is the stack trace:&quot;);</b>
+<b class="nc"><i>337</i>&nbsp;			e.printStackTrace();</b>
+<b class="fc"><i>338</i>&nbsp;		}</b>
+<b class="fc"><i>339</i>&nbsp;	}</b>
+<i>340</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2020-07-02 13:20</div>
+    <div style="float:right;">generated on 2020-07-03 01:29</div>
 </div>
 </body>
 </html>

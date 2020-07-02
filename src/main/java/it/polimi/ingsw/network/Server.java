@@ -235,7 +235,7 @@ public class Server implements Runnable {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
 				// someone accessed illegally the server, a refresh is needed
-				if (lobbyDimension == -1) {
+				if (lobbyDimension == 1) {
 					resetStatus();
 				}
 				throw new IllegalCallerException();
@@ -270,10 +270,11 @@ public class Server implements Runnable {
 			lobbyDimension = -1;
 			creator = null;
 			preparedListeners.clear();
-			for (ServerClientListenerThread handler : lobbyClients.keySet()) {
-				handler.closeSocketAndTerminate();
-			}
+			Set<ServerClientListenerThread> threadList = lobbyClients.keySet();
 			lobbyClients.clear();
+			for (ServerClientListenerThread handler : threadList) {
+				handler.fatalError("Two clients created a conflict accessing the server");
+			}
 		}
 	}
 	/**

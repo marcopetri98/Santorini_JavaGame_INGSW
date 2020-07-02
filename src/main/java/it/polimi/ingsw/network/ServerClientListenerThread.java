@@ -297,8 +297,10 @@ public class ServerClientListenerThread extends Thread {
 			setupOutput = new NetSetup(Constants.SETUP_CREATE);
 			sendMessage(setupOutput);
 		} catch (IllegalCallerException ex) {
+			ex.printStackTrace();
 			throw new AssertionError("A thread called getClientPosition() or setPlayerNumber() without representing a client");
 		} catch (IllegalArgumentException ex) {
+			ex.printStackTrace();
 			throw new AssertionError("Dimension of the game passed to the server was wrong");
 		}
 	}

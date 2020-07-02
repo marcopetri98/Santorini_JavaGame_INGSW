@@ -58,10 +58,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    68.6%
+    68.8%
   </span>
   <span class="absValue">
-    (127/ 185)
+    (128/ 186)
   </span>
 </td>
 </tr>
@@ -309,7 +309,7 @@
 <b class="fc"><i>235</i>&nbsp;		synchronized (lobbyClients) {</b>
 <b class="fc"><i>236</i>&nbsp;			if (!lobbyClients.containsKey(handler)) {</b>
 <i>237</i>&nbsp;				// someone accessed illegally the server, a refresh is needed
-<b class="fc"><i>238</i>&nbsp;				if (lobbyDimension == -1) {</b>
+<b class="fc"><i>238</i>&nbsp;				if (lobbyDimension == 1) {</b>
 <b class="nc"><i>239</i>&nbsp;					resetStatus();</b>
 <i>240</i>&nbsp;				}
 <b class="fc"><i>241</i>&nbsp;				throw new IllegalCallerException();</b>
@@ -344,81 +344,82 @@
 <b class="fc"><i>270</i>&nbsp;			lobbyDimension = -1;</b>
 <b class="fc"><i>271</i>&nbsp;			creator = null;</b>
 <b class="fc"><i>272</i>&nbsp;			preparedListeners.clear();</b>
-<b class="fc"><i>273</i>&nbsp;			for (ServerClientListenerThread handler : lobbyClients.keySet()) {</b>
-<b class="nc"><i>274</i>&nbsp;				handler.closeSocketAndTerminate();</b>
-<b class="nc"><i>275</i>&nbsp;			}</b>
-<b class="fc"><i>276</i>&nbsp;			lobbyClients.clear();</b>
-<b class="fc"><i>277</i>&nbsp;		}</b>
-<b class="fc"><i>278</i>&nbsp;	}</b>
-<i>279</i>&nbsp;	/**
-<i>280</i>&nbsp;	 * This method create a game where players are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
-<i>281</i>&nbsp;	 */
-<i>282</i>&nbsp;	private void createGame() {
-<i>283</i>&nbsp;		int lobbySize;
-<b class="fc"><i>284</i>&nbsp;		synchronized (lobbyClients) {</b>
-<b class="fc"><i>285</i>&nbsp;			lobbySize = lobbyClients.size();</b>
-<b class="fc"><i>286</i>&nbsp;		}</b>
-<i>287</i>&nbsp;		// it is not needed to synchronize on lobbyClients because add players and remove players cannot execute until create game hasn&#39;t finished
-<b class="fc"><i>288</i>&nbsp;		synchronized (preparedListeners) {</b>
-<b class="fc"><i>289</i>&nbsp;			while (preparedListeners.size() != lobbySize) {</b>
-<i>290</i>&nbsp;				try {
-<b class="nc"><i>291</i>&nbsp;					preparedListeners.wait();</b>
-<b class="nc"><i>292</i>&nbsp;				} catch (InterruptedException e) {</b>
-<b class="nc"><i>293</i>&nbsp;					throw new AssertionError(&quot;Thread was interrupted while waiting for all threads to be ready&quot;);</b>
-<b class="nc"><i>294</i>&nbsp;				}</b>
-<i>295</i>&nbsp;			}
-<b class="fc"><i>296</i>&nbsp;		}</b>
-<i>297</i>&nbsp;
-<b class="fc"><i>298</i>&nbsp;		synchronized (lobbyClients) {</b>
-<b class="fc"><i>299</i>&nbsp;			if (lobbyDimension == lobbyClients.size()) {</b>
-<i>300</i>&nbsp;				try {
-<b class="fc"><i>301</i>&nbsp;					Game game = new Game(lobbyClients.values().toArray(new String[0]));</b>
-<b class="fc"><i>302</i>&nbsp;					ServerController controller = new ServerController(game);</b>
-<b class="fc"><i>303</i>&nbsp;					List&lt;ServerClientListenerThread&gt; keys = new ArrayList&lt;&gt;(lobbyClients.keySet());</b>
-<b class="fc"><i>304</i>&nbsp;					for (int i = 0; i &lt; lobbyClients.size(); i++) {</b>
-<b class="fc"><i>305</i>&nbsp;						RemoteView remoteView = new RemoteView(keys.get(i));</b>
-<b class="fc"><i>306</i>&nbsp;						keys.get(i).setGamePhase(NetworkPhase.LOBBY);</b>
-<b class="fc"><i>307</i>&nbsp;						keys.get(i).setGameServer(remoteView);</b>
-<b class="fc"><i>308</i>&nbsp;						remoteView.addObserver(controller);</b>
-<b class="fc"><i>309</i>&nbsp;						game.addObserver(remoteView);</b>
-<i>310</i>&nbsp;					}
-<b class="fc"><i>311</i>&nbsp;					controller.generateOrder();</b>
-<b class="fc"><i>312</i>&nbsp;					previousLobby = lobbyClients;</b>
-<b class="fc"><i>313</i>&nbsp;					lobbyClients.clear();</b>
-<b class="fc"><i>314</i>&nbsp;					lobbyDimension = -1;</b>
-<b class="fc"><i>315</i>&nbsp;					creator = null;</b>
-<b class="fc"><i>316</i>&nbsp;					starting = false;</b>
-<b class="fc"><i>317</i>&nbsp;					synchronized (preparedListeners) {</b>
-<b class="fc"><i>318</i>&nbsp;						preparedListeners.clear();</b>
-<b class="fc"><i>319</i>&nbsp;						preparedListeners.notifyAll();</b>
-<b class="fc"><i>320</i>&nbsp;					}</b>
-<b class="fc"><i>321</i>&nbsp;					lobbyClients.notifyAll();</b>
-<b class="nc"><i>322</i>&nbsp;				} catch (NullPointerException e) {</b>
-<i>323</i>&nbsp;					// it needs a thread making al thread finish to execute because if not, if a thread terminate itself stops before terminating the others
-<b class="nc"><i>324</i>&nbsp;					for (ServerClientListenerThread handler : lobbyClients.keySet()) {</b>
-<b class="nc"><i>325</i>&nbsp;						handler.fatalError(&quot;During game creation the game was created null and passed to server controller&quot;);</b>
-<b class="nc"><i>326</i>&nbsp;					}</b>
-<b class="nc"><i>327</i>&nbsp;					lobbyClients.clear();</b>
-<b class="nc"><i>328</i>&nbsp;					lobbyDimension = -1;</b>
-<b class="nc"><i>329</i>&nbsp;					creator = null;</b>
-<b class="nc"><i>330</i>&nbsp;					starting = false;</b>
-<b class="nc"><i>331</i>&nbsp;					synchronized (preparedListeners) {</b>
-<b class="nc"><i>332</i>&nbsp;						preparedListeners.clear();</b>
-<b class="nc"><i>333</i>&nbsp;						preparedListeners.notifyAll();</b>
-<b class="nc"><i>334</i>&nbsp;					}</b>
-<b class="nc"><i>335</i>&nbsp;					lobbyClients.notifyAll();</b>
-<b class="nc"><i>336</i>&nbsp;					throw new AssertionError(&quot;Something&#39;s gone wrong and the server tried to create a gaming server with null game&quot;);</b>
-<b class="fc"><i>337</i>&nbsp;				}</b>
-<i>338</i>&nbsp;			}
-<b class="fc"><i>339</i>&nbsp;		}</b>
-<b class="fc"><i>340</i>&nbsp;	}</b>
-<i>341</i>&nbsp;}
+<b class="fc"><i>273</i>&nbsp;			Set&lt;ServerClientListenerThread&gt; threadList = lobbyClients.keySet();</b>
+<b class="fc"><i>274</i>&nbsp;			lobbyClients.clear();</b>
+<b class="fc"><i>275</i>&nbsp;			for (ServerClientListenerThread handler : threadList) {</b>
+<b class="nc"><i>276</i>&nbsp;				handler.fatalError(&quot;Two clients created a conflict accessing the server&quot;);</b>
+<b class="nc"><i>277</i>&nbsp;			}</b>
+<b class="fc"><i>278</i>&nbsp;		}</b>
+<b class="fc"><i>279</i>&nbsp;	}</b>
+<i>280</i>&nbsp;	/**
+<i>281</i>&nbsp;	 * This method create a game where players are going to play, it creates a RemoteView for each client and connects it to its handler, at the end it calls the method generateOrder() on the controller in order to create a playing order.
+<i>282</i>&nbsp;	 */
+<i>283</i>&nbsp;	private void createGame() {
+<i>284</i>&nbsp;		int lobbySize;
+<b class="fc"><i>285</i>&nbsp;		synchronized (lobbyClients) {</b>
+<b class="fc"><i>286</i>&nbsp;			lobbySize = lobbyClients.size();</b>
+<b class="fc"><i>287</i>&nbsp;		}</b>
+<i>288</i>&nbsp;		// it is not needed to synchronize on lobbyClients because add players and remove players cannot execute until create game hasn&#39;t finished
+<b class="fc"><i>289</i>&nbsp;		synchronized (preparedListeners) {</b>
+<b class="fc"><i>290</i>&nbsp;			while (preparedListeners.size() != lobbySize) {</b>
+<i>291</i>&nbsp;				try {
+<b class="nc"><i>292</i>&nbsp;					preparedListeners.wait();</b>
+<b class="nc"><i>293</i>&nbsp;				} catch (InterruptedException e) {</b>
+<b class="nc"><i>294</i>&nbsp;					throw new AssertionError(&quot;Thread was interrupted while waiting for all threads to be ready&quot;);</b>
+<b class="nc"><i>295</i>&nbsp;				}</b>
+<i>296</i>&nbsp;			}
+<b class="fc"><i>297</i>&nbsp;		}</b>
+<i>298</i>&nbsp;
+<b class="fc"><i>299</i>&nbsp;		synchronized (lobbyClients) {</b>
+<b class="fc"><i>300</i>&nbsp;			if (lobbyDimension == lobbyClients.size()) {</b>
+<i>301</i>&nbsp;				try {
+<b class="fc"><i>302</i>&nbsp;					Game game = new Game(lobbyClients.values().toArray(new String[0]));</b>
+<b class="fc"><i>303</i>&nbsp;					ServerController controller = new ServerController(game);</b>
+<b class="fc"><i>304</i>&nbsp;					List&lt;ServerClientListenerThread&gt; keys = new ArrayList&lt;&gt;(lobbyClients.keySet());</b>
+<b class="fc"><i>305</i>&nbsp;					for (int i = 0; i &lt; lobbyClients.size(); i++) {</b>
+<b class="fc"><i>306</i>&nbsp;						RemoteView remoteView = new RemoteView(keys.get(i));</b>
+<b class="fc"><i>307</i>&nbsp;						keys.get(i).setGamePhase(NetworkPhase.LOBBY);</b>
+<b class="fc"><i>308</i>&nbsp;						keys.get(i).setGameServer(remoteView);</b>
+<b class="fc"><i>309</i>&nbsp;						remoteView.addObserver(controller);</b>
+<b class="fc"><i>310</i>&nbsp;						game.addObserver(remoteView);</b>
+<i>311</i>&nbsp;					}
+<b class="fc"><i>312</i>&nbsp;					controller.generateOrder();</b>
+<b class="fc"><i>313</i>&nbsp;					previousLobby = lobbyClients;</b>
+<b class="fc"><i>314</i>&nbsp;					lobbyClients.clear();</b>
+<b class="fc"><i>315</i>&nbsp;					lobbyDimension = -1;</b>
+<b class="fc"><i>316</i>&nbsp;					creator = null;</b>
+<b class="fc"><i>317</i>&nbsp;					starting = false;</b>
+<b class="fc"><i>318</i>&nbsp;					synchronized (preparedListeners) {</b>
+<b class="fc"><i>319</i>&nbsp;						preparedListeners.clear();</b>
+<b class="fc"><i>320</i>&nbsp;						preparedListeners.notifyAll();</b>
+<b class="fc"><i>321</i>&nbsp;					}</b>
+<b class="fc"><i>322</i>&nbsp;					lobbyClients.notifyAll();</b>
+<b class="nc"><i>323</i>&nbsp;				} catch (NullPointerException e) {</b>
+<i>324</i>&nbsp;					// it needs a thread making al thread finish to execute because if not, if a thread terminate itself stops before terminating the others
+<b class="nc"><i>325</i>&nbsp;					for (ServerClientListenerThread handler : lobbyClients.keySet()) {</b>
+<b class="nc"><i>326</i>&nbsp;						handler.fatalError(&quot;During game creation the game was created null and passed to server controller&quot;);</b>
+<b class="nc"><i>327</i>&nbsp;					}</b>
+<b class="nc"><i>328</i>&nbsp;					lobbyClients.clear();</b>
+<b class="nc"><i>329</i>&nbsp;					lobbyDimension = -1;</b>
+<b class="nc"><i>330</i>&nbsp;					creator = null;</b>
+<b class="nc"><i>331</i>&nbsp;					starting = false;</b>
+<b class="nc"><i>332</i>&nbsp;					synchronized (preparedListeners) {</b>
+<b class="nc"><i>333</i>&nbsp;						preparedListeners.clear();</b>
+<b class="nc"><i>334</i>&nbsp;						preparedListeners.notifyAll();</b>
+<b class="nc"><i>335</i>&nbsp;					}</b>
+<b class="nc"><i>336</i>&nbsp;					lobbyClients.notifyAll();</b>
+<b class="nc"><i>337</i>&nbsp;					throw new AssertionError(&quot;Something&#39;s gone wrong and the server tried to create a gaming server with null game&quot;);</b>
+<b class="fc"><i>338</i>&nbsp;				}</b>
+<i>339</i>&nbsp;			}
+<b class="fc"><i>340</i>&nbsp;		}</b>
+<b class="fc"><i>341</i>&nbsp;	}</b>
+<i>342</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2020-07-02 13:20</div>
+    <div style="float:right;">generated on 2020-07-03 01:29</div>
 </div>
 </body>
 </html>

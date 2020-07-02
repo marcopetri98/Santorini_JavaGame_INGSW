@@ -47,10 +47,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    10%
+    9.9%
   </span>
   <span class="absValue">
-    (26/ 260)
+    (26/ 262)
   </span>
 </td>
 </tr>
@@ -104,10 +104,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    10%
+    9.9%
   </span>
   <span class="absValue">
-    (29/ 290)
+    (29/ 292)
   </span>
 </td>
 </tr>
@@ -416,333 +416,335 @@
 <b class="nc"><i>297</i>&nbsp;			setupOutput = new NetSetup(Constants.SETUP_CREATE);</b>
 <b class="nc"><i>298</i>&nbsp;			sendMessage(setupOutput);</b>
 <b class="nc"><i>299</i>&nbsp;		} catch (IllegalCallerException ex) {</b>
-<b class="nc"><i>300</i>&nbsp;			throw new AssertionError(&quot;A thread called getClientPosition() or setPlayerNumber() without representing a client&quot;);</b>
-<b class="nc"><i>301</i>&nbsp;		} catch (IllegalArgumentException ex) {</b>
-<b class="nc"><i>302</i>&nbsp;			throw new AssertionError(&quot;Dimension of the game passed to the server was wrong&quot;);</b>
-<b class="nc"><i>303</i>&nbsp;		}</b>
-<b class="nc"><i>304</i>&nbsp;	}</b>
-<i>305</i>&nbsp;
-<i>306</i>&nbsp;	/**
-<i>307</i>&nbsp;	 * This function parses the input that arrives from the client in the lobby phase of the game, here the client can only disconnect from the lobby.
-<i>308</i>&nbsp;	 * @param lobbyMessage is the message sent by the client
-<i>309</i>&nbsp;	 */
-<i>310</i>&nbsp;	private void parseLobbyInput(NetLobbyPreparation lobbyMessage) {
-<i>311</i>&nbsp;		NetLobbyPreparation lobbyOutput;
-<i>312</i>&nbsp;
-<b class="nc"><i>313</i>&nbsp;		if (lobbyMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>314</i>&nbsp;			// it disconnects the user from the lobby
-<b class="nc"><i>315</i>&nbsp;			disconnect();</b>
-<i>316</i>&nbsp;		} else {
-<i>317</i>&nbsp;			// user sent a wrong message
-<b class="nc"><i>318</i>&nbsp;			lobbyOutput = new NetLobbyPreparation(Constants.LOBBY_ERROR);</b>
-<b class="nc"><i>319</i>&nbsp;			sendMessage(lobbyOutput);</b>
-<i>320</i>&nbsp;		}
-<b class="nc"><i>321</i>&nbsp;	}</b>
-<i>322</i>&nbsp;	/**
-<i>323</i>&nbsp;	 * This function parses the input that arrives from the client in the color choice phase, if the client has sent a color of the game it calls the {@link it.polimi.ingsw.network.RemoteView} handling method.
-<i>324</i>&nbsp;	 * @param colorMessage is the message sent by the client
-<i>325</i>&nbsp;	 */
-<i>326</i>&nbsp;	private void parseColorInput(NetColorPreparation colorMessage) {
-<i>327</i>&nbsp;		NetColorPreparation colorOutput;
-<i>328</i>&nbsp;
-<b class="nc"><i>329</i>&nbsp;		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) &amp;&amp; colorMessage.player != null &amp;&amp; colorMessage.player.equals(playerName) &amp;&amp; Constants.COLOR_COLORS.contains(colorMessage.getColor())) {</b>
-<i>330</i>&nbsp;			// the user is trying to choose the color with a well formed message, this is sent to the remoteView
-<b class="nc"><i>331</i>&nbsp;			gameServer.handleColorRequest(colorMessage,false);</b>
-<b class="nc"><i>332</i>&nbsp;		} else if (colorMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>333</i>&nbsp;			// disconnects the user
-<b class="nc"><i>334</i>&nbsp;			disconnect();</b>
-<i>335</i>&nbsp;		} else {
-<i>336</i>&nbsp;			// the user has sent a bad message
-<b class="nc"><i>337</i>&nbsp;			colorOutput = new NetColorPreparation(Constants.COLOR_ERROR);</b>
-<b class="nc"><i>338</i>&nbsp;			sendMessage(colorOutput);</b>
-<i>339</i>&nbsp;		}
-<b class="nc"><i>340</i>&nbsp;	}</b>
-<i>341</i>&nbsp;	/**
-<i>342</i>&nbsp;	 * This function parses the input that arrives from the client in the gods phase, in this phase the client can choose a god, game gods or the starter (or also disconnect). In all cases if the message is correctly formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
-<i>343</i>&nbsp;	 * @param divinityMessage is the message sent by the client
-<i>344</i>&nbsp;	 */
-<i>345</i>&nbsp;	private void parseDivinityInput(NetDivinityChoice divinityMessage) {
-<i>346</i>&nbsp;		NetDivinityChoice divinityOutput;
-<i>347</i>&nbsp;
-<b class="nc"><i>348</i>&nbsp;		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS) &amp;&amp; divinityMessage.player != null &amp;&amp; divinityMessage.player.equals(playerName)) {</b>
-<i>349</i>&nbsp;			// if the player has sent a well formed message with gods that has to be in the game it sends this to the remote view
-<b class="nc"><i>350</i>&nbsp;			if ((divinityMessage.getDivinities().size() == 2 || divinityMessage.getDivinities().size() == 3) &amp;&amp; Constants.GODS_GOD_NAMES.containsAll(divinityMessage.getDivinities())) {</b>
-<b class="nc"><i>351</i>&nbsp;				gameServer.handleDivinityRequest(divinityMessage,false);</b>
-<i>352</i>&nbsp;			} else {
-<b class="nc"><i>353</i>&nbsp;				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);</b>
-<b class="nc"><i>354</i>&nbsp;				sendMessage(divinityOutput);</b>
-<i>355</i>&nbsp;			}
-<b class="nc"><i>356</i>&nbsp;		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE) &amp;&amp; divinityMessage.player != null &amp;&amp; divinityMessage.player.equals(playerName)) {</b>
-<i>357</i>&nbsp;			// if the player chose a divinity it sends the message to the remote view
-<b class="nc"><i>358</i>&nbsp;			if (Constants.GODS_GOD_NAMES.contains(divinityMessage.getDivinity())) {</b>
-<b class="nc"><i>359</i>&nbsp;				gameServer.handleDivinityRequest(divinityMessage,false);</b>
-<i>360</i>&nbsp;			} else {
-<b class="nc"><i>361</i>&nbsp;				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);</b>
-<b class="nc"><i>362</i>&nbsp;				sendMessage(divinityOutput);</b>
-<i>363</i>&nbsp;			}
-<b class="nc"><i>364</i>&nbsp;		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) &amp;&amp; divinityMessage.player != null &amp;&amp; divinityMessage.challenger != null &amp;&amp; divinityMessage.challenger.equals(playerName)) {</b>
-<i>365</i>&nbsp;			// if the player is trying to select a start player with a well formed message it sends the message to the remote view
-<b class="nc"><i>366</i>&nbsp;			gameServer.handleDivinityRequest(divinityMessage,false);</b>
-<b class="nc"><i>367</i>&nbsp;		} else if (divinityMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>368</i>&nbsp;			// it disconnects the user
-<b class="nc"><i>369</i>&nbsp;			disconnect();</b>
-<i>370</i>&nbsp;		} else {
-<i>371</i>&nbsp;			// message isn&#39;t well formed ==&gt; error message sent
-<b class="nc"><i>372</i>&nbsp;			divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);</b>
-<b class="nc"><i>373</i>&nbsp;			sendMessage(divinityOutput);</b>
-<i>374</i>&nbsp;		}
-<b class="nc"><i>375</i>&nbsp;	}</b>
-<i>376</i>&nbsp;	/**
-<i>377</i>&nbsp;	 * This function parses the input that arrives from the client in the game setup phase, in this phase the player can send its workers position on the game table or disconnect, if the message id well formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
-<i>378</i>&nbsp;	 * @param gameSetupMessage is the message sent by the client
-<i>379</i>&nbsp;	 */
-<i>380</i>&nbsp;	private void parseGameSetupInput(NetGameSetup gameSetupMessage) {
-<i>381</i>&nbsp;		NetGameSetup gameSetupOutput;
-<i>382</i>&nbsp;
-<b class="nc"><i>383</i>&nbsp;		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE) &amp;&amp; gameSetupMessage.player != null &amp;&amp; gameSetupMessage.player.equals(playerName)) {</b>
-<b class="nc"><i>384</i>&nbsp;			if (gameSetupMessage.worker1.getFirst() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker1.getFirst() &gt;= 0 &amp;&amp; gameSetupMessage.worker1.getSecond() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker1.getSecond() &gt;= 0 &amp;&amp; gameSetupMessage.worker2.getFirst() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker2.getFirst() &gt;= 0 &amp;&amp; gameSetupMessage.worker2.getSecond() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker2.getSecond() &gt;= 0 &amp;&amp; !gameSetupMessage.worker1.equals(gameSetupMessage.worker2) &amp;&amp; gameSetupMessage.worker1.getFirst() != null &amp;&amp; gameSetupMessage.worker1.getSecond() != null &amp;&amp; gameSetupMessage.worker2.getFirst() != null &amp;&amp; gameSetupMessage.worker2.getSecond() != null) {</b>
-<i>385</i>&nbsp;				// the user is sending coordinates of the map where it want to put workers (not on the same cell)
-<b class="nc"><i>386</i>&nbsp;				gameServer.handlePositionRequest(gameSetupMessage,false);</b>
-<i>387</i>&nbsp;			} else {
-<b class="nc"><i>388</i>&nbsp;				gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);</b>
-<b class="nc"><i>389</i>&nbsp;				sendMessage(gameSetupMessage);</b>
-<i>390</i>&nbsp;			}
-<b class="nc"><i>391</i>&nbsp;		} else if (gameSetupMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>392</i>&nbsp;			// it disconnects the user
-<b class="nc"><i>393</i>&nbsp;			disconnect();</b>
-<i>394</i>&nbsp;		} else {
-<i>395</i>&nbsp;			// the message isn&#39;t well formed
-<b class="nc"><i>396</i>&nbsp;			gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);</b>
-<b class="nc"><i>397</i>&nbsp;			sendMessage(gameSetupMessage);</b>
-<i>398</i>&nbsp;		}
-<b class="nc"><i>399</i>&nbsp;	}</b>
-<i>400</i>&nbsp;	/**
-<i>401</i>&nbsp;	 * This function parses the input that arrives from the client in the gaming phase, in this phase a player can move, build or disconnect, if the message is well formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
-<i>402</i>&nbsp;	 * @param gamingMsg is the message sent by the client
-<i>403</i>&nbsp;	 */
-<i>404</i>&nbsp;	private void parseGamingInput(NetGaming gamingMsg) {
-<i>405</i>&nbsp;		NetGaming playerTurnOutput;
-<b class="nc"><i>406</i>&nbsp;		NetworkPhase currentPhase = getGamePhase();</b>
-<i>407</i>&nbsp;
-<b class="nc"><i>408</i>&nbsp;		if (currentPhase == NetworkPhase.PLAYERTURN) {</b>
-<b class="nc"><i>409</i>&nbsp;			if (gamingMsg.message.equals(Constants.PLAYER_IN_MOVE) &amp;&amp; gamingMsg.player != null &amp;&amp; gamingMsg.player.equals(playerName)) {</b>
-<b class="nc"><i>410</i>&nbsp;				if (gamingMsg.move != null &amp;&amp; gamingMsg.move.isWellFormed()) {</b>
-<b class="nc"><i>411</i>&nbsp;					gameServer.handleMoveRequest(gamingMsg, false);</b>
-<i>412</i>&nbsp;				} else {
-<b class="nc"><i>413</i>&nbsp;					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);</b>
-<b class="nc"><i>414</i>&nbsp;					sendMessage(gamingMsg);</b>
-<i>415</i>&nbsp;				}
-<b class="nc"><i>416</i>&nbsp;			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_BUILD) &amp;&amp; gamingMsg.player != null &amp;&amp; gamingMsg.player.equals(playerName)) {</b>
-<b class="nc"><i>417</i>&nbsp;				if (gamingMsg.build != null &amp;&amp; gamingMsg.build.isWellFormed()) {</b>
-<b class="nc"><i>418</i>&nbsp;					gameServer.handleBuildRequest(gamingMsg, false);</b>
-<i>419</i>&nbsp;				} else {
-<b class="nc"><i>420</i>&nbsp;					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);</b>
-<b class="nc"><i>421</i>&nbsp;					sendMessage(gamingMsg);</b>
-<i>422</i>&nbsp;				}
-<b class="nc"><i>423</i>&nbsp;			} else if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>424</i>&nbsp;				// it disconnects the user from the lobby
-<b class="nc"><i>425</i>&nbsp;				disconnect();</b>
-<i>426</i>&nbsp;			} else {
-<b class="nc"><i>427</i>&nbsp;				gamingMsg = new NetGaming(Constants.PLAYER_ERROR);</b>
-<b class="nc"><i>428</i>&nbsp;				sendMessage(gamingMsg);</b>
-<i>429</i>&nbsp;			}
-<b class="nc"><i>430</i>&nbsp;		} else if (currentPhase == NetworkPhase.OTHERTURN) {</b>
-<b class="nc"><i>431</i>&nbsp;			if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>432</i>&nbsp;				// it disconnects the user from the lobby
-<b class="nc"><i>433</i>&nbsp;				disconnect();</b>
-<i>434</i>&nbsp;			} else {
-<b class="nc"><i>435</i>&nbsp;				gamingMsg = new NetGaming(Constants.OTHERS_ERROR);</b>
-<b class="nc"><i>436</i>&nbsp;				sendMessage(gamingMsg);</b>
-<i>437</i>&nbsp;			}
-<i>438</i>&nbsp;		} else {
-<i>439</i>&nbsp;			// the player is an observer and can only observe the game or disconnect
-<b class="nc"><i>440</i>&nbsp;			if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
-<i>441</i>&nbsp;				// it disconnects the user from the lobby
-<b class="nc"><i>442</i>&nbsp;				gameServer.handleObserverQuit();</b>
-<b class="nc"><i>443</i>&nbsp;				closeSocketAndTerminate();</b>
-<i>444</i>&nbsp;			} else {
-<b class="nc"><i>445</i>&nbsp;				gamingMsg = new NetGaming(Constants.GENERAL_ERROR);</b>
-<b class="nc"><i>446</i>&nbsp;				sendMessage(gamingMsg);</b>
-<i>447</i>&nbsp;			}
-<i>448</i>&nbsp;		}
-<b class="nc"><i>449</i>&nbsp;	}</b>
-<i>450</i>&nbsp;
-<i>451</i>&nbsp;	/* **********************************************
-<i>452</i>&nbsp;	 *												*
-<i>453</i>&nbsp;	 *												*
+<b class="nc"><i>300</i>&nbsp;			ex.printStackTrace();</b>
+<b class="nc"><i>301</i>&nbsp;			throw new AssertionError(&quot;A thread called getClientPosition() or setPlayerNumber() without representing a client&quot;);</b>
+<b class="nc"><i>302</i>&nbsp;		} catch (IllegalArgumentException ex) {</b>
+<b class="nc"><i>303</i>&nbsp;			ex.printStackTrace();</b>
+<b class="nc"><i>304</i>&nbsp;			throw new AssertionError(&quot;Dimension of the game passed to the server was wrong&quot;);</b>
+<b class="nc"><i>305</i>&nbsp;		}</b>
+<b class="nc"><i>306</i>&nbsp;	}</b>
+<i>307</i>&nbsp;
+<i>308</i>&nbsp;	/**
+<i>309</i>&nbsp;	 * This function parses the input that arrives from the client in the lobby phase of the game, here the client can only disconnect from the lobby.
+<i>310</i>&nbsp;	 * @param lobbyMessage is the message sent by the client
+<i>311</i>&nbsp;	 */
+<i>312</i>&nbsp;	private void parseLobbyInput(NetLobbyPreparation lobbyMessage) {
+<i>313</i>&nbsp;		NetLobbyPreparation lobbyOutput;
+<i>314</i>&nbsp;
+<b class="nc"><i>315</i>&nbsp;		if (lobbyMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>316</i>&nbsp;			// it disconnects the user from the lobby
+<b class="nc"><i>317</i>&nbsp;			disconnect();</b>
+<i>318</i>&nbsp;		} else {
+<i>319</i>&nbsp;			// user sent a wrong message
+<b class="nc"><i>320</i>&nbsp;			lobbyOutput = new NetLobbyPreparation(Constants.LOBBY_ERROR);</b>
+<b class="nc"><i>321</i>&nbsp;			sendMessage(lobbyOutput);</b>
+<i>322</i>&nbsp;		}
+<b class="nc"><i>323</i>&nbsp;	}</b>
+<i>324</i>&nbsp;	/**
+<i>325</i>&nbsp;	 * This function parses the input that arrives from the client in the color choice phase, if the client has sent a color of the game it calls the {@link it.polimi.ingsw.network.RemoteView} handling method.
+<i>326</i>&nbsp;	 * @param colorMessage is the message sent by the client
+<i>327</i>&nbsp;	 */
+<i>328</i>&nbsp;	private void parseColorInput(NetColorPreparation colorMessage) {
+<i>329</i>&nbsp;		NetColorPreparation colorOutput;
+<i>330</i>&nbsp;
+<b class="nc"><i>331</i>&nbsp;		if (colorMessage.message.equals(Constants.COLOR_IN_CHOICE) &amp;&amp; colorMessage.player != null &amp;&amp; colorMessage.player.equals(playerName) &amp;&amp; Constants.COLOR_COLORS.contains(colorMessage.getColor())) {</b>
+<i>332</i>&nbsp;			// the user is trying to choose the color with a well formed message, this is sent to the remoteView
+<b class="nc"><i>333</i>&nbsp;			gameServer.handleColorRequest(colorMessage,false);</b>
+<b class="nc"><i>334</i>&nbsp;		} else if (colorMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>335</i>&nbsp;			// disconnects the user
+<b class="nc"><i>336</i>&nbsp;			disconnect();</b>
+<i>337</i>&nbsp;		} else {
+<i>338</i>&nbsp;			// the user has sent a bad message
+<b class="nc"><i>339</i>&nbsp;			colorOutput = new NetColorPreparation(Constants.COLOR_ERROR);</b>
+<b class="nc"><i>340</i>&nbsp;			sendMessage(colorOutput);</b>
+<i>341</i>&nbsp;		}
+<b class="nc"><i>342</i>&nbsp;	}</b>
+<i>343</i>&nbsp;	/**
+<i>344</i>&nbsp;	 * This function parses the input that arrives from the client in the gods phase, in this phase the client can choose a god, game gods or the starter (or also disconnect). In all cases if the message is correctly formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
+<i>345</i>&nbsp;	 * @param divinityMessage is the message sent by the client
+<i>346</i>&nbsp;	 */
+<i>347</i>&nbsp;	private void parseDivinityInput(NetDivinityChoice divinityMessage) {
+<i>348</i>&nbsp;		NetDivinityChoice divinityOutput;
+<i>349</i>&nbsp;
+<b class="nc"><i>350</i>&nbsp;		if (divinityMessage.message.equals(Constants.GODS_IN_GAME_GODS) &amp;&amp; divinityMessage.player != null &amp;&amp; divinityMessage.player.equals(playerName)) {</b>
+<i>351</i>&nbsp;			// if the player has sent a well formed message with gods that has to be in the game it sends this to the remote view
+<b class="nc"><i>352</i>&nbsp;			if ((divinityMessage.getDivinities().size() == 2 || divinityMessage.getDivinities().size() == 3) &amp;&amp; Constants.GODS_GOD_NAMES.containsAll(divinityMessage.getDivinities())) {</b>
+<b class="nc"><i>353</i>&nbsp;				gameServer.handleDivinityRequest(divinityMessage,false);</b>
+<i>354</i>&nbsp;			} else {
+<b class="nc"><i>355</i>&nbsp;				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);</b>
+<b class="nc"><i>356</i>&nbsp;				sendMessage(divinityOutput);</b>
+<i>357</i>&nbsp;			}
+<b class="nc"><i>358</i>&nbsp;		} else if (divinityMessage.message.equals(Constants.GODS_IN_CHOICE) &amp;&amp; divinityMessage.player != null &amp;&amp; divinityMessage.player.equals(playerName)) {</b>
+<i>359</i>&nbsp;			// if the player chose a divinity it sends the message to the remote view
+<b class="nc"><i>360</i>&nbsp;			if (Constants.GODS_GOD_NAMES.contains(divinityMessage.getDivinity())) {</b>
+<b class="nc"><i>361</i>&nbsp;				gameServer.handleDivinityRequest(divinityMessage,false);</b>
+<i>362</i>&nbsp;			} else {
+<b class="nc"><i>363</i>&nbsp;				divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);</b>
+<b class="nc"><i>364</i>&nbsp;				sendMessage(divinityOutput);</b>
+<i>365</i>&nbsp;			}
+<b class="nc"><i>366</i>&nbsp;		} else if (divinityMessage.message.equals(Constants.GODS_IN_START_PLAYER) &amp;&amp; divinityMessage.player != null &amp;&amp; divinityMessage.challenger != null &amp;&amp; divinityMessage.challenger.equals(playerName)) {</b>
+<i>367</i>&nbsp;			// if the player is trying to select a start player with a well formed message it sends the message to the remote view
+<b class="nc"><i>368</i>&nbsp;			gameServer.handleDivinityRequest(divinityMessage,false);</b>
+<b class="nc"><i>369</i>&nbsp;		} else if (divinityMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>370</i>&nbsp;			// it disconnects the user
+<b class="nc"><i>371</i>&nbsp;			disconnect();</b>
+<i>372</i>&nbsp;		} else {
+<i>373</i>&nbsp;			// message isn&#39;t well formed ==&gt; error message sent
+<b class="nc"><i>374</i>&nbsp;			divinityOutput = new NetDivinityChoice(Constants.GODS_ERROR);</b>
+<b class="nc"><i>375</i>&nbsp;			sendMessage(divinityOutput);</b>
+<i>376</i>&nbsp;		}
+<b class="nc"><i>377</i>&nbsp;	}</b>
+<i>378</i>&nbsp;	/**
+<i>379</i>&nbsp;	 * This function parses the input that arrives from the client in the game setup phase, in this phase the player can send its workers position on the game table or disconnect, if the message id well formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
+<i>380</i>&nbsp;	 * @param gameSetupMessage is the message sent by the client
+<i>381</i>&nbsp;	 */
+<i>382</i>&nbsp;	private void parseGameSetupInput(NetGameSetup gameSetupMessage) {
+<i>383</i>&nbsp;		NetGameSetup gameSetupOutput;
+<i>384</i>&nbsp;
+<b class="nc"><i>385</i>&nbsp;		if (gameSetupMessage.message.equals(Constants.GAMESETUP_IN_PLACE) &amp;&amp; gameSetupMessage.player != null &amp;&amp; gameSetupMessage.player.equals(playerName)) {</b>
+<b class="nc"><i>386</i>&nbsp;			if (gameSetupMessage.worker1.getFirst() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker1.getFirst() &gt;= 0 &amp;&amp; gameSetupMessage.worker1.getSecond() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker1.getSecond() &gt;= 0 &amp;&amp; gameSetupMessage.worker2.getFirst() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker2.getFirst() &gt;= 0 &amp;&amp; gameSetupMessage.worker2.getSecond() &lt; Constants.MAP_SIDE &amp;&amp; gameSetupMessage.worker2.getSecond() &gt;= 0 &amp;&amp; !gameSetupMessage.worker1.equals(gameSetupMessage.worker2) &amp;&amp; gameSetupMessage.worker1.getFirst() != null &amp;&amp; gameSetupMessage.worker1.getSecond() != null &amp;&amp; gameSetupMessage.worker2.getFirst() != null &amp;&amp; gameSetupMessage.worker2.getSecond() != null) {</b>
+<i>387</i>&nbsp;				// the user is sending coordinates of the map where it want to put workers (not on the same cell)
+<b class="nc"><i>388</i>&nbsp;				gameServer.handlePositionRequest(gameSetupMessage,false);</b>
+<i>389</i>&nbsp;			} else {
+<b class="nc"><i>390</i>&nbsp;				gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);</b>
+<b class="nc"><i>391</i>&nbsp;				sendMessage(gameSetupMessage);</b>
+<i>392</i>&nbsp;			}
+<b class="nc"><i>393</i>&nbsp;		} else if (gameSetupMessage.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>394</i>&nbsp;			// it disconnects the user
+<b class="nc"><i>395</i>&nbsp;			disconnect();</b>
+<i>396</i>&nbsp;		} else {
+<i>397</i>&nbsp;			// the message isn&#39;t well formed
+<b class="nc"><i>398</i>&nbsp;			gameSetupOutput = new NetGameSetup(Constants.GAMESETUP_ERROR);</b>
+<b class="nc"><i>399</i>&nbsp;			sendMessage(gameSetupMessage);</b>
+<i>400</i>&nbsp;		}
+<b class="nc"><i>401</i>&nbsp;	}</b>
+<i>402</i>&nbsp;	/**
+<i>403</i>&nbsp;	 * This function parses the input that arrives from the client in the gaming phase, in this phase a player can move, build or disconnect, if the message is well formed it is sent to the {@link it.polimi.ingsw.network.RemoteView} handling method.
+<i>404</i>&nbsp;	 * @param gamingMsg is the message sent by the client
+<i>405</i>&nbsp;	 */
+<i>406</i>&nbsp;	private void parseGamingInput(NetGaming gamingMsg) {
+<i>407</i>&nbsp;		NetGaming playerTurnOutput;
+<b class="nc"><i>408</i>&nbsp;		NetworkPhase currentPhase = getGamePhase();</b>
+<i>409</i>&nbsp;
+<b class="nc"><i>410</i>&nbsp;		if (currentPhase == NetworkPhase.PLAYERTURN) {</b>
+<b class="nc"><i>411</i>&nbsp;			if (gamingMsg.message.equals(Constants.PLAYER_IN_MOVE) &amp;&amp; gamingMsg.player != null &amp;&amp; gamingMsg.player.equals(playerName)) {</b>
+<b class="nc"><i>412</i>&nbsp;				if (gamingMsg.move != null &amp;&amp; gamingMsg.move.isWellFormed()) {</b>
+<b class="nc"><i>413</i>&nbsp;					gameServer.handleMoveRequest(gamingMsg, false);</b>
+<i>414</i>&nbsp;				} else {
+<b class="nc"><i>415</i>&nbsp;					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);</b>
+<b class="nc"><i>416</i>&nbsp;					sendMessage(gamingMsg);</b>
+<i>417</i>&nbsp;				}
+<b class="nc"><i>418</i>&nbsp;			} else if (gamingMsg.message.equals(Constants.PLAYER_IN_BUILD) &amp;&amp; gamingMsg.player != null &amp;&amp; gamingMsg.player.equals(playerName)) {</b>
+<b class="nc"><i>419</i>&nbsp;				if (gamingMsg.build != null &amp;&amp; gamingMsg.build.isWellFormed()) {</b>
+<b class="nc"><i>420</i>&nbsp;					gameServer.handleBuildRequest(gamingMsg, false);</b>
+<i>421</i>&nbsp;				} else {
+<b class="nc"><i>422</i>&nbsp;					gamingMsg = new NetGaming(Constants.PLAYER_ERROR);</b>
+<b class="nc"><i>423</i>&nbsp;					sendMessage(gamingMsg);</b>
+<i>424</i>&nbsp;				}
+<b class="nc"><i>425</i>&nbsp;			} else if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>426</i>&nbsp;				// it disconnects the user from the lobby
+<b class="nc"><i>427</i>&nbsp;				disconnect();</b>
+<i>428</i>&nbsp;			} else {
+<b class="nc"><i>429</i>&nbsp;				gamingMsg = new NetGaming(Constants.PLAYER_ERROR);</b>
+<b class="nc"><i>430</i>&nbsp;				sendMessage(gamingMsg);</b>
+<i>431</i>&nbsp;			}
+<b class="nc"><i>432</i>&nbsp;		} else if (currentPhase == NetworkPhase.OTHERTURN) {</b>
+<b class="nc"><i>433</i>&nbsp;			if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>434</i>&nbsp;				// it disconnects the user from the lobby
+<b class="nc"><i>435</i>&nbsp;				disconnect();</b>
+<i>436</i>&nbsp;			} else {
+<b class="nc"><i>437</i>&nbsp;				gamingMsg = new NetGaming(Constants.OTHERS_ERROR);</b>
+<b class="nc"><i>438</i>&nbsp;				sendMessage(gamingMsg);</b>
+<i>439</i>&nbsp;			}
+<i>440</i>&nbsp;		} else {
+<i>441</i>&nbsp;			// the player is an observer and can only observe the game or disconnect
+<b class="nc"><i>442</i>&nbsp;			if (gamingMsg.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<i>443</i>&nbsp;				// it disconnects the user from the lobby
+<b class="nc"><i>444</i>&nbsp;				gameServer.handleObserverQuit();</b>
+<b class="nc"><i>445</i>&nbsp;				closeSocketAndTerminate();</b>
+<i>446</i>&nbsp;			} else {
+<b class="nc"><i>447</i>&nbsp;				gamingMsg = new NetGaming(Constants.GENERAL_ERROR);</b>
+<b class="nc"><i>448</i>&nbsp;				sendMessage(gamingMsg);</b>
+<i>449</i>&nbsp;			}
+<i>450</i>&nbsp;		}
+<b class="nc"><i>451</i>&nbsp;	}</b>
+<i>452</i>&nbsp;
+<i>453</i>&nbsp;	/* **********************************************
 <i>454</i>&nbsp;	 *												*
-<i>455</i>&nbsp;	 *	MODIFIERS OF THE SERVER LISTENER THREAD		*
-<i>456</i>&nbsp;	 * 												*
-<i>457</i>&nbsp;	 * 												*
+<i>455</i>&nbsp;	 *												*
+<i>456</i>&nbsp;	 *												*
+<i>457</i>&nbsp;	 *	MODIFIERS OF THE SERVER LISTENER THREAD		*
 <i>458</i>&nbsp;	 * 												*
-<i>459</i>&nbsp;	 ************************************************/
-<i>460</i>&nbsp;	/**
-<i>461</i>&nbsp;	 * It sets the player&#39;s name.
-<i>462</i>&nbsp;	 * @param name is player&#39;s name
-<i>463</i>&nbsp;	 */
-<i>464</i>&nbsp;	private void setPlayerName(String name) {
-<b class="nc"><i>465</i>&nbsp;		synchronized (playerNameLock) {</b>
-<b class="nc"><i>466</i>&nbsp;			playerName = name;</b>
-<b class="nc"><i>467</i>&nbsp;		}</b>
-<b class="nc"><i>468</i>&nbsp;	}</b>
-<i>469</i>&nbsp;	/**
-<i>470</i>&nbsp;	 * It sets the remote view connected to this client.
-<i>471</i>&nbsp;	 * @param gameServer is the remote view component of the server which is connected to this client
-<i>472</i>&nbsp;	 */
-<i>473</i>&nbsp;	public void setGameServer(RemoteView gameServer) {
-<b class="fc"><i>474</i>&nbsp;		synchronized (scopeLock) {</b>
-<b class="fc"><i>475</i>&nbsp;			this.gameServer = gameServer;</b>
-<b class="fc"><i>476</i>&nbsp;			scopeLock.notifyAll();</b>
-<b class="fc"><i>477</i>&nbsp;		}</b>
-<b class="fc"><i>478</i>&nbsp;	}</b>
-<i>479</i>&nbsp;	/**
-<i>480</i>&nbsp;	 * It sets the current thread to {@code active} value, if it is set to false the thread is going to terminate, instead the thread is going to continue its normal work.
-<i>481</i>&nbsp;	 * @param active true if the thread must be operate, false otherwise
-<i>482</i>&nbsp;	 */
-<i>483</i>&nbsp;	public void setActive(boolean active) {
-<b class="nc"><i>484</i>&nbsp;		synchronized (stateLock) {</b>
-<b class="nc"><i>485</i>&nbsp;			this.active = active;</b>
-<b class="nc"><i>486</i>&nbsp;		}</b>
-<b class="nc"><i>487</i>&nbsp;	}</b>
-<i>488</i>&nbsp;	/**
-<i>489</i>&nbsp;	 * It sets the network game phase.
-<i>490</i>&nbsp;	 * @param gamePhase is the game network phase
-<i>491</i>&nbsp;	 */
-<i>492</i>&nbsp;	public void setGamePhase(NetworkPhase gamePhase) {
-<b class="fc"><i>493</i>&nbsp;		synchronized (stateLock) {</b>
-<b class="fc"><i>494</i>&nbsp;			this.gamePhase = gamePhase;</b>
-<b class="fc"><i>495</i>&nbsp;		}</b>
-<b class="fc"><i>496</i>&nbsp;	}</b>
-<i>497</i>&nbsp;	/**
-<i>498</i>&nbsp;	 * It writes the message on the output stream and send it to the client, after sending the message it is called a {@code output.reset()} method to reset the output stream.
-<i>499</i>&nbsp;	 * @param object is the {@link it.polimi.ingsw.network.objects.NetObject} to send to the client
-<i>500</i>&nbsp;	 */
-<i>501</i>&nbsp;	public void sendMessage(NetObject object) {
-<b class="nc"><i>502</i>&nbsp;		synchronized (output) {</b>
-<i>503</i>&nbsp;			try {
-<b class="nc"><i>504</i>&nbsp;				output.writeObject(object);</b>
-<b class="nc"><i>505</i>&nbsp;				output.flush();</b>
-<b class="nc"><i>506</i>&nbsp;				output.reset();</b>
-<b class="nc"><i>507</i>&nbsp;			} catch (IOException e2) {</b>
-<b class="nc"><i>508</i>&nbsp;				setActive(false);</b>
-<b class="nc"><i>509</i>&nbsp;				closeSocketAndTerminate();</b>
-<b class="nc"><i>510</i>&nbsp;			}</b>
-<b class="nc"><i>511</i>&nbsp;		}</b>
-<b class="nc"><i>512</i>&nbsp;	}</b>
-<i>513</i>&nbsp;	/**
-<i>514</i>&nbsp;	 * It sends a general error to the client to make it know that an unknown error occurred.
-<i>515</i>&nbsp;	 */
-<i>516</i>&nbsp;	public void sendGeneralError() {
-<b class="nc"><i>517</i>&nbsp;		NetObject object = new NetObject(Constants.GENERAL_ERROR);</b>
-<b class="nc"><i>518</i>&nbsp;		sendMessage(object);</b>
-<b class="nc"><i>519</i>&nbsp;	}</b>
-<i>520</i>&nbsp;	/**
-<i>521</i>&nbsp;	 * It closes the socket and calls {@code setActive(false);}.
-<i>522</i>&nbsp;	 */
-<i>523</i>&nbsp;	public void closeSocketAndTerminate() {
-<i>524</i>&nbsp;		try {
-<b class="nc"><i>525</i>&nbsp;			clientSocket.close();</b>
-<b class="nc"><i>526</i>&nbsp;			playerName = null;</b>
-<b class="nc"><i>527</i>&nbsp;			setActive(false);</b>
-<b class="nc"><i>528</i>&nbsp;		} catch (IOException e2) {</b>
-<b class="nc"><i>529</i>&nbsp;			playerName = null;</b>
-<b class="nc"><i>530</i>&nbsp;			setActive(false);</b>
-<b class="nc"><i>531</i>&nbsp;		}</b>
-<b class="nc"><i>532</i>&nbsp;	}</b>
-<i>533</i>&nbsp;
-<i>534</i>&nbsp;	/* **********************************************
-<i>535</i>&nbsp;	 *												*
-<i>536</i>&nbsp;	 *												*
+<i>459</i>&nbsp;	 * 												*
+<i>460</i>&nbsp;	 * 												*
+<i>461</i>&nbsp;	 ************************************************/
+<i>462</i>&nbsp;	/**
+<i>463</i>&nbsp;	 * It sets the player&#39;s name.
+<i>464</i>&nbsp;	 * @param name is player&#39;s name
+<i>465</i>&nbsp;	 */
+<i>466</i>&nbsp;	private void setPlayerName(String name) {
+<b class="nc"><i>467</i>&nbsp;		synchronized (playerNameLock) {</b>
+<b class="nc"><i>468</i>&nbsp;			playerName = name;</b>
+<b class="nc"><i>469</i>&nbsp;		}</b>
+<b class="nc"><i>470</i>&nbsp;	}</b>
+<i>471</i>&nbsp;	/**
+<i>472</i>&nbsp;	 * It sets the remote view connected to this client.
+<i>473</i>&nbsp;	 * @param gameServer is the remote view component of the server which is connected to this client
+<i>474</i>&nbsp;	 */
+<i>475</i>&nbsp;	public void setGameServer(RemoteView gameServer) {
+<b class="fc"><i>476</i>&nbsp;		synchronized (scopeLock) {</b>
+<b class="fc"><i>477</i>&nbsp;			this.gameServer = gameServer;</b>
+<b class="fc"><i>478</i>&nbsp;			scopeLock.notifyAll();</b>
+<b class="fc"><i>479</i>&nbsp;		}</b>
+<b class="fc"><i>480</i>&nbsp;	}</b>
+<i>481</i>&nbsp;	/**
+<i>482</i>&nbsp;	 * It sets the current thread to {@code active} value, if it is set to false the thread is going to terminate, instead the thread is going to continue its normal work.
+<i>483</i>&nbsp;	 * @param active true if the thread must be operate, false otherwise
+<i>484</i>&nbsp;	 */
+<i>485</i>&nbsp;	public void setActive(boolean active) {
+<b class="nc"><i>486</i>&nbsp;		synchronized (stateLock) {</b>
+<b class="nc"><i>487</i>&nbsp;			this.active = active;</b>
+<b class="nc"><i>488</i>&nbsp;		}</b>
+<b class="nc"><i>489</i>&nbsp;	}</b>
+<i>490</i>&nbsp;	/**
+<i>491</i>&nbsp;	 * It sets the network game phase.
+<i>492</i>&nbsp;	 * @param gamePhase is the game network phase
+<i>493</i>&nbsp;	 */
+<i>494</i>&nbsp;	public void setGamePhase(NetworkPhase gamePhase) {
+<b class="fc"><i>495</i>&nbsp;		synchronized (stateLock) {</b>
+<b class="fc"><i>496</i>&nbsp;			this.gamePhase = gamePhase;</b>
+<b class="fc"><i>497</i>&nbsp;		}</b>
+<b class="fc"><i>498</i>&nbsp;	}</b>
+<i>499</i>&nbsp;	/**
+<i>500</i>&nbsp;	 * It writes the message on the output stream and send it to the client, after sending the message it is called a {@code output.reset()} method to reset the output stream.
+<i>501</i>&nbsp;	 * @param object is the {@link it.polimi.ingsw.network.objects.NetObject} to send to the client
+<i>502</i>&nbsp;	 */
+<i>503</i>&nbsp;	public void sendMessage(NetObject object) {
+<b class="nc"><i>504</i>&nbsp;		synchronized (output) {</b>
+<i>505</i>&nbsp;			try {
+<b class="nc"><i>506</i>&nbsp;				output.writeObject(object);</b>
+<b class="nc"><i>507</i>&nbsp;				output.flush();</b>
+<b class="nc"><i>508</i>&nbsp;				output.reset();</b>
+<b class="nc"><i>509</i>&nbsp;			} catch (IOException e2) {</b>
+<b class="nc"><i>510</i>&nbsp;				setActive(false);</b>
+<b class="nc"><i>511</i>&nbsp;				closeSocketAndTerminate();</b>
+<b class="nc"><i>512</i>&nbsp;			}</b>
+<b class="nc"><i>513</i>&nbsp;		}</b>
+<b class="nc"><i>514</i>&nbsp;	}</b>
+<i>515</i>&nbsp;	/**
+<i>516</i>&nbsp;	 * It sends a general error to the client to make it know that an unknown error occurred.
+<i>517</i>&nbsp;	 */
+<i>518</i>&nbsp;	public void sendGeneralError() {
+<b class="nc"><i>519</i>&nbsp;		NetObject object = new NetObject(Constants.GENERAL_ERROR);</b>
+<b class="nc"><i>520</i>&nbsp;		sendMessage(object);</b>
+<b class="nc"><i>521</i>&nbsp;	}</b>
+<i>522</i>&nbsp;	/**
+<i>523</i>&nbsp;	 * It closes the socket and calls {@code setActive(false);}.
+<i>524</i>&nbsp;	 */
+<i>525</i>&nbsp;	public void closeSocketAndTerminate() {
+<i>526</i>&nbsp;		try {
+<b class="nc"><i>527</i>&nbsp;			clientSocket.close();</b>
+<b class="nc"><i>528</i>&nbsp;			playerName = null;</b>
+<b class="nc"><i>529</i>&nbsp;			setActive(false);</b>
+<b class="nc"><i>530</i>&nbsp;		} catch (IOException e2) {</b>
+<b class="nc"><i>531</i>&nbsp;			playerName = null;</b>
+<b class="nc"><i>532</i>&nbsp;			setActive(false);</b>
+<b class="nc"><i>533</i>&nbsp;		}</b>
+<b class="nc"><i>534</i>&nbsp;	}</b>
+<i>535</i>&nbsp;
+<i>536</i>&nbsp;	/* **********************************************
 <i>537</i>&nbsp;	 *												*
-<i>538</i>&nbsp;	 *			GETTERS FOR THIS CLASS				*
-<i>539</i>&nbsp;	 * 												*
-<i>540</i>&nbsp;	 * 												*
+<i>538</i>&nbsp;	 *												*
+<i>539</i>&nbsp;	 *												*
+<i>540</i>&nbsp;	 *			GETTERS FOR THIS CLASS				*
 <i>541</i>&nbsp;	 * 												*
-<i>542</i>&nbsp;	 ************************************************/
-<i>543</i>&nbsp;	/**
-<i>544</i>&nbsp;	 * Gets game phase.
-<i>545</i>&nbsp;	 * @return game phase
-<i>546</i>&nbsp;	 */
-<i>547</i>&nbsp;	public NetworkPhase getGamePhase() {
-<b class="fc"><i>548</i>&nbsp;		synchronized (stateLock) {</b>
-<b class="fc"><i>549</i>&nbsp;			return gamePhase;</b>
-<b class="nc"><i>550</i>&nbsp;		}</b>
-<i>551</i>&nbsp;	}
-<i>552</i>&nbsp;	/**
-<i>553</i>&nbsp;	 * Gets player name.
-<i>554</i>&nbsp;	 * @return player name
-<i>555</i>&nbsp;	 */
-<i>556</i>&nbsp;	public String getPlayerName() {
-<b class="nc"><i>557</i>&nbsp;		synchronized (playerNameLock) {</b>
-<b class="nc"><i>558</i>&nbsp;			return playerName;</b>
-<b class="nc"><i>559</i>&nbsp;		}</b>
-<i>560</i>&nbsp;	}
-<i>561</i>&nbsp;
-<i>562</i>&nbsp;	/* **********************************************
-<i>563</i>&nbsp;	 *												*
-<i>564</i>&nbsp;	 *												*
+<i>542</i>&nbsp;	 * 												*
+<i>543</i>&nbsp;	 * 												*
+<i>544</i>&nbsp;	 ************************************************/
+<i>545</i>&nbsp;	/**
+<i>546</i>&nbsp;	 * Gets game phase.
+<i>547</i>&nbsp;	 * @return game phase
+<i>548</i>&nbsp;	 */
+<i>549</i>&nbsp;	public NetworkPhase getGamePhase() {
+<b class="fc"><i>550</i>&nbsp;		synchronized (stateLock) {</b>
+<b class="fc"><i>551</i>&nbsp;			return gamePhase;</b>
+<b class="nc"><i>552</i>&nbsp;		}</b>
+<i>553</i>&nbsp;	}
+<i>554</i>&nbsp;	/**
+<i>555</i>&nbsp;	 * Gets player name.
+<i>556</i>&nbsp;	 * @return player name
+<i>557</i>&nbsp;	 */
+<i>558</i>&nbsp;	public String getPlayerName() {
+<b class="nc"><i>559</i>&nbsp;		synchronized (playerNameLock) {</b>
+<b class="nc"><i>560</i>&nbsp;			return playerName;</b>
+<b class="nc"><i>561</i>&nbsp;		}</b>
+<i>562</i>&nbsp;	}
+<i>563</i>&nbsp;
+<i>564</i>&nbsp;	/* **********************************************
 <i>565</i>&nbsp;	 *												*
-<i>566</i>&nbsp;	 *			UPDATERS OF THE REMOTE VIEW			*
-<i>567</i>&nbsp;	 * 												*
-<i>568</i>&nbsp;	 * 												*
+<i>566</i>&nbsp;	 *												*
+<i>567</i>&nbsp;	 *												*
+<i>568</i>&nbsp;	 *			UPDATERS OF THE REMOTE VIEW			*
 <i>569</i>&nbsp;	 * 												*
-<i>570</i>&nbsp;	 ************************************************/
-<i>571</i>&nbsp;	/**
-<i>572</i>&nbsp;	 * This method calls the remote view method which handles the disconnection of the client.
-<i>573</i>&nbsp;	 */
-<i>574</i>&nbsp;	public void notifyDisconnection() {
-<b class="nc"><i>575</i>&nbsp;		gameServer.notifyQuit(playerName);</b>
-<b class="nc"><i>576</i>&nbsp;		gameServer.removeAllObservers();</b>
-<b class="nc"><i>577</i>&nbsp;	}</b>
-<i>578</i>&nbsp;
-<i>579</i>&nbsp;	// METHODS CALLED THAT CHANGES THE STATE OF THE LISTENER THREAD
-<i>580</i>&nbsp;	/**
-<i>581</i>&nbsp;	 * This method is called when a programming error occurred, it sends a message to the client to notify it that this game has crashed and throws an AssertionError on the server.
-<i>582</i>&nbsp;	 * @param info information about the error
-<i>583</i>&nbsp;	 * @throws AssertionError always thrown because the server had an error due to incorrect calls to methods
-<i>584</i>&nbsp;	 */
-<i>585</i>&nbsp;	public void fatalError(String info) {
-<b class="nc"><i>586</i>&nbsp;		verifyClient = false;</b>
-<b class="nc"><i>587</i>&nbsp;		NetObject sendError = new NetObject(Constants.GENERAL_FATAL_ERROR);</b>
-<b class="nc"><i>588</i>&nbsp;		sendMessage(sendError);</b>
-<b class="nc"><i>589</i>&nbsp;		disconnect();</b>
-<b class="nc"><i>590</i>&nbsp;		closeSocketAndTerminate();</b>
-<b class="nc"><i>591</i>&nbsp;		throw new AssertionError(&quot;A fatal error occurred and these are the info about it: &quot;+info);</b>
-<i>592</i>&nbsp;	}
-<i>593</i>&nbsp;	/**
-<i>594</i>&nbsp;	 * This method disconnects the user.
-<i>595</i>&nbsp;	 */
-<i>596</i>&nbsp;	public void disconnect() {
-<b class="nc"><i>597</i>&nbsp;		if (gamePhase == NetworkPhase.LOBBY || gamePhase == NetworkPhase.PRELOBBY) {</b>
-<i>598</i>&nbsp;			try {
-<b class="nc"><i>599</i>&nbsp;				lobbyServer.removePlayer(playerName,this);</b>
-<b class="nc"><i>600</i>&nbsp;				closeSocketAndTerminate();</b>
-<b class="nc"><i>601</i>&nbsp;			} catch (AlreadyStartedException e) {</b>
-<i>602</i>&nbsp;				// if the user has disconnected during the game creation it waits for the game creation and notifies that to the gaming server
-<b class="nc"><i>603</i>&nbsp;				synchronized (scopeLock) {</b>
-<b class="nc"><i>604</i>&nbsp;					while (gameServer == null) {</b>
-<i>605</i>&nbsp;						try {
-<b class="nc"><i>606</i>&nbsp;							scopeLock.wait();</b>
-<b class="nc"><i>607</i>&nbsp;						} catch (InterruptedException e2) {</b>
-<b class="nc"><i>608</i>&nbsp;							throw new AssertionError(&quot;Thread was interrupted and the code never interrupts it&quot;);</b>
-<b class="nc"><i>609</i>&nbsp;						}</b>
-<i>610</i>&nbsp;					}
-<b class="nc"><i>611</i>&nbsp;					notifyDisconnection();</b>
-<b class="nc"><i>612</i>&nbsp;					closeSocketAndTerminate();</b>
-<b class="nc"><i>613</i>&nbsp;				}</b>
-<b class="nc"><i>614</i>&nbsp;			}</b>
-<i>615</i>&nbsp;		} else {
-<b class="nc"><i>616</i>&nbsp;			notifyDisconnection();</b>
-<b class="nc"><i>617</i>&nbsp;			closeSocketAndTerminate();</b>
-<i>618</i>&nbsp;		}
-<b class="nc"><i>619</i>&nbsp;	}</b>
-<i>620</i>&nbsp;}
+<i>570</i>&nbsp;	 * 												*
+<i>571</i>&nbsp;	 * 												*
+<i>572</i>&nbsp;	 ************************************************/
+<i>573</i>&nbsp;	/**
+<i>574</i>&nbsp;	 * This method calls the remote view method which handles the disconnection of the client.
+<i>575</i>&nbsp;	 */
+<i>576</i>&nbsp;	public void notifyDisconnection() {
+<b class="nc"><i>577</i>&nbsp;		gameServer.notifyQuit(playerName);</b>
+<b class="nc"><i>578</i>&nbsp;		gameServer.removeAllObservers();</b>
+<b class="nc"><i>579</i>&nbsp;	}</b>
+<i>580</i>&nbsp;
+<i>581</i>&nbsp;	// METHODS CALLED THAT CHANGES THE STATE OF THE LISTENER THREAD
+<i>582</i>&nbsp;	/**
+<i>583</i>&nbsp;	 * This method is called when a programming error occurred, it sends a message to the client to notify it that this game has crashed and throws an AssertionError on the server.
+<i>584</i>&nbsp;	 * @param info information about the error
+<i>585</i>&nbsp;	 * @throws AssertionError always thrown because the server had an error due to incorrect calls to methods
+<i>586</i>&nbsp;	 */
+<i>587</i>&nbsp;	public void fatalError(String info) {
+<b class="nc"><i>588</i>&nbsp;		verifyClient = false;</b>
+<b class="nc"><i>589</i>&nbsp;		NetObject sendError = new NetObject(Constants.GENERAL_FATAL_ERROR);</b>
+<b class="nc"><i>590</i>&nbsp;		sendMessage(sendError);</b>
+<b class="nc"><i>591</i>&nbsp;		disconnect();</b>
+<b class="nc"><i>592</i>&nbsp;		closeSocketAndTerminate();</b>
+<b class="nc"><i>593</i>&nbsp;		throw new AssertionError(&quot;A fatal error occurred and these are the info about it: &quot;+info);</b>
+<i>594</i>&nbsp;	}
+<i>595</i>&nbsp;	/**
+<i>596</i>&nbsp;	 * This method disconnects the user.
+<i>597</i>&nbsp;	 */
+<i>598</i>&nbsp;	public void disconnect() {
+<b class="nc"><i>599</i>&nbsp;		if (gamePhase == NetworkPhase.LOBBY || gamePhase == NetworkPhase.PRELOBBY) {</b>
+<i>600</i>&nbsp;			try {
+<b class="nc"><i>601</i>&nbsp;				lobbyServer.removePlayer(playerName,this);</b>
+<b class="nc"><i>602</i>&nbsp;				closeSocketAndTerminate();</b>
+<b class="nc"><i>603</i>&nbsp;			} catch (AlreadyStartedException e) {</b>
+<i>604</i>&nbsp;				// if the user has disconnected during the game creation it waits for the game creation and notifies that to the gaming server
+<b class="nc"><i>605</i>&nbsp;				synchronized (scopeLock) {</b>
+<b class="nc"><i>606</i>&nbsp;					while (gameServer == null) {</b>
+<i>607</i>&nbsp;						try {
+<b class="nc"><i>608</i>&nbsp;							scopeLock.wait();</b>
+<b class="nc"><i>609</i>&nbsp;						} catch (InterruptedException e2) {</b>
+<b class="nc"><i>610</i>&nbsp;							throw new AssertionError(&quot;Thread was interrupted and the code never interrupts it&quot;);</b>
+<b class="nc"><i>611</i>&nbsp;						}</b>
+<i>612</i>&nbsp;					}
+<b class="nc"><i>613</i>&nbsp;					notifyDisconnection();</b>
+<b class="nc"><i>614</i>&nbsp;					closeSocketAndTerminate();</b>
+<b class="nc"><i>615</i>&nbsp;				}</b>
+<b class="nc"><i>616</i>&nbsp;			}</b>
+<i>617</i>&nbsp;		} else {
+<b class="nc"><i>618</i>&nbsp;			notifyDisconnection();</b>
+<b class="nc"><i>619</i>&nbsp;			closeSocketAndTerminate();</b>
+<i>620</i>&nbsp;		}
+<b class="nc"><i>621</i>&nbsp;	}</b>
+<i>622</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2020-07-02 13:20</div>
+    <div style="float:right;">generated on 2020-07-03 01:29</div>
 </div>
 </body>
 </html>

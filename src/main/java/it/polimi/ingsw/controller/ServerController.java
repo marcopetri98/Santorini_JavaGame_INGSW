@@ -289,8 +289,8 @@ public class ServerController implements ObserverController {
 							if (observedModel.getPlayerPossibleBuilds().size() == 0) {
 								observedModel.changeTurn();
 								observedModel.computeActions();
-								defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());
 							}
+							defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());
 						}
 					} else {
 						caller.communicateError();
@@ -333,7 +333,8 @@ public class ServerController implements ObserverController {
 		try {
 			observedModel.removeObserver((ObserverRemoteView)observed);
 		} catch (IllegalArgumentException e) {
-			throw new AssertionError("The server controller has been called to remove an observer that doesn't exist");
+			System.err.println("A strange event happened, however it has been blocked: The server controller has been called to remove an observer that doesn't exist. Here is the stack trace:");
+			e.printStackTrace();
 		}
 	}
 }
