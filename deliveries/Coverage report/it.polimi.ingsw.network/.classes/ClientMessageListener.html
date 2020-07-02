@@ -1,0 +1,463 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ClientMessageListener</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.network</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ClientMessageListener (it.polimi.ingsw.network)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClientMessageListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 111)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ClientMessageListener$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClientMessageListener$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 122)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.network;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.sun.source.tree.AssertTree;
+<i>4</i>&nbsp;import it.polimi.ingsw.network.objects.*;
+<i>5</i>&nbsp;import it.polimi.ingsw.ui.GraphicInterface;
+<i>6</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.io.IOException;
+<i>9</i>&nbsp;import java.io.ObjectInputStream;
+<i>10</i>&nbsp;import java.io.ObjectOutputStream;
+<i>11</i>&nbsp;import java.net.Socket;
+<i>12</i>&nbsp;import java.net.UnknownHostException;
+<i>13</i>&nbsp;import java.util.concurrent.*;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; * This class is the base network class of the client that is intended to communicate with the server, it is used by a CLI client or by a GUI client.
+<i>17</i>&nbsp; */
+<i>18</i>&nbsp;public class ClientMessageListener extends Thread {
+<i>19</i>&nbsp;	private GraphicInterface viewController;
+<i>20</i>&nbsp;	private Socket serverSocket;
+<i>21</i>&nbsp;	private ObjectInputStream input;
+<i>22</i>&nbsp;	private ObjectOutputStream output;
+<i>23</i>&nbsp;	private NetworkPhase currentPhase;
+<i>24</i>&nbsp;	private boolean disconnected;
+<i>25</i>&nbsp;	private boolean active;
+<i>26</i>&nbsp;	private boolean wantsToPlay;
+<i>27</i>&nbsp;	private boolean finished;
+<i>28</i>&nbsp;	private final Object startLock, stateLock, inputLock, outputLock;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;	/**
+<i>31</i>&nbsp;	 * It creates a client message listener for the graphic interface controller passed as parameter.
+<i>32</i>&nbsp;	 * @param controller is the graphic interface controller
+<i>33</i>&nbsp;	 */
+<i>34</i>&nbsp;	public ClientMessageListener(GraphicInterface controller) {
+<b class="nc"><i>35</i>&nbsp;		super(&quot;ClientMessageListener&quot;);</b>
+<b class="nc"><i>36</i>&nbsp;		viewController = controller;</b>
+<b class="nc"><i>37</i>&nbsp;		active = true;</b>
+<b class="nc"><i>38</i>&nbsp;		wantsToPlay = false;</b>
+<b class="nc"><i>39</i>&nbsp;		disconnected = false;</b>
+<b class="nc"><i>40</i>&nbsp;		finished = false;</b>
+<b class="nc"><i>41</i>&nbsp;		startLock = new Object();</b>
+<b class="nc"><i>42</i>&nbsp;		stateLock = new Object();</b>
+<b class="nc"><i>43</i>&nbsp;		inputLock = new Object();</b>
+<b class="nc"><i>44</i>&nbsp;		outputLock = new Object();</b>
+<b class="nc"><i>45</i>&nbsp;		currentPhase = NetworkPhase.PRELOBBY;</b>
+<i>46</i>&nbsp;	}
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;	/**
+<i>49</i>&nbsp;	 * This method listen for messages from the server and analyzes it and pass it to the parsing method for the current network phase.
+<i>50</i>&nbsp;	 */
+<i>51</i>&nbsp;	@Override
+<i>52</i>&nbsp;	public void run() {
+<b class="nc"><i>53</i>&nbsp;		NetObject ingoingObject = null;</b>
+<i>54</i>&nbsp;
+<b class="nc"><i>55</i>&nbsp;		while (active) {</b>
+<i>56</i>&nbsp;			// waits until the player select a server where to play or close the application
+<b class="nc"><i>57</i>&nbsp;			while (!wantsToPlay &amp;&amp; active) {</b>
+<b class="nc"><i>58</i>&nbsp;				synchronized (startLock) {</b>
+<i>59</i>&nbsp;					try {
+<b class="nc"><i>60</i>&nbsp;						startLock.wait();</b>
+<b class="nc"><i>61</i>&nbsp;					} catch (InterruptedException e) {</b>
+<b class="nc"><i>62</i>&nbsp;						throw new AssertionError(&quot;Someone interrupted the wait&quot;);</b>
+<b class="nc"><i>63</i>&nbsp;					}</b>
+<b class="nc"><i>64</i>&nbsp;				}</b>
+<i>65</i>&nbsp;			}
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;			// the player has chosen a server and here the listener listens for messages from the server
+<b class="nc"><i>68</i>&nbsp;			if (active) {</b>
+<i>69</i>&nbsp;				try {
+<b class="nc"><i>70</i>&nbsp;					ingoingObject = (NetObject) input.readObject();</b>
+<b class="nc"><i>71</i>&nbsp;				} catch (ClassNotFoundException e) {</b>
+<b class="nc"><i>72</i>&nbsp;					setActive(false);</b>
+<b class="nc"><i>73</i>&nbsp;				} catch (IOException e) {</b>
+<b class="nc"><i>74</i>&nbsp;					setActive(false);</b>
+<i>75</i>&nbsp;					// if the server has disconnected there has been a connection error only if the player hasn&#39;t disconnected and the game hasn&#39;t finished
+<b class="nc"><i>76</i>&nbsp;					if (!disconnected &amp;&amp; !finished) {</b>
+<b class="nc"><i>77</i>&nbsp;						viewController.retrieveConnectionError();</b>
+<i>78</i>&nbsp;					}
+<b class="nc"><i>79</i>&nbsp;				}</b>
+<i>80</i>&nbsp;
+<b class="nc"><i>81</i>&nbsp;				if (ingoingObject != null &amp;&amp; active) {</b>
+<b class="nc"><i>82</i>&nbsp;					if (ingoingObject.message.equals(Constants.GENERAL_FATAL_ERROR)) {</b>
+<b class="nc"><i>83</i>&nbsp;						viewController.retrieveError();</b>
+<b class="nc"><i>84</i>&nbsp;					} else if (ingoingObject.message.equals(Constants.CHECK)) {</b>
+<b class="nc"><i>85</i>&nbsp;						sendMessage(new NetObject(Constants.CHECK));</b>
+<i>86</i>&nbsp;					} else {
+<b class="nc"><i>87</i>&nbsp;						if (ingoingObject.message.equals(Constants.GENERAL_WINNER) || ingoingObject.message.equals(Constants.GENERAL_PLAYER_DISCONNECTED) || ingoingObject.message.equals(Constants.GENERAL_SETUP_DISCONNECT)) {</b>
+<b class="nc"><i>88</i>&nbsp;							finished = true;</b>
+<i>89</i>&nbsp;						}
+<b class="nc"><i>90</i>&nbsp;						switch (currentPhase) {</b>
+<i>91</i>&nbsp;							case PRELOBBY:
+<b class="nc"><i>92</i>&nbsp;								if (ingoingObject instanceof NetSetup) {</b>
+<b class="nc"><i>93</i>&nbsp;									parseSetupInput((NetSetup) ingoingObject);</b>
+<i>94</i>&nbsp;								}
+<i>95</i>&nbsp;								break;
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;							case LOBBY:
+<b class="nc"><i>98</i>&nbsp;								if (ingoingObject instanceof NetLobbyPreparation) {</b>
+<b class="nc"><i>99</i>&nbsp;									parseLobbyInput((NetLobbyPreparation) ingoingObject);</b>
+<i>100</i>&nbsp;								}
+<i>101</i>&nbsp;								break;
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;							case COLORS:
+<b class="nc"><i>104</i>&nbsp;								if (ingoingObject instanceof NetColorPreparation) {</b>
+<b class="nc"><i>105</i>&nbsp;									parseColorInput((NetColorPreparation) ingoingObject);</b>
+<i>106</i>&nbsp;								}
+<i>107</i>&nbsp;								break;
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;							case GODS:
+<b class="nc"><i>110</i>&nbsp;								if (ingoingObject instanceof NetDivinityChoice) {</b>
+<b class="nc"><i>111</i>&nbsp;									parseDivinityInput((NetDivinityChoice) ingoingObject);</b>
+<i>112</i>&nbsp;								}
+<i>113</i>&nbsp;								break;
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;							case SETUP:
+<b class="nc"><i>116</i>&nbsp;								if (ingoingObject instanceof NetGameSetup) {</b>
+<b class="nc"><i>117</i>&nbsp;									parseGameSetupInput((NetGameSetup) ingoingObject);</b>
+<i>118</i>&nbsp;								}
+<i>119</i>&nbsp;								break;
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;							default:
+<b class="nc"><i>122</i>&nbsp;								if (ingoingObject instanceof NetGaming) {</b>
+<b class="nc"><i>123</i>&nbsp;									parseGamingInput((NetGaming) ingoingObject);</b>
+<i>124</i>&nbsp;								}
+<i>125</i>&nbsp;								break;
+<i>126</i>&nbsp;						}
+<i>127</i>&nbsp;					}
+<i>128</i>&nbsp;				}
+<i>129</i>&nbsp;			}
+<i>130</i>&nbsp;		}
+<i>131</i>&nbsp;	}
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;	/* **********************************************
+<i>134</i>&nbsp;	 *												*
+<i>135</i>&nbsp;	 *												*
+<i>136</i>&nbsp;	 *												*
+<i>137</i>&nbsp;	 *	METHODS USED TO PARSE SERVER MESSAGES		*
+<i>138</i>&nbsp;	 * 												*
+<i>139</i>&nbsp;	 * 												*
+<i>140</i>&nbsp;	 * 												*
+<i>141</i>&nbsp;	 ************************************************/
+<i>142</i>&nbsp;	/**
+<i>143</i>&nbsp;	 * This method parses the setup messages sending them to the controller and it changes the network phase id a specific message arrives.
+<i>144</i>&nbsp;	 * @param msg is the message arrived from the server
+<i>145</i>&nbsp;	 */
+<i>146</i>&nbsp;	private void parseSetupInput(NetSetup msg) {
+<b class="nc"><i>147</i>&nbsp;		if (msg.message.equals(Constants.SETUP_CREATE_WORKED) || msg.message.equals(Constants.SETUP_OUT_CONNWORKED) || msg.message.equals(Constants.SETUP_OUT_CONNFINISH)) {</b>
+<b class="nc"><i>148</i>&nbsp;			currentPhase = NetworkPhase.LOBBY;</b>
+<i>149</i>&nbsp;		}
+<b class="nc"><i>150</i>&nbsp;		viewController.retrieveConnectionMsg(msg);</b>
+<i>151</i>&nbsp;	}
+<i>152</i>&nbsp;	/**
+<i>153</i>&nbsp;	 * This method parses the lobby messages sending them to the controller and it changes the network phase id a specific message arrives.
+<i>154</i>&nbsp;	 * @param msg is the message arrived from the server
+<i>155</i>&nbsp;	 */
+<i>156</i>&nbsp;	private void parseLobbyInput(NetLobbyPreparation msg) {
+<b class="nc"><i>157</i>&nbsp;		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {</b>
+<b class="nc"><i>158</i>&nbsp;			currentPhase = NetworkPhase.COLORS;</b>
+<i>159</i>&nbsp;		}
+<b class="nc"><i>160</i>&nbsp;		viewController.retrieveLobbyMsg(msg);</b>
+<i>161</i>&nbsp;	}
+<i>162</i>&nbsp;	/**
+<i>163</i>&nbsp;	 * This method parses the color messages sending them to the controller and it changes the network phase id a specific message arrives.
+<i>164</i>&nbsp;	 * @param msg is the message arrived from the server
+<i>165</i>&nbsp;	 */
+<i>166</i>&nbsp;	private void parseColorInput(NetColorPreparation msg) {
+<b class="nc"><i>167</i>&nbsp;		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {</b>
+<b class="nc"><i>168</i>&nbsp;			currentPhase = NetworkPhase.GODS;</b>
+<i>169</i>&nbsp;		}
+<b class="nc"><i>170</i>&nbsp;		viewController.retrieveColorMsg(msg);</b>
+<i>171</i>&nbsp;	}
+<i>172</i>&nbsp;	/**
+<i>173</i>&nbsp;	 * This method parses the gods phase messages sending them to the controller and it changes the network phase id a specific message arrives.
+<i>174</i>&nbsp;	 * @param msg is the message arrived from the server
+<i>175</i>&nbsp;	 */
+<i>176</i>&nbsp;	private void parseDivinityInput(NetDivinityChoice msg) {
+<b class="nc"><i>177</i>&nbsp;		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE) &amp;&amp; msg.godsEnd) {</b>
+<b class="nc"><i>178</i>&nbsp;			currentPhase = NetworkPhase.SETUP;</b>
+<i>179</i>&nbsp;		}
+<b class="nc"><i>180</i>&nbsp;		viewController.retrieveGodsMsg(msg);</b>
+<i>181</i>&nbsp;	}
+<i>182</i>&nbsp;	/**
+<i>183</i>&nbsp;	 * This method parses the game setup messages sending to the controller and it changes the network phase if a specific message arrives.
+<i>184</i>&nbsp;	 * @param msg is the message arrived from the server
+<i>185</i>&nbsp;	 */
+<i>186</i>&nbsp;	private void parseGameSetupInput(NetGameSetup msg) {
+<b class="nc"><i>187</i>&nbsp;		if (msg.message.equals(Constants.GENERAL_PHASE_UPDATE)) {</b>
+<b class="nc"><i>188</i>&nbsp;			currentPhase = NetworkPhase.PLAYERTURN;</b>
+<i>189</i>&nbsp;		}
+<b class="nc"><i>190</i>&nbsp;		viewController.retrieveGameSetupMsg(msg);</b>
+<i>191</i>&nbsp;	}
+<i>192</i>&nbsp;	/**
+<i>193</i>&nbsp;	 * This method parses the gaming messages.
+<i>194</i>&nbsp;	 * @param msg is the message arrived from the server
+<i>195</i>&nbsp;	 */
+<i>196</i>&nbsp;	private void parseGamingInput(NetGaming msg) {
+<b class="nc"><i>197</i>&nbsp;		viewController.retrieveGamingMsg(msg);</b>
+<i>198</i>&nbsp;	}
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;	/* **********************************************
+<i>201</i>&nbsp;	 *												*
+<i>202</i>&nbsp;	 *												*
+<i>203</i>&nbsp;	 *												*
+<i>204</i>&nbsp;	 *	METHODS USED TO SEND MESSAGES TO THE SERVER	*
+<i>205</i>&nbsp;	 * 												*
+<i>206</i>&nbsp;	 * 												*
+<i>207</i>&nbsp;	 * 												*
+<i>208</i>&nbsp;	 ************************************************/
+<i>209</i>&nbsp;	/**
+<i>210</i>&nbsp;	 * This methods try to connect the client with the specified server, it returns a boolean to indicate if the operation succeeded.
+<i>211</i>&nbsp;	 * @param address is the server address
+<i>212</i>&nbsp;	 * @return true if it succeed in connecting to the server
+<i>213</i>&nbsp;	 */
+<i>214</i>&nbsp;	public boolean connectToServer(String address) {
+<b class="nc"><i>215</i>&nbsp;		ExecutorService myService = Executors.newSingleThreadExecutor();</b>
+<b class="nc"><i>216</i>&nbsp;		Future&lt;Integer&gt; executingThread = myService.submit(new Callable&lt;Integer&gt;() {</b>
+<i>217</i>&nbsp;			@Override
+<i>218</i>&nbsp;			public Integer call() throws Exception {
+<i>219</i>&nbsp;				try {
+<b class="nc"><i>220</i>&nbsp;					serverSocket = new Socket(address, 21005);</b>
+<b class="nc"><i>221</i>&nbsp;					output = new ObjectOutputStream(serverSocket.getOutputStream());</b>
+<b class="nc"><i>222</i>&nbsp;					input = new ObjectInputStream(serverSocket.getInputStream());</b>
+<b class="nc"><i>223</i>&nbsp;				} catch (UnknownHostException e) {</b>
+<b class="nc"><i>224</i>&nbsp;					return 1;</b>
+<b class="nc"><i>225</i>&nbsp;				} catch (IOException e) {</b>
+<b class="nc"><i>226</i>&nbsp;					return 2;</b>
+<b class="nc"><i>227</i>&nbsp;				}</b>
+<b class="nc"><i>228</i>&nbsp;				return 0;</b>
+<i>229</i>&nbsp;			}
+<i>230</i>&nbsp;		});
+<i>231</i>&nbsp;
+<i>232</i>&nbsp;		int returnValue;
+<i>233</i>&nbsp;		try {
+<b class="nc"><i>234</i>&nbsp;			returnValue = executingThread.get(1000, TimeUnit.MILLISECONDS);</b>
+<b class="nc"><i>235</i>&nbsp;			myService.shutdownNow();</b>
+<b class="nc"><i>236</i>&nbsp;		} catch (TimeoutException timedOut) {</b>
+<b class="nc"><i>237</i>&nbsp;			viewController.retrieveConnectionError();</b>
+<b class="nc"><i>238</i>&nbsp;			return false;</b>
+<b class="nc"><i>239</i>&nbsp;		} catch (CancellationException | InterruptedException | ExecutionException e) {</b>
+<b class="nc"><i>240</i>&nbsp;			viewController.retrieveError();</b>
+<b class="nc"><i>241</i>&nbsp;			return false;</b>
+<b class="nc"><i>242</i>&nbsp;		}</b>
+<i>243</i>&nbsp;
+<b class="nc"><i>244</i>&nbsp;		if (returnValue == 1 || returnValue == 2) {</b>
+<b class="nc"><i>245</i>&nbsp;			viewController.retrieveConnectionError();</b>
+<b class="nc"><i>246</i>&nbsp;			return false;</b>
+<i>247</i>&nbsp;		} else {
+<b class="nc"><i>248</i>&nbsp;			currentPhase = NetworkPhase.PRELOBBY;</b>
+<b class="nc"><i>249</i>&nbsp;			return true;</b>
+<i>250</i>&nbsp;		}
+<i>251</i>&nbsp;	}
+<i>252</i>&nbsp;	/**
+<i>253</i>&nbsp;	 * It sends a message to the server writing to the output stream and after this it resets the stream.
+<i>254</i>&nbsp;	 * @param message is a {@link it.polimi.ingsw.network.objects.NetObject} to send to the server
+<i>255</i>&nbsp;	 */
+<i>256</i>&nbsp;	public void sendMessage(NetObject message) {
+<b class="nc"><i>257</i>&nbsp;		synchronized (outputLock) {</b>
+<i>258</i>&nbsp;			try {
+<b class="nc"><i>259</i>&nbsp;				if (message.message.equals(Constants.GENERAL_DISCONNECT)) {</b>
+<b class="nc"><i>260</i>&nbsp;					disconnected = true;</b>
+<i>261</i>&nbsp;				}
+<b class="nc"><i>262</i>&nbsp;				output.writeObject(message);</b>
+<b class="nc"><i>263</i>&nbsp;				output.flush();</b>
+<b class="nc"><i>264</i>&nbsp;				output.reset();</b>
+<b class="nc"><i>265</i>&nbsp;			} catch (IOException e) {</b>
+<i>266</i>&nbsp;				// server has crashed and it stops to send messages
+<b class="nc"><i>267</i>&nbsp;				viewController.retrieveError();</b>
+<b class="nc"><i>268</i>&nbsp;				setActive(false);</b>
+<b class="nc"><i>269</i>&nbsp;			}</b>
+<b class="nc"><i>270</i>&nbsp;		}</b>
+<i>271</i>&nbsp;	}
+<i>272</i>&nbsp;
+<i>273</i>&nbsp;	/* **********************************************
+<i>274</i>&nbsp;	 *												*
+<i>275</i>&nbsp;	 *												*
+<i>276</i>&nbsp;	 *												*
+<i>277</i>&nbsp;	 * MODIFIERS OF THIS CLASS USED TO CHANGE STATE	*
+<i>278</i>&nbsp;	 * 												*
+<i>279</i>&nbsp;	 * 												*
+<i>280</i>&nbsp;	 * 												*
+<i>281</i>&nbsp;	 ************************************************/
+<i>282</i>&nbsp;	/**
+<i>283</i>&nbsp;	 * Sets a value used by the client message listener to compute if it must terminate the thread or if it must continue to work.
+<i>284</i>&nbsp;	 * @param value is a boolean value which represent if the client message listener is functioning
+<i>285</i>&nbsp;	 */
+<i>286</i>&nbsp;	public void setActive(boolean value) {
+<b class="nc"><i>287</i>&nbsp;		synchronized (stateLock) {</b>
+<b class="nc"><i>288</i>&nbsp;			active = value;</b>
+<b class="nc"><i>289</i>&nbsp;			if (!value) {</b>
+<b class="nc"><i>290</i>&nbsp;				synchronized (stateLock) {</b>
+<b class="nc"><i>291</i>&nbsp;					stateLock.notifyAll();</b>
+<b class="nc"><i>292</i>&nbsp;				}</b>
+<i>293</i>&nbsp;			}
+<b class="nc"><i>294</i>&nbsp;		}</b>
+<i>295</i>&nbsp;	}
+<i>296</i>&nbsp;	/**
+<i>297</i>&nbsp;	 * Sets a flag inside the client message listener which indicate that the player want or does not want to play.
+<i>298</i>&nbsp;	 * @param value is the boolean value indicating if the player wants to play
+<i>299</i>&nbsp;	 */
+<i>300</i>&nbsp;	public void setWantsToPlay(boolean value) {
+<b class="nc"><i>301</i>&nbsp;		synchronized (startLock) {</b>
+<b class="nc"><i>302</i>&nbsp;			wantsToPlay = value;</b>
+<b class="nc"><i>303</i>&nbsp;			startLock.notifyAll();</b>
+<b class="nc"><i>304</i>&nbsp;		}</b>
+<i>305</i>&nbsp;	}
+<i>306</i>&nbsp;	/**
+<i>307</i>&nbsp;	 * It reset the listening putting the flag which indicated if the player wants to play to false and the active variable to true.
+<i>308</i>&nbsp;	 */
+<i>309</i>&nbsp;	public void resetListening() {
+<b class="nc"><i>310</i>&nbsp;		synchronized (startLock) {</b>
+<b class="nc"><i>311</i>&nbsp;			wantsToPlay = false;</b>
+<b class="nc"><i>312</i>&nbsp;			currentPhase = NetworkPhase.PRELOBBY;</b>
+<b class="nc"><i>313</i>&nbsp;			startLock.notifyAll();</b>
+<b class="nc"><i>314</i>&nbsp;		}</b>
+<i>315</i>&nbsp;	}
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;	/* **********************************************
+<i>318</i>&nbsp;	 *												*
+<i>319</i>&nbsp;	 *												*
+<i>320</i>&nbsp;	 *												*
+<i>321</i>&nbsp;	 *	GETTERS OF THIS CLASS USED TO CHANGE STATE	*
+<i>322</i>&nbsp;	 * 												*
+<i>323</i>&nbsp;	 * 												*
+<i>324</i>&nbsp;	 * 												*
+<i>325</i>&nbsp;	 ************************************************/
+<i>326</i>&nbsp;	/**
+<i>327</i>&nbsp;	 * Gets a value that represents if the client wants to play.
+<i>328</i>&nbsp;	 * @return true if the player wants to play, false instead
+<i>329</i>&nbsp;	 */
+<i>330</i>&nbsp;	public boolean getWantsToPlay() {
+<b class="nc"><i>331</i>&nbsp;		synchronized (startLock) {</b>
+<b class="nc"><i>332</i>&nbsp;			return wantsToPlay;</b>
+<b class="nc"><i>333</i>&nbsp;		}</b>
+<i>334</i>&nbsp;	}
+<i>335</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GodCardFactory</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.core.gods</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GodCardFactory (it.polimi.ingsw.core.gods)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GodCardFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    51.9%
+  </span>
+  <span class="absValue">
+    (14/ 27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.core.gods;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.core.Player;
+<i>4</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp; * This class is a class which implements the Factory design pattern, it is a class which aim is to create GodCards types given some attributes without that the owner knows how it creates the cards.
+<i>8</i>&nbsp; */
+<b class="nc"><i>9</i>&nbsp;public class GodCardFactory {</b>
+<i>10</i>&nbsp;	/**
+<i>11</i>&nbsp;	 * This method creates a {@link it.polimi.ingsw.core.gods.GodCard} without an owner which dynamic type is chosen by the {@code godName} parameter
+<i>12</i>&nbsp;	 * @param godName god&#39;s name
+<i>13</i>&nbsp;	 * @return a {@link it.polimi.ingsw.core.gods.GodCard}
+<i>14</i>&nbsp;	 * @throws IllegalArgumentException if {@code godName} is not a name of a game god or if {@code godName} is null
+<i>15</i>&nbsp;	 */
+<i>16</i>&nbsp;	public static GodCard createGodCard(String godName) throws IllegalArgumentException {
+<b class="fc"><i>17</i>&nbsp;		if (godName == null || !Constants.GODS_GOD_NAMES.contains(godName.toUpperCase())) {</b>
+<b class="nc"><i>18</i>&nbsp;			throw new IllegalArgumentException();</b>
+<i>19</i>&nbsp;		}
+<b class="fc"><i>20</i>&nbsp;		return switch (godName) {</b>
+<b class="fc"><i>21</i>&nbsp;			case &quot;APOLLO&quot; -&gt; new Apollo();</b>
+<b class="fc"><i>22</i>&nbsp;			case &quot;ARTEMIS&quot; -&gt; new Artemis();</b>
+<b class="fc"><i>23</i>&nbsp;			case &quot;ATHENA&quot; -&gt; new Athena();</b>
+<b class="fc"><i>24</i>&nbsp;			case &quot;ATLAS&quot; -&gt; new Atlas();</b>
+<b class="nc"><i>25</i>&nbsp;			case &quot;DEMETER&quot; -&gt; new Demeter();</b>
+<b class="nc"><i>26</i>&nbsp;			case &quot;HEPHAESTUS&quot; -&gt; new Hephaestus();</b>
+<b class="nc"><i>27</i>&nbsp;			case &quot;MINOTAUR&quot; -&gt; new Minotaur();</b>
+<b class="nc"><i>28</i>&nbsp;			case &quot;PAN&quot; -&gt; new Pan();</b>
+<b class="fc"><i>29</i>&nbsp;			case &quot;PROMETHEUS&quot; -&gt; new Prometheus();</b>
+<b class="nc"><i>30</i>&nbsp;			default -&gt; throw new AssertionError(&quot;The god that is wanted to be created is correct and not handled&quot;);</b>
+<i>31</i>&nbsp;		};
+<i>32</i>&nbsp;	}
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;	/**
+<i>35</i>&nbsp;	 * This method creates a {@link it.polimi.ingsw.core.gods.GodCard} with an owner which dynamic type is chosen by the {@code godName} parameter and owner specified by the {@code owner}.
+<i>36</i>&nbsp;	 * @param godName god&#39;s name
+<i>37</i>&nbsp;	 * @param owner card&#39;s owner
+<i>38</i>&nbsp;	 * @return a {@link it.polimi.ingsw.core.gods.GodCard}
+<i>39</i>&nbsp;	 * @throws IllegalArgumentException if {@code godName} is not a name of a game god, if {@code godName} is null or if {@code owner} is null
+<i>40</i>&nbsp;	 */
+<i>41</i>&nbsp;	public static GodCard createGodCard(String godName, Player owner) throws IllegalArgumentException {
+<b class="fc"><i>42</i>&nbsp;		if (godName == null || owner == null || !Constants.GODS_GOD_NAMES.contains(godName.toUpperCase())) {</b>
+<b class="nc"><i>43</i>&nbsp;			throw new IllegalArgumentException();</b>
+<i>44</i>&nbsp;		}
+<b class="fc"><i>45</i>&nbsp;		return switch (godName) {</b>
+<b class="fc"><i>46</i>&nbsp;			case &quot;APOLLO&quot; -&gt; new Apollo(owner);</b>
+<b class="fc"><i>47</i>&nbsp;			case &quot;ARTEMIS&quot; -&gt; new Artemis(owner);</b>
+<b class="fc"><i>48</i>&nbsp;			case &quot;ATHENA&quot; -&gt; new Athena(owner);</b>
+<b class="fc"><i>49</i>&nbsp;			case &quot;ATLAS&quot; -&gt; new Atlas(owner);</b>
+<b class="nc"><i>50</i>&nbsp;			case &quot;DEMETER&quot; -&gt; new Demeter(owner);</b>
+<b class="nc"><i>51</i>&nbsp;			case &quot;HEPHAESTUS&quot; -&gt; new Hephaestus(owner);</b>
+<b class="nc"><i>52</i>&nbsp;			case &quot;MINOTAUR&quot; -&gt; new Minotaur(owner);</b>
+<b class="nc"><i>53</i>&nbsp;			case &quot;PAN&quot; -&gt; new Pan(owner);</b>
+<b class="fc"><i>54</i>&nbsp;			case &quot;PROMETHEUS&quot; -&gt; new Prometheus(owner);</b>
+<b class="nc"><i>55</i>&nbsp;			default -&gt; throw new AssertionError(&quot;The god that is wanted to be created is correct and not handled&quot;);</b>
+<i>56</i>&nbsp;		};
+<i>57</i>&nbsp;	}
+<i>58</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

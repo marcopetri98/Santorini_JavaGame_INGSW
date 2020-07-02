@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SetupManager</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SetupManager (it.polimi.ingsw.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SetupManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.8%
+  </span>
+  <span class="absValue">
+    (59/ 65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// other project&#39;s classes needed here
+<i>4</i>&nbsp;import it.polimi.ingsw.core.Game;
+<i>5</i>&nbsp;import it.polimi.ingsw.core.Map;
+<i>6</i>&nbsp;import it.polimi.ingsw.core.Player;
+<i>7</i>&nbsp;import it.polimi.ingsw.core.state.GodsPhase;
+<i>8</i>&nbsp;import it.polimi.ingsw.core.state.Phase;
+<i>9</i>&nbsp;import it.polimi.ingsw.network.objects.NetColorPreparation;
+<i>10</i>&nbsp;import it.polimi.ingsw.network.objects.NetDivinityChoice;
+<i>11</i>&nbsp;import it.polimi.ingsw.network.objects.NetGameSetup;
+<i>12</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>13</i>&nbsp;import it.polimi.ingsw.util.exceptions.BadRequestException;
+<i>14</i>&nbsp;import it.polimi.ingsw.util.exceptions.WrongPhaseException;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;// necessary imports of Java SE
+<i>17</i>&nbsp;import it.polimi.ingsw.util.Color;
+<i>18</i>&nbsp;import java.util.ArrayList;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;import java.util.stream.Collectors;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;/**
+<i>23</i>&nbsp; * This class is the controller class which effectuate the actions needed in the game setup and requested from the clients. This class is always called by {@link it.polimi.ingsw.controller.ServerController} which filters the requests with preliminary controls on the request inspecting the game values using the interfaces which it expose.
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;public class SetupManager {
+<i>26</i>&nbsp;	private final Game observedModel;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;	// constructor for this class
+<i>29</i>&nbsp;	/**
+<i>30</i>&nbsp;	 * Creates the {@code SetupManager} with the game.
+<i>31</i>&nbsp;	 * @param g the game to control
+<i>32</i>&nbsp;	 */
+<b class="fc"><i>33</i>&nbsp;	public SetupManager(Game g) {</b>
+<b class="fc"><i>34</i>&nbsp;		observedModel = g;</b>
+<b class="fc"><i>35</i>&nbsp;	}</b>
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;	// actions to effectuate on the game
+<i>38</i>&nbsp;	/**
+<i>39</i>&nbsp;	 * This method generate random order of play in the game choosing the first player randomly, at the end it updates the game play order shuffling players.
+<i>40</i>&nbsp;	 */
+<i>41</i>&nbsp;	public void generateOrder() {
+<i>42</i>&nbsp;		int playerNumber, random;
+<b class="fc"><i>43</i>&nbsp;		List&lt;String&gt; temp = new ArrayList&lt;&gt;(), gamers = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>44</i>&nbsp;		List&lt;Player&gt; players = observedModel.getPlayers();</b>
+<i>45</i>&nbsp;
+<b class="fc"><i>46</i>&nbsp;		for (Player player : players) {</b>
+<b class="fc"><i>47</i>&nbsp;			temp.add(player.getPlayerName());</b>
+<b class="fc"><i>48</i>&nbsp;		}</b>
+<b class="fc"><i>49</i>&nbsp;		playerNumber = temp.size();</b>
+<i>50</i>&nbsp;		// generate random order
+<b class="fc"><i>51</i>&nbsp;		while (gamers.size() &lt; playerNumber) {</b>
+<b class="fc"><i>52</i>&nbsp;			if (temp.size() &gt; 1) {</b>
+<i>53</i>&nbsp;				// find a random player to add to the gamers list
+<b class="fc"><i>54</i>&nbsp;				random = (int) (Math.random() * (double) temp.size());</b>
+<b class="fc"><i>55</i>&nbsp;				gamers.add(temp.get(random));</b>
+<b class="fc"><i>56</i>&nbsp;				temp.remove(random);</b>
+<i>57</i>&nbsp;			} else {
+<i>58</i>&nbsp;				// adds the last player
+<b class="fc"><i>59</i>&nbsp;				gamers.add(temp.get(0));</b>
+<i>60</i>&nbsp;			}
+<i>61</i>&nbsp;		}
+<i>62</i>&nbsp;		try {
+<b class="fc"><i>63</i>&nbsp;			observedModel.setOrder(gamers);</b>
+<b class="fc"><i>64</i>&nbsp;			observedModel.changeTurn();</b>
+<b class="fc"><i>65</i>&nbsp;		} catch (IllegalArgumentException | WrongPhaseException e) {</b>
+<b class="fc"><i>66</i>&nbsp;			throw new AssertionError(&quot;Generate order called in a phase different from the setup&quot;);</b>
+<b class="fc"><i>67</i>&nbsp;		}</b>
+<b class="fc"><i>68</i>&nbsp;	}</b>
+<i>69</i>&nbsp;	/**
+<i>70</i>&nbsp;	 * This method changes set the color of a player with the color selected by the player. The color can be selected if no one has selected this color before and if the color is inside the game, if those requests are not fulfilled an exception is thrown.
+<i>71</i>&nbsp;	 * @param playerColors the player request
+<i>72</i>&nbsp;	 * @throws BadRequestException if the request cannot be completed
+<i>73</i>&nbsp;	 * @throws WrongPhaseException if the method is called in a game phase different from the color selection one
+<i>74</i>&nbsp;	 */
+<i>75</i>&nbsp;	public void changeColor(NetColorPreparation playerColors) throws BadRequestException, WrongPhaseException {
+<b class="fc"><i>76</i>&nbsp;		List&lt;Color&gt; chosenColors = observedModel.getPlayers().stream().filter((player) -&gt; {try { player.getWorker1(); return true; } catch (IllegalStateException e) { return false; }}).map((player) -&gt; player.getWorker1().color).collect(Collectors.toList());</b>
+<b class="fc"><i>77</i>&nbsp;		if (chosenColors.contains(playerColors.color) || !observedModel.getPlayerTurn().getPlayerName().equals(playerColors.player) || !playerColors.message.equals(Constants.COLOR_IN_CHOICE) || !observedModel.getPlayers().contains(observedModel.getPlayerByName(playerColors.player)) || !Constants.COLOR_COLORS.contains(playerColors.color)) {</b>
+<b class="fc"><i>78</i>&nbsp;			throw new BadRequestException();</b>
+<i>79</i>&nbsp;		} else {
+<i>80</i>&nbsp;			try {
+<b class="fc"><i>81</i>&nbsp;				observedModel.setPlayerColor(playerColors.player,playerColors.color);</b>
+<b class="nc"><i>82</i>&nbsp;			} catch (WrongPhaseException | IllegalArgumentException e) {</b>
+<b class="nc"><i>83</i>&nbsp;				throw new BadRequestException();</b>
+<b class="fc"><i>84</i>&nbsp;			}</b>
+<i>85</i>&nbsp;		}
+<b class="fc"><i>86</i>&nbsp;	}</b>
+<i>87</i>&nbsp;	/**
+<i>88</i>&nbsp;	 * This method handles the god requests of all players, it sets the game gods when the challenger chooses them (only if all the gods selected are part of the game), it chooses a player&#39;s god if it is free (no one has already selected it) and select the starter when the challenger should select it (only if the request&#39;s player is the challenger in its active turn during the right game phase).
+<i>89</i>&nbsp;	 * @param request the player&#39;s request
+<i>90</i>&nbsp;	 * @throws BadRequestException if the request cannot be completed
+<i>91</i>&nbsp;	 * @throws WrongPhaseException if the method is called in a game phase different from the gods selection one
+<i>92</i>&nbsp;	 */
+<i>93</i>&nbsp;	public void handleGodMessage(NetDivinityChoice request) throws BadRequestException, WrongPhaseException {
+<b class="fc"><i>94</i>&nbsp;		if (request == null || observedModel.getPhase().getPhase() != Phase.GODS) {</b>
+<b class="fc"><i>95</i>&nbsp;			throw new BadRequestException();</b>
+<i>96</i>&nbsp;		} else {
+<i>97</i>&nbsp;			try {
+<b class="fc"><i>98</i>&nbsp;				observedModel.getPlayerByName(request.player);</b>
+<b class="fc"><i>99</i>&nbsp;			} catch (IllegalArgumentException e) {</b>
+<b class="fc"><i>100</i>&nbsp;				throw new BadRequestException();</b>
+<b class="fc"><i>101</i>&nbsp;			}</b>
+<i>102</i>&nbsp;		}
+<b class="fc"><i>103</i>&nbsp;		if (Constants.GODS_IN_GAME_GODS.equals(request.message)) {</b>
+<i>104</i>&nbsp;			// if the player is the challenger it changes the gods for this game
+<b class="fc"><i>105</i>&nbsp;			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.player) || observedModel.getPhase().getGodsPhase() != GodsPhase.CHALLENGER_CHOICE) {</b>
+<b class="nc"><i>106</i>&nbsp;				throw new BadRequestException();</b>
+<i>107</i>&nbsp;			} else {
+<i>108</i>&nbsp;				try {
+<b class="fc"><i>109</i>&nbsp;					observedModel.setGameGods(request.getDivinities());</b>
+<b class="fc"><i>110</i>&nbsp;				} catch (IllegalArgumentException e) {</b>
+<b class="fc"><i>111</i>&nbsp;					throw new BadRequestException();</b>
+<b class="fc"><i>112</i>&nbsp;				}</b>
+<i>113</i>&nbsp;			}
+<b class="fc"><i>114</i>&nbsp;		} else if (Constants.GODS_IN_CHOICE.equals(request.message)) {</b>
+<i>115</i>&nbsp;			// if the god is already chosen it throws an exception, if not it sets the god
+<b class="fc"><i>116</i>&nbsp;			List&lt;String&gt; cardsChosen = observedModel.getPlayers().stream().filter((player) -&gt; { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map((player) -&gt; player.getCard().getName().toUpperCase()).collect(Collectors.toList());</b>
+<b class="fc"><i>117</i>&nbsp;			if (cardsChosen.contains(request.divinity) || observedModel.getPhase().getGodsPhase() != GodsPhase.GODS_CHOICE) {</b>
+<b class="fc"><i>118</i>&nbsp;				throw new BadRequestException();</b>
+<i>119</i>&nbsp;			} else {
+<b class="fc"><i>120</i>&nbsp;				observedModel.setPlayerGod(request.player,request.divinity);</b>
+<i>121</i>&nbsp;			}
+<b class="fc"><i>122</i>&nbsp;		} else {</b>
+<i>123</i>&nbsp;			// if the player is the challenger it chooses the starter player
+<b class="fc"><i>124</i>&nbsp;			if (!observedModel.getPlayers().get(0).getPlayerName().equals(request.challenger) || observedModel.getPhase().getGodsPhase() != GodsPhase.STARTER_CHOICE) {</b>
+<b class="nc"><i>125</i>&nbsp;				throw new BadRequestException();</b>
+<i>126</i>&nbsp;			} else {
+<i>127</i>&nbsp;				try {
+<b class="fc"><i>128</i>&nbsp;					observedModel.setStarter(request.player);</b>
+<b class="nc"><i>129</i>&nbsp;				} catch (IllegalStateException e) {</b>
+<b class="nc"><i>130</i>&nbsp;					throw new BadRequestException();</b>
+<b class="fc"><i>131</i>&nbsp;				}</b>
+<i>132</i>&nbsp;			}
+<i>133</i>&nbsp;		}
+<b class="fc"><i>134</i>&nbsp;	}</b>
+<i>135</i>&nbsp;	/**
+<i>136</i>&nbsp;	 * This method handles the request of positioning the workers of the player on the map, it can be completed only if cells are free and if the player is the active player.
+<i>137</i>&nbsp;	 * @param positions the player&#39;s request
+<i>138</i>&nbsp;	 * @throws BadRequestException if the request cannot be completed
+<i>139</i>&nbsp;	 */
+<i>140</i>&nbsp;	public void positionWorkers(NetGameSetup positions) throws BadRequestException {
+<b class="fc"><i>141</i>&nbsp;		Map gameMap = observedModel.getMap();</b>
+<i>142</i>&nbsp;		// if there aren&#39;t workers in that position it set the workers in that position
+<b class="fc"><i>143</i>&nbsp;		if (!positions.isWellFormed() || !observedModel.getPlayerTurn().equals(observedModel.getPlayerByName(positions.player))) {</b>
+<b class="fc"><i>144</i>&nbsp;			throw new BadRequestException();</b>
+<b class="fc"><i>145</i>&nbsp;		} else if (gameMap.getCell(positions.worker1.getFirst(),positions.worker1.getSecond()).getWorker() != null || gameMap.getCell(positions.worker2.getFirst(),positions.worker2.getSecond()).getWorker() != null || positions.worker1.equals(positions.worker2)) {</b>
+<b class="fc"><i>146</i>&nbsp;			throw new BadRequestException();</b>
+<i>147</i>&nbsp;		} else {
+<i>148</i>&nbsp;			try {
+<b class="fc"><i>149</i>&nbsp;				observedModel.setWorkerPositions(positions);</b>
+<b class="fc"><i>150</i>&nbsp;			} catch (IllegalArgumentException | WrongPhaseException e) {</b>
+<b class="fc"><i>151</i>&nbsp;				throw new BadRequestException();</b>
+<b class="fc"><i>152</i>&nbsp;			}</b>
+<i>153</i>&nbsp;		}
+<b class="fc"><i>154</i>&nbsp;	}</b>
+<i>155</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

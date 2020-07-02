@@ -1,0 +1,153 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Command</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.ui.cli.view</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Command (it.polimi.ingsw.ui.cli.view)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Command</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.ui.cli.view;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;import java.util.Arrays;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;/**
+<i>8</i>&nbsp; * This class is the class used to get commands of the user with the CLI.
+<i>9</i>&nbsp; */
+<i>10</i>&nbsp;public class Command {
+<i>11</i>&nbsp;	public String commandType;
+<i>12</i>&nbsp;	private String[] otherValues;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;	/**
+<i>15</i>&nbsp;	 * It creates a command with the given words
+<i>16</i>&nbsp;	 * @param words words wrote by the user
+<i>17</i>&nbsp;	 */
+<b class="nc"><i>18</i>&nbsp;	public Command(String[] words) {</b>
+<b class="nc"><i>19</i>&nbsp;		if (words == null) {</b>
+<b class="nc"><i>20</i>&nbsp;			commandType = null;</b>
+<b class="nc"><i>21</i>&nbsp;			otherValues = null;</b>
+<i>22</i>&nbsp;		} else {
+<b class="nc"><i>23</i>&nbsp;			commandType = words[0];</b>
+<b class="nc"><i>24</i>&nbsp;			if (words.length &lt;= 1) {</b>
+<b class="nc"><i>25</i>&nbsp;				otherValues = null;</b>
+<i>26</i>&nbsp;			} else {
+<b class="nc"><i>27</i>&nbsp;				otherValues = new String[words.length-1];</b>
+<b class="nc"><i>28</i>&nbsp;				for (int i = 0; i &lt; otherValues.length; i++) {</b>
+<b class="nc"><i>29</i>&nbsp;					otherValues[i] = words[i+1];</b>
+<i>30</i>&nbsp;				}
+<i>31</i>&nbsp;			}
+<i>32</i>&nbsp;		}
+<i>33</i>&nbsp;	}
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;	/**
+<i>36</i>&nbsp;	 * It returns the number of the parameters of the command
+<i>37</i>&nbsp;	 * @return the number of parameters of the command
+<i>38</i>&nbsp;	 */
+<i>39</i>&nbsp;	public int getNumParameters() {
+<b class="nc"><i>40</i>&nbsp;		if (otherValues == null) {</b>
+<b class="nc"><i>41</i>&nbsp;			return 0;</b>
+<i>42</i>&nbsp;		} else {
+<b class="nc"><i>43</i>&nbsp;			return otherValues.length;</b>
+<i>44</i>&nbsp;		}
+<i>45</i>&nbsp;	}
+<i>46</i>&nbsp;	/**
+<i>47</i>&nbsp;	 * It returns the parameter with the index specified in the parameter
+<i>48</i>&nbsp;	 * @param i an integer greater than 0
+<i>49</i>&nbsp;	 * @return the parameter at that index
+<i>50</i>&nbsp;	 * @throws IndexOutOfBoundsException if {@code i} is less than 0 or greater than the index of the last element
+<i>51</i>&nbsp;	 */
+<i>52</i>&nbsp;	public String getParameter(int i) {
+<b class="nc"><i>53</i>&nbsp;		if (i &lt; otherValues.length) {</b>
+<b class="nc"><i>54</i>&nbsp;			return otherValues[i];</b>
+<i>55</i>&nbsp;		} else {
+<b class="nc"><i>56</i>&nbsp;			throw new IndexOutOfBoundsException();</b>
+<i>57</i>&nbsp;		}
+<i>58</i>&nbsp;	}
+<i>59</i>&nbsp;	/**
+<i>60</i>&nbsp;	 * This methods converts parameters of the commands to a list and returns it.
+<i>61</i>&nbsp;	 * @return list of parameters
+<i>62</i>&nbsp;	 */
+<i>63</i>&nbsp;	public List&lt;String&gt; getParameterList() {
+<b class="nc"><i>64</i>&nbsp;		List&lt;String&gt; returnList = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>65</i>&nbsp;		for (int i = 0; i &lt; otherValues.length; i++) {</b>
+<b class="nc"><i>66</i>&nbsp;			returnList.add(otherValues[i]);</b>
+<i>67</i>&nbsp;		}
+<b class="nc"><i>68</i>&nbsp;		return returnList;</b>
+<i>69</i>&nbsp;	}
+<i>70</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

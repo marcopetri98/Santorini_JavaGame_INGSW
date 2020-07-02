@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NetColorPreparation</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.network.objects</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NetColorPreparation (it.polimi.ingsw.network.objects)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NetColorPreparation</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (11/ 33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.network.objects;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.util.Color;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.util.LinkedHashMap;
+<i>6</i>&nbsp;import java.util.Map;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; * This class is a class used to exchange messages between clients and server in the color phase of the game when players have to choose a color. More information about game phase can be found on {@link it.polimi.ingsw.core.state} package.
+<i>10</i>&nbsp; */
+<i>11</i>&nbsp;public class NetColorPreparation extends NetObject {
+<i>12</i>&nbsp;	public final String player;
+<i>13</i>&nbsp;	public final Color color;
+<i>14</i>&nbsp;	public final NetColorPreparation next;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;	/**
+<i>17</i>&nbsp;	 * Creates a standard message and only calls the super constructor.
+<i>18</i>&nbsp;	 * @param msg is the message to be sent
+<i>19</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null
+<i>20</i>&nbsp;	 */
+<i>21</i>&nbsp;	public NetColorPreparation(String msg) throws NullPointerException {
+<b class="nc"><i>22</i>&nbsp;		super(msg);</b>
+<b class="nc"><i>23</i>&nbsp;		player = null;</b>
+<b class="nc"><i>24</i>&nbsp;		color = null;</b>
+<b class="nc"><i>25</i>&nbsp;		next = null;</b>
+<b class="nc"><i>26</i>&nbsp;	}</b>
+<i>27</i>&nbsp;	/**
+<i>28</i>&nbsp;	 * Creates a message with a message and a player&#39;s name.
+<i>29</i>&nbsp;	 * @param msg is the message to be sent
+<i>30</i>&nbsp;	 * @param player is the player&#39;s name
+<i>31</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null
+<i>32</i>&nbsp;	 */
+<i>33</i>&nbsp;	public NetColorPreparation(String msg, String player) throws NullPointerException {
+<b class="fc"><i>34</i>&nbsp;		super(msg);</b>
+<b class="fc"><i>35</i>&nbsp;		this.player = player;</b>
+<b class="fc"><i>36</i>&nbsp;		color = null;</b>
+<b class="fc"><i>37</i>&nbsp;		next = null;</b>
+<b class="fc"><i>38</i>&nbsp;	}</b>
+<i>39</i>&nbsp;	/**
+<i>40</i>&nbsp;	 * Creates a message sent from the client to the server indicating the player&#39;s color choice.
+<i>41</i>&nbsp;	 * @param msg is the message to be sent
+<i>42</i>&nbsp;	 * @param player is the player&#39;s name
+<i>43</i>&nbsp;	 * @param c is the color chosen by the player
+<i>44</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null or {@code player} is null or {@code c} is null
+<i>45</i>&nbsp;	 */
+<i>46</i>&nbsp;	public NetColorPreparation(String msg, String player, Color c) throws NullPointerException {
+<b class="fc"><i>47</i>&nbsp;		super(msg);</b>
+<b class="fc"><i>48</i>&nbsp;		if (player == null || c == null) {</b>
+<b class="nc"><i>49</i>&nbsp;			throw new NullPointerException();</b>
+<i>50</i>&nbsp;		}
+<b class="fc"><i>51</i>&nbsp;		this.player = player;</b>
+<b class="fc"><i>52</i>&nbsp;		this.color = c;</b>
+<b class="fc"><i>53</i>&nbsp;		this.next = null;</b>
+<b class="fc"><i>54</i>&nbsp;	}</b>
+<i>55</i>&nbsp;	/**
+<i>56</i>&nbsp;	 * Creates a message from the server to the client with a player&#39;s color choice concatenating to other {@code NetColorPreparation} objects.
+<i>57</i>&nbsp;	 * @param msg is the message to be sent
+<i>58</i>&nbsp;	 * @param player is the player&#39;s name
+<i>59</i>&nbsp;	 * @param c is the color chosen by the player
+<i>60</i>&nbsp;	 * @param next is the next element to concatenated to the dynamic list
+<i>61</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null or {@code player} is null or {@code c} is null
+<i>62</i>&nbsp;	 */
+<i>63</i>&nbsp;	public NetColorPreparation(String msg, String player, Color c, NetColorPreparation next) throws NullPointerException {
+<b class="nc"><i>64</i>&nbsp;		super(msg);</b>
+<b class="nc"><i>65</i>&nbsp;		if (player == null || c == null) {</b>
+<b class="nc"><i>66</i>&nbsp;			throw new NullPointerException();</b>
+<i>67</i>&nbsp;		}
+<b class="nc"><i>68</i>&nbsp;		this.player = player;</b>
+<b class="nc"><i>69</i>&nbsp;		this.color = c;</b>
+<b class="nc"><i>70</i>&nbsp;		this.next = next;</b>
+<b class="nc"><i>71</i>&nbsp;	}</b>
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;	/**
+<i>74</i>&nbsp;	 * Gets the parameter {@link #player}.
+<i>75</i>&nbsp;	 * @return value of {@link #player}
+<i>76</i>&nbsp;	 */
+<i>77</i>&nbsp;	public String getPlayer() {
+<b class="nc"><i>78</i>&nbsp;		return player;</b>
+<i>79</i>&nbsp;	}
+<i>80</i>&nbsp;	/**
+<i>81</i>&nbsp;	 * Gets the parameter {@link #color}.
+<i>82</i>&nbsp;	 * @return value of {@link #color}
+<i>83</i>&nbsp;	 */
+<i>84</i>&nbsp;	public Color getColor() {
+<b class="nc"><i>85</i>&nbsp;		return color;</b>
+<i>86</i>&nbsp;	}
+<i>87</i>&nbsp;	/**
+<i>88</i>&nbsp;	 * Gets the parameter {@link #next}.
+<i>89</i>&nbsp;	 * @return value of {@link #next}
+<i>90</i>&nbsp;	 */
+<i>91</i>&nbsp;	public NetColorPreparation getNext() {
+<b class="nc"><i>92</i>&nbsp;		return next;</b>
+<i>93</i>&nbsp;	}
+<i>94</i>&nbsp;	/**
+<i>95</i>&nbsp;	 * Builds a map with the association between the players (keys) and the colors they have chosen (values) inside this structure.
+<i>96</i>&nbsp;	 * @return a map of colors players&#39; choice
+<i>97</i>&nbsp;	 */
+<i>98</i>&nbsp;	public Map&lt;String,Color&gt; getPlayerColorsMap() {
+<b class="nc"><i>99</i>&nbsp;		Map&lt;String,Color&gt; list = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc"><i>100</i>&nbsp;		if (player != null &amp;&amp; color != null) {</b>
+<b class="nc"><i>101</i>&nbsp;			list.put(player,color);</b>
+<b class="nc"><i>102</i>&nbsp;			if (next != null) {</b>
+<b class="nc"><i>103</i>&nbsp;				list.putAll(next.getPlayerColorsMap());</b>
+<i>104</i>&nbsp;			}
+<i>105</i>&nbsp;		}
+<b class="nc"><i>106</i>&nbsp;		return list;</b>
+<i>107</i>&nbsp;	}
+<i>108</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

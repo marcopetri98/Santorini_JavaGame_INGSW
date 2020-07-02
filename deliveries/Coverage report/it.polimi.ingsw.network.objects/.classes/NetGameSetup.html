@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NetGameSetup</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.network.objects</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NetGameSetup (it.polimi.ingsw.network.objects)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NetGameSetup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (13/ 39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.network.objects;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// necessary imports from other packages of the project
+<i>4</i>&nbsp;import it.polimi.ingsw.network.game.NetMap;
+<i>5</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>6</i>&nbsp;import it.polimi.ingsw.util.Pair;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; * This class is a class used to exchange messages between clients and server in the game setup phase of the game where player positions worker on the game map. More information about game phase can be found on {@link it.polimi.ingsw.core.state} package.
+<i>10</i>&nbsp; */
+<i>11</i>&nbsp;public class NetGameSetup extends NetObject {
+<i>12</i>&nbsp;	public final String player;
+<i>13</i>&nbsp;	public final NetMap gameMap;
+<i>14</i>&nbsp;	public final Pair&lt;Integer,Integer&gt; worker1;
+<i>15</i>&nbsp;	public final Pair&lt;Integer,Integer&gt; worker2;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;	/**
+<i>18</i>&nbsp;	 * Creates a standard message and only calls the super constructor.
+<i>19</i>&nbsp;	 * @param msg is the message to be sent
+<i>20</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null
+<i>21</i>&nbsp;	 */
+<i>22</i>&nbsp;	public NetGameSetup(String msg) {
+<b class="nc"><i>23</i>&nbsp;		super(msg);</b>
+<b class="nc"><i>24</i>&nbsp;		player = null;</b>
+<b class="nc"><i>25</i>&nbsp;		gameMap = null;</b>
+<b class="nc"><i>26</i>&nbsp;		worker1 = null;</b>
+<b class="nc"><i>27</i>&nbsp;		worker2 = null;</b>
+<b class="nc"><i>28</i>&nbsp;	}</b>
+<i>29</i>&nbsp;	/**
+<i>30</i>&nbsp;	 * Creates a message with a message and a player&#39;s name.
+<i>31</i>&nbsp;	 * @param msg is the message to be sent
+<i>32</i>&nbsp;	 * @param player is the player&#39;s name
+<i>33</i>&nbsp;	 */
+<i>34</i>&nbsp;	public NetGameSetup(String msg, String player) {
+<b class="nc"><i>35</i>&nbsp;		super(msg);</b>
+<b class="nc"><i>36</i>&nbsp;		this.player = player;</b>
+<b class="nc"><i>37</i>&nbsp;		gameMap = null;</b>
+<b class="nc"><i>38</i>&nbsp;		worker1 = null;</b>
+<b class="nc"><i>39</i>&nbsp;		worker2 = null;</b>
+<b class="nc"><i>40</i>&nbsp;	}</b>
+<i>41</i>&nbsp;	/**
+<i>42</i>&nbsp;	 * Create an update message from the server to the client with the information about the new map.
+<i>43</i>&nbsp;	 * @param msg is the message to be sent
+<i>44</i>&nbsp;	 * @param map is the updated game map
+<i>45</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null or {@code map} is null
+<i>46</i>&nbsp;	 */
+<i>47</i>&nbsp;	public NetGameSetup(String msg, NetMap map) throws NullPointerException {
+<b class="nc"><i>48</i>&nbsp;		super(msg);</b>
+<b class="nc"><i>49</i>&nbsp;		if (map == null) {</b>
+<b class="nc"><i>50</i>&nbsp;			throw new NullPointerException();</b>
+<i>51</i>&nbsp;		}
+<b class="nc"><i>52</i>&nbsp;		player = null;</b>
+<b class="nc"><i>53</i>&nbsp;		gameMap = map;</b>
+<b class="nc"><i>54</i>&nbsp;		worker1 = null;</b>
+<b class="nc"><i>55</i>&nbsp;		worker2 = null;</b>
+<b class="nc"><i>56</i>&nbsp;	}</b>
+<i>57</i>&nbsp;	/**
+<i>58</i>&nbsp;	 * Create a message from the client to the server with the information about the position of the workers on the game map that the player wants to have for its own workers.
+<i>59</i>&nbsp;	 * @param msg is the message to be sent
+<i>60</i>&nbsp;	 * @param player is the player&#39;s name
+<i>61</i>&nbsp;	 * @param worker1 are the coordinates for the first worker
+<i>62</i>&nbsp;	 * @param worker2 are the coordinates for the second worker
+<i>63</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null or {@code worker1} is null or {@code worker2} is null
+<i>64</i>&nbsp;	 * @throws IllegalArgumentException if coordinates ate not inside the map
+<i>65</i>&nbsp;	 */
+<i>66</i>&nbsp;	public NetGameSetup(String msg, String player, Pair&lt;Integer,Integer&gt; worker1, Pair&lt;Integer,Integer&gt; worker2) throws NullPointerException, IllegalArgumentException {
+<b class="fc"><i>67</i>&nbsp;		super(msg);</b>
+<b class="fc"><i>68</i>&nbsp;		if (worker1 == null || worker2 == null) {</b>
+<b class="nc"><i>69</i>&nbsp;			throw new NullPointerException();</b>
+<b class="fc"><i>70</i>&nbsp;		} else if (!(worker1.getFirst() &lt;= 4 &amp;&amp; worker1.getFirst() &gt;= 0 &amp;&amp; worker1.getSecond() &lt;= 4 &amp;&amp; worker1.getSecond() &gt;= 0 &amp;&amp; worker2.getFirst() &lt;= 4 &amp;&amp; worker2.getFirst() &gt;= 0 &amp;&amp; worker2.getSecond() &lt;= 4 &amp;&amp; worker2.getSecond() &gt;= 0)) {</b>
+<b class="nc"><i>71</i>&nbsp;			throw new IllegalArgumentException();</b>
+<i>72</i>&nbsp;		}
+<b class="fc"><i>73</i>&nbsp;		this.player = player;</b>
+<b class="fc"><i>74</i>&nbsp;		gameMap = null;</b>
+<b class="fc"><i>75</i>&nbsp;		this.worker1 = worker1;</b>
+<b class="fc"><i>76</i>&nbsp;		this.worker2 = worker2;</b>
+<b class="fc"><i>77</i>&nbsp;	}</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;	/**
+<i>80</i>&nbsp;	 * It checks if the coordinates inside this object are possible coordinates for the game table.
+<i>81</i>&nbsp;	 * @return true if is well formed, false instead
+<i>82</i>&nbsp;	 */
+<i>83</i>&nbsp;	public boolean isWellFormed() {
+<b class="fc"><i>84</i>&nbsp;		if (gameMap == null) {</b>
+<b class="fc"><i>85</i>&nbsp;			if (worker1 == null || worker2 == null) {</b>
+<b class="nc"><i>86</i>&nbsp;				return false;</b>
+<i>87</i>&nbsp;			} else {
+<b class="fc"><i>88</i>&nbsp;				if (worker1.getFirst() &lt; 0 || worker1.getFirst() &gt;= Constants.MAP_SIDE || worker1.getSecond() &lt; 0 || worker1.getSecond() &gt;= Constants.MAP_SIDE || worker2.getFirst() &lt; 0 || worker2.getFirst() &gt;= Constants.MAP_SIDE || worker2.getSecond() &lt; 0 || worker2.getSecond() &gt;= Constants.MAP_SIDE) {</b>
+<b class="fc"><i>89</i>&nbsp;					return false;</b>
+<i>90</i>&nbsp;				} else {
+<b class="fc"><i>91</i>&nbsp;					return true;</b>
+<i>92</i>&nbsp;				}
+<i>93</i>&nbsp;			}
+<i>94</i>&nbsp;		} else {
+<b class="nc"><i>95</i>&nbsp;			if (worker1 != null || worker2 != null) {</b>
+<b class="nc"><i>96</i>&nbsp;				return false;</b>
+<i>97</i>&nbsp;			} else {
+<b class="nc"><i>98</i>&nbsp;				return true;</b>
+<i>99</i>&nbsp;			}
+<i>100</i>&nbsp;		}
+<i>101</i>&nbsp;	}
+<i>102</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

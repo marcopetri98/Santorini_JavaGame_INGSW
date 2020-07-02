@@ -1,0 +1,661 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ChooseGodsFirstSceneController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.ui.gui.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ChooseGodsFirstSceneController (it.polimi.ingsw.ui.gui.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChooseGodsFirstSceneController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 286)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.ui.gui.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.network.objects.NetDivinityChoice;
+<i>4</i>&nbsp;import it.polimi.ingsw.network.objects.NetObject;
+<i>5</i>&nbsp;import it.polimi.ingsw.network.objects.NetSetup;
+<i>6</i>&nbsp;import it.polimi.ingsw.ui.gui.viewModel.GameState;
+<i>7</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>8</i>&nbsp;import javafx.animation.FadeTransition;
+<i>9</i>&nbsp;import javafx.animation.PathTransition;
+<i>10</i>&nbsp;import javafx.animation.SequentialTransition;
+<i>11</i>&nbsp;import javafx.animation.Transition;
+<i>12</i>&nbsp;import javafx.fxml.FXML;
+<i>13</i>&nbsp;import javafx.fxml.FXMLLoader;
+<i>14</i>&nbsp;import javafx.scene.Cursor;
+<i>15</i>&nbsp;import javafx.scene.Parent;
+<i>16</i>&nbsp;import javafx.scene.Scene;
+<i>17</i>&nbsp;import javafx.scene.image.Image;
+<i>18</i>&nbsp;import javafx.scene.image.ImageView;
+<i>19</i>&nbsp;import javafx.scene.input.MouseEvent;
+<i>20</i>&nbsp;import javafx.scene.shape.Line;
+<i>21</i>&nbsp;import javafx.stage.Stage;
+<i>22</i>&nbsp;import javafx.util.Duration;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import java.io.IOException;
+<i>25</i>&nbsp;import java.util.ArrayList;
+<i>26</i>&nbsp;import java.util.List;
+<i>27</i>&nbsp;import java.util.Set;
+<i>28</i>&nbsp;import java.util.TreeSet;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;/**
+<i>31</i>&nbsp; * This class implements the choosing color scene of the GUI only for the challenger.
+<i>32</i>&nbsp; */
+<b class="nc"><i>33</i>&nbsp;public class ChooseGodsFirstSceneController implements SceneController {</b>
+<i>34</i>&nbsp;	@FXML
+<i>35</i>&nbsp;	private ImageView button_exit;
+<i>36</i>&nbsp;	@FXML
+<i>37</i>&nbsp;	private ImageView card_apollo;
+<i>38</i>&nbsp;	@FXML
+<i>39</i>&nbsp;	private ImageView card_artemis;
+<i>40</i>&nbsp;	@FXML
+<i>41</i>&nbsp;	private ImageView card_minotaur;
+<i>42</i>&nbsp;	@FXML
+<i>43</i>&nbsp;	private ImageView card_pan;
+<i>44</i>&nbsp;	@FXML
+<i>45</i>&nbsp;	private ImageView card_prometheus;
+<i>46</i>&nbsp;	@FXML
+<i>47</i>&nbsp;	private ImageView card_demeter;
+<i>48</i>&nbsp;	@FXML
+<i>49</i>&nbsp;	private ImageView card_hephaestus;
+<i>50</i>&nbsp;	@FXML
+<i>51</i>&nbsp;	private ImageView button_next;
+<i>52</i>&nbsp;	@FXML
+<i>53</i>&nbsp;	private ImageView description;
+<i>54</i>&nbsp;	@FXML
+<i>55</i>&nbsp;	private ImageView card_athena;
+<i>56</i>&nbsp;	@FXML
+<i>57</i>&nbsp;	private ImageView card_atlas;
+<i>58</i>&nbsp;	@FXML
+<i>59</i>&nbsp;	private ImageView icon_errorFatalBG;
+<i>60</i>&nbsp;	@FXML
+<i>61</i>&nbsp;	private ImageView icon_errorFatal;
+<i>62</i>&nbsp;	@FXML
+<i>63</i>&nbsp;	private ImageView icon_error;
+<i>64</i>&nbsp;
+<b class="nc"><i>65</i>&nbsp;	Image cardApollo = new Image(&quot;/img/gods/card_apollo.png&quot;);</b>
+<b class="nc"><i>66</i>&nbsp;	Image cardApolloPressed = new Image(&quot;/img/gods/card_apollo_pressed.png&quot;);</b>
+<b class="nc"><i>67</i>&nbsp;	Image descriptionApollo = new Image(&quot;/img/gods/description_apollo.png&quot;);</b>
+<b class="nc"><i>68</i>&nbsp;	Image cardArtemis = new Image(&quot;/img/gods/card_artemis.png&quot;);</b>
+<b class="nc"><i>69</i>&nbsp;	Image cardArtemisPressed = new Image(&quot;/img/gods/card_artemis_pressed.png&quot;);</b>
+<b class="nc"><i>70</i>&nbsp;	Image descriptionArtemis = new Image(&quot;/img/gods/description_artemis.png&quot;);</b>
+<b class="nc"><i>71</i>&nbsp;	Image cardAthena = new Image(&quot;/img/gods/card_athena.png&quot;);</b>
+<b class="nc"><i>72</i>&nbsp;	Image cardAthenaPressed = new Image(&quot;/img/gods/card_athena_pressed.png&quot;);</b>
+<b class="nc"><i>73</i>&nbsp;	Image descriptionAthena = new Image(&quot;/img/gods/description_athena.png&quot;);</b>
+<b class="nc"><i>74</i>&nbsp;	Image cardAtlas = new Image(&quot;/img/gods/card_atlas.png&quot;);</b>
+<b class="nc"><i>75</i>&nbsp;	Image cardAtlasPressed = new Image(&quot;/img/gods/card_atlas_pressed.png&quot;);</b>
+<b class="nc"><i>76</i>&nbsp;	Image descriptionAtlas = new Image(&quot;/img/gods/description_atlas.png&quot;);</b>
+<b class="nc"><i>77</i>&nbsp;	Image cardDemeter = new Image(&quot;/img/gods/card_demeter.png&quot;);</b>
+<b class="nc"><i>78</i>&nbsp;	Image cardDemeterPressed = new Image(&quot;/img/gods/card_demeter_pressed.png&quot;);</b>
+<b class="nc"><i>79</i>&nbsp;	Image descriptionDemeter = new Image(&quot;/img/gods/description_demeter.png&quot;);</b>
+<b class="nc"><i>80</i>&nbsp;	Image cardHephaestus = new Image(&quot;/img/gods/card_hephaestus.png&quot;);</b>
+<b class="nc"><i>81</i>&nbsp;	Image cardHephaestusPressed = new Image(&quot;/img/gods/card_hephaestus_pressed.png&quot;);</b>
+<b class="nc"><i>82</i>&nbsp;	Image descriptionHephaestus = new Image(&quot;/img/gods/description_hephaestus.png&quot;);</b>
+<b class="nc"><i>83</i>&nbsp;	Image cardMinotaur = new Image(&quot;/img/gods/card_minotaur.png&quot;);</b>
+<b class="nc"><i>84</i>&nbsp;	Image cardMinotaurPressed = new Image(&quot;/img/gods/card_minotaur_pressed.png&quot;);</b>
+<b class="nc"><i>85</i>&nbsp;	Image descriptionMinotaur = new Image(&quot;/img/gods/description_minotaur.png&quot;);</b>
+<b class="nc"><i>86</i>&nbsp;	Image cardPan = new Image(&quot;/img/gods/card_pan.png&quot;);</b>
+<b class="nc"><i>87</i>&nbsp;	Image cardPanPressed = new Image(&quot;/img/gods/card_pan_pressed.png&quot;);</b>
+<b class="nc"><i>88</i>&nbsp;	Image descriptionPan = new Image(&quot;/img/gods/description_pan.png&quot;);</b>
+<b class="nc"><i>89</i>&nbsp;	Image cardPrometheus = new Image(&quot;/img/gods/card_prometheus.png&quot;);</b>
+<b class="nc"><i>90</i>&nbsp;	Image cardPrometheusPressed = new Image(&quot;/img/gods/card_prometheus_pressed.png&quot;);</b>
+<b class="nc"><i>91</i>&nbsp;	Image descriptionPrometheus = new Image(&quot;/img/gods/description_prometheus.png&quot;);</b>
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;	Image buttonNextPressed = new Image(&quot;/img/home_next_btn_pressed.png&quot;);</b>
+<b class="nc"><i>94</i>&nbsp;	Image buttonNext = new Image(&quot;/img/home_next_btn.png&quot;);</b>
+<b class="nc"><i>95</i>&nbsp;	Image buttonExitPressed = new Image(&quot;/img/home_exit_btn_pressed.png&quot;);</b>
+<b class="nc"><i>96</i>&nbsp;	Image buttonExit = new Image(&quot;/img/home_exit_btn.png&quot;);</b>
+<b class="nc"><i>97</i>&nbsp;	Image errorFatalBG = new Image(&quot;/img/errorFatal_background.png&quot;);</b>
+<b class="nc"><i>98</i>&nbsp;	Image errorFatal = new Image(&quot;/img/error_fatal.png&quot;);</b>
+<b class="nc"><i>99</i>&nbsp;	Image errorSomeoneDisconnected = new Image(&quot;/img/message_someoneDisconnected.png&quot;);</b>
+<b class="nc"><i>100</i>&nbsp;	Image errorNumberCards = new Image(&quot;/img/error_numberCards.png&quot;);</b>
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;	// objects used to change scene
+<i>103</i>&nbsp;	private Parent previousFXML;
+<i>104</i>&nbsp;	private Parent nextFXML;
+<i>105</i>&nbsp;	private Scene previousScene;
+<i>106</i>&nbsp;	private Scene nextScene;
+<i>107</i>&nbsp;	private Stage currentStage;
+<b class="nc"><i>108</i>&nbsp;	private boolean finished = false;</b>
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;	// triggers for server messages
+<i>111</i>&nbsp;	private GameState gameState;
+<b class="nc"><i>112</i>&nbsp;	private boolean pressedApollo = false;</b>
+<b class="nc"><i>113</i>&nbsp;	private boolean pressedArtemis = false;</b>
+<b class="nc"><i>114</i>&nbsp;	private boolean pressedAthena = false;</b>
+<b class="nc"><i>115</i>&nbsp;	private boolean pressedAtlas = false;</b>
+<b class="nc"><i>116</i>&nbsp;	private boolean pressedDemeter = false;</b>
+<b class="nc"><i>117</i>&nbsp;	private boolean pressedHephaestus = false;</b>
+<b class="nc"><i>118</i>&nbsp;	private boolean pressedMinotaur = false;</b>
+<b class="nc"><i>119</i>&nbsp;	private boolean pressedPan = false;</b>
+<b class="nc"><i>120</i>&nbsp;	private boolean pressedPrometheus = false;</b>
+<b class="nc"><i>121</i>&nbsp;	private int cardPressed = 0;</b>
+<b class="nc"><i>122</i>&nbsp;	private Set&lt;String&gt; godNamesSelected = new TreeSet&lt;&gt;();</b>
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;	public void initialize(){
+<b class="nc"><i>125</i>&nbsp;		MainGuiController.getInstance().setSceneController(this);</b>
+<b class="nc"><i>126</i>&nbsp;		gameState = MainGuiController.getInstance().getGameState();</b>
+<b class="nc"><i>127</i>&nbsp;		description.setImage(null);</b>
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;
+<b class="nc"><i>130</i>&nbsp;		card_apollo.setImage(cardApollo);</b>
+<b class="nc"><i>131</i>&nbsp;		card_artemis.setImage(cardArtemis);</b>
+<b class="nc"><i>132</i>&nbsp;		card_athena.setImage(cardAthena);</b>
+<b class="nc"><i>133</i>&nbsp;		card_atlas.setImage(cardAtlas);</b>
+<b class="nc"><i>134</i>&nbsp;		card_demeter.setImage(cardDemeter);</b>
+<b class="nc"><i>135</i>&nbsp;		card_hephaestus.setImage(cardHephaestus);</b>
+<b class="nc"><i>136</i>&nbsp;		card_minotaur.setImage(cardMinotaur);</b>
+<b class="nc"><i>137</i>&nbsp;		card_pan.setImage(cardPan);</b>
+<b class="nc"><i>138</i>&nbsp;		card_prometheus.setImage(cardPrometheus);</b>
+<i>139</i>&nbsp;
+<b class="nc"><i>140</i>&nbsp;		icon_errorFatal.toBack();</b>
+<b class="nc"><i>141</i>&nbsp;		icon_errorFatalBG.toBack();</b>
+<b class="nc"><i>142</i>&nbsp;		icon_errorFatal.setImage(null);</b>
+<b class="nc"><i>143</i>&nbsp;		icon_error.toBack();</b>
+<b class="nc"><i>144</i>&nbsp;		icon_error.setImage(null);</b>
+<i>145</i>&nbsp;	}
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;	/**
+<i>148</i>&nbsp;	 * This method creates a fade transition of an image.
+<i>149</i>&nbsp;	 * @param imageView the ImageView that has to be faded.
+<i>150</i>&nbsp;	 * @param image the Image to set in the ImageView.
+<i>151</i>&nbsp;	 */
+<i>152</i>&nbsp;	private void fadeImage(ImageView imageView, Image image){
+<b class="nc"><i>153</i>&nbsp;		imageView.setImage(image);</b>
+<b class="nc"><i>154</i>&nbsp;		FadeTransition ft = new FadeTransition(Duration.millis(2500), imageView);</b>
+<b class="nc"><i>155</i>&nbsp;		ft.setFromValue(0);</b>
+<b class="nc"><i>156</i>&nbsp;		ft.setToValue(1);</b>
+<b class="nc"><i>157</i>&nbsp;		ft.setCycleCount(1);</b>
+<b class="nc"><i>158</i>&nbsp;		ft.play();</b>
+<i>159</i>&nbsp;	}
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;	/**
+<i>162</i>&nbsp;	 * This method creates a slide transition of an image.
+<i>163</i>&nbsp;	 * @param imageView the ImageView that has to be slided.
+<i>164</i>&nbsp;	 * @param image the Image to set in the ImageView.
+<i>165</i>&nbsp;	 * @param x1 initial x coordinate.
+<i>166</i>&nbsp;	 * @param y1 initial y coordinate.
+<i>167</i>&nbsp;	 * @param x2 final x coordinate.
+<i>168</i>&nbsp;	 * @param y2 final y coordinate.
+<i>169</i>&nbsp;	 * @param duration duration of the transtion.
+<i>170</i>&nbsp;	 */
+<i>171</i>&nbsp;	private void slidingImage(ImageView imageView, Image image, int x1, int y1, int x2, int y2, int duration) {
+<b class="nc"><i>172</i>&nbsp;		imageView.setImage(image);</b>
+<b class="nc"><i>173</i>&nbsp;		Line line = new Line();</b>
+<b class="nc"><i>174</i>&nbsp;		line.setStartX(x1);</b>
+<b class="nc"><i>175</i>&nbsp;		line.setStartY(y1);</b>
+<b class="nc"><i>176</i>&nbsp;		line.setEndX(x2);</b>
+<b class="nc"><i>177</i>&nbsp;		line.setEndY(y2);</b>
+<b class="nc"><i>178</i>&nbsp;		PathTransition transition = new PathTransition();</b>
+<b class="nc"><i>179</i>&nbsp;		transition.setNode(imageView);</b>
+<b class="nc"><i>180</i>&nbsp;		transition.setDuration(Duration.millis(duration));</b>
+<b class="nc"><i>181</i>&nbsp;		transition.setPath(line);</b>
+<b class="nc"><i>182</i>&nbsp;		transition.setCycleCount(1);</b>
+<b class="nc"><i>183</i>&nbsp;		transition.play();</b>
+<i>184</i>&nbsp;	}
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;	/**
+<i>187</i>&nbsp;	 * This method is a combination of slide transition (4 transition: to left, then to right, then to left, then to right) to simulate a cloud fluctuation
+<i>188</i>&nbsp;	 * @param imageView the ImageView that has to be slided.
+<i>189</i>&nbsp;	 * @param image the Image to set in the ImageView.
+<i>190</i>&nbsp;	 * @param x1_1 first transition initial x coordinate.
+<i>191</i>&nbsp;	 * @param y1_1 first transition initial y coordinate.
+<i>192</i>&nbsp;	 * @param x2_1 first transition final x coordinate.
+<i>193</i>&nbsp;	 * @param y2_1 first transition final y coordinate.
+<i>194</i>&nbsp;	 * @param x1_2 second transition initial x coordinate.
+<i>195</i>&nbsp;	 * @param y1_2 second transition initial x coordinate.
+<i>196</i>&nbsp;	 * @param x2_2 second transition final x coordinate.
+<i>197</i>&nbsp;	 * @param y2_2 second transition final x coordinate.
+<i>198</i>&nbsp;	 * @param x1_3 third transition initial x coordinate.
+<i>199</i>&nbsp;	 * @param y1_3 third transition initial x coordinate.
+<i>200</i>&nbsp;	 * @param x2_3 third transition final x coordinate.
+<i>201</i>&nbsp;	 * @param y2_3 third transition final x coordinate.
+<i>202</i>&nbsp;	 * @param x1_4 fourth transition initial x coordinate.
+<i>203</i>&nbsp;	 * @param y1_4 fourth transition initial x coordinate.
+<i>204</i>&nbsp;	 * @param x2_4 fourth transition final x coordinate.
+<i>205</i>&nbsp;	 * @param y2_4 fourth transition final x coordinate.
+<i>206</i>&nbsp;	 * @param duration1 duration of the first transition.
+<i>207</i>&nbsp;	 * @param duration2 duration of the first transition.
+<i>208</i>&nbsp;	 * @param duration3 duration of the first transition.
+<i>209</i>&nbsp;	 * @param duration4 duration of the first transition.
+<i>210</i>&nbsp;	 */
+<i>211</i>&nbsp;	private void moveImage(ImageView imageView, Image image, int x1_1, int y1_1, int x2_1, int y2_1, int x1_2, int y1_2, int x2_2, int y2_2, int x1_3, int y1_3, int x2_3, int y2_3, int x1_4, int y1_4, int x2_4, int y2_4, int duration1, int duration2, int duration3, int duration4) {
+<b class="nc"><i>212</i>&nbsp;		imageView.setImage(image);</b>
+<i>213</i>&nbsp;
+<b class="nc"><i>214</i>&nbsp;		Line line1 = new Line();</b>
+<b class="nc"><i>215</i>&nbsp;		Line line2 = new Line();</b>
+<b class="nc"><i>216</i>&nbsp;		Line line3 = new Line();</b>
+<b class="nc"><i>217</i>&nbsp;		Line line4 = new Line();</b>
+<i>218</i>&nbsp;
+<b class="nc"><i>219</i>&nbsp;		SequentialTransition sequential = new SequentialTransition(setLine(imageView, line1, x1_1, y1_1, x2_1, y2_1, duration1), setLine(imageView, line2, x1_2, y1_2, x2_2, y2_2, duration2), setLine(imageView, line3, x1_3, y1_3, x2_3, y2_3, duration3), setLine(imageView, line4, x1_4, y1_4, x2_4, y2_4, duration4));</b>
+<b class="nc"><i>220</i>&nbsp;		sequential.play();</b>
+<i>221</i>&nbsp;	}
+<i>222</i>&nbsp;
+<i>223</i>&nbsp;	/**
+<i>224</i>&nbsp;	 * This method creates the line path for a slide transition.
+<i>225</i>&nbsp;	 * @param imageView the ImageView that has to be slided.
+<i>226</i>&nbsp;	 * @param line the default line path.
+<i>227</i>&nbsp;	 * @param x1 initial x coordinate.
+<i>228</i>&nbsp;	 * @param y1 initial y coordinate.
+<i>229</i>&nbsp;	 * @param x2 final x coordinate.
+<i>230</i>&nbsp;	 * @param y2 final y coordinate.
+<i>231</i>&nbsp;	 * @param duration duration of the transtion.
+<i>232</i>&nbsp;	 * @return the line transition.
+<i>233</i>&nbsp;	 */
+<i>234</i>&nbsp;	private Transition setLine(ImageView imageView, Line line, int x1, int y1, int x2, int y2, int duration){
+<b class="nc"><i>235</i>&nbsp;		line.setStartX(x1);</b>
+<b class="nc"><i>236</i>&nbsp;		line.setStartY(y1);</b>
+<b class="nc"><i>237</i>&nbsp;		line.setEndX(x2);</b>
+<b class="nc"><i>238</i>&nbsp;		line.setEndY(y2);</b>
+<b class="nc"><i>239</i>&nbsp;		PathTransition transition = new PathTransition();</b>
+<b class="nc"><i>240</i>&nbsp;		transition.setNode(imageView);</b>
+<b class="nc"><i>241</i>&nbsp;		transition.setDuration(Duration.millis(duration));</b>
+<b class="nc"><i>242</i>&nbsp;		transition.setPath(line);</b>
+<b class="nc"><i>243</i>&nbsp;		transition.setCycleCount(1);</b>
+<i>244</i>&nbsp;
+<b class="nc"><i>245</i>&nbsp;		return transition;</b>
+<i>246</i>&nbsp;	}
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;	/* **********************************************
+<i>249</i>&nbsp;	 *												*
+<i>250</i>&nbsp;	 *			HANDLERS OF USER INTERACTION		*
+<i>251</i>&nbsp;	 * 												*
+<i>252</i>&nbsp;	 ************************************************/
+<i>253</i>&nbsp;
+<i>254</i>&nbsp;	/**
+<i>255</i>&nbsp;	 * This method handles the mouse entry on a god card, sliding up the description of that god.
+<i>256</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>257</i>&nbsp;	 */
+<i>258</i>&nbsp;	public void mouseEnteredCard(MouseEvent mouseEvent) {
+<b class="nc"><i>259</i>&nbsp;		ImageView cardEntered = (ImageView) mouseEvent.getTarget();</b>
+<i>260</i>&nbsp;
+<b class="nc"><i>261</i>&nbsp;		if (cardEntered.getImage().equals(cardApollo) || cardEntered.getImage().equals(cardApolloPressed)) {</b>
+<b class="nc"><i>262</i>&nbsp;			mouseEnterCard(description,descriptionApollo);</b>
+<b class="nc"><i>263</i>&nbsp;		} else if (cardEntered.getImage().equals(cardArtemis) || cardEntered.getImage().equals(cardArtemisPressed)) {</b>
+<b class="nc"><i>264</i>&nbsp;			mouseEnterCard(description,descriptionArtemis);</b>
+<b class="nc"><i>265</i>&nbsp;		} else if (cardEntered.getImage().equals(cardAthena) || cardEntered.getImage().equals(cardAthenaPressed)) {</b>
+<b class="nc"><i>266</i>&nbsp;			mouseEnterCard(description,descriptionAthena);</b>
+<b class="nc"><i>267</i>&nbsp;		} else if (cardEntered.getImage().equals(cardAtlas) || cardEntered.getImage().equals(cardAtlasPressed)) {</b>
+<b class="nc"><i>268</i>&nbsp;			mouseEnterCard(description,descriptionAtlas);</b>
+<b class="nc"><i>269</i>&nbsp;		} else if (cardEntered.getImage().equals(cardDemeter) || cardEntered.getImage().equals(cardDemeterPressed)) {</b>
+<b class="nc"><i>270</i>&nbsp;			mouseEnterCard(description,descriptionDemeter);</b>
+<b class="nc"><i>271</i>&nbsp;		} else if (cardEntered.getImage().equals(cardHephaestus) || cardEntered.getImage().equals(cardHephaestusPressed)) {</b>
+<b class="nc"><i>272</i>&nbsp;			mouseEnterCard(description,descriptionHephaestus);</b>
+<b class="nc"><i>273</i>&nbsp;		} else if (cardEntered.getImage().equals(cardMinotaur) || cardEntered.getImage().equals(cardMinotaurPressed)) {</b>
+<b class="nc"><i>274</i>&nbsp;			mouseEnterCard(description,descriptionMinotaur);</b>
+<b class="nc"><i>275</i>&nbsp;		} else if (cardEntered.getImage().equals(cardPan) || cardEntered.getImage().equals(cardPanPressed)) {</b>
+<b class="nc"><i>276</i>&nbsp;			mouseEnterCard(description,descriptionPan);</b>
+<b class="nc"><i>277</i>&nbsp;		} else if (cardEntered.getImage().equals(cardPrometheus) || cardEntered.getImage().equals(cardPrometheusPressed)) {</b>
+<b class="nc"><i>278</i>&nbsp;			mouseEnterCard(description,descriptionPrometheus);</b>
+<i>279</i>&nbsp;		}
+<i>280</i>&nbsp;	}
+<i>281</i>&nbsp;
+<i>282</i>&nbsp;	/**
+<i>283</i>&nbsp;	 * This method handles the mouse entry on a god card, sliding down the description of that god.
+<i>284</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>285</i>&nbsp;	 */
+<i>286</i>&nbsp;	public void mouseExitedCard(MouseEvent mouseEvent) {
+<b class="nc"><i>287</i>&nbsp;		mouseExitCard(description);</b>
+<i>288</i>&nbsp;	}
+<i>289</i>&nbsp;
+<i>290</i>&nbsp;	/**
+<i>291</i>&nbsp;	 * This method handles the mouse click on a god card, choosing that card.
+<i>292</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>293</i>&nbsp;	 */
+<i>294</i>&nbsp;	public void mousePressedCard(MouseEvent mouseEvent) {
+<b class="nc"><i>295</i>&nbsp;		ImageView cardEntered = (ImageView) mouseEvent.getTarget();</b>
+<i>296</i>&nbsp;
+<b class="nc"><i>297</i>&nbsp;		if (cardEntered.getImage().equals(cardApollo) || cardEntered.getImage().equals(cardApolloPressed)) {</b>
+<b class="nc"><i>298</i>&nbsp;			pressingCard(pressedApollo, card_apollo, cardApolloPressed, cardApollo);</b>
+<b class="nc"><i>299</i>&nbsp;		} else if (cardEntered.getImage().equals(cardArtemis) || cardEntered.getImage().equals(cardArtemisPressed)) {</b>
+<b class="nc"><i>300</i>&nbsp;			pressingCard(pressedArtemis, card_artemis, cardArtemisPressed, cardArtemis);</b>
+<b class="nc"><i>301</i>&nbsp;		} else if (cardEntered.getImage().equals(cardAthena) || cardEntered.getImage().equals(cardAthenaPressed)) {</b>
+<b class="nc"><i>302</i>&nbsp;			pressingCard(pressedAthena, card_athena, cardAthenaPressed, cardAthena);</b>
+<b class="nc"><i>303</i>&nbsp;		} else if (cardEntered.getImage().equals(cardAtlas) || cardEntered.getImage().equals(cardAtlasPressed)) {</b>
+<b class="nc"><i>304</i>&nbsp;			pressingCard(pressedAtlas, card_atlas, cardAtlasPressed, cardAtlas);</b>
+<b class="nc"><i>305</i>&nbsp;		} else if (cardEntered.getImage().equals(cardDemeter) || cardEntered.getImage().equals(cardDemeterPressed)) {</b>
+<b class="nc"><i>306</i>&nbsp;			pressingCard(pressedDemeter, card_demeter, cardDemeterPressed, cardDemeter);</b>
+<b class="nc"><i>307</i>&nbsp;		} else if (cardEntered.getImage().equals(cardHephaestus) || cardEntered.getImage().equals(cardHephaestusPressed)) {</b>
+<b class="nc"><i>308</i>&nbsp;			pressingCard(pressedHephaestus, card_hephaestus, cardHephaestusPressed, cardHephaestus);</b>
+<b class="nc"><i>309</i>&nbsp;		} else if (cardEntered.getImage().equals(cardMinotaur) || cardEntered.getImage().equals(cardMinotaurPressed)) {</b>
+<b class="nc"><i>310</i>&nbsp;			pressingCard(pressedMinotaur, card_minotaur, cardMinotaurPressed, cardMinotaur);</b>
+<b class="nc"><i>311</i>&nbsp;		} else if (cardEntered.getImage().equals(cardPan) || cardEntered.getImage().equals(cardPanPressed)) {</b>
+<b class="nc"><i>312</i>&nbsp;			pressingCard(pressedPan, card_pan, cardPanPressed, cardPan);</b>
+<b class="nc"><i>313</i>&nbsp;		} else if (cardEntered.getImage().equals(cardPrometheus) || cardEntered.getImage().equals(cardPrometheusPressed)) {</b>
+<b class="nc"><i>314</i>&nbsp;			pressingCard(pressedPrometheus, card_prometheus, cardPrometheusPressed, cardPrometheus);</b>
+<i>315</i>&nbsp;		}
+<i>316</i>&nbsp;	}
+<i>317</i>&nbsp;
+<i>318</i>&nbsp;	/**
+<i>319</i>&nbsp;	 * This method creates the sliding up transition of the god card description
+<i>320</i>&nbsp;	 * @param imageView the ImageView that has to be faded.
+<i>321</i>&nbsp;	 * @param image the Image to set in the ImageView.
+<i>322</i>&nbsp;	 */
+<i>323</i>&nbsp;	private void mouseEnterCard(ImageView imageView, Image image){
+<b class="nc"><i>324</i>&nbsp;		imageView.setImage(image);</b>
+<b class="nc"><i>325</i>&nbsp;		Line line = new Line();</b>
+<b class="nc"><i>326</i>&nbsp;		line.setStartX(182);</b>
+<b class="nc"><i>327</i>&nbsp;		line.setStartY(500);</b>
+<b class="nc"><i>328</i>&nbsp;		line.setEndX(182);</b>
+<b class="nc"><i>329</i>&nbsp;		line.setEndY(174);</b>
+<b class="nc"><i>330</i>&nbsp;		PathTransition transition = new PathTransition();</b>
+<b class="nc"><i>331</i>&nbsp;		transition.setNode(imageView);</b>
+<b class="nc"><i>332</i>&nbsp;		transition.setDuration(Duration.millis(450));</b>
+<b class="nc"><i>333</i>&nbsp;		transition.setPath(line);</b>
+<b class="nc"><i>334</i>&nbsp;		transition.setCycleCount(1);</b>
+<b class="nc"><i>335</i>&nbsp;		transition.play();</b>
+<i>336</i>&nbsp;	}
+<i>337</i>&nbsp;
+<i>338</i>&nbsp;	/**
+<i>339</i>&nbsp;	 * This method creates the sliding down transition of the god card description
+<i>340</i>&nbsp;	 * @param imageView the ImageView that has to be faded.
+<i>341</i>&nbsp;	 */
+<i>342</i>&nbsp;	private void mouseExitCard(ImageView imageView){
+<b class="nc"><i>343</i>&nbsp;		Line line = new Line();</b>
+<b class="nc"><i>344</i>&nbsp;		line.setStartX(182);</b>
+<b class="nc"><i>345</i>&nbsp;		line.setStartY(174);</b>
+<b class="nc"><i>346</i>&nbsp;		line.setEndX(182);</b>
+<b class="nc"><i>347</i>&nbsp;		line.setEndY(500);</b>
+<b class="nc"><i>348</i>&nbsp;		PathTransition transition = new PathTransition();</b>
+<b class="nc"><i>349</i>&nbsp;		transition.setNode(imageView);</b>
+<b class="nc"><i>350</i>&nbsp;		transition.setDuration(Duration.millis(450));</b>
+<b class="nc"><i>351</i>&nbsp;		transition.setPath(line);</b>
+<b class="nc"><i>352</i>&nbsp;		transition.setCycleCount(1);</b>
+<b class="nc"><i>353</i>&nbsp;		transition.play();</b>
+<i>354</i>&nbsp;	}
+<i>355</i>&nbsp;
+<i>356</i>&nbsp;	/**
+<i>357</i>&nbsp;	 * This method handles the mous click on a god card, making it pressed (selected) or unpressed (unselected).
+<i>358</i>&nbsp;	 * @param pressed boolean parameter to check if the card is pressed or not.
+<i>359</i>&nbsp;	 * @param imageView the ImageView interested.
+<i>360</i>&nbsp;	 * @param imagePressed the image pressed of a god card
+<i>361</i>&nbsp;	 * @param image the standard image (unpressed) of a god card.
+<i>362</i>&nbsp;	 */
+<i>363</i>&nbsp;	private void pressingCard(boolean pressed, ImageView imageView, Image imagePressed, Image image){
+<b class="nc"><i>364</i>&nbsp;		if(!pressed) {</b>
+<b class="nc"><i>365</i>&nbsp;			if (cardPressed &lt; gameState.getPlayerNumber()) {</b>
+<b class="nc"><i>366</i>&nbsp;				imageView.setImage(imagePressed);</b>
+<b class="nc"><i>367</i>&nbsp;				if (imagePressed.equals(cardApolloPressed)) {</b>
+<b class="nc"><i>368</i>&nbsp;					godNamesSelected.add(Constants.APOLLO);</b>
+<b class="nc"><i>369</i>&nbsp;					pressedApollo = true;</b>
+<b class="nc"><i>370</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>371</i>&nbsp;				} else if (imagePressed.equals(cardArtemisPressed)) {</b>
+<b class="nc"><i>372</i>&nbsp;					godNamesSelected.add(Constants.ARTEMIS);</b>
+<b class="nc"><i>373</i>&nbsp;					pressedArtemis = true;</b>
+<b class="nc"><i>374</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>375</i>&nbsp;				} else if (imagePressed.equals(cardAthenaPressed)) {</b>
+<b class="nc"><i>376</i>&nbsp;					godNamesSelected.add(Constants.ATHENA);</b>
+<b class="nc"><i>377</i>&nbsp;					pressedAthena = true;</b>
+<b class="nc"><i>378</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>379</i>&nbsp;				} else if (imagePressed.equals(cardAtlasPressed)) {</b>
+<b class="nc"><i>380</i>&nbsp;					godNamesSelected.add(Constants.ATLAS);</b>
+<b class="nc"><i>381</i>&nbsp;					pressedAtlas = true;</b>
+<b class="nc"><i>382</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>383</i>&nbsp;				} else if (imagePressed.equals(cardDemeterPressed)) {</b>
+<b class="nc"><i>384</i>&nbsp;					godNamesSelected.add(Constants.DEMETER);</b>
+<b class="nc"><i>385</i>&nbsp;					pressedDemeter = true;</b>
+<b class="nc"><i>386</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>387</i>&nbsp;				} else if (imagePressed.equals(cardHephaestusPressed)) {</b>
+<b class="nc"><i>388</i>&nbsp;					godNamesSelected.add(Constants.HEPHAESTUS);</b>
+<b class="nc"><i>389</i>&nbsp;					pressedHephaestus = true;</b>
+<b class="nc"><i>390</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>391</i>&nbsp;				} else if (imagePressed.equals(cardMinotaurPressed)) {</b>
+<b class="nc"><i>392</i>&nbsp;					godNamesSelected.add(Constants.MINOTAUR);</b>
+<b class="nc"><i>393</i>&nbsp;					pressedMinotaur = true;</b>
+<b class="nc"><i>394</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>395</i>&nbsp;				} else if (imagePressed.equals(cardPanPressed)) {</b>
+<b class="nc"><i>396</i>&nbsp;					godNamesSelected.add(Constants.PAN);</b>
+<b class="nc"><i>397</i>&nbsp;					pressedPan = true;</b>
+<b class="nc"><i>398</i>&nbsp;					cardPressed++;</b>
+<b class="nc"><i>399</i>&nbsp;				} else if (imagePressed.equals(cardPrometheusPressed)) {</b>
+<b class="nc"><i>400</i>&nbsp;					godNamesSelected.add(Constants.PROMETHEUS);</b>
+<b class="nc"><i>401</i>&nbsp;					pressedPrometheus = true;</b>
+<b class="nc"><i>402</i>&nbsp;					cardPressed++;</b>
+<i>403</i>&nbsp;				}
+<i>404</i>&nbsp;			}
+<i>405</i>&nbsp;		} else {
+<b class="nc"><i>406</i>&nbsp;			imageView.setImage(image);</b>
+<b class="nc"><i>407</i>&nbsp;			if(image.equals(cardApollo)){</b>
+<b class="nc"><i>408</i>&nbsp;				godNamesSelected.remove(Constants.APOLLO);</b>
+<b class="nc"><i>409</i>&nbsp;				pressedApollo = false;</b>
+<b class="nc"><i>410</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>411</i>&nbsp;			} else if(image.equals(cardArtemis)){</b>
+<b class="nc"><i>412</i>&nbsp;				godNamesSelected.remove(Constants.ARTEMIS);</b>
+<b class="nc"><i>413</i>&nbsp;				pressedArtemis = false;</b>
+<b class="nc"><i>414</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>415</i>&nbsp;			} else if(image.equals(cardAthena)){</b>
+<b class="nc"><i>416</i>&nbsp;				godNamesSelected.remove(Constants.ATHENA);</b>
+<b class="nc"><i>417</i>&nbsp;				pressedAthena = false;</b>
+<b class="nc"><i>418</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>419</i>&nbsp;			} else if(image.equals(cardAtlas)){</b>
+<b class="nc"><i>420</i>&nbsp;				godNamesSelected.remove(Constants.ATLAS);</b>
+<b class="nc"><i>421</i>&nbsp;				pressedAtlas = false;</b>
+<b class="nc"><i>422</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>423</i>&nbsp;			} else if(image.equals(cardDemeter)){</b>
+<b class="nc"><i>424</i>&nbsp;				godNamesSelected.remove(Constants.DEMETER);</b>
+<b class="nc"><i>425</i>&nbsp;				pressedDemeter = false;</b>
+<b class="nc"><i>426</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>427</i>&nbsp;			} else if(image.equals(cardHephaestus)){</b>
+<b class="nc"><i>428</i>&nbsp;				godNamesSelected.remove(Constants.HEPHAESTUS);</b>
+<b class="nc"><i>429</i>&nbsp;				pressedHephaestus = false;</b>
+<b class="nc"><i>430</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>431</i>&nbsp;			} else if(image.equals(cardMinotaur)){</b>
+<b class="nc"><i>432</i>&nbsp;				godNamesSelected.remove(Constants.MINOTAUR);</b>
+<b class="nc"><i>433</i>&nbsp;				pressedMinotaur = false;</b>
+<b class="nc"><i>434</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>435</i>&nbsp;			} else if(image.equals(cardPan)){</b>
+<b class="nc"><i>436</i>&nbsp;				godNamesSelected.remove(Constants.PAN);</b>
+<b class="nc"><i>437</i>&nbsp;				pressedPan = false;</b>
+<b class="nc"><i>438</i>&nbsp;				cardPressed--;</b>
+<b class="nc"><i>439</i>&nbsp;			} else if(image.equals(cardPrometheus)){</b>
+<b class="nc"><i>440</i>&nbsp;				godNamesSelected.remove(Constants.PROMETHEUS);</b>
+<b class="nc"><i>441</i>&nbsp;				pressedPrometheus = false;</b>
+<b class="nc"><i>442</i>&nbsp;				cardPressed--;</b>
+<i>443</i>&nbsp;			}
+<i>444</i>&nbsp;		}
+<i>445</i>&nbsp;	}
+<i>446</i>&nbsp;
+<i>447</i>&nbsp;	/**
+<i>448</i>&nbsp;	 * This method handles the mouse click on a next button, making it pressed.
+<i>449</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>450</i>&nbsp;	 */
+<i>451</i>&nbsp;	public void mousePressedNext(MouseEvent mouseEvent) {
+<b class="nc"><i>452</i>&nbsp;		button_next.setImage(buttonNextPressed);</b>
+<i>453</i>&nbsp;	}
+<i>454</i>&nbsp;
+<i>455</i>&nbsp;	/**
+<i>456</i>&nbsp;	 * This method handles the mouse release on a next button: making it unpressed and changing the scene.
+<i>457</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>458</i>&nbsp;	 */
+<i>459</i>&nbsp;	public void mouseReleasedNext(MouseEvent mouseEvent) {
+<b class="nc"><i>460</i>&nbsp;		button_next.setImage(buttonNext);</b>
+<i>461</i>&nbsp;
+<b class="nc"><i>462</i>&nbsp;		if (!finished) {</b>
+<b class="nc"><i>463</i>&nbsp;			if (cardPressed != gameState.getPlayerNumber()) {</b>
+<b class="nc"><i>464</i>&nbsp;				wrongSelectOfGods();</b>
+<i>465</i>&nbsp;			} else {
+<b class="nc"><i>466</i>&nbsp;				((ImageView) mouseEvent.getTarget()).getScene().setCursor(Cursor.WAIT);</b>
+<b class="nc"><i>467</i>&nbsp;				NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_IN_GAME_GODS, gameState.getPlayer(), new ArrayList&lt;&gt;(godNamesSelected));</b>
+<b class="nc"><i>468</i>&nbsp;				MainGuiController.getInstance().sendMessage(godsMessage);</b>
+<i>469</i>&nbsp;			}
+<i>470</i>&nbsp;		}
+<i>471</i>&nbsp;	}
+<i>472</i>&nbsp;
+<i>473</i>&nbsp;	/**
+<i>474</i>&nbsp;	 * This method handles the mouse click on a exit button: making it pressed.
+<i>475</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>476</i>&nbsp;	 * @throws IOException if the fxml file can&#39;t be loaded
+<i>477</i>&nbsp;	 */
+<i>478</i>&nbsp;	public void mousePressedExit(MouseEvent mouseEvent) throws IOException {
+<b class="nc"><i>479</i>&nbsp;		button_exit.setImage(buttonExitPressed);</b>
+<b class="nc"><i>480</i>&nbsp;		previousFXML = FXMLLoader.load(getClass().getResource(&quot;/fxml/menu.fxml&quot;));</b>
+<b class="nc"><i>481</i>&nbsp;		previousScene = new Scene(previousFXML);</b>
+<i>482</i>&nbsp;	}
+<i>483</i>&nbsp;
+<i>484</i>&nbsp;	/**
+<i>485</i>&nbsp;	 * This method handles the mouse release on a exit button: making it unpressed and returning to the home scene.
+<i>486</i>&nbsp;	 * @param mouseEvent the MouseEvent that allows to analyze the information of the mouse click
+<i>487</i>&nbsp;	 */
+<i>488</i>&nbsp;	public void mouseReleasedExit(MouseEvent mouseEvent) {
+<b class="nc"><i>489</i>&nbsp;		button_exit.setImage(buttonExit);</b>
+<i>490</i>&nbsp;
+<b class="nc"><i>491</i>&nbsp;		if (!finished) {</b>
+<b class="nc"><i>492</i>&nbsp;			NetDivinityChoice netSetup = new NetDivinityChoice(Constants.GENERAL_DISCONNECT);</b>
+<b class="nc"><i>493</i>&nbsp;			MainGuiController.getInstance().sendMessage(netSetup);</b>
+<i>494</i>&nbsp;		}
+<b class="nc"><i>495</i>&nbsp;		MainGuiController.getInstance().refresh();</b>
+<b class="nc"><i>496</i>&nbsp;		MainGuiController.getInstance().setSceneController(null);</b>
+<b class="nc"><i>497</i>&nbsp;		currentStage = (Stage) button_exit.getScene().getWindow();</b>
+<b class="nc"><i>498</i>&nbsp;		currentStage.setScene(previousScene);</b>
+<i>499</i>&nbsp;	}
+<i>500</i>&nbsp;
+<i>501</i>&nbsp;	/* **********************************************
+<i>502</i>&nbsp;	 *												*
+<i>503</i>&nbsp;	 *		EVENTS AFTER SERVER MESSAGE				*
+<i>504</i>&nbsp;	 * 												*
+<i>505</i>&nbsp;	 ************************************************/
+<i>506</i>&nbsp;
+<i>507</i>&nbsp;	/**
+<i>508</i>&nbsp;	 * This method displays a pop up message which notify the player to choose the correct number of god cards.
+<i>509</i>&nbsp;	 */
+<i>510</i>&nbsp;	public void wrongSelectOfGods() {
+<b class="nc"><i>511</i>&nbsp;		icon_error.toFront();</b>
+<b class="nc"><i>512</i>&nbsp;		moveImage(icon_error, errorNumberCards, 600, 212, 198, 212, 198, 212, 211, 212, 211, 212, 198, 212, 198,212, 600, 212, 700, 1000, 1000, 500);</b>
+<b class="nc"><i>513</i>&nbsp;		button_next.toFront();</b>
+<i>514</i>&nbsp;	}
+<i>515</i>&nbsp;
+<i>516</i>&nbsp;	/**
+<i>517</i>&nbsp;	 * This method displays a pop up message which notify the player according to notify parameter.
+<i>518</i>&nbsp;	 * @param reason 0 if a player disconnected during the setup, 1 if the server has crashed
+<i>519</i>&nbsp;	 */
+<i>520</i>&nbsp;	private void gameCantContinue(int reason) {
+<b class="nc"><i>521</i>&nbsp;		if(reason == 0){</b>
+<b class="nc"><i>522</i>&nbsp;			fadeImage(icon_errorFatalBG, errorFatalBG);</b>
+<b class="nc"><i>523</i>&nbsp;			slidingImage(icon_errorFatal, errorSomeoneDisconnected, 650, 0, 650, 325, 1250);</b>
+<b class="nc"><i>524</i>&nbsp;			icon_errorFatalBG.toFront();</b>
+<b class="nc"><i>525</i>&nbsp;			icon_errorFatal.toFront();</b>
+<b class="nc"><i>526</i>&nbsp;			button_exit.toFront();</b>
+<i>527</i>&nbsp;		} else {
+<b class="nc"><i>528</i>&nbsp;			fadeImage(icon_errorFatalBG, errorFatalBG);</b>
+<b class="nc"><i>529</i>&nbsp;			slidingImage(icon_errorFatal, errorFatal, 650, 0, 650, 325, 1250);</b>
+<b class="nc"><i>530</i>&nbsp;			icon_errorFatalBG.toFront();</b>
+<b class="nc"><i>531</i>&nbsp;			icon_errorFatal.toFront();</b>
+<b class="nc"><i>532</i>&nbsp;			button_exit.toFront();</b>
+<i>533</i>&nbsp;		}
+<i>534</i>&nbsp;	}
+<i>535</i>&nbsp;
+<i>536</i>&nbsp;	/* **********************************************
+<i>537</i>&nbsp;	 *												*
+<i>538</i>&nbsp;	 *		METHODS CALLED BY MAIN CONTROLLER		*
+<i>539</i>&nbsp;	 * 												*
+<i>540</i>&nbsp;	 ************************************************/
+<i>541</i>&nbsp;
+<i>542</i>&nbsp;	/**
+<i>543</i>&nbsp;	 * This methods handles an error from the server.
+<i>544</i>&nbsp;	 */
+<i>545</i>&nbsp;	@Override
+<i>546</i>&nbsp;	public void fatalError() {
+<b class="nc"><i>547</i>&nbsp;		finished = true;</b>
+<b class="nc"><i>548</i>&nbsp;		gameCantContinue(1);</b>
+<i>549</i>&nbsp;	}
+<i>550</i>&nbsp;
+<i>551</i>&nbsp;	/**
+<i>552</i>&nbsp;	 * This methods handles messages from the server.
+<i>553</i>&nbsp;	 * @param message is the message arrived from the server
+<i>554</i>&nbsp;	 * @throws IOException if there has been an error handling the message
+<i>555</i>&nbsp;	 */
+<i>556</i>&nbsp;	@Override
+<i>557</i>&nbsp;	public void deposeMessage(NetObject message) throws IOException {
+<b class="nc"><i>558</i>&nbsp;		switch (message.message) {</b>
+<b class="nc"><i>559</i>&nbsp;			case Constants.GODS_GODS -&gt; {</b>
+<b class="nc"><i>560</i>&nbsp;				gameState.setGodsName(((NetDivinityChoice)message).getDivinities());</b>
+<i>561</i>&nbsp;			}
+<b class="nc"><i>562</i>&nbsp;			case Constants.GENERAL_PHASE_UPDATE -&gt; {</b>
+<b class="nc"><i>563</i>&nbsp;				gameState.advancePhase();</b>
+<i>564</i>&nbsp;			}
+<b class="nc"><i>565</i>&nbsp;			case Constants.TURN_PLAYERTURN -&gt; {</b>
+<b class="nc"><i>566</i>&nbsp;				gameState.setActivePlayer(((NetDivinityChoice)message).getPlayer());</b>
+<b class="nc"><i>567</i>&nbsp;				nextFXML = FXMLLoader.load(getClass().getResource(&quot;/fxml/choose_gods.fxml&quot;));</b>
+<b class="nc"><i>568</i>&nbsp;				nextScene = new Scene(nextFXML);</b>
+<b class="nc"><i>569</i>&nbsp;				currentStage = (Stage) button_next.getScene().getWindow();</b>
+<b class="nc"><i>570</i>&nbsp;				currentStage.setScene(nextScene);</b>
+<i>571</i>&nbsp;			}
+<i>572</i>&nbsp;			case Constants.GENERAL_SETUP_DISCONNECT -&gt; {
+<b class="nc"><i>573</i>&nbsp;				finished = true;</b>
+<b class="nc"><i>574</i>&nbsp;				gameCantContinue(0);</b>
+<i>575</i>&nbsp;			}
+<i>576</i>&nbsp;		}
+<i>577</i>&nbsp;	}
+<i>578</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

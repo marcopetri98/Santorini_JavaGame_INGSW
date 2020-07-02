@@ -1,0 +1,294 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MainCliController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.ui.cli.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MainCliController (it.polimi.ingsw.ui.cli.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainCliController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 64)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.ui.cli.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.network.ClientMessageListener;
+<i>4</i>&nbsp;import it.polimi.ingsw.network.objects.*;
+<i>5</i>&nbsp;import it.polimi.ingsw.ui.GraphicInterface;
+<i>6</i>&nbsp;import it.polimi.ingsw.ui.cli.view.CliGame;
+<i>7</i>&nbsp;import it.polimi.ingsw.ui.cli.view.CliInitial;
+<i>8</i>&nbsp;import it.polimi.ingsw.ui.cli.view.CliInput;
+<i>9</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * This class is the base class for the Cli message management, it is the first client controller created and is necessary to receive messages from the server, it receives server messages and puts them into Cli queue and stops the input getter to get input setting a timeout on it.
+<i>13</i>&nbsp; */
+<i>14</i>&nbsp;public class MainCliController implements GraphicInterface {
+<i>15</i>&nbsp;	private CliGame gameView;
+<i>16</i>&nbsp;	private CliInitial pregameView;
+<i>17</i>&nbsp;	private CliInput inputHandler;
+<i>18</i>&nbsp;	private ClientMessageListener listener;
+<i>19</i>&nbsp;	private UserInputController inputController;
+<i>20</i>&nbsp;	private boolean pregameStage;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;	/**
+<i>23</i>&nbsp;	 * Creates an initial Cli controller
+<i>24</i>&nbsp;	 * @param pregameView menu cli view
+<i>25</i>&nbsp;	 */
+<b class="nc"><i>26</i>&nbsp;	public MainCliController(CliInitial pregameView) {</b>
+<b class="nc"><i>27</i>&nbsp;		this.pregameView = pregameView;</b>
+<b class="nc"><i>28</i>&nbsp;		pregameStage = true;</b>
+<i>29</i>&nbsp;	}
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;	/* **********************************************
+<i>32</i>&nbsp;	 *												*
+<i>33</i>&nbsp;	 *												*
+<i>34</i>&nbsp;	 *												*
+<i>35</i>&nbsp;	 *	SETTERS OF THIS CLASS USED TO CHANGE STATE	*
+<i>36</i>&nbsp;	 * 												*
+<i>37</i>&nbsp;	 * 												*
+<i>38</i>&nbsp;	 * 												*
+<i>39</i>&nbsp;	 ************************************************/
+<i>40</i>&nbsp;	/**
+<i>41</i>&nbsp;	 * Set game view passing from the initial phase to the game phase.
+<i>42</i>&nbsp;	 * @param game a {@link it.polimi.ingsw.ui.cli.view.CliGame}
+<i>43</i>&nbsp;	 * @throws NullPointerException if {@code game} is null
+<i>44</i>&nbsp;	 */
+<i>45</i>&nbsp;	public void setGameView(CliGame game) throws NullPointerException {
+<b class="nc"><i>46</i>&nbsp;		if (game == null) {</b>
+<b class="nc"><i>47</i>&nbsp;			throw new NullPointerException();</b>
+<i>48</i>&nbsp;		}
+<b class="nc"><i>49</i>&nbsp;		gameView = game;</b>
+<b class="nc"><i>50</i>&nbsp;		gameView.setInputController(inputController);</b>
+<b class="nc"><i>51</i>&nbsp;		inputController.setGameView(game);</b>
+<i>52</i>&nbsp;	}
+<i>53</i>&nbsp;	/**
+<i>54</i>&nbsp;	 * Sets the input getter.
+<i>55</i>&nbsp;	 * @param handler a {@link it.polimi.ingsw.ui.cli.view.CliInput}
+<i>56</i>&nbsp;	 * @throws NullPointerException if {@code handler} is null
+<i>57</i>&nbsp;	 */
+<i>58</i>&nbsp;	public void setInputHandler(CliInput handler) throws NullPointerException {
+<b class="nc"><i>59</i>&nbsp;		if (handler == null) {</b>
+<b class="nc"><i>60</i>&nbsp;			throw new NullPointerException();</b>
+<i>61</i>&nbsp;		}
+<b class="nc"><i>62</i>&nbsp;		inputHandler = handler;</b>
+<i>63</i>&nbsp;	}
+<i>64</i>&nbsp;	/**
+<i>65</i>&nbsp;	 * Sets the message listener from the server.
+<i>66</i>&nbsp;	 * @param listener a {@link it.polimi.ingsw.network.ClientMessageListener}
+<i>67</i>&nbsp;	 * @throws NullPointerException if {@code listener} is null
+<i>68</i>&nbsp;	 */
+<i>69</i>&nbsp;	public void setListener(ClientMessageListener listener) throws NullPointerException {
+<b class="nc"><i>70</i>&nbsp;		if (listener == null) {</b>
+<b class="nc"><i>71</i>&nbsp;			throw new NullPointerException();</b>
+<i>72</i>&nbsp;		}
+<b class="nc"><i>73</i>&nbsp;		this.listener = listener;</b>
+<b class="nc"><i>74</i>&nbsp;		inputController = new UserInputController(listener);</b>
+<b class="nc"><i>75</i>&nbsp;		pregameView.setUserInputController(inputController);</b>
+<i>76</i>&nbsp;	}
+<i>77</i>&nbsp;	/**
+<i>78</i>&nbsp;	 * Sets a flag to say that the client is not yet in game, it is in lobby or in the menu.
+<i>79</i>&nbsp;	 * @param value a boolean value
+<i>80</i>&nbsp;	 */
+<i>81</i>&nbsp;	public void setPregameStage(boolean value) {
+<b class="nc"><i>82</i>&nbsp;		pregameStage = value;</b>
+<i>83</i>&nbsp;	}
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;	/* **********************************************
+<i>86</i>&nbsp;	 *												*
+<i>87</i>&nbsp;	 *												*
+<i>88</i>&nbsp;	 *												*
+<i>89</i>&nbsp;	 *	METHODS OF THE VIEW CALLED BY THE NETWORK	*
+<i>90</i>&nbsp;	 * 	CLIENT COMPONENT (ClientCli)				*
+<i>91</i>&nbsp;	 * 												*
+<i>92</i>&nbsp;	 * 												*
+<i>93</i>&nbsp;	 * 												*
+<i>94</i>&nbsp;	 ************************************************/
+<i>95</i>&nbsp;	/**
+<i>96</i>&nbsp;	 * When this method is called there has been an error and the information.
+<i>97</i>&nbsp;	 */
+<i>98</i>&nbsp;	@Override
+<i>99</i>&nbsp;	public void retrieveError() {
+<b class="nc"><i>100</i>&nbsp;		if (pregameStage) {</b>
+<b class="nc"><i>101</i>&nbsp;			if (pregameView.isMenuPhase()) {</b>
+<b class="nc"><i>102</i>&nbsp;				NetObject clientErrorMsg = new NetSetup(Constants.GENERAL_FATAL_ERROR);</b>
+<b class="nc"><i>103</i>&nbsp;				pregameView.queueMessage(clientErrorMsg);</b>
+<b class="nc"><i>104</i>&nbsp;				inputHandler.setTimeout();</b>
+<b class="nc"><i>105</i>&nbsp;			} else {</b>
+<b class="nc"><i>106</i>&nbsp;				NetObject clientErrorMsg = new NetLobbyPreparation(Constants.GENERAL_FATAL_ERROR);</b>
+<b class="nc"><i>107</i>&nbsp;				pregameView.queueMessage(clientErrorMsg);</b>
+<b class="nc"><i>108</i>&nbsp;				inputHandler.setTimeout();</b>
+<b class="nc"><i>109</i>&nbsp;			}</b>
+<i>110</i>&nbsp;		} else {
+<b class="nc"><i>111</i>&nbsp;			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);</b>
+<b class="nc"><i>112</i>&nbsp;			gameView.addToQueue(clientErrorMsg);</b>
+<b class="nc"><i>113</i>&nbsp;			inputHandler.setTimeout();</b>
+<i>114</i>&nbsp;		}
+<i>115</i>&nbsp;	}
+<i>116</i>&nbsp;	/**
+<i>117</i>&nbsp;	 * When this method is called there has been a connection error and the information.
+<i>118</i>&nbsp;	 */
+<i>119</i>&nbsp;	@Override
+<i>120</i>&nbsp;	public void retrieveConnectionError() {
+<b class="nc"><i>121</i>&nbsp;		if (pregameStage) {</b>
+<b class="nc"><i>122</i>&nbsp;			if (pregameView.isMenuPhase()) {</b>
+<b class="nc"><i>123</i>&nbsp;				NetObject clientErrorMsg = new NetSetup(Constants.GENERAL_NOT_EXIST_SERVER);</b>
+<b class="nc"><i>124</i>&nbsp;				pregameView.queueMessage(clientErrorMsg);</b>
+<b class="nc"><i>125</i>&nbsp;				inputHandler.setTimeout();</b>
+<b class="nc"><i>126</i>&nbsp;			} else {</b>
+<b class="nc"><i>127</i>&nbsp;				NetObject clientErrorMsg = new NetLobbyPreparation(Constants.GENERAL_FATAL_ERROR);</b>
+<b class="nc"><i>128</i>&nbsp;				pregameView.queueMessage(clientErrorMsg);</b>
+<b class="nc"><i>129</i>&nbsp;				inputHandler.setTimeout();</b>
+<b class="nc"><i>130</i>&nbsp;			}</b>
+<i>131</i>&nbsp;		} else {
+<b class="nc"><i>132</i>&nbsp;			NetObject clientErrorMsg = new NetObject(Constants.GENERAL_FATAL_ERROR);</b>
+<b class="nc"><i>133</i>&nbsp;			gameView.addToQueue(clientErrorMsg);</b>
+<b class="nc"><i>134</i>&nbsp;			inputHandler.setTimeout();</b>
+<i>135</i>&nbsp;		}
+<i>136</i>&nbsp;	}
+<i>137</i>&nbsp;	/**
+<i>138</i>&nbsp;	 * It receives asynchronous or synchronous messages from the network component a message that is during the connection to a lobby to participate to a game.
+<i>139</i>&nbsp;	 * @param connMsg a setup message
+<i>140</i>&nbsp;	 */
+<i>141</i>&nbsp;	@Override
+<i>142</i>&nbsp;	public void retrieveConnectionMsg(NetSetup connMsg) {
+<b class="nc"><i>143</i>&nbsp;		switch (connMsg.message) {</b>
+<i>144</i>&nbsp;			case Constants.SETUP_OUT_CONNFAILED, Constants.SETUP_CREATE_WORKED, Constants.SETUP_OUT_CONNWORKED, Constants.SETUP_ERROR, Constants.SETUP_CREATE, Constants.SETUP_OUT_CONNFINISH -&gt; {
+<b class="nc"><i>145</i>&nbsp;				pregameView.queueMessage(connMsg);</b>
+<b class="nc"><i>146</i>&nbsp;				pregameView.notifyPregameCli();</b>
+<i>147</i>&nbsp;			}
+<i>148</i>&nbsp;		}
+<i>149</i>&nbsp;	}
+<i>150</i>&nbsp;	/**
+<i>151</i>&nbsp;	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about lobby end and list of players.
+<i>152</i>&nbsp;	 * @param lobbyMsg a lobby message
+<i>153</i>&nbsp;	 */
+<i>154</i>&nbsp;	@Override
+<i>155</i>&nbsp;	public void retrieveLobbyMsg(NetLobbyPreparation lobbyMsg) {
+<b class="nc"><i>156</i>&nbsp;		switch (lobbyMsg.message) {</b>
+<i>157</i>&nbsp;			case Constants.LOBBY_TURN, Constants.LOBBY_ERROR -&gt; {
+<b class="nc"><i>158</i>&nbsp;				inputHandler.setTimeout();</b>
+<b class="nc"><i>159</i>&nbsp;				pregameView.queueMessage(lobbyMsg);</b>
+<b class="nc"><i>160</i>&nbsp;				if (lobbyMsg.message.equals(Constants.LOBBY_TURN)) {</b>
+<b class="nc"><i>161</i>&nbsp;					gameView.setPlayers(lobbyMsg);</b>
+<i>162</i>&nbsp;				}
+<i>163</i>&nbsp;			}
+<i>164</i>&nbsp;			case Constants.GENERAL_PHASE_UPDATE -&gt; {
+<b class="nc"><i>165</i>&nbsp;				gameView.addToQueue(lobbyMsg);</b>
+<i>166</i>&nbsp;			}
+<i>167</i>&nbsp;		}
+<i>168</i>&nbsp;	}
+<i>169</i>&nbsp;	/**
+<i>170</i>&nbsp;	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or a message about.
+<i>171</i>&nbsp;	 * @param colorMsg a color phase message
+<i>172</i>&nbsp;	 */
+<i>173</i>&nbsp;	@Override
+<i>174</i>&nbsp;	public void retrieveColorMsg(NetColorPreparation colorMsg) {
+<b class="nc"><i>175</i>&nbsp;		inputHandler.setTimeout();</b>
+<b class="nc"><i>176</i>&nbsp;		gameView.addToQueue(colorMsg);</b>
+<i>177</i>&nbsp;	}
+<i>178</i>&nbsp;	/**
+<i>179</i>&nbsp;	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about.
+<i>180</i>&nbsp;	 * @param godsMsg a gods phase message
+<i>181</i>&nbsp;	 */
+<i>182</i>&nbsp;	@Override
+<i>183</i>&nbsp;	public void retrieveGodsMsg(NetDivinityChoice godsMsg) {
+<b class="nc"><i>184</i>&nbsp;		inputHandler.setTimeout();</b>
+<b class="nc"><i>185</i>&nbsp;		gameView.addToQueue(godsMsg);</b>
+<i>186</i>&nbsp;	}
+<i>187</i>&nbsp;	/**
+<i>188</i>&nbsp;	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about.
+<i>189</i>&nbsp;	 * @param gameSetupMsg a workers position phase message
+<i>190</i>&nbsp;	 */
+<i>191</i>&nbsp;	@Override
+<i>192</i>&nbsp;	public void retrieveGameSetupMsg(NetGameSetup gameSetupMsg) {
+<b class="nc"><i>193</i>&nbsp;		if (gameSetupMsg.message.equals(Constants.GENERAL_GAMEMAP_UPDATE)) {</b>
+<b class="nc"><i>194</i>&nbsp;			inputController.setMap(gameSetupMsg.gameMap);</b>
+<i>195</i>&nbsp;		}
+<b class="nc"><i>196</i>&nbsp;		inputHandler.setTimeout();</b>
+<b class="nc"><i>197</i>&nbsp;		gameView.addToQueue(gameSetupMsg);</b>
+<i>198</i>&nbsp;	}
+<i>199</i>&nbsp;	/**
+<i>200</i>&nbsp;	 * It receives asynchronous or synchronous messages from the network component that there was an error on the message sent or the message about.
+<i>201</i>&nbsp;	 * @param gamingMsg a gaming message
+<i>202</i>&nbsp;	 */
+<i>203</i>&nbsp;	@Override
+<i>204</i>&nbsp;	public void retrieveGamingMsg(NetGaming gamingMsg) {
+<b class="nc"><i>205</i>&nbsp;		if (gamingMsg.message.equals(Constants.GENERAL_GAMEMAP_UPDATE)) {</b>
+<b class="nc"><i>206</i>&nbsp;			inputController.setMap(gamingMsg.gameMap);</b>
+<i>207</i>&nbsp;		}
+<b class="nc"><i>208</i>&nbsp;		inputHandler.setTimeout();</b>
+<b class="nc"><i>209</i>&nbsp;		gameView.addToQueue(gamingMsg);</b>
+<i>210</i>&nbsp;	}
+<i>211</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

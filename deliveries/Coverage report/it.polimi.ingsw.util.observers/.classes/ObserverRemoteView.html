@@ -1,0 +1,149 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ObserverRemoteView</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.util.observers</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ObserverRemoteView (it.polimi.ingsw.util.observers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ObserverRemoteView</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.util.observers;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.core.Build;
+<i>4</i>&nbsp;import it.polimi.ingsw.core.Map;
+<i>5</i>&nbsp;import it.polimi.ingsw.core.Move;
+<i>6</i>&nbsp;import it.polimi.ingsw.core.gods.GodCard;
+<i>7</i>&nbsp;import it.polimi.ingsw.core.state.Turn;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import it.polimi.ingsw.util.Color;
+<i>10</i>&nbsp;import java.util.List;
+<i>11</i>&nbsp;import java.util.HashMap;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;/**
+<i>14</i>&nbsp; * This is the class that represent the Observer pattern for remote view inside the Distributed MVC pattern, this object will be overridden by the remote view of the server that implements the Distributed MVC remote view pattern.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;public interface ObserverRemoteView extends ObserverObject {
+<i>17</i>&nbsp;	/**
+<i>18</i>&nbsp;	 * This method is called when game state changed and gods have been chosen by the challenger.
+<i>19</i>&nbsp;	 * @param observed is the observable object which called this method
+<i>20</i>&nbsp;	 * @param godsInfo is the list of gods chosen by the challenger
+<i>21</i>&nbsp;	 */
+<i>22</i>&nbsp;	void updateGods(ObservableObject observed, List&lt;GodCard&gt; godsInfo);
+<i>23</i>&nbsp;	/**
+<i>24</i>&nbsp;	 * This method is called when game state changed because a player has chosen a god, the player will be informed about current gods chosen.
+<i>25</i>&nbsp;	 * @param observed is the observable object which called this method
+<i>26</i>&nbsp;	 * @param godsInfo is the map of gods chosen by the players at the moment
+<i>27</i>&nbsp;	 */
+<i>28</i>&nbsp;	void updateGods(ObservableObject observed, HashMap&lt;String,GodCard&gt; godsInfo);
+<i>29</i>&nbsp;	/**
+<i>30</i>&nbsp;	 * This method is called when game state changed because the challenger chose the starter and the player must be informed.
+<i>31</i>&nbsp;	 * @param observed is the observable object which called this method
+<i>32</i>&nbsp;	 * @param godsInfo is the name of the starter
+<i>33</i>&nbsp;	 */
+<i>34</i>&nbsp;	void updateGods(ObservableObject observed, String godsInfo);
+<i>35</i>&nbsp;	/**
+<i>36</i>&nbsp;	 * This method is called when game state changed because a player has chosen a color and the player will be informed about the chosen colors.
+<i>37</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>38</i>&nbsp;	 * @param playerColors is the map of the color chosen by the players for the moment
+<i>39</i>&nbsp;	 */
+<i>40</i>&nbsp;	void updateColors(ObservableGame observed, HashMap&lt;String,Color&gt; playerColors);
+<i>41</i>&nbsp;	/**
+<i>42</i>&nbsp;	 * This method is called when game state changed updating the gaming order, the player will be notified about the new order.
+<i>43</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>44</i>&nbsp;	 * @param order is the order of gaming of the player in this game
+<i>45</i>&nbsp;	 */
+<i>46</i>&nbsp;	void updateOrder(ObservableGame observed, String[] order);
+<i>47</i>&nbsp;	/**
+<i>48</i>&nbsp;	 * This method is called when game state changed because a player positioned its worker on the game table, the player will be informed.
+<i>49</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>50</i>&nbsp;	 * @param gameMap is the current game map
+<i>51</i>&nbsp;	 * @param finished if the worker positioning phase is finished
+<i>52</i>&nbsp;	 */
+<i>53</i>&nbsp;	void updatePositions(ObservableGame observed, Map gameMap, boolean finished);
+<i>54</i>&nbsp;	/**
+<i>55</i>&nbsp;	 * This method is called when game state changed and has calculated the possible action that the active player can perform, the player will be informed about them.
+<i>56</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>57</i>&nbsp;	 * @param moves is the list of possible moves
+<i>58</i>&nbsp;	 * @param builds is the list of possible builds
+<i>59</i>&nbsp;	 */
+<i>60</i>&nbsp;	void updatePossibleActions(ObservableGame observed, List&lt;Move&gt; moves, List&lt;Build&gt; builds);
+<i>61</i>&nbsp;	/**
+<i>62</i>&nbsp;	 * This method is called when game state changed because someone moved a worker and the player will be notified.
+<i>63</i>&nbsp;	 * @param observed is the observable object which called this method
+<i>64</i>&nbsp;	 * @param netMap is the current game map
+<i>65</i>&nbsp;	 */
+<i>66</i>&nbsp;	void updateMove(ObservableObject observed, Map netMap);
+<i>67</i>&nbsp;	/**
+<i>68</i>&nbsp;	 * This method is called when game state changed because someone has built on the map and the player will be notified.
+<i>69</i>&nbsp;	 * @param observed is the observable object which called this method
+<i>70</i>&nbsp;	 * @param netMap is the current game map
+<i>71</i>&nbsp;	 */
+<i>72</i>&nbsp;	void updateBuild(ObservableObject observed, Map netMap);
+<i>73</i>&nbsp;	/**
+<i>74</i>&nbsp;	 * This method is called when game state changed and a player has been defeated and this information will be sent to the client.
+<i>75</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>76</i>&nbsp;	 * @param playerDefeated is the player defeated
+<i>77</i>&nbsp;	 */
+<i>78</i>&nbsp;	void updateDefeat(ObservableGame observed, String playerDefeated);
+<i>79</i>&nbsp;	/**
+<i>80</i>&nbsp;	 * This method is called when game state changed because there is a winner and this information will be sent to the client.
+<i>81</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>82</i>&nbsp;	 * @param playerWinner is the winner
+<i>83</i>&nbsp;	 */
+<i>84</i>&nbsp;	void updateWinner(ObservableGame observed, String playerWinner);
+<i>85</i>&nbsp;	/**
+<i>86</i>&nbsp;	 * This method is called when game state changed because the turn changed and there is a new active player and the client must be notified.
+<i>87</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>88</i>&nbsp;	 * @param playerName is the player&#39;s name
+<i>89</i>&nbsp;	 */
+<i>90</i>&nbsp;	void updateActivePlayer(ObservableGame observed, String playerName);
+<i>91</i>&nbsp;	/**
+<i>92</i>&nbsp;	 * This method is called when game state changed because it entered in a different phase and this information will be sent to the user.
+<i>93</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>94</i>&nbsp;	 * @param turn the current game phase
+<i>95</i>&nbsp;	 */
+<i>96</i>&nbsp;	void updatePhaseChange(ObservableGame observed, Turn turn);
+<i>97</i>&nbsp;	/**
+<i>98</i>&nbsp;	 * This method is called when game state changed because it is finished and the player will be notified.
+<i>99</i>&nbsp;	 * @param observed is the observable game which called this method
+<i>100</i>&nbsp;	 */
+<i>101</i>&nbsp;	void updateGameFinished(ObservableGame observed);
+<i>102</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

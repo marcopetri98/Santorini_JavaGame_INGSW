@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Pair</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Pair (it.polimi.ingsw.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Pair</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65%
+  </span>
+  <span class="absValue">
+    (13/ 20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.util;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.Serializable;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * This is a class which represent a pair.
+<i>7</i>&nbsp; * @param &lt;P&gt; first element of the pair
+<i>8</i>&nbsp; * @param &lt;Q&gt; second element of the pair
+<i>9</i>&nbsp; */
+<i>10</i>&nbsp;public class Pair&lt;P,Q&gt; implements Serializable {
+<i>11</i>&nbsp;	private P p;
+<i>12</i>&nbsp;	private Q q;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;	/**
+<i>15</i>&nbsp;	 * Creates a pair with first element of {@code p} and second element of {@code q}
+<i>16</i>&nbsp;	 * @param p first element
+<i>17</i>&nbsp;	 * @param q second element
+<i>18</i>&nbsp;	 */
+<b class="fc"><i>19</i>&nbsp;	public Pair(P p, Q q) {</b>
+<b class="fc"><i>20</i>&nbsp;		this.p = p;</b>
+<b class="fc"><i>21</i>&nbsp;		this.q = q;</b>
+<b class="fc"><i>22</i>&nbsp;	}</b>
+<i>23</i>&nbsp;	/**
+<i>24</i>&nbsp;	 * Creates a new pair from another one.
+<i>25</i>&nbsp;	 * @param other a pair
+<i>26</i>&nbsp;	 */
+<b class="nc"><i>27</i>&nbsp;	public Pair(Pair&lt;P,Q&gt; other) {</b>
+<b class="nc"><i>28</i>&nbsp;		this.p = other.getFirst();</b>
+<b class="nc"><i>29</i>&nbsp;		this.q = other.getSecond();</b>
+<b class="nc"><i>30</i>&nbsp;	}</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;	/**
+<i>33</i>&nbsp;	 * Gets the first element.
+<i>34</i>&nbsp;	 * @return first element
+<i>35</i>&nbsp;	 */
+<i>36</i>&nbsp;	public P getFirst() {
+<b class="fc"><i>37</i>&nbsp;		return p;</b>
+<i>38</i>&nbsp;	}
+<i>39</i>&nbsp;	/**
+<i>40</i>&nbsp;	 * Gets the second element.
+<i>41</i>&nbsp;	 * @return second element
+<i>42</i>&nbsp;	 */
+<i>43</i>&nbsp;	public Q getSecond() {
+<b class="fc"><i>44</i>&nbsp;		return q;</b>
+<i>45</i>&nbsp;	}
+<i>46</i>&nbsp;	/**
+<i>47</i>&nbsp;	 * Sets the first element
+<i>48</i>&nbsp;	 * @param p is an element with the same type of the first element
+<i>49</i>&nbsp;	 */
+<i>50</i>&nbsp;	public void setFirst(P p) {
+<b class="fc"><i>51</i>&nbsp;		this.p = p;</b>
+<b class="fc"><i>52</i>&nbsp;	}</b>
+<i>53</i>&nbsp;	/**
+<i>54</i>&nbsp;	 * Sets the second element
+<i>55</i>&nbsp;	 * @param q is an element with the same type of the second element
+<i>56</i>&nbsp;	 */
+<i>57</i>&nbsp;	public void setSecond(Q q) {
+<b class="fc"><i>58</i>&nbsp;		this.q = q;</b>
+<b class="fc"><i>59</i>&nbsp;	}</b>
+<i>60</i>&nbsp;	/**
+<i>61</i>&nbsp;	 * It controls if the two pairs have the first element equal.
+<i>62</i>&nbsp;	 * @param other is a pair
+<i>63</i>&nbsp;	 * @return true if the first elements are equal
+<i>64</i>&nbsp;	 */
+<i>65</i>&nbsp;	public boolean firstEqual(Pair&lt;P,Q&gt; other) {
+<b class="nc"><i>66</i>&nbsp;		return p.equals(other.getFirst());</b>
+<i>67</i>&nbsp;	}
+<i>68</i>&nbsp;	/**
+<i>69</i>&nbsp;	 * It controls if the two pairs have the second element equal.
+<i>70</i>&nbsp;	 * @param other is a pair
+<i>71</i>&nbsp;	 * @return true if the second elements are equal
+<i>72</i>&nbsp;	 */
+<i>73</i>&nbsp;	public boolean secondEqual(Pair&lt;P,Q&gt; other) {
+<b class="nc"><i>74</i>&nbsp;		return q.equals(other.getSecond());</b>
+<i>75</i>&nbsp;	}
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;	@Override
+<i>78</i>&nbsp;	public boolean equals(Object obj) {
+<b class="fc"><i>79</i>&nbsp;		if (obj instanceof Pair) {</b>
+<b class="fc"><i>80</i>&nbsp;			Pair&lt;P,Q&gt; other = (Pair&lt;P,Q&gt;)obj;</b>
+<b class="fc"><i>81</i>&nbsp;			return p.equals(other.getFirst()) &amp;&amp; q.equals(other.getSecond());</b>
+<i>82</i>&nbsp;		} else {
+<b class="nc"><i>83</i>&nbsp;			return false;</b>
+<i>84</i>&nbsp;		}
+<i>85</i>&nbsp;	}
+<i>86</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

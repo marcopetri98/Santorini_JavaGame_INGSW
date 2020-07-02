@@ -1,0 +1,422 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ServerController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ServerController (it.polimi.ingsw.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServerController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.1%
+  </span>
+  <span class="absValue">
+    (117/ 146)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// necessary imports of Java SE
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;// other project&#39;s classes needed here
+<i>6</i>&nbsp;import it.polimi.ingsw.core.*;
+<i>7</i>&nbsp;import it.polimi.ingsw.core.gods.GodCard;
+<i>8</i>&nbsp;import it.polimi.ingsw.core.state.GamePhase;
+<i>9</i>&nbsp;import it.polimi.ingsw.core.state.Phase;
+<i>10</i>&nbsp;import it.polimi.ingsw.core.state.Turn;
+<i>11</i>&nbsp;import it.polimi.ingsw.network.RemoteView;
+<i>12</i>&nbsp;import it.polimi.ingsw.network.game.NetAvailableBuildings;
+<i>13</i>&nbsp;import it.polimi.ingsw.network.game.NetAvailablePositions;
+<i>14</i>&nbsp;import it.polimi.ingsw.network.objects.NetColorPreparation;
+<i>15</i>&nbsp;import it.polimi.ingsw.network.objects.NetDivinityChoice;
+<i>16</i>&nbsp;import it.polimi.ingsw.network.objects.NetGameSetup;
+<i>17</i>&nbsp;import it.polimi.ingsw.network.objects.NetGaming;
+<i>18</i>&nbsp;import it.polimi.ingsw.util.exceptions.BadRequestException;
+<i>19</i>&nbsp;import it.polimi.ingsw.util.exceptions.NoBuildException;
+<i>20</i>&nbsp;import it.polimi.ingsw.util.exceptions.NoMoveException;
+<i>21</i>&nbsp;import it.polimi.ingsw.util.exceptions.WrongPhaseException;
+<i>22</i>&nbsp;import it.polimi.ingsw.util.observers.ObservableObject;
+<i>23</i>&nbsp;import it.polimi.ingsw.util.observers.ObservableRemoteView;
+<i>24</i>&nbsp;import it.polimi.ingsw.util.observers.ObserverController;
+<i>25</i>&nbsp;import it.polimi.ingsw.util.observers.ObserverRemoteView;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;import java.util.ArrayList;
+<i>28</i>&nbsp;import java.util.List;
+<i>29</i>&nbsp;import java.util.stream.Collectors;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;/**
+<i>32</i>&nbsp; * This is the main class for the controller of the game, it is the controller for the Distributed MVC pattern. It owns the game and other controllers and manage the all execution, it calls other controllers when specific actions must be controlled and eventually modifies the game if needed.
+<i>33</i>&nbsp; */
+<i>34</i>&nbsp;public class ServerController implements ObserverController {
+<i>35</i>&nbsp;	private final Game observedModel;
+<i>36</i>&nbsp;	private final Mover moveController;
+<i>37</i>&nbsp;	private final Builder buildController;
+<i>38</i>&nbsp;	private final DefeatManager defeatController;
+<i>39</i>&nbsp;	private final VictoryManager victoryController;
+<i>40</i>&nbsp;	private final SetupManager setupController;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;	// constructors and setters for this class
+<i>43</i>&nbsp;	/**
+<i>44</i>&nbsp;	 * Creates a {@code ServerController} with the game to control.
+<i>45</i>&nbsp;	 * @param g is the game to control
+<i>46</i>&nbsp;	 * @throws NullPointerException if {@code g} is null
+<i>47</i>&nbsp;	 */
+<b class="fc"><i>48</i>&nbsp;	public ServerController(Game g) throws NullPointerException {</b>
+<b class="fc"><i>49</i>&nbsp;		if (g == null) throw new NullPointerException();</b>
+<b class="fc"><i>50</i>&nbsp;		moveController = new Mover(g);</b>
+<b class="fc"><i>51</i>&nbsp;		buildController = new Builder(g);</b>
+<b class="fc"><i>52</i>&nbsp;		defeatController = new DefeatManager(g);</b>
+<b class="fc"><i>53</i>&nbsp;		victoryController = new VictoryManager(g);</b>
+<b class="fc"><i>54</i>&nbsp;		setupController = new SetupManager(g);</b>
+<b class="fc"><i>55</i>&nbsp;		observedModel = g;</b>
+<b class="fc"><i>56</i>&nbsp;	}</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;	// actions called by the players or the server
+<i>59</i>&nbsp;	/**
+<i>60</i>&nbsp;	 * Calls the generate order function.
+<i>61</i>&nbsp;	 */
+<i>62</i>&nbsp;	public void generateOrder() {
+<b class="fc"><i>63</i>&nbsp;		setupController.generateOrder();</b>
+<b class="fc"><i>64</i>&nbsp;	}</b>
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;	// support methods
+<i>67</i>&nbsp;	/**
+<i>68</i>&nbsp;	 * Checks if the current phase is a phase where can be performed a move.
+<i>69</i>&nbsp;	 * @return true if a move can be performed, otherwise false
+<i>70</i>&nbsp;	 */
+<i>71</i>&nbsp;	private boolean isMovablePhase() {
+<b class="fc"><i>72</i>&nbsp;		return observedModel.getPhase().getGamePhase() == GamePhase.MOVE || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE;</b>
+<i>73</i>&nbsp;	}
+<i>74</i>&nbsp;	/**
+<i>75</i>&nbsp;	 * Checks if the current phase is a phase where can be performed a build.
+<i>76</i>&nbsp;	 * @return true if a build can be performed, otherwise false
+<i>77</i>&nbsp;	 */
+<i>78</i>&nbsp;	private boolean isBuildablePhase() {
+<b class="fc"><i>79</i>&nbsp;		if (observedModel.getPhase().getGamePhase() == GamePhase.BUILD || observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {</b>
+<b class="fc"><i>80</i>&nbsp;			return true;</b>
+<i>81</i>&nbsp;		}
+<b class="nc"><i>82</i>&nbsp;		return false;</b>
+<i>83</i>&nbsp;	}
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;	// OVERRIDDEN METHODS FROM THE OBSERVER
+<i>86</i>&nbsp;	/**
+<i>87</i>&nbsp;	 * This method receives a request from a client through its {@link it.polimi.ingsw.network.RemoteView} and analyze if it&#39;s the player&#39;s turn and if it is the correct phase (the color phase), if this conditions are all true then the method calls the {@link it.polimi.ingsw.controller.SetupManager}, otherwise it calls the error handling method of the {@link it.polimi.ingsw.network.RemoteView}.
+<i>88</i>&nbsp;	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+<i>89</i>&nbsp;	 * @param playerColors is the {@link it.polimi.ingsw.network.objects.NetColorPreparation} message sent from the player
+<i>90</i>&nbsp;	 */
+<i>91</i>&nbsp;	@Override
+<i>92</i>&nbsp;	public synchronized void updateColors(ObservableObject observed, NetColorPreparation playerColors) {
+<i>93</i>&nbsp;		// it controls if the player which sent the request is in its turn and can choose a color
+<b class="fc"><i>94</i>&nbsp;		RemoteView caller = (RemoteView) observed;</b>
+<b class="fc"><i>95</i>&nbsp;		String activePlayer = observedModel.getPlayerTurn().getPlayerName();</b>
+<i>96</i>&nbsp;		// if the player is trying to choose a color already chosen or isn&#39;t its turn it returns an error
+<b class="fc"><i>97</i>&nbsp;		if (observedModel.isFinished() || !activePlayer.equals(playerColors.player) || observedModel.getPhase().getPhase() != Phase.COLORS) {</b>
+<b class="fc"><i>98</i>&nbsp;			caller.communicateError();</b>
+<i>99</i>&nbsp;		} else {
+<i>100</i>&nbsp;			// the player can choose this color
+<i>101</i>&nbsp;			try {
+<b class="fc"><i>102</i>&nbsp;				setupController.changeColor(playerColors);</b>
+<b class="fc"><i>103</i>&nbsp;				observedModel.changeTurn();</b>
+<b class="nc"><i>104</i>&nbsp;			} catch (WrongPhaseException | BadRequestException e) {</b>
+<b class="nc"><i>105</i>&nbsp;				caller.communicateError();</b>
+<b class="fc"><i>106</i>&nbsp;			}</b>
+<i>107</i>&nbsp;		}
+<b class="fc"><i>108</i>&nbsp;	}</b>
+<i>109</i>&nbsp;	/**
+<i>110</i>&nbsp;	 * This method receives a request from a client through its {@link it.polimi.ingsw.network.RemoteView} and analyze if it&#39;s the player&#39;s turn and if it is the correct phase (the gods phase), if this conditions are all true then the method calls the {@link it.polimi.ingsw.controller.SetupManager}, otherwise it calls the error handling method of the {@link it.polimi.ingsw.network.RemoteView}.
+<i>111</i>&nbsp;	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+<i>112</i>&nbsp;	 * @param playerGods is the {@link it.polimi.ingsw.network.objects.NetDivinityChoice} message sent from the player
+<i>113</i>&nbsp;	 */
+<i>114</i>&nbsp;	@Override
+<i>115</i>&nbsp;	public synchronized void updateGods(ObservableObject observed, NetDivinityChoice playerGods) {
+<i>116</i>&nbsp;		// it controls if the player which sent the request is in its turn and can choose a color
+<b class="fc"><i>117</i>&nbsp;		RemoteView caller = (RemoteView) observed;</b>
+<b class="fc"><i>118</i>&nbsp;		String activePlayer = observedModel.getPlayerTurn().getPlayerName();</b>
+<b class="fc"><i>119</i>&nbsp;		if (observedModel.isFinished() || (playerGods.challenger == null &amp;&amp; !activePlayer.equals(playerGods.player)) || (playerGods.challenger != null &amp;&amp; !activePlayer.equals(playerGods.challenger)) || observedModel.getPhase().getPhase() != Phase.GODS) {</b>
+<b class="fc"><i>120</i>&nbsp;			caller.communicateError();</b>
+<i>121</i>&nbsp;		} else {
+<i>122</i>&nbsp;			try {
+<b class="fc"><i>123</i>&nbsp;				setupController.handleGodMessage(playerGods);</b>
+<b class="fc"><i>124</i>&nbsp;				observedModel.changeTurn();</b>
+<b class="nc"><i>125</i>&nbsp;			} catch (WrongPhaseException | BadRequestException e) {</b>
+<b class="nc"><i>126</i>&nbsp;				caller.communicateError();</b>
+<b class="fc"><i>127</i>&nbsp;			}</b>
+<i>128</i>&nbsp;		}
+<b class="fc"><i>129</i>&nbsp;	}</b>
+<i>130</i>&nbsp;	/**
+<i>131</i>&nbsp;	 * This method receives a request from a client through its {@link it.polimi.ingsw.network.RemoteView} and analyze if it&#39;s the player&#39;s turn and if it is the correct phase (the positioning workers on game map phase), if this conditions are all true then the method calls the {@link it.polimi.ingsw.controller.SetupManager}, otherwise it calls the error handling method of the {@link it.polimi.ingsw.network.RemoteView}.
+<i>132</i>&nbsp;	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+<i>133</i>&nbsp;	 * @param netObject is the {@link it.polimi.ingsw.network.objects.NetGameSetup} message sent from the player
+<i>134</i>&nbsp;	 */
+<i>135</i>&nbsp;	@Override
+<i>136</i>&nbsp;	public synchronized void updatePositions(ObservableObject observed, NetGameSetup netObject) {
+<i>137</i>&nbsp;		// it controls if the player which sent the request is in its turn and can choose a color
+<b class="fc"><i>138</i>&nbsp;		RemoteView caller = (RemoteView) observed;</b>
+<b class="fc"><i>139</i>&nbsp;		String activePlayer = observedModel.getPlayerTurn().getPlayerName();</b>
+<b class="fc"><i>140</i>&nbsp;		if (observedModel.isFinished() || !activePlayer.equals(netObject.player) || observedModel.getPhase().getPhase() != Phase.SETUP) {</b>
+<b class="fc"><i>141</i>&nbsp;			caller.communicateError();</b>
+<i>142</i>&nbsp;		} else {
+<i>143</i>&nbsp;			try {
+<b class="fc"><i>144</i>&nbsp;				setupController.positionWorkers(netObject);</b>
+<b class="fc"><i>145</i>&nbsp;				observedModel.changeTurn();</b>
+<b class="fc"><i>146</i>&nbsp;				if (observedModel.getPlayers().get(0) == observedModel.getPlayerTurn()) {</b>
+<b class="fc"><i>147</i>&nbsp;					observedModel.computeActions();</b>
+<b class="fc"><i>148</i>&nbsp;					if (observedModel.getPlayerPossibleMoves().size() == 0 &amp;&amp; observedModel.getPlayerPossibleBuilds().size() == 0) {</b>
+<b class="fc"><i>149</i>&nbsp;						observedModel.applyDefeat(observedModel.getPlayerTurn());</b>
+<b class="nc"><i>150</i>&nbsp;					} else if (observedModel.getPlayerPossibleBuilds().size() == 0) {</b>
+<b class="nc"><i>151</i>&nbsp;						observedModel.changeTurn();</b>
+<b class="nc"><i>152</i>&nbsp;						observedModel.computeActions();</b>
+<i>153</i>&nbsp;					}
+<i>154</i>&nbsp;				}
+<b class="nc"><i>155</i>&nbsp;			} catch (BadRequestException e) {</b>
+<b class="nc"><i>156</i>&nbsp;				caller.communicateError();</b>
+<b class="fc"><i>157</i>&nbsp;			}</b>
+<i>158</i>&nbsp;		}
+<b class="fc"><i>159</i>&nbsp;	}</b>
+<i>160</i>&nbsp;	/**
+<i>161</i>&nbsp;	 * This function is called when a player can move and want to perform a certain move, if it can&#39;t move this method is going to call the error handling method of the {@link it.polimi.ingsw.network.RemoteView} and stops.
+<i>162</i>&nbsp;	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+<i>163</i>&nbsp;	 * @param moveMessage is the {@link it.polimi.ingsw.network.objects.NetGaming} message sent from the player
+<i>164</i>&nbsp;	 */
+<i>165</i>&nbsp;	@Override
+<i>166</i>&nbsp;	public synchronized void updateMove(ObservableObject observed, NetGaming moveMessage) {
+<i>167</i>&nbsp;		// it controls if the player which sent the request is in its turn and can choose a color
+<b class="fc"><i>168</i>&nbsp;		RemoteView caller = (RemoteView) observed;</b>
+<b class="fc"><i>169</i>&nbsp;		String activePlayer = observedModel.getPlayerTurn().getPlayerName();</b>
+<b class="fc"><i>170</i>&nbsp;		if (observedModel.isFinished() || !activePlayer.equals(moveMessage.player) || !isMovablePhase() || moveMessage.move == null) {</b>
+<b class="fc"><i>171</i>&nbsp;			caller.communicateError();</b>
+<i>172</i>&nbsp;		} else {
+<b class="fc"><i>173</i>&nbsp;			List&lt;Move&gt; possibleMoves = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>174</i>&nbsp;			Player movingPlayer = observedModel.getPlayerByName(moveMessage.player);</b>
+<i>175</i>&nbsp;			Worker selectedWorker;
+<b class="fc"><i>176</i>&nbsp;			Turn turn = observedModel.getPhase();</b>
+<b class="fc"><i>177</i>&nbsp;			List&lt;GodCard&gt; playersCards = observedModel.getPlayers().stream().filter((player) -&gt; { try { player.getCard(); return true; } catch (IllegalStateException e) { return false; } }).map(Player::getCard).collect(Collectors.toList());</b>
+<b class="fc"><i>178</i>&nbsp;			boolean hasMoves = false;</b>
+<i>179</i>&nbsp;
+<b class="fc"><i>180</i>&nbsp;			if (moveMessage.move.workerID == movingPlayer.getPlayerID()+1) {</b>
+<b class="fc"><i>181</i>&nbsp;				selectedWorker = movingPlayer.getWorker1();</b>
+<i>182</i>&nbsp;			} else {
+<b class="nc"><i>183</i>&nbsp;				selectedWorker = movingPlayer.getWorker2();</b>
+<i>184</i>&nbsp;			}
+<b class="fc"><i>185</i>&nbsp;			for (GodCard card : playersCards) {</b>
+<b class="fc"><i>186</i>&nbsp;				if (card.getOwner() != movingPlayer &amp;&amp; card.getTypeGod() == TypeGod.OTHER_TURN_GOD &amp;&amp; turn.getGamePhase() == GamePhase.MOVE) {</b>
+<i>187</i>&nbsp;					try {
+<b class="fc"><i>188</i>&nbsp;						possibleMoves.addAll(card.checkMove(observedModel.getMap(),selectedWorker,turn));</b>
+<b class="nc"><i>189</i>&nbsp;					} catch (NoMoveException e) {</b>
+<b class="nc"><i>190</i>&nbsp;						throw new AssertionError(&quot;Controller called a check move on a god that isn&#39;t an other turn god for moves&quot;);</b>
+<b class="fc"><i>191</i>&nbsp;					}</b>
+<i>192</i>&nbsp;				}
+<b class="fc"><i>193</i>&nbsp;			}</b>
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;			try {
+<i>196</i>&nbsp;				// if a player has a god that acts on other players turn it doesn&#39;t generate moves for him
+<b class="fc"><i>197</i>&nbsp;				if (movingPlayer.getCard().getTypeGod() != TypeGod.OTHER_TURN_GOD) {</b>
+<b class="fc"><i>198</i>&nbsp;					possibleMoves.addAll(movingPlayer.getCard().checkMove(observedModel.getMap(), selectedWorker, turn));</b>
+<b class="fc"><i>199</i>&nbsp;					hasMoves = true;</b>
+<i>200</i>&nbsp;				} else {
+<b class="nc"><i>201</i>&nbsp;					throw new NoMoveException();</b>
+<i>202</i>&nbsp;				}
+<b class="nc"><i>203</i>&nbsp;			} catch (NoMoveException e) {</b>
+<i>204</i>&nbsp;				// if it is the move phase and none of the gods change the standard way of moving it will be called the standard method
+<b class="nc"><i>205</i>&nbsp;				if (turn.getGamePhase() == GamePhase.MOVE) {</b>
+<b class="nc"><i>206</i>&nbsp;					possibleMoves.addAll(GodCard.standardMoves(selectedWorker.getPos().map,selectedWorker,turn));</b>
+<b class="nc"><i>207</i>&nbsp;					hasMoves = true;</b>
+<i>208</i>&nbsp;				}
+<b class="fc"><i>209</i>&nbsp;			}</b>
+<i>210</i>&nbsp;
+<b class="fc"><i>211</i>&nbsp;			if (hasMoves) {</b>
+<b class="fc"><i>212</i>&nbsp;				if (movingPlayer.isWorkerLocked()) {</b>
+<b class="fc"><i>213</i>&nbsp;					if (movingPlayer.getActiveWorker().workerID == moveMessage.move.workerID) {</b>
+<b class="fc"><i>214</i>&nbsp;						if (!moveController.move(moveMessage.move, possibleMoves)) {</b>
+<b class="fc"><i>215</i>&nbsp;							caller.communicateError();</b>
+<i>216</i>&nbsp;						} else {
+<b class="fc"><i>217</i>&nbsp;							victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);</b>
+<b class="fc"><i>218</i>&nbsp;							observedModel.changeTurn();</b>
+<b class="fc"><i>219</i>&nbsp;							observedModel.computeActions();</b>
+<b class="fc"><i>220</i>&nbsp;							defeatController.buildDefeat(observedModel.getPlayerPossibleBuilds());</b>
+<i>221</i>&nbsp;						}
+<i>222</i>&nbsp;					} else {
+<b class="nc"><i>223</i>&nbsp;						caller.communicateError();</b>
+<i>224</i>&nbsp;					}
+<i>225</i>&nbsp;				} else {
+<b class="fc"><i>226</i>&nbsp;					if (!moveController.move(moveMessage.move, possibleMoves)) {</b>
+<b class="fc"><i>227</i>&nbsp;						caller.communicateError();</b>
+<i>228</i>&nbsp;					} else {
+<b class="fc"><i>229</i>&nbsp;						victoryController.checkVictory(selectedWorker.getLastPos(),selectedWorker.getPos(),possibleMoves);</b>
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;						// if a player with prometheus moved without building before the game must go from before move phase to build phase (2 step on phase advance)
+<b class="fc"><i>232</i>&nbsp;						if (observedModel.getPhase().getGamePhase() == GamePhase.BEFOREMOVE) {</b>
+<b class="nc"><i>233</i>&nbsp;							observedModel.changeTurn();</b>
+<i>234</i>&nbsp;						}
+<b class="fc"><i>235</i>&nbsp;						observedModel.changeTurn();</b>
+<b class="fc"><i>236</i>&nbsp;						observedModel.computeActions();</b>
+<b class="fc"><i>237</i>&nbsp;						defeatController.buildDefeat(observedModel.getPlayerPossibleBuilds());</b>
+<i>238</i>&nbsp;					}
+<i>239</i>&nbsp;				}
+<i>240</i>&nbsp;			}
+<i>241</i>&nbsp;		}
+<b class="fc"><i>242</i>&nbsp;	}</b>
+<i>243</i>&nbsp;	/**
+<i>244</i>&nbsp;	 * This method is called when a client wants to perform a certain build, if the player cannot perform a build because the indicated one is forbidden or because it isn&#39;t its turn or it is the wrong phase, this method is going to call the error handling method of the {@link it.polimi.ingsw.network.RemoteView} and stops.
+<i>245</i>&nbsp;	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObserverObject} which called this method
+<i>246</i>&nbsp;	 * @param buildMessage is the {@link it.polimi.ingsw.network.objects.NetGaming} message sent from the player
+<i>247</i>&nbsp;	 */
+<i>248</i>&nbsp;	@Override
+<i>249</i>&nbsp;	public synchronized void updateBuild(ObservableObject observed, NetGaming buildMessage) {
+<i>250</i>&nbsp;		// it controls if the player which sent the request is in its turn and can choose a color
+<b class="fc"><i>251</i>&nbsp;		RemoteView caller = (RemoteView) observed;</b>
+<b class="fc"><i>252</i>&nbsp;		String activePlayer = observedModel.getPlayerTurn().getPlayerName();</b>
+<b class="fc"><i>253</i>&nbsp;		if (observedModel.isFinished() || !activePlayer.equals(buildMessage.player) || !isBuildablePhase() || buildMessage.build == null) {</b>
+<b class="fc"><i>254</i>&nbsp;			caller.communicateError();</b>
+<i>255</i>&nbsp;		} else {
+<b class="fc"><i>256</i>&nbsp;			List&lt;Build&gt; possibleBuilds = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>257</i>&nbsp;			Player buildingPlayer = observedModel.getPlayerByName(buildMessage.player);</b>
+<i>258</i>&nbsp;			Worker selectedWorker;
+<b class="fc"><i>259</i>&nbsp;			Turn turn = observedModel.getPhase();</b>
+<i>260</i>&nbsp;
+<b class="fc"><i>261</i>&nbsp;			if (buildMessage.build.workerID == buildingPlayer.getPlayerID()+1) {</b>
+<b class="fc"><i>262</i>&nbsp;				selectedWorker = buildingPlayer.getWorker1();</b>
+<i>263</i>&nbsp;			} else {
+<b class="nc"><i>264</i>&nbsp;				selectedWorker = buildingPlayer.getWorker2();</b>
+<i>265</i>&nbsp;			}
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;			try {
+<b class="fc"><i>268</i>&nbsp;				possibleBuilds.addAll(buildingPlayer.getCard().checkBuild(observedModel.getMap(),selectedWorker,turn));</b>
+<b class="nc"><i>269</i>&nbsp;			} catch (NoBuildException e) {</b>
+<i>270</i>&nbsp;				// if it is the move phase and none of the gods change the standard way of moving it will be called the standard method
+<b class="nc"><i>271</i>&nbsp;				if (turn.getGamePhase() == GamePhase.BUILD) {</b>
+<b class="nc"><i>272</i>&nbsp;					possibleBuilds = GodCard.standardBuilds(selectedWorker.getPos().map,selectedWorker,turn);</b>
+<i>273</i>&nbsp;				} else {
+<i>274</i>&nbsp;					// it can&#39;t move and it isn&#39;t in the move phase
+<b class="nc"><i>275</i>&nbsp;					caller.communicateError();</b>
+<i>276</i>&nbsp;				}
+<b class="fc"><i>277</i>&nbsp;			}</b>
+<i>278</i>&nbsp;
+<b class="fc"><i>279</i>&nbsp;			if (possibleBuilds.size() != 0) {</b>
+<b class="fc"><i>280</i>&nbsp;				if (buildingPlayer.isWorkerLocked()) {</b>
+<b class="fc"><i>281</i>&nbsp;					if (buildingPlayer.getActiveWorker().workerID == buildMessage.build.workerID) {</b>
+<i>282</i>&nbsp;						// the phase is the building phase, for this reason i need to check if
+<b class="fc"><i>283</i>&nbsp;						defeatController.buildDefeat(possibleBuilds);</b>
+<b class="fc"><i>284</i>&nbsp;						if (!buildController.build(buildMessage.build, possibleBuilds)) {</b>
+<b class="nc"><i>285</i>&nbsp;							caller.communicateError();</b>
+<i>286</i>&nbsp;						} else {
+<b class="fc"><i>287</i>&nbsp;							observedModel.changeTurn();</b>
+<b class="fc"><i>288</i>&nbsp;							observedModel.computeActions();</b>
+<b class="fc"><i>289</i>&nbsp;							if (observedModel.getPlayerPossibleBuilds().size() == 0) {</b>
+<b class="fc"><i>290</i>&nbsp;								observedModel.changeTurn();</b>
+<b class="fc"><i>291</i>&nbsp;								observedModel.computeActions();</b>
+<b class="fc"><i>292</i>&nbsp;								defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());</b>
+<i>293</i>&nbsp;							}
+<i>294</i>&nbsp;						}
+<i>295</i>&nbsp;					} else {
+<b class="nc"><i>296</i>&nbsp;						caller.communicateError();</b>
+<i>297</i>&nbsp;					}
+<i>298</i>&nbsp;				} else {
+<b class="fc"><i>299</i>&nbsp;					if (!buildController.build(buildMessage.build, possibleBuilds)) {</b>
+<b class="fc"><i>300</i>&nbsp;						caller.communicateError();</b>
+<i>301</i>&nbsp;					} else {
+<b class="fc"><i>302</i>&nbsp;						observedModel.applyWorkerLock(buildingPlayer,selectedWorker.workerID-buildingPlayer.getPlayerID());</b>
+<b class="fc"><i>303</i>&nbsp;						observedModel.changeTurn();</b>
+<b class="fc"><i>304</i>&nbsp;						observedModel.computeActions();</b>
+<b class="fc"><i>305</i>&nbsp;						defeatController.moveDefeat(observedModel.getPlayerPossibleMovesWorker1(),observedModel.getPlayerPossibleMovesWorker2());</b>
+<i>306</i>&nbsp;					}
+<i>307</i>&nbsp;				}
+<i>308</i>&nbsp;			}
+<i>309</i>&nbsp;		}
+<b class="fc"><i>310</i>&nbsp;	}</b>
+<i>311</i>&nbsp;	/**
+<i>312</i>&nbsp;	 * This method is called when a player wants to quit the game, it make it quit and changes the model, if the player isn&#39;t inside the game this method is going to call the error handling method of the {@link it.polimi.ingsw.network.RemoteView} and stops.
+<i>313</i>&nbsp;	 * @param observed is the observable object
+<i>314</i>&nbsp;	 * @param playerName is the player&#39;s name
+<i>315</i>&nbsp;	 */
+<i>316</i>&nbsp;	@Override
+<i>317</i>&nbsp;	public synchronized void updateQuit(ObservableObject observed, String playerName) {
+<i>318</i>&nbsp;		// it controls if the player which sent the request is in its turn and can choose a color
+<b class="fc"><i>319</i>&nbsp;		RemoteView caller = (RemoteView) observed;</b>
+<b class="fc"><i>320</i>&nbsp;		List&lt;String&gt; playerNames = observedModel.getPlayers().stream().map(Player::getPlayerName).collect(Collectors.toList());</b>
+<b class="fc"><i>321</i>&nbsp;		if (observedModel.isFinished() || !playerNames.contains(playerName)) {</b>
+<b class="fc"><i>322</i>&nbsp;			caller.communicateError();</b>
+<i>323</i>&nbsp;		} else {
+<b class="fc"><i>324</i>&nbsp;			observedModel.applyDisconnection(playerName);</b>
+<i>325</i>&nbsp;		}
+<b class="fc"><i>326</i>&nbsp;	}</b>
+<i>327</i>&nbsp;	/**
+<i>328</i>&nbsp;	 * This method is called when a player which is only observing the match wants to quit the game, it make it quit and changes the model, if the player isn&#39;t inside the game as observer an {@code AssertionError} is thrown because there has been an error on handling the observers.
+<i>329</i>&nbsp;	 * @param observed is the {@link it.polimi.ingsw.util.observers.ObservableRemoteView} which called this method
+<i>330</i>&nbsp;	 */
+<i>331</i>&nbsp;	@Override
+<i>332</i>&nbsp;	public synchronized void observerQuit(ObservableRemoteView observed) {
+<i>333</i>&nbsp;		try {
+<b class="fc"><i>334</i>&nbsp;			observedModel.removeObserver((ObserverRemoteView)observed);</b>
+<b class="nc"><i>335</i>&nbsp;		} catch (IllegalArgumentException e) {</b>
+<b class="nc"><i>336</i>&nbsp;			throw new AssertionError(&quot;The server controller has been called to remove an observer that doesn&#39;t exist&quot;);</b>
+<b class="fc"><i>337</i>&nbsp;		}</b>
+<b class="fc"><i>338</i>&nbsp;	}</b>
+<i>339</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

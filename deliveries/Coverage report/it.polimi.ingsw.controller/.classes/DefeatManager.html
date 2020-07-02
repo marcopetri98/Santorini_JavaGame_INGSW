@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DefeatManager</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DefeatManager (it.polimi.ingsw.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefeatManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.4%
+  </span>
+  <span class="absValue">
+    (27/ 28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.core.*;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.util.ArrayList;
+<i>6</i>&nbsp;import java.util.List;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; * This is the controller part dedicated to checking the defeat of any player
+<i>10</i>&nbsp; */
+<i>11</i>&nbsp;public class DefeatManager {
+<i>12</i>&nbsp;	private Game observedModel;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;	// CONSTRUCTOR
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;	/**
+<i>17</i>&nbsp;	 * This is the constructor of the class
+<i>18</i>&nbsp;	 * @param g the {@link Game}
+<i>19</i>&nbsp;	 */
+<b class="fc"><i>20</i>&nbsp;	public DefeatManager(Game g) {</b>
+<b class="fc"><i>21</i>&nbsp;		observedModel = g;</b>
+<b class="fc"><i>22</i>&nbsp;	}</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;	/**
+<i>25</i>&nbsp;	 * The method checks if the standard condition of defeat (with respect to the move phase) is respected: if it is, it calls applyDefeat method in Game class
+<i>26</i>&nbsp;	 * @param worker1_possible_moves the possible moves of the first worker of the active player
+<i>27</i>&nbsp;	 * @param worker2_possible_moves the possible moves of the second worker of the active player
+<i>28</i>&nbsp;	 * @throws NullPointerException if the parameter is null
+<i>29</i>&nbsp;	 * @return true if the player has been defeated
+<i>30</i>&nbsp;	 */
+<i>31</i>&nbsp;	public boolean moveDefeat(List&lt;Move&gt; worker1_possible_moves, List&lt;Move&gt; worker2_possible_moves) throws NullPointerException {
+<b class="fc"><i>32</i>&nbsp;		if(worker1_possible_moves == null || worker2_possible_moves == null){</b>
+<b class="fc"><i>33</i>&nbsp;			throw new NullPointerException();</b>
+<i>34</i>&nbsp;		} else {
+<b class="fc"><i>35</i>&nbsp;			List&lt;Move&gt; worker1_filtered = filterMoves(worker1_possible_moves);</b>
+<b class="fc"><i>36</i>&nbsp;			List&lt;Move&gt; worker2_filtered = filterMoves(worker2_possible_moves);</b>
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;			if (worker1_filtered.size() == 0 &amp;&amp; worker2_filtered.size() == 0){</b>
+<b class="fc"><i>39</i>&nbsp;				observedModel.applyDefeat(observedModel.getPlayerTurn());</b>
+<b class="fc"><i>40</i>&nbsp;				return true;</b>
+<i>41</i>&nbsp;			}
+<i>42</i>&nbsp;		}
+<b class="fc"><i>43</i>&nbsp;		return false;</b>
+<i>44</i>&nbsp;	}
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;	/**
+<i>47</i>&nbsp;	 * The method checks if the standard condition of defeat (with respect to the build phase) is respected: if it is, it calls applyDefeat method in Game class
+<i>48</i>&nbsp;	 * @param worker_possible_builds the possible builds of the active worker of the active player
+<i>49</i>&nbsp;	 * @throws NullPointerException if the parameter is null
+<i>50</i>&nbsp;	 * @return true if the player has been defeated
+<i>51</i>&nbsp;	 */
+<i>52</i>&nbsp;	public boolean buildDefeat(List&lt;Build&gt; worker_possible_builds) throws NullPointerException {
+<b class="fc"><i>53</i>&nbsp;		if(worker_possible_builds == null) {</b>
+<b class="fc"><i>54</i>&nbsp;			throw new NullPointerException();</b>
+<i>55</i>&nbsp;		} else {
+<b class="fc"><i>56</i>&nbsp;			if (worker_possible_builds.size() == 0) {</b>
+<b class="fc"><i>57</i>&nbsp;				observedModel.applyDefeat(observedModel.getPlayerTurn());</b>
+<b class="fc"><i>58</i>&nbsp;				return true;</b>
+<i>59</i>&nbsp;			}
+<i>60</i>&nbsp;		}
+<b class="fc"><i>61</i>&nbsp;		return false;</b>
+<i>62</i>&nbsp;	}
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;	/**
+<i>65</i>&nbsp;	 * It receives a list of moves where can be present only moves that can be applied
+<i>66</i>&nbsp;	 * @param list a list of moves
+<i>67</i>&nbsp;	 * @return a list of only possible moves eliminating forbidden ones
+<i>68</i>&nbsp;	 */
+<i>69</i>&nbsp;	public static List&lt;Move&gt; filterMoves(List&lt;Move&gt; list) {
+<b class="fc"><i>70</i>&nbsp;		List&lt;Move&gt; newList = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>71</i>&nbsp;		boolean toAdd = false;</b>
+<b class="fc"><i>72</i>&nbsp;		for (int i = 0; i &lt; list.size(); i++) {</b>
+<b class="fc"><i>73</i>&nbsp;			if (list.get(i).typeMove == TypeMove.SIMPLE_MOVE || list.get(i).typeMove == TypeMove.CONDITIONED_MOVE || list.get(i).typeMove == TypeMove.VICTORY_MOVE) {</b>
+<b class="fc"><i>74</i>&nbsp;				toAdd = true;</b>
+<b class="fc"><i>75</i>&nbsp;				for (int j = 0; j &lt; list.size(); j++) {</b>
+<b class="fc"><i>76</i>&nbsp;					if (list.get(j).typeMove == TypeMove.FORBIDDEN_MOVE &amp;&amp; list.get(i).getCellNext().equals(list.get(j).getCellNext()) &amp;&amp; list.get(i).getCellPrev().equals(list.get(j).getCellPrev()) &amp;&amp; list.get(i).getWorker().equals(list.get(j).getWorker())) {</b>
+<b class="nc"><i>77</i>&nbsp;						toAdd = false;</b>
+<i>78</i>&nbsp;					}
+<i>79</i>&nbsp;				}
+<i>80</i>&nbsp;			}
+<b class="fc"><i>81</i>&nbsp;			if (toAdd) {</b>
+<b class="fc"><i>82</i>&nbsp;				newList.add(list.get(i));</b>
+<i>83</i>&nbsp;			}
+<i>84</i>&nbsp;		}
+<b class="fc"><i>85</i>&nbsp;		return newList;</b>
+<i>86</i>&nbsp;	}
+<i>87</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

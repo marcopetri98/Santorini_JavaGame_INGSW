@@ -1,0 +1,572 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RemoteView</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.network</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RemoteView (it.polimi.ingsw.network)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteView</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.7%
+  </span>
+  <span class="absValue">
+    (5/ 23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.9%
+  </span>
+  <span class="absValue">
+    (30/ 177)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemoteView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (6/ 24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    17.4%
+  </span>
+  <span class="absValue">
+    (31/ 178)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.network;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// necessary imports from other packages of the project
+<i>4</i>&nbsp;import it.polimi.ingsw.core.*;
+<i>5</i>&nbsp;import it.polimi.ingsw.core.gods.GodCard;
+<i>6</i>&nbsp;import it.polimi.ingsw.core.state.GamePhase;
+<i>7</i>&nbsp;import it.polimi.ingsw.core.state.GodsPhase;
+<i>8</i>&nbsp;import it.polimi.ingsw.core.state.Phase;
+<i>9</i>&nbsp;import it.polimi.ingsw.core.state.Turn;
+<i>10</i>&nbsp;import it.polimi.ingsw.network.game.NetAvailableBuildings;
+<i>11</i>&nbsp;import it.polimi.ingsw.network.game.NetAvailablePositions;
+<i>12</i>&nbsp;import it.polimi.ingsw.network.game.NetMap;
+<i>13</i>&nbsp;import it.polimi.ingsw.network.objects.*;
+<i>14</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>15</i>&nbsp;import it.polimi.ingsw.util.observers.ObservableGame;
+<i>16</i>&nbsp;import it.polimi.ingsw.util.observers.ObservableObject;
+<i>17</i>&nbsp;import it.polimi.ingsw.util.observers.ObservableRemoteView;
+<i>18</i>&nbsp;import it.polimi.ingsw.util.observers.ObserverRemoteView;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;// necessary imports of Java SE
+<i>21</i>&nbsp;import it.polimi.ingsw.util.Color;
+<i>22</i>&nbsp;import java.util.ArrayList;
+<i>23</i>&nbsp;import java.util.HashMap;
+<i>24</i>&nbsp;import java.util.List;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;/**
+<i>27</i>&nbsp; * This class is the remote view class of the Distributed MVC pattern, it receives input from client&#39;s view and forward these commands to the controller with light controls. After the controller has changed something (on the model) this class is notified because it observes the model and the model notifies its observers. It is observed by the controller, this means that when it receives a valid message from the client it notifies the controller because something is changed (also if none of its attributes is changed, it&#39;s changed the status).
+<i>28</i>&nbsp; */
+<i>29</i>&nbsp;public class RemoteView extends ObservableRemoteView implements ObserverRemoteView {
+<i>30</i>&nbsp;	private final ServerClientListenerThread clientHandler;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;	/**
+<i>33</i>&nbsp;	 * It creates a new remote view connected with the passed server handler for the client.
+<i>34</i>&nbsp;	 * @param handler is the server handler for the client
+<i>35</i>&nbsp;	 * @throws NullPointerException it handler is null
+<i>36</i>&nbsp;	 */
+<b class="fc"><i>37</i>&nbsp;	public RemoteView(ServerClientListenerThread handler) throws NullPointerException {</b>
+<b class="fc"><i>38</i>&nbsp;		if (handler == null) {</b>
+<b class="nc"><i>39</i>&nbsp;			throw new NullPointerException();</b>
+<i>40</i>&nbsp;		}
+<b class="fc"><i>41</i>&nbsp;		clientHandler = handler;</b>
+<b class="fc"><i>42</i>&nbsp;	}</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;	// METHODS USED TO INFORM THE PLAYER ABOUT AN ERROR
+<i>45</i>&nbsp;	/**
+<i>46</i>&nbsp;	 * This function is called from the controller when user send a well formed request he cannot send for some reason: it isn&#39;t its turn or he cannot perform this command because of game state.
+<i>47</i>&nbsp;	 */
+<i>48</i>&nbsp;	public void communicateError() {
+<b class="pc"><i>49</i>&nbsp;		switch (clientHandler.getGamePhase()) {</b>
+<b class="nc"><i>50</i>&nbsp;			case COLORS -&gt; clientHandler.sendMessage(new NetColorPreparation(Constants.COLOR_ERROR));</b>
+<b class="nc"><i>51</i>&nbsp;			case GODS -&gt; clientHandler.sendMessage(new NetDivinityChoice(Constants.GODS_ERROR));</b>
+<b class="nc"><i>52</i>&nbsp;			case SETUP -&gt; clientHandler.sendMessage(new NetGameSetup(Constants.GAMESETUP_ERROR));</b>
+<b class="nc"><i>53</i>&nbsp;			case PLAYERTURN -&gt; clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));</b>
+<b class="nc"><i>54</i>&nbsp;			case OTHERTURN -&gt; clientHandler.sendMessage(new NetGaming(Constants.OTHERS_ERROR));</b>
+<i>55</i>&nbsp;		}
+<b class="nc"><i>56</i>&nbsp;	}</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;	/* **********************************************
+<i>59</i>&nbsp;	 *												*
+<i>60</i>&nbsp;	 *												*
+<i>61</i>&nbsp;	 *												*
+<i>62</i>&nbsp;	 *	METHODS CALLED TO HANDLE CLIENT REQUESTS	*
+<i>63</i>&nbsp;	 * 												*
+<i>64</i>&nbsp;	 * 												*
+<i>65</i>&nbsp;	 * 												*
+<i>66</i>&nbsp;	 ************************************************/
+<i>67</i>&nbsp;	// METHODS CALLED BY THE CLIENTS WHEN TRYING TO DO A POSSIBLE ACTION REGARDING TO THE PHASE
+<i>68</i>&nbsp;	/**
+<i>69</i>&nbsp;	 * It receives a well formed request of color, meaning that the color is one of the three available colors, the remote view cannot know if the color is already owned by another player or not, for this reason notifies the ServerController. If it may receive a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn&#39;t do that action.
+<i>70</i>&nbsp;	 * @param req represent the message sent by the client
+<i>71</i>&nbsp;	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
+<i>72</i>&nbsp;	 */
+<i>73</i>&nbsp;	public void handleColorRequest(NetColorPreparation req, boolean error) {
+<b class="nc"><i>74</i>&nbsp;		if (!error) {</b>
+<b class="nc"><i>75</i>&nbsp;			notifyColors(req);</b>
+<i>76</i>&nbsp;		} else {
+<b class="nc"><i>77</i>&nbsp;			clientHandler.sendMessage(new NetColorPreparation(Constants.COLOR_ERROR));</b>
+<i>78</i>&nbsp;		}
+<b class="nc"><i>79</i>&nbsp;	}</b>
+<i>80</i>&nbsp;	/**
+<i>81</i>&nbsp;	 * It receives a well formed request of divinity choice, meaning that the divinity exists or all divinity exists and there aren&#39;t duplicates if the player is the challenger and is choosing the gods to play with. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn&#39;t do that action.
+<i>82</i>&nbsp;	 * @param req represent the message sent by the client
+<i>83</i>&nbsp;	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
+<i>84</i>&nbsp;	 */
+<i>85</i>&nbsp;	public void handleDivinityRequest(NetDivinityChoice req, boolean error) {
+<b class="nc"><i>86</i>&nbsp;		if (!error) {</b>
+<b class="nc"><i>87</i>&nbsp;			notifyGods(req);</b>
+<i>88</i>&nbsp;		} else {
+<b class="nc"><i>89</i>&nbsp;			clientHandler.sendMessage(new NetDivinityChoice(Constants.GODS_ERROR));</b>
+<i>90</i>&nbsp;		}
+<b class="nc"><i>91</i>&nbsp;	}</b>
+<i>92</i>&nbsp;	/**
+<i>93</i>&nbsp;	 * It receives a well formed request of positioning of workers, when with well formed we mean that the position is inside the map. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn&#39;t do that action.
+<i>94</i>&nbsp;	 * @param req represent the message sent by the client
+<i>95</i>&nbsp;	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
+<i>96</i>&nbsp;	 */
+<i>97</i>&nbsp;	public void handlePositionRequest(NetGameSetup req, boolean error) {
+<b class="nc"><i>98</i>&nbsp;		if (!error) {</b>
+<b class="nc"><i>99</i>&nbsp;			notifyPositions(req);</b>
+<i>100</i>&nbsp;		} else {
+<b class="nc"><i>101</i>&nbsp;			clientHandler.sendMessage(new NetGameSetup(Constants.GAMESETUP_ERROR));</b>
+<i>102</i>&nbsp;		}
+<b class="nc"><i>103</i>&nbsp;	}</b>
+<i>104</i>&nbsp;	/**
+<i>105</i>&nbsp;	 * It receives a well formed request of a move, well formed means that the cell is inside the map, it is needed to check worker and if is possible to move there. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn&#39;t do that action.
+<i>106</i>&nbsp;	 * @param req represent the message sent by the client
+<i>107</i>&nbsp;	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
+<i>108</i>&nbsp;	 */
+<i>109</i>&nbsp;	public void handleMoveRequest(NetGaming req, boolean error) {
+<b class="nc"><i>110</i>&nbsp;		if (!error) {</b>
+<b class="nc"><i>111</i>&nbsp;			notifyMove(req);</b>
+<i>112</i>&nbsp;		} else {
+<b class="nc"><i>113</i>&nbsp;			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));</b>
+<i>114</i>&nbsp;		}
+<b class="nc"><i>115</i>&nbsp;	}</b>
+<i>116</i>&nbsp;	/**
+<i>117</i>&nbsp;	 * It receives a well formed request of build, well formed means that the cell is inside the map, it is needed to check if the build can be done and if all parameters are correct. If it receives a callback (a call of this function by the observer) with error true it sends an error to the client, because he couldn&#39;t do that action.
+<i>118</i>&nbsp;	 * @param req represent the message sent by the client
+<i>119</i>&nbsp;	 * @param error represent that an error occurred with the request and is called by the controller observer with true to set that it has to reply to the client with an error
+<i>120</i>&nbsp;	 */
+<i>121</i>&nbsp;	public void handleBuildRequest(NetGaming req, boolean error) {
+<b class="nc"><i>122</i>&nbsp;		if (!error) {</b>
+<b class="nc"><i>123</i>&nbsp;			notifyBuild(req);</b>
+<i>124</i>&nbsp;		} else {
+<b class="nc"><i>125</i>&nbsp;			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ERROR));</b>
+<i>126</i>&nbsp;		}
+<b class="nc"><i>127</i>&nbsp;	}</b>
+<i>128</i>&nbsp;	/**
+<i>129</i>&nbsp;	 * A player that is an observer has sent a request to quit the game, the request is forwarded to the controller.
+<i>130</i>&nbsp;	 */
+<i>131</i>&nbsp;	public void handleObserverQuit() {
+<b class="nc"><i>132</i>&nbsp;		if (clientHandler.getGamePhase() == NetworkPhase.OBSERVER) {</b>
+<b class="nc"><i>133</i>&nbsp;			notifyObserverQuit();</b>
+<b class="nc"><i>134</i>&nbsp;			removeAllObservers();</b>
+<i>135</i>&nbsp;		} else {
+<b class="nc"><i>136</i>&nbsp;			throw new AssertionError(&quot;It has been called by the ClientListenerThread the quit of an observer in a different phase from the observing&quot;);</b>
+<i>137</i>&nbsp;		}
+<b class="nc"><i>138</i>&nbsp;	}</b>
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;	/* **********************************************
+<i>141</i>&nbsp;	 *												*
+<i>142</i>&nbsp;	 *												*
+<i>143</i>&nbsp;	 *												*
+<i>144</i>&nbsp;	 *	UPDATE OF THE GAME TO SEND TO THE CLIENT	*
+<i>145</i>&nbsp;	 * 												*
+<i>146</i>&nbsp;	 * 												*
+<i>147</i>&nbsp;	 * 												*
+<i>148</i>&nbsp;	 ************************************************/
+<i>149</i>&nbsp;	// METHODS USED TO INFORM THE CONTROLLER ABOUT A REQUEST OF THE CLIENT
+<i>150</i>&nbsp;	/**
+<i>151</i>&nbsp;	 * This method sends the message of defeat to the player connected with this remote view.
+<i>152</i>&nbsp;	 * @param observed is the observable game
+<i>153</i>&nbsp;	 * @param playerDefeated is the player defeated
+<i>154</i>&nbsp;	 */
+<i>155</i>&nbsp;	@Override
+<i>156</i>&nbsp;	public synchronized void updateDefeat(ObservableGame observed, String playerDefeated) {
+<b class="nc"><i>157</i>&nbsp;		if (observed == null || playerDefeated == null) {</b>
+<b class="nc"><i>158</i>&nbsp;			clientHandler.fatalError(&quot;&quot;);</b>
+<i>159</i>&nbsp;		} else {
+<b class="nc"><i>160</i>&nbsp;			NetGaming yourMessage = new NetGaming(Constants.GENERAL_DEFEATED, playerDefeated);</b>
+<b class="nc"><i>161</i>&nbsp;			clientHandler.sendMessage(yourMessage);</b>
+<i>162</i>&nbsp;
+<b class="nc"><i>163</i>&nbsp;			if (clientHandler.getPlayerName().equals(playerDefeated)) {</b>
+<b class="nc"><i>164</i>&nbsp;				clientHandler.setGamePhase(NetworkPhase.OBSERVER);</b>
+<i>165</i>&nbsp;			}
+<i>166</i>&nbsp;		}
+<b class="nc"><i>167</i>&nbsp;	}</b>
+<i>168</i>&nbsp;	/**
+<i>169</i>&nbsp;	 * This method sends the message of win to the player connected with this remote view.
+<i>170</i>&nbsp;	 * @param observed is the observable game
+<i>171</i>&nbsp;	 * @param playerWinner is the winner player
+<i>172</i>&nbsp;	 */
+<i>173</i>&nbsp;	@Override
+<i>174</i>&nbsp;	public synchronized void updateWinner(ObservableGame observed, String playerWinner) {
+<b class="nc"><i>175</i>&nbsp;		if (observed == null || playerWinner == null) {</b>
+<b class="nc"><i>176</i>&nbsp;			clientHandler.fatalError(&quot;&quot;);</b>
+<i>177</i>&nbsp;		} else {
+<b class="nc"><i>178</i>&nbsp;			clientHandler.setGamePhase(NetworkPhase.END);</b>
+<b class="nc"><i>179</i>&nbsp;			NetGaming yourMessage = new NetGaming(Constants.GENERAL_WINNER, playerWinner);</b>
+<b class="nc"><i>180</i>&nbsp;			clientHandler.sendMessage(yourMessage);</b>
+<b class="nc"><i>181</i>&nbsp;			clientHandler.closeSocketAndTerminate();</b>
+<i>182</i>&nbsp;		}
+<b class="nc"><i>183</i>&nbsp;	}</b>
+<i>184</i>&nbsp;	/**
+<i>185</i>&nbsp;	 * This method sends the message with the order of play.
+<i>186</i>&nbsp;	 * @param observed is the observable game
+<i>187</i>&nbsp;	 * @param order an array with players&#39; order
+<i>188</i>&nbsp;	 */
+<i>189</i>&nbsp;	@Override
+<i>190</i>&nbsp;	public synchronized void updateOrder(ObservableGame observed, String[] order) {
+<b class="fc"><i>191</i>&nbsp;		if (observed == null || order == null || clientHandler.getGamePhase() != NetworkPhase.LOBBY) {</b>
+<b class="nc"><i>192</i>&nbsp;			clientHandler.fatalError(&quot;It has been called the notify of player&#39;s order in the wrong phase or maybe with a null parameter&quot;);</b>
+<i>193</i>&nbsp;		} else {
+<b class="fc"><i>194</i>&nbsp;			NetLobbyPreparation sendOrder = null;</b>
+<i>195</i>&nbsp;			// builds the sequence object of players to send to player
+<b class="fc"><i>196</i>&nbsp;			for (int i = 0; i &lt; order.length; i++) {</b>
+<b class="fc"><i>197</i>&nbsp;				if (i == 0) {</b>
+<b class="fc"><i>198</i>&nbsp;					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[order.length-1-i], order.length-i);</b>
+<i>199</i>&nbsp;				} else {
+<b class="fc"><i>200</i>&nbsp;					sendOrder = new NetLobbyPreparation(Constants.LOBBY_TURN, order[order.length-1-i], order.length-i, sendOrder);</b>
+<i>201</i>&nbsp;				}
+<i>202</i>&nbsp;			}
+<i>203</i>&nbsp;			// it communicated to the client the play order
+<b class="fc"><i>204</i>&nbsp;			clientHandler.sendMessage(sendOrder);</b>
+<i>205</i>&nbsp;		}
+<b class="fc"><i>206</i>&nbsp;	}</b>
+<i>207</i>&nbsp;	/**
+<i>208</i>&nbsp;	 * When this method is called it informs the player about the color chosen by the other players, if all players have chosen card it change the handler phase and says to the client that he enters in the god selection phase
+<i>209</i>&nbsp;	 * @param observed is the observable game
+<i>210</i>&nbsp;	 * @param playerColors an HashMap that matches every player with the selected color
+<i>211</i>&nbsp;	 */
+<i>212</i>&nbsp;	@Override
+<i>213</i>&nbsp;	public synchronized void updateColors(ObservableGame observed, HashMap&lt;String, Color&gt; playerColors) {
+<b class="nc"><i>214</i>&nbsp;		if (observed == null || playerColors == null || clientHandler.getGamePhase() != NetworkPhase.COLORS || playerColors.size() == 0) {</b>
+<b class="nc"><i>215</i>&nbsp;			clientHandler.fatalError(&quot;It has been called the notify of players&#39; color with null parameter or in the wrong phase&quot;);</b>
+<i>216</i>&nbsp;		} else {
+<b class="nc"><i>217</i>&nbsp;			NetColorPreparation colorMessage = null;</b>
+<b class="nc"><i>218</i>&nbsp;			int i = 0;</b>
+<i>219</i>&nbsp;			// it builds the entire list about players&#39; colors
+<b class="nc"><i>220</i>&nbsp;			for (String playerName : playerColors.keySet()) {</b>
+<b class="nc"><i>221</i>&nbsp;				if (i == 0) {</b>
+<b class="nc"><i>222</i>&nbsp;					colorMessage = new NetColorPreparation(Constants.COLOR_CHOICES,playerName,playerColors.get(playerName));</b>
+<b class="nc"><i>223</i>&nbsp;					i++;</b>
+<i>224</i>&nbsp;				} else {
+<b class="nc"><i>225</i>&nbsp;					colorMessage = new NetColorPreparation(Constants.COLOR_CHOICES,playerName,playerColors.get(playerName),colorMessage);</b>
+<i>226</i>&nbsp;				}
+<b class="nc"><i>227</i>&nbsp;			}</b>
+<b class="nc"><i>228</i>&nbsp;			clientHandler.sendMessage(colorMessage);</b>
+<i>229</i>&nbsp;		}
+<b class="nc"><i>230</i>&nbsp;	}</b>
+<i>231</i>&nbsp;	/**
+<i>232</i>&nbsp;	 * This function says to all players the gods chosen by the challenger for this game
+<i>233</i>&nbsp;	 * @param observed is the observable game
+<i>234</i>&nbsp;	 * @param godsInfo it represent the list of gods that are chosen by the challenger
+<i>235</i>&nbsp;	 */
+<i>236</i>&nbsp;	@Override
+<i>237</i>&nbsp;	public synchronized void updateGods(ObservableObject observed, List&lt;GodCard&gt; godsInfo) {
+<b class="nc"><i>238</i>&nbsp;		if (observed == null || godsInfo == null || clientHandler.getGamePhase() != NetworkPhase.GODS) {</b>
+<b class="nc"><i>239</i>&nbsp;			clientHandler.fatalError(&quot;The gods update on a wrong phase or with wrong parameters&quot;);</b>
+<i>240</i>&nbsp;		} else {
+<b class="nc"><i>241</i>&nbsp;			List&lt;String&gt; godsNames = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>242</i>&nbsp;			for (GodCard card : godsInfo) {</b>
+<b class="nc"><i>243</i>&nbsp;				godsNames.add(card.getName());</b>
+<b class="nc"><i>244</i>&nbsp;			}</b>
+<b class="nc"><i>245</i>&nbsp;			NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_GODS,godsNames);</b>
+<b class="nc"><i>246</i>&nbsp;			clientHandler.sendMessage(godsMessage);</b>
+<i>247</i>&nbsp;		}
+<b class="nc"><i>248</i>&nbsp;	}</b>
+<i>249</i>&nbsp;	/**
+<i>250</i>&nbsp;	 * This function says to the player all gods selected till now by the players
+<i>251</i>&nbsp;	 * @param observed is the observable game
+<i>252</i>&nbsp;	 * @param godsInfo it represent the gods chosen by the current player turn
+<i>253</i>&nbsp;	 */
+<i>254</i>&nbsp;	@Override
+<i>255</i>&nbsp;	public synchronized void updateGods(ObservableObject observed, HashMap&lt;String,GodCard&gt; godsInfo) {
+<b class="nc"><i>256</i>&nbsp;		if (observed == null || godsInfo == null || clientHandler.getGamePhase() != NetworkPhase.GODS) {</b>
+<b class="nc"><i>257</i>&nbsp;			clientHandler.fatalError(&quot;The gods update on a wrong phase or with wrong parameters&quot;);</b>
+<i>258</i>&nbsp;		} else {
+<b class="nc"><i>259</i>&nbsp;			NetDivinityChoice godsMessage = null;</b>
+<b class="nc"><i>260</i>&nbsp;			int i = 0;</b>
+<i>261</i>&nbsp;			// it builds the entire list about players&#39; colors
+<b class="nc"><i>262</i>&nbsp;			for (String playerName : godsInfo.keySet()) {</b>
+<b class="nc"><i>263</i>&nbsp;				if (i == 0) {</b>
+<b class="nc"><i>264</i>&nbsp;					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName(),false);</b>
+<b class="nc"><i>265</i>&nbsp;					i++;</b>
+<i>266</i>&nbsp;				} else {
+<b class="nc"><i>267</i>&nbsp;					godsMessage = new NetDivinityChoice(Constants.GODS_CHOICES,playerName,godsInfo.get(playerName).getName(),godsMessage);</b>
+<i>268</i>&nbsp;				}
+<b class="nc"><i>269</i>&nbsp;			}</b>
+<b class="nc"><i>270</i>&nbsp;			clientHandler.sendMessage(godsMessage);</b>
+<i>271</i>&nbsp;		}
+<b class="nc"><i>272</i>&nbsp;	}</b>
+<i>273</i>&nbsp;	/**
+<i>274</i>&nbsp;	 * This function says to the player the player who starts to position its workers on the game board
+<i>275</i>&nbsp;	 * @param observed is the observable game
+<i>276</i>&nbsp;	 * @param godsInfo it contains the information about the player that start to position workers
+<i>277</i>&nbsp;	 */
+<i>278</i>&nbsp;	@Override
+<i>279</i>&nbsp;	public synchronized void updateGods(ObservableObject observed, String godsInfo) {
+<b class="nc"><i>280</i>&nbsp;		if (observed == null || godsInfo == null || clientHandler.getGamePhase() != NetworkPhase.GODS) {</b>
+<b class="nc"><i>281</i>&nbsp;			clientHandler.fatalError(&quot;The gods update on a wrong phase or with wrong parameters&quot;);</b>
+<i>282</i>&nbsp;		} else {
+<b class="nc"><i>283</i>&nbsp;			NetDivinityChoice godsMessage = new NetDivinityChoice(Constants.GODS_STARTER,godsInfo);</b>
+<b class="nc"><i>284</i>&nbsp;			clientHandler.sendMessage(godsMessage);</b>
+<i>285</i>&nbsp;		}
+<b class="nc"><i>286</i>&nbsp;	}</b>
+<i>287</i>&nbsp;	/**
+<i>288</i>&nbsp;	 * This method sends a message to the client with the information about the updated map.
+<i>289</i>&nbsp;	 * @param observed is the observable game
+<i>290</i>&nbsp;	 * @param gameMap is the game map
+<i>291</i>&nbsp;	 * @param finished is a boolean which says if the position phase is finished
+<i>292</i>&nbsp;	 */
+<i>293</i>&nbsp;	@Override
+<i>294</i>&nbsp;	public synchronized void updatePositions(ObservableGame observed, Map gameMap, boolean finished) {
+<b class="nc"><i>295</i>&nbsp;		if (observed == null || gameMap == null) {</b>
+<b class="nc"><i>296</i>&nbsp;			clientHandler.fatalError(&quot;The positions update is called with null parameters&quot;);</b>
+<i>297</i>&nbsp;		} else {
+<b class="nc"><i>298</i>&nbsp;			NetGameSetup gameSetupMessage = new NetGameSetup(Constants.GENERAL_GAMEMAP_UPDATE,new NetMap(gameMap));</b>
+<b class="nc"><i>299</i>&nbsp;			clientHandler.sendMessage(gameSetupMessage);</b>
+<i>300</i>&nbsp;		}
+<b class="nc"><i>301</i>&nbsp;	}</b>
+<i>302</i>&nbsp;	/**
+<i>303</i>&nbsp;	 * This method sends a message to the client with the information about the updated map.
+<i>304</i>&nbsp;	 * @param observed is the observable game
+<i>305</i>&nbsp;	 * @param netMap is the game map
+<i>306</i>&nbsp;	 */
+<i>307</i>&nbsp;	@Override
+<i>308</i>&nbsp;	public synchronized void updateMove(ObservableObject observed, Map netMap) {
+<b class="nc"><i>309</i>&nbsp;		if (observed == null || netMap == null) {</b>
+<b class="nc"><i>310</i>&nbsp;			clientHandler.fatalError(&quot;It is called the move update with wrong or null parameters&quot;);</b>
+<i>311</i>&nbsp;		} else {
+<b class="nc"><i>312</i>&nbsp;			NetGaming yourMessage = new NetGaming(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));</b>
+<b class="nc"><i>313</i>&nbsp;			clientHandler.sendMessage(yourMessage);</b>
+<i>314</i>&nbsp;		}
+<b class="nc"><i>315</i>&nbsp;	}</b>
+<i>316</i>&nbsp;	/**
+<i>317</i>&nbsp;	 * This method sends a message to the client with the information about the updated map.
+<i>318</i>&nbsp;	 * @param observed is the observable game
+<i>319</i>&nbsp;	 * @param netMap is the game map
+<i>320</i>&nbsp;	 */
+<i>321</i>&nbsp;	@Override
+<i>322</i>&nbsp;	public synchronized void updateBuild(ObservableObject observed, Map netMap) {
+<b class="nc"><i>323</i>&nbsp;		if (observed == null || netMap == null) {</b>
+<b class="nc"><i>324</i>&nbsp;			clientHandler.fatalError(&quot;It is called the move update with wrong or null parameters&quot;);</b>
+<i>325</i>&nbsp;		} else {
+<b class="nc"><i>326</i>&nbsp;			NetGaming yourMessage = new NetGaming(Constants.GENERAL_GAMEMAP_UPDATE, new NetMap((Map)netMap));</b>
+<b class="nc"><i>327</i>&nbsp;			clientHandler.sendMessage(yourMessage);</b>
+<i>328</i>&nbsp;		}
+<b class="nc"><i>329</i>&nbsp;	}</b>
+<i>330</i>&nbsp;	/**
+<i>331</i>&nbsp;	 * Sends the information to the client about a player that has disconnected.
+<i>332</i>&nbsp;	 * @param observed is the observable game
+<i>333</i>&nbsp;	 * @param playerName is the name of the player who quit the game
+<i>334</i>&nbsp;	 */
+<i>335</i>&nbsp;	@Override
+<i>336</i>&nbsp;	public synchronized void updateQuit(ObservableObject observed, String playerName) {
+<b class="nc"><i>337</i>&nbsp;		if (observed == null || playerName == null) {</b>
+<b class="nc"><i>338</i>&nbsp;			clientHandler.fatalError(&quot;It is called the quit of a player with a null parameter&quot;);</b>
+<i>339</i>&nbsp;		} else {
+<b class="nc"><i>340</i>&nbsp;			NetGaming yourMessage = new NetGaming(Constants.GENERAL_PLAYER_DISCONNECTED, playerName);</b>
+<b class="nc"><i>341</i>&nbsp;			clientHandler.sendMessage(yourMessage);</b>
+<i>342</i>&nbsp;		}
+<b class="nc"><i>343</i>&nbsp;	}</b>
+<i>344</i>&nbsp;	/**
+<i>345</i>&nbsp;	 * This method sends the information about the current game phase.
+<i>346</i>&nbsp;	 * @param observed is the observable game
+<i>347</i>&nbsp;	 * @param turn is the current game turn
+<i>348</i>&nbsp;	 */
+<i>349</i>&nbsp;	@Override
+<i>350</i>&nbsp;	public void updatePhaseChange(ObservableGame observed, Turn turn) {
+<b class="fc"><i>351</i>&nbsp;		if (observed == null || turn == null) {</b>
+<b class="nc"><i>352</i>&nbsp;			clientHandler.fatalError(&quot;It has been called the update phase with wrong parameters&quot;);</b>
+<i>353</i>&nbsp;		} else {
+<b class="fc"><i>354</i>&nbsp;			switch (clientHandler.getGamePhase()) {</b>
+<b class="fc"><i>355</i>&nbsp;				case LOBBY -&gt; {</b>
+<b class="fc"><i>356</i>&nbsp;					clientHandler.setGamePhase(NetworkPhase.COLORS);</b>
+<b class="fc"><i>357</i>&nbsp;					clientHandler.sendMessage(new NetLobbyPreparation(Constants.GENERAL_PHASE_UPDATE));</b>
+<i>358</i>&nbsp;				}
+<b class="nc"><i>359</i>&nbsp;				case COLORS -&gt; {</b>
+<b class="nc"><i>360</i>&nbsp;					clientHandler.setGamePhase(NetworkPhase.GODS);</b>
+<b class="nc"><i>361</i>&nbsp;					clientHandler.sendMessage(new NetColorPreparation(Constants.GENERAL_PHASE_UPDATE));</b>
+<i>362</i>&nbsp;
+<b class="nc"><i>363</i>&nbsp;					Game caller = (Game) observed;</b>
+<b class="nc"><i>364</i>&nbsp;					NetDivinityChoice divinityChoice = new NetDivinityChoice(Constants.GODS_CHALLENGER, caller.getPlayers().get(0).getPlayerName());</b>
+<b class="nc"><i>365</i>&nbsp;					clientHandler.sendMessage(divinityChoice);</b>
+<i>366</i>&nbsp;				}
+<i>367</i>&nbsp;				case GODS -&gt;  {
+<i>368</i>&nbsp;					// if the players that have chosen the color number is the same as the number of all players in the lobby it must change the phase to gods selection
+<b class="nc"><i>369</i>&nbsp;					if (turn.getPhase() == Phase.GODS &amp;&amp; turn.getGodsPhase() == GodsPhase.STARTER_CHOICE) {</b>
+<b class="nc"><i>370</i>&nbsp;						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,false));</b>
+<b class="nc"><i>371</i>&nbsp;					} else if (turn.getPhase() == Phase.GODS &amp;&amp; turn.getGodsPhase() == GodsPhase.GODS_CHOICE) {</b>
+<b class="nc"><i>372</i>&nbsp;						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,false));</b>
+<b class="nc"><i>373</i>&nbsp;					} else if (turn.getPhase() == Phase.SETUP) {</b>
+<b class="nc"><i>374</i>&nbsp;						clientHandler.setGamePhase(NetworkPhase.SETUP);</b>
+<b class="nc"><i>375</i>&nbsp;						clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_PHASE_UPDATE,true));</b>
+<i>376</i>&nbsp;					}
+<i>377</i>&nbsp;				}
+<b class="nc"><i>378</i>&nbsp;				case SETUP -&gt;  {</b>
+<b class="nc"><i>379</i>&nbsp;					clientHandler.setGamePhase(NetworkPhase.OTHERTURN);</b>
+<b class="nc"><i>380</i>&nbsp;					clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_PHASE_UPDATE));</b>
+<i>381</i>&nbsp;				}
+<i>382</i>&nbsp;				case PLAYERTURN, OTHERTURN -&gt;  {
+<b class="nc"><i>383</i>&nbsp;					clientHandler.sendMessage(new NetGaming(Constants.GENERAL_PHASE_UPDATE));</b>
+<i>384</i>&nbsp;				}
+<i>385</i>&nbsp;			}
+<i>386</i>&nbsp;		}
+<b class="fc"><i>387</i>&nbsp;	}</b>
+<i>388</i>&nbsp;
+<i>389</i>&nbsp;	/**
+<i>390</i>&nbsp;	 * This method sends the information about the possible action of the current player in this game phase.
+<i>391</i>&nbsp;	 * @param observed is the observable game
+<i>392</i>&nbsp;	 * @param moves is a list of moves
+<i>393</i>&nbsp;	 * @param builds is a list of builds
+<i>394</i>&nbsp;	 */
+<i>395</i>&nbsp;	@Override
+<i>396</i>&nbsp;	public void updatePossibleActions(ObservableGame observed, List&lt;Move&gt; moves, List&lt;Build&gt; builds) {
+<b class="fc"><i>397</i>&nbsp;		if (observed == null) {</b>
+<b class="nc"><i>398</i>&nbsp;			clientHandler.fatalError(&quot;It has been called the update on active player with a null parameter&quot;);</b>
+<i>399</i>&nbsp;		} else {
+<b class="fc"><i>400</i>&nbsp;			NetAvailableBuildings possibleBuilds = new NetAvailableBuildings(builds);</b>
+<b class="fc"><i>401</i>&nbsp;			NetAvailablePositions possibleMoves = new NetAvailablePositions(moves);</b>
+<i>402</i>&nbsp;
+<b class="fc"><i>403</i>&nbsp;			Game caller = (Game) observed;</b>
+<b class="fc"><i>404</i>&nbsp;			clientHandler.sendMessage(new NetGaming(Constants.PLAYER_ACTIONS,caller.getPlayerTurn().getPlayerName(),possibleBuilds,possibleMoves));</b>
+<i>405</i>&nbsp;		}
+<b class="fc"><i>406</i>&nbsp;	}</b>
+<i>407</i>&nbsp;
+<i>408</i>&nbsp;	/**
+<i>409</i>&nbsp;	 * This method sends the information about the active player turn and changes the network phase of the ServerClientListenerThread.
+<i>410</i>&nbsp;	 * @param observed is the observable game
+<i>411</i>&nbsp;	 * @param playerName the name of the player that should play at this moment of the game
+<i>412</i>&nbsp;	 */
+<i>413</i>&nbsp;	@Override
+<i>414</i>&nbsp;	public void updateActivePlayer(ObservableGame observed, String playerName) {
+<b class="fc"><i>415</i>&nbsp;		if (observed == null || playerName == null) {</b>
+<b class="nc"><i>416</i>&nbsp;			clientHandler.fatalError(&quot;It has been called the update on active player with a null parameter&quot;);</b>
+<i>417</i>&nbsp;		} else {
+<b class="fc"><i>418</i>&nbsp;			switch (clientHandler.getGamePhase()) {</b>
+<b class="fc"><i>419</i>&nbsp;				case COLORS -&gt; {</b>
+<b class="fc"><i>420</i>&nbsp;					NetColorPreparation colorPhase = new NetColorPreparation(Constants.TURN_PLAYERTURN, playerName);</b>
+<b class="fc"><i>421</i>&nbsp;					clientHandler.sendMessage(colorPhase);</b>
+<i>422</i>&nbsp;				}
+<b class="nc"><i>423</i>&nbsp;				case GODS -&gt; {</b>
+<b class="nc"><i>424</i>&nbsp;					NetDivinityChoice godsPhase = new NetDivinityChoice(Constants.TURN_PLAYERTURN, playerName);</b>
+<b class="nc"><i>425</i>&nbsp;					clientHandler.sendMessage(godsPhase);</b>
+<i>426</i>&nbsp;				}
+<b class="nc"><i>427</i>&nbsp;				case SETUP -&gt; {</b>
+<b class="nc"><i>428</i>&nbsp;					NetGameSetup setupPhase = new NetGameSetup(Constants.TURN_PLAYERTURN, playerName);</b>
+<b class="nc"><i>429</i>&nbsp;					clientHandler.sendMessage(setupPhase);</b>
+<i>430</i>&nbsp;				}
+<i>431</i>&nbsp;				case PLAYERTURN, OTHERTURN, OBSERVER -&gt; {
+<b class="nc"><i>432</i>&nbsp;					if (clientHandler.getPlayerName().equals(playerName)) {</b>
+<b class="nc"><i>433</i>&nbsp;						clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);</b>
+<i>434</i>&nbsp;					} else {
+<b class="nc"><i>435</i>&nbsp;						if (clientHandler.getGamePhase() != NetworkPhase.OBSERVER) {</b>
+<b class="nc"><i>436</i>&nbsp;							clientHandler.setGamePhase(NetworkPhase.OTHERTURN);</b>
+<i>437</i>&nbsp;						}
+<i>438</i>&nbsp;					}
+<b class="nc"><i>439</i>&nbsp;					NetGaming othersEndTurn = new NetGaming(Constants.TURN_PLAYERTURN, playerName);</b>
+<b class="nc"><i>440</i>&nbsp;					clientHandler.sendMessage(othersEndTurn);</b>
+<i>441</i>&nbsp;				}
+<i>442</i>&nbsp;			}
+<i>443</i>&nbsp;		}
+<b class="fc"><i>444</i>&nbsp;	}</b>
+<i>445</i>&nbsp;	/**
+<i>446</i>&nbsp;	 * This method sends the message to the client that the game is finished because someone has disconnected during the setup.
+<i>447</i>&nbsp;	 * @param observed is the observable game
+<i>448</i>&nbsp;	 */
+<i>449</i>&nbsp;	@Override
+<i>450</i>&nbsp;	public void updateGameFinished(ObservableGame observed) {
+<b class="nc"><i>451</i>&nbsp;		if (observed == null || clientHandler.getGamePhase() == NetworkPhase.PLAYERTURN || clientHandler.getGamePhase() == NetworkPhase.OTHERTURN) {</b>
+<b class="nc"><i>452</i>&nbsp;			throw new AssertionError(&quot;The update method has been called with a null parameter or not during the setup&quot;);</b>
+<i>453</i>&nbsp;		} else {
+<b class="nc"><i>454</i>&nbsp;			switch (clientHandler.getGamePhase()) {</b>
+<b class="nc"><i>455</i>&nbsp;				case LOBBY -&gt; clientHandler.sendMessage(new NetLobbyPreparation(Constants.GENERAL_SETUP_DISCONNECT));</b>
+<b class="nc"><i>456</i>&nbsp;				case COLORS -&gt; clientHandler.sendMessage(new NetColorPreparation(Constants.GENERAL_SETUP_DISCONNECT));</b>
+<b class="nc"><i>457</i>&nbsp;				case GODS -&gt; clientHandler.sendMessage(new NetDivinityChoice(Constants.GENERAL_SETUP_DISCONNECT));</b>
+<b class="nc"><i>458</i>&nbsp;				case SETUP -&gt; clientHandler.sendMessage(new NetGameSetup(Constants.GENERAL_SETUP_DISCONNECT));</b>
+<i>459</i>&nbsp;			}
+<b class="nc"><i>460</i>&nbsp;			clientHandler.closeSocketAndTerminate();</b>
+<i>461</i>&nbsp;		}
+<b class="nc"><i>462</i>&nbsp;	}</b>
+<i>463</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

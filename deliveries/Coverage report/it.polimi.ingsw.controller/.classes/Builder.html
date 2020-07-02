@@ -1,0 +1,129 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Builder</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.controller</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Builder (it.polimi.ingsw.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/ 11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.controller;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.core.Build;
+<i>4</i>&nbsp;import it.polimi.ingsw.core.Game;
+<i>5</i>&nbsp;import it.polimi.ingsw.network.game.NetBuild;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.net.Inet4Address;
+<i>8</i>&nbsp;import java.util.List;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;/**
+<i>11</i>&nbsp; * This is the controller part dedicated to applying the builds
+<i>12</i>&nbsp; */
+<i>13</i>&nbsp;public class Builder {
+<i>14</i>&nbsp;	private Game observedModel;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;	// CONSTRUCTOR
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;	/**
+<i>19</i>&nbsp;	 * This is the constructor of the class
+<i>20</i>&nbsp;	 * @param g the {@link Game}
+<i>21</i>&nbsp;	 */
+<b class="fc"><i>22</i>&nbsp;	public Builder(Game g) {</b>
+<b class="fc"><i>23</i>&nbsp;		observedModel = g;</b>
+<b class="fc"><i>24</i>&nbsp;	}</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;	/**
+<i>27</i>&nbsp;	 * The method checks if the {@link NetBuild} returned by the client is indeed possible, and if it is, it applies it
+<i>28</i>&nbsp;	 * @param netBuild the build communicated to the server.
+<i>29</i>&nbsp;	 * @param possibilities the list of possible builds the player could do.
+<i>30</i>&nbsp;	 * @return true if the netBuild is contained in the possibilities list and call applyBuild in Game class; else return false.
+<i>31</i>&nbsp;	 * @throws NullPointerException if the parameter is null
+<i>32</i>&nbsp;	 */
+<i>33</i>&nbsp;	public boolean build(NetBuild netBuild, List&lt;Build&gt; possibilities) throws NullPointerException {
+<b class="fc"><i>34</i>&nbsp;		if (netBuild == null || possibilities == null) {</b>
+<b class="fc"><i>35</i>&nbsp;			throw new NullPointerException();</b>
+<i>36</i>&nbsp;		}
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;		for(Build b : possibilities){</b>
+<b class="fc"><i>39</i>&nbsp;			if (b.isSameAs(netBuild)) {</b>
+<b class="fc"><i>40</i>&nbsp;				observedModel.applyBuild(b);</b>
+<b class="fc"><i>41</i>&nbsp;				return true;</b>
+<i>42</i>&nbsp;			}
+<b class="fc"><i>43</i>&nbsp;		}</b>
+<b class="fc"><i>44</i>&nbsp;		return false;</b>
+<i>45</i>&nbsp;	}
+<i>46</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

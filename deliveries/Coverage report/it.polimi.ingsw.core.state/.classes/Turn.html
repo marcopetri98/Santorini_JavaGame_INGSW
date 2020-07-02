@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Turn</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.core.state</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Turn (it.polimi.ingsw.core.state)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Turn</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.2%
+  </span>
+  <span class="absValue">
+    (23/ 27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.core.state;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;/**
+<i>4</i>&nbsp; * This class represent the phase and the turn of the game, it has a phase and for some of them a subphase indicating how the game is going.
+<i>5</i>&nbsp; */
+<i>6</i>&nbsp;public class Turn implements Cloneable {
+<i>7</i>&nbsp;	private Phase phase;
+<i>8</i>&nbsp;	private GamePhase gamePhase;
+<i>9</i>&nbsp;	private GodsPhase godsPhase;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;	/**
+<i>12</i>&nbsp;	 * Creates a turn in the start phase, the lobby one.
+<i>13</i>&nbsp;	 */
+<b class="fc"><i>14</i>&nbsp;	public Turn() {</b>
+<b class="fc"><i>15</i>&nbsp;		phase = Phase.LOBBY;</b>
+<b class="fc"><i>16</i>&nbsp;		gamePhase = GamePhase.BEFOREMOVE;</b>
+<b class="fc"><i>17</i>&nbsp;		godsPhase = GodsPhase.CHALLENGER_CHOICE;</b>
+<b class="fc"><i>18</i>&nbsp;	}</b>
+<i>19</i>&nbsp;	/**
+<i>20</i>&nbsp;	 * Creates a game with the given phase
+<i>21</i>&nbsp;	 * @param p a {@link it.polimi.ingsw.core.state.Phase}
+<i>22</i>&nbsp;	 * @param game a {@link it.polimi.ingsw.core.state.GamePhase}
+<i>23</i>&nbsp;	 * @param gods a {@link it.polimi.ingsw.core.state.GodsPhase}
+<i>24</i>&nbsp;	 */
+<b class="fc"><i>25</i>&nbsp;	private Turn(Phase p, GamePhase game, GodsPhase gods) {</b>
+<b class="fc"><i>26</i>&nbsp;		phase = p;</b>
+<b class="fc"><i>27</i>&nbsp;		gamePhase = game;</b>
+<b class="fc"><i>28</i>&nbsp;		godsPhase = gods;</b>
+<b class="fc"><i>29</i>&nbsp;	}</b>
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;	// modifiers
+<i>32</i>&nbsp;	/**
+<i>33</i>&nbsp;	 * It advanced the game to the next phase of the game
+<i>34</i>&nbsp;	 */
+<i>35</i>&nbsp;	public void advance() {
+<b class="fc"><i>36</i>&nbsp;		if (phase != Phase.PLAYERTURN) {</b>
+<b class="fc"><i>37</i>&nbsp;			if (phase != Phase.GODS) {</b>
+<b class="fc"><i>38</i>&nbsp;				phase = phase.advance(phase);</b>
+<i>39</i>&nbsp;			} else {
+<i>40</i>&nbsp;				try {
+<b class="fc"><i>41</i>&nbsp;					godsPhase = godsPhase.advance(godsPhase);</b>
+<b class="fc"><i>42</i>&nbsp;				} catch (IllegalStateException e) {</b>
+<b class="fc"><i>43</i>&nbsp;					phase = phase.advance(phase);</b>
+<b class="fc"><i>44</i>&nbsp;				}</b>
+<i>45</i>&nbsp;			}
+<i>46</i>&nbsp;		} else {
+<b class="fc"><i>47</i>&nbsp;			gamePhase = gamePhase.advance(gamePhase);</b>
+<i>48</i>&nbsp;		}
+<b class="fc"><i>49</i>&nbsp;	}</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;	// getters
+<i>52</i>&nbsp;	/**
+<i>53</i>&nbsp;	 * Gets the current {@link it.polimi.ingsw.core.state.Phase}
+<i>54</i>&nbsp;	 * @return current {@link it.polimi.ingsw.core.state.Phase}
+<i>55</i>&nbsp;	 */
+<i>56</i>&nbsp;	public Phase getPhase() {
+<b class="fc"><i>57</i>&nbsp;		return phase;</b>
+<i>58</i>&nbsp;	}
+<i>59</i>&nbsp;	/**
+<i>60</i>&nbsp;	 * Gets the current {@link it.polimi.ingsw.core.state.GamePhase}
+<i>61</i>&nbsp;	 * @return current {@link it.polimi.ingsw.core.state.GamePhase}
+<i>62</i>&nbsp;	 */
+<i>63</i>&nbsp;	public GamePhase getGamePhase() {
+<b class="fc"><i>64</i>&nbsp;		return gamePhase;</b>
+<i>65</i>&nbsp;	}
+<i>66</i>&nbsp;	/**
+<i>67</i>&nbsp;	 * Gets the current {@link it.polimi.ingsw.core.state.GodsPhase}
+<i>68</i>&nbsp;	 * @return current {@link it.polimi.ingsw.core.state.GodsPhase}
+<i>69</i>&nbsp;	 */
+<i>70</i>&nbsp;	public GodsPhase getGodsPhase() {
+<b class="fc"><i>71</i>&nbsp;		return godsPhase;</b>
+<i>72</i>&nbsp;	}
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;	// methods overriding
+<i>75</i>&nbsp;	@Override
+<i>76</i>&nbsp;	public boolean equals(Object obj) {
+<b class="nc"><i>77</i>&nbsp;		if (obj instanceof Turn) {</b>
+<b class="nc"><i>78</i>&nbsp;			Turn other = (Turn)obj;</b>
+<b class="nc"><i>79</i>&nbsp;			return phase == other.phase &amp;&amp; gamePhase == other.gamePhase &amp;&amp; godsPhase == other.godsPhase;</b>
+<i>80</i>&nbsp;		}
+<b class="nc"><i>81</i>&nbsp;		return false;</b>
+<i>82</i>&nbsp;	}
+<i>83</i>&nbsp;	@Override
+<i>84</i>&nbsp;	public Turn clone() {
+<b class="fc"><i>85</i>&nbsp;		return new Turn(phase,gamePhase,godsPhase);</b>
+<i>86</i>&nbsp;	}
+<i>87</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

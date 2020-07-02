@@ -1,0 +1,110 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NetObject</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.network.objects</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NetObject (it.polimi.ingsw.network.objects)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NetObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.network.objects;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// necessary imports from other packages of the project
+<i>4</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;// necessary imports of Java SE
+<i>7</i>&nbsp;import java.io.Serializable;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;/**
+<i>10</i>&nbsp; * This class is the base class for every message exchange between a Santorini server and a Santorini client for the video game version, it implements java {@code Serializable} interface and is used to send a generic information, in fact it only carries the information about the message sent and the current version of the game.
+<i>11</i>&nbsp; */
+<i>12</i>&nbsp;public class NetObject implements Serializable {
+<i>13</i>&nbsp;	public static final int serialUID = Constants.ACTUAL_VERSION;
+<i>14</i>&nbsp;	public final String message;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;	/**
+<i>17</i>&nbsp;	 * It creates a {@code NetObject} with the specified message in the parameter.
+<i>18</i>&nbsp;	 * @param msg is the message to be sent
+<i>19</i>&nbsp;	 * @throws NullPointerException if {@code msg} is null
+<i>20</i>&nbsp;	 */
+<b class="fc"><i>21</i>&nbsp;	public NetObject(String msg) throws NullPointerException {</b>
+<b class="fc"><i>22</i>&nbsp;		if (msg == null) {</b>
+<b class="nc"><i>23</i>&nbsp;			throw new NullPointerException();</b>
+<i>24</i>&nbsp;		}
+<b class="fc"><i>25</i>&nbsp;		message = msg;</b>
+<b class="fc"><i>26</i>&nbsp;	}</b>
+<i>27</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

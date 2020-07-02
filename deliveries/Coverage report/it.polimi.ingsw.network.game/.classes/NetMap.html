@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NetMap</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.network.game</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NetMap (it.polimi.ingsw.network.game)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NetMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.network.game;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// necessary imports from other packages of the project
+<i>4</i>&nbsp;import it.polimi.ingsw.core.Map;
+<i>5</i>&nbsp;import it.polimi.ingsw.core.Worker;
+<i>6</i>&nbsp;import it.polimi.ingsw.util.Constants;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;// necessary imports of Java SE
+<i>9</i>&nbsp;import java.io.Serializable;
+<i>10</i>&nbsp;import java.util.ArrayList;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;/**
+<i>14</i>&nbsp; * This is the network class that represent the server game map, it is a fully map with all the needed information using other network classes like {@link it.polimi.ingsw.network.game.NetCell} directly and indirectly through the previous cited: {@link it.polimi.ingsw.network.game.NetWorker}, {@link it.polimi.ingsw.network.game.NetBuilding}.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;public class NetMap implements Serializable {
+<i>17</i>&nbsp;	public final List&lt;List&lt;NetCell&gt;&gt; cells;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;	/**
+<i>20</i>&nbsp;	 * Creates a map from a {@link it.polimi.ingsw.core.Cell} copying it in the network version.
+<i>21</i>&nbsp;	 * @param map a {@link it.polimi.ingsw.core.Map}
+<i>22</i>&nbsp;	 */
+<b class="nc"><i>23</i>&nbsp;	public NetMap(Map map) {</b>
+<b class="nc"><i>24</i>&nbsp;		cells = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>25</i>&nbsp;		for (int x = 0; x &lt;= 4; x++) {</b>
+<b class="nc"><i>26</i>&nbsp;			cells.add(new ArrayList&lt;NetCell&gt;());</b>
+<b class="nc"><i>27</i>&nbsp;			for (int y = 0; y &lt;= 4; y++) {</b>
+<b class="nc"><i>28</i>&nbsp;				cells.get(x).add(new NetCell(map.getCell(x,y)));</b>
+<i>29</i>&nbsp;			}
+<i>30</i>&nbsp;		}
+<i>31</i>&nbsp;	}
+<i>32</i>&nbsp;	/**
+<i>33</i>&nbsp;	 * Modifies a network map changing a cell on it, without modifying other values.
+<i>34</i>&nbsp;	 * @param netMap the network map to modify
+<i>35</i>&nbsp;	 * @param cell cell to insert
+<i>36</i>&nbsp;	 * @param x x coordinate
+<i>37</i>&nbsp;	 * @param y y coordinate
+<i>38</i>&nbsp;	 */
+<b class="nc"><i>39</i>&nbsp;	private NetMap(NetMap netMap, NetCell cell, int x, int y) {</b>
+<b class="nc"><i>40</i>&nbsp;		cells = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>41</i>&nbsp;		for (int i = 0; i &lt;= 4; i++) {</b>
+<b class="nc"><i>42</i>&nbsp;			cells.add(new ArrayList&lt;NetCell&gt;());</b>
+<b class="nc"><i>43</i>&nbsp;			for (int j = 0; j &lt;= 4; j++) {</b>
+<b class="nc"><i>44</i>&nbsp;				if (i != x || j != y) {</b>
+<b class="nc"><i>45</i>&nbsp;					cells.get(i).add(new NetCell(netMap.getCell(i,j)));</b>
+<i>46</i>&nbsp;				} else {
+<b class="nc"><i>47</i>&nbsp;					cells.get(i).add(cell);</b>
+<i>48</i>&nbsp;				}
+<i>49</i>&nbsp;			}
+<i>50</i>&nbsp;		}
+<i>51</i>&nbsp;	}
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;	/* **********************************************
+<i>54</i>&nbsp;	 *												*
+<i>55</i>&nbsp;	 *		MODIFIERS FOR USER IMMUTABLE OBJECT		*
+<i>56</i>&nbsp;	 * 												*
+<i>57</i>&nbsp;	 ************************************************/
+<i>58</i>&nbsp;	/**
+<i>59</i>&nbsp;	 * Changes the current map changin a cell in the specified cartesian coordinates.
+<i>60</i>&nbsp;	 * @param newCell the new cell to insert in the map
+<i>61</i>&nbsp;	 * @param x x coordinate
+<i>62</i>&nbsp;	 * @param y y coordinate
+<i>63</i>&nbsp;	 * @return the new modified map
+<i>64</i>&nbsp;	 */
+<i>65</i>&nbsp;	public NetMap changeCell(NetCell newCell, int x, int y) {
+<b class="nc"><i>66</i>&nbsp;		return new NetMap(this,newCell,x,y);</b>
+<i>67</i>&nbsp;	}
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;	/* **********************************************
+<i>70</i>&nbsp;	 *												*
+<i>71</i>&nbsp;	 * GETTERS AND METHODS WHICH DON&#39;T CHANGE STATE	*
+<i>72</i>&nbsp;	 * 												*
+<i>73</i>&nbsp;	 ************************************************/
+<i>74</i>&nbsp;	/**
+<i>75</i>&nbsp;	 * It gets a cell of the current map given some cartesian coordinates.
+<i>76</i>&nbsp;	 * @param x x coordinate
+<i>77</i>&nbsp;	 * @param y y coordinate
+<i>78</i>&nbsp;	 * @return the {@link it.polimi.ingsw.network.game.NetCell} at the given coordinates
+<i>79</i>&nbsp;	 * @throws IllegalArgumentException if the coordinates aren&#39;t inside the map
+<i>80</i>&nbsp;	 */
+<i>81</i>&nbsp;	public NetCell getCell(int x, int y) throws IllegalArgumentException {
+<b class="nc"><i>82</i>&nbsp;		if (x &lt; 0 || y &lt; 0 || x &gt;= Constants.MAP_SIDE || y &gt;= Constants.MAP_SIDE) {</b>
+<b class="nc"><i>83</i>&nbsp;			throw new IllegalArgumentException();</b>
+<i>84</i>&nbsp;		}
+<b class="nc"><i>85</i>&nbsp;		return cells.get(x).get(y);</b>
+<i>86</i>&nbsp;	}
+<i>87</i>&nbsp;	/**
+<i>88</i>&nbsp;	 * Gets the x cartesian coordinate of a given cell of the map.
+<i>89</i>&nbsp;	 * @param c is the cell to search for
+<i>90</i>&nbsp;	 * @return an integer representing its x coordinate
+<i>91</i>&nbsp;	 * @throws IllegalArgumentException if the {@link it.polimi.ingsw.network.game.NetCell} doesn&#39;t exists
+<i>92</i>&nbsp;	 */
+<i>93</i>&nbsp;	public int getX(NetCell c) throws IllegalArgumentException {
+<b class="nc"><i>94</i>&nbsp;		for (int i = 0; i &lt; Constants.MAP_SIDE; i++) {</b>
+<b class="nc"><i>95</i>&nbsp;			for (int j = 0; j &lt; Constants.MAP_SIDE; j++) {</b>
+<b class="nc"><i>96</i>&nbsp;				if (c == cells.get(i).get(j)) {</b>
+<b class="nc"><i>97</i>&nbsp;					return i;</b>
+<i>98</i>&nbsp;				}
+<i>99</i>&nbsp;			}
+<i>100</i>&nbsp;		}
+<b class="nc"><i>101</i>&nbsp;		throw new IllegalArgumentException();</b>
+<i>102</i>&nbsp;	}
+<i>103</i>&nbsp;	/**
+<i>104</i>&nbsp;	 * Gets the y cartesian coordinate of a given cell of the map.
+<i>105</i>&nbsp;	 * @param c is the cell to search for
+<i>106</i>&nbsp;	 * @return an integer representing its y coordinate
+<i>107</i>&nbsp;	 * @throws IllegalArgumentException if the {@link it.polimi.ingsw.network.game.NetCell} doesn&#39;t exists
+<i>108</i>&nbsp;	 */
+<i>109</i>&nbsp;	public int getY(NetCell c) throws IllegalArgumentException  {
+<b class="nc"><i>110</i>&nbsp;		for (int i = 0; i &lt; Constants.MAP_SIDE; i++) {</b>
+<b class="nc"><i>111</i>&nbsp;			for (int j = 0; j &lt; Constants.MAP_SIDE; j++) {</b>
+<b class="nc"><i>112</i>&nbsp;				if (c == cells.get(i).get(j)) {</b>
+<b class="nc"><i>113</i>&nbsp;					return j;</b>
+<i>114</i>&nbsp;				}
+<i>115</i>&nbsp;			}
+<i>116</i>&nbsp;		}
+<b class="nc"><i>117</i>&nbsp;		throw new IllegalArgumentException();</b>
+<i>118</i>&nbsp;	}
+<i>119</i>&nbsp;	/**
+<i>120</i>&nbsp;	 * Checks if the given cell is inside the current map.
+<i>121</i>&nbsp;	 * @param cell a {@link it.polimi.ingsw.network.game.NetCell}
+<i>122</i>&nbsp;	 * @return true if the cell is contained, false instead
+<i>123</i>&nbsp;	 */
+<i>124</i>&nbsp;	public boolean contains(NetCell cell) {
+<b class="nc"><i>125</i>&nbsp;		for (int x = 0; x &lt; cells.size(); x++) {</b>
+<b class="nc"><i>126</i>&nbsp;			if (cells.get(x).contains(cell)) {</b>
+<b class="nc"><i>127</i>&nbsp;				return true;</b>
+<i>128</i>&nbsp;			}
+<i>129</i>&nbsp;		}
+<b class="nc"><i>130</i>&nbsp;		return false;</b>
+<i>131</i>&nbsp;	}
+<i>132</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ClientGUIApp</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ClientGUIApp (it.polimi.ingsw)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClientGUIApp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;// necessary imports from other packages of the project
+<i>4</i>&nbsp;import it.polimi.ingsw.network.ClientMessageListener;
+<i>5</i>&nbsp;import it.polimi.ingsw.ui.gui.controller.MainGuiController;
+<i>6</i>&nbsp;import javafx.application.Application;
+<i>7</i>&nbsp;import javafx.application.Platform;
+<i>8</i>&nbsp;import javafx.fxml.FXMLLoader;
+<i>9</i>&nbsp;import javafx.scene.Parent;
+<i>10</i>&nbsp;import javafx.scene.Scene;
+<i>11</i>&nbsp;import javafx.scene.image.Image;
+<i>12</i>&nbsp;import javafx.stage.Stage;
+<i>13</i>&nbsp;import jdk.dynalink.linker.GuardedInvocationTransformer;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; * This class is the base App class for GUI clients, it starts the GUI client, the client lives until the player doesn&#39;t close the game.
+<i>17</i>&nbsp; */
+<b class="nc"><i>18</i>&nbsp;public class ClientGUIApp extends Application {</b>
+<i>19</i>&nbsp;	public static void main(String[] args) {
+<i>20</i>&nbsp;		ClientMessageListener listener;
+<i>21</i>&nbsp;		MainGuiController guiController;
+<i>22</i>&nbsp;
+<b class="nc"><i>23</i>&nbsp;		guiController = MainGuiController.getInstance();</b>
+<b class="nc"><i>24</i>&nbsp;		listener = new ClientMessageListener(guiController);</b>
+<b class="nc"><i>25</i>&nbsp;		guiController.setListener(listener);</b>
+<b class="nc"><i>26</i>&nbsp;		listener.start();</b>
+<b class="nc"><i>27</i>&nbsp;		launch(args);</b>
+<i>28</i>&nbsp;	}
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;	@Override
+<i>31</i>&nbsp;	public void start(Stage stage) throws Exception {
+<b class="nc"><i>32</i>&nbsp;		Parent root = FXMLLoader.load(getClass().getResource(&quot;/fxml/menu.fxml&quot;)); //in this moment, I&#39;m using this as a scene tester</b>
+<b class="nc"><i>33</i>&nbsp;		Scene menu = new Scene(root);</b>
+<b class="nc"><i>34</i>&nbsp;		stage.setScene(menu);</b>
+<b class="nc"><i>35</i>&nbsp;		stage.setTitle(&quot;Santorini&quot;);</b>
+<b class="nc"><i>36</i>&nbsp;		stage.getIcons().add(new Image(&quot;/img/icon_logo.png&quot;));</b>
+<b class="nc"><i>37</i>&nbsp;		stage.setResizable(false);</b>
+<b class="nc"><i>38</i>&nbsp;		stage.show();</b>
+<b class="nc"><i>39</i>&nbsp;		stage.setOnCloseRequest(windowEvent -&gt; {</b>
+<b class="nc"><i>40</i>&nbsp;			Platform.exit();</b>
+<i>41</i>&nbsp;
+<b class="nc"><i>42</i>&nbsp;			if (MainGuiController.getInstance().getGameState().getPlayer() != null) {</b>
+<b class="nc"><i>43</i>&nbsp;				MainGuiController.getInstance().closeDisconnect();</b>
+<i>44</i>&nbsp;			}
+<b class="nc"><i>45</i>&nbsp;			MainGuiController.getInstance().getListener().setActive(false);</b>
+<i>46</i>&nbsp;
+<b class="nc"><i>47</i>&nbsp;			System.exit(0);</b>
+<i>48</i>&nbsp;		});
+<i>49</i>&nbsp;	}
+<i>50</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:20</div>
+</div>
+</body>
+</html>
