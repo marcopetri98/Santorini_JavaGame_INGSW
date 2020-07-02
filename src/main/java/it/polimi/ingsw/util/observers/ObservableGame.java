@@ -38,6 +38,25 @@ public class ObservableGame extends ObservableObject {
 		}
 	}
 	/**
+	 * Remove {@code obs} to the list of the observers for this object.
+	 * @param obs is the observer
+	 * @throws IllegalArgumentException if the {@code obs} parameter is null or isn't an observer of this object
+	 */
+	public void removeObserver(ObserverRemoteView obs) throws IllegalArgumentException {
+		if (!rvObs.contains(obs) || obs == null) {
+			throw new IllegalArgumentException();
+		}
+		super.removeObserver(obs);
+		rvObs.remove(obs);
+	}
+	/**
+	 * Remove all observers for this object.
+	 */
+	@Override
+	public void removeAllObservers() {
+		super.removeAllObservers();
+	}
+	/**
 	 * It notifies all the {@link it.polimi.ingsw.util.observers.ObserverRemoteView} observers that the gaming order changed.
 	 * @param order is an array containing the names of the players in gaming order
 	 * @throws NullPointerException it order is null

@@ -305,6 +305,7 @@ public class MapSceneController implements SceneController {
 	private boolean hasMoved = false;
 	private boolean transitioningFromSetupToPlay = false;
 	private boolean hasBuilt = false;
+	private boolean isObserving = false;
 	private NetMove performedMove = null;
 	private NetBuild performedBuild = null;
 
@@ -816,6 +817,10 @@ public class MapSceneController implements SceneController {
 	public void mouseReleasedExit2(MouseEvent mouseEvent) throws IOException {
 		button_exit2.setImage(buttonExit);
 
+		if (isObserving) {
+			NetGaming netSetup = new NetGaming(Constants.GENERAL_DISCONNECT);
+			MainGuiController.getInstance().sendMessage(netSetup);
+		}
 		previousFXML = FXMLLoader.load(getClass().getResource("/fxml/menu.fxml"));
 		previousScene = new Scene(previousFXML);
 		MainGuiController.getInstance().refresh();
@@ -2071,6 +2076,9 @@ public class MapSceneController implements SceneController {
 			}
 			case Constants.GENERAL_DEFEATED -> {
 				NetGaming netGaming = (NetGaming) message;
+				if (gameState.getPlayer().equals(netGaming.player) && gameState.getPlayers().size() == 3) {
+					isObserving = true;
+				}
 				gameState.removePlayer(netGaming.player);
 				playerLost(netGaming.player);
 			}

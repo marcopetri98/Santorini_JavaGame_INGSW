@@ -129,7 +129,7 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 	 * A player that is an observer has sent a request to quit the game, the request is forwarded to the controller.
 	 */
 	public void handleObserverQuit() {
-		if (clientHandler.getGamePhase() != NetworkPhase.OBSERVER) {
+		if (clientHandler.getGamePhase() == NetworkPhase.OBSERVER) {
 			notifyObserverQuit();
 			removeAllObservers();
 		} else {
@@ -179,7 +179,6 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 			NetGaming yourMessage = new NetGaming(Constants.GENERAL_WINNER, playerWinner);
 			clientHandler.sendMessage(yourMessage);
 			clientHandler.closeSocketAndTerminate();
-			observed.removeObserver(this);
 		}
 	}
 	/**
@@ -433,7 +432,9 @@ public class RemoteView extends ObservableRemoteView implements ObserverRemoteVi
 					if (clientHandler.getPlayerName().equals(playerName)) {
 						clientHandler.setGamePhase(NetworkPhase.PLAYERTURN);
 					} else {
-						clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
+						if (clientHandler.getGamePhase() != NetworkPhase.OBSERVER) {
+							clientHandler.setGamePhase(NetworkPhase.OTHERTURN);
+						}
 					}
 					NetGaming othersEndTurn = new NetGaming(Constants.TURN_PLAYERTURN, playerName);
 					clientHandler.sendMessage(othersEndTurn);

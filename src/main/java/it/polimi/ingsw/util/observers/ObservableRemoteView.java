@@ -33,6 +33,18 @@ public class ObservableRemoteView extends ObservableObject {
 		}
 	}
 	/**
+	 * Remove {@code obs} to the list of the observers for this object.
+	 * @param obs is the observer
+	 * @throws IllegalArgumentException if the {@code obs} parameter is null or isn't an observer of this object
+	 */
+	public void removeObserver(ObserverController obs) throws IllegalArgumentException {
+		if (obs == null || !obs.equals(ctrObs)) {
+			throw new IllegalArgumentException();
+		}
+		super.removeObserver(obs);
+		ctrObs = null;
+	}
+	/**
 	 * Remove all observers for this object.
 	 */
 	@Override

@@ -136,6 +136,8 @@ public class Server implements Runnable {
 	public void isNowPrepared(ServerClientListenerThread handler) throws IllegalCallerException, IllegalStateException {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
+				// someone accessed illegally the server, a refresh is needed
+				resetStatus();
 				throw new IllegalCallerException();
 			}
 		}
@@ -200,6 +202,8 @@ public class Server implements Runnable {
 	public void setPlayerNumber(int dimension, ServerClientListenerThread handler) throws IllegalCallerException, IllegalArgumentException, IllegalStateException {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler) || creator != handler) {
+				// someone accessed illegally the server, a refresh is needed
+				resetStatus();
 				throw new IllegalCallerException();
 			} else if (lobbyDimension == 2 || lobbyDimension == 3) {
 				throw new IllegalStateException();
@@ -226,6 +230,8 @@ public class Server implements Runnable {
 	public int getClientPosition(ServerClientListenerThread handler) throws IllegalCallerException {
 		synchronized (lobbyClients) {
 			if (!lobbyClients.containsKey(handler)) {
+				// someone accessed illegally the server, a refresh is needed
+				resetStatus();
 				throw new IllegalCallerException();
 			}
 			return new ArrayList<>(lobbyClients.keySet()).indexOf(handler);
@@ -248,6 +254,20 @@ public class Server implements Runnable {
 	public int getLobbyDimension() {
 		synchronized (lobbyClients) {
 			return lobbyDimension;
+		}
+	}
+	/**
+	 * Reset server status due to a forbidden access to server methods
+	 */
+	private void resetStatus() {
+		synchronized (lobbyClients) {
+			lobbyDimension = -1;
+			creator = null;
+			preparedListeners.clear();
+			for (ServerClientListenerThread handler : lobbyClients.keySet()) {
+				handler.closeSocketAndTerminate();
+			}
+			lobbyClients.clear();
 		}
 	}
 	/**
