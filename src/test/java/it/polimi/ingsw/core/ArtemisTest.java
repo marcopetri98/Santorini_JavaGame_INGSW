@@ -102,7 +102,7 @@ public class ArtemisTest {
 	}
 
 	/**
-	 * Worker1 in (1,1) (level 2) and Worker2 in (1,2), opponent worker1 in (2,2) (level 3) and worker2 in (2,1) (level 1), building with dome in (2,0), building level 3 in (1,0), building level 1 in (0,0), dome only in (0,1): it should return only 6 cells ( (i,j) & (s,t) ) which I compare "manually" with the returned arrayList of the checkMove
+	 * Worker1 in (1,1) (level 2) and Worker2 in (1,2), opponent worker1 in (2,2) (level 3) and worker2 in (2,1) (level 1), building with dome in (2,0), building level 3 in (1,0), building level 1 in (0,0), dome only in (0,1): it should return only 5 cells ( (i,j) & (s,t) ) which I compare "manually" with the returned arrayList of the checkMove
 	 */
 	@Test
 	public void checkMoveTestGeneral() throws NoMoveException {
@@ -135,7 +135,7 @@ public class ArtemisTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(6, artemis.checkMove(map, player.getWorker1(), turn).size());
+		assertEquals(5, artemis.checkMove(map, player.getWorker1(), turn).size());
 
 		i=1; j=0; s=0; t=0;
 		Move newMove = new Move(TypeMove.SIMPLE_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());

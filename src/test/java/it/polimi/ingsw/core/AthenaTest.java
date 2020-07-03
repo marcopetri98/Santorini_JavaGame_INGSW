@@ -39,10 +39,7 @@ public class AthenaTest {
 	}
 
 	/**
-	 * Worker1 in (1,1) (level 2) and Worker2 in (1,2), opponent worker1 in (2,2) (level 3) and worker2 in (2,1) (level 1), building with dome in (2,0), building level 3 in (1,0), building level 1 in (0,0), dome only in (0,1): it should return only 3 cells which I compare "manually" with the returned arrayList of the checkMove.
-	 * The cells returned are the cells where the level is >1, without checking if there is a worker or a dome, because it's useless.
-	 * Return cells only if the boolean flag wentUp is true (it means my worker moved up in the last turn)
-	 * the opponent worker won't move to these cells returned.
+	 * Worker1 in (1,1) (level 2) and Worker2 in (1,2), opponent worker1 in (2,2) (level 3) and worker2 in (2,1) (level 1), building with dome in (2,0), building level 3 in (1,0), building level 1 in (0,0), dome only in (0,1): it should return only 9 cells which I compare "manually" with the returned arrayList of the checkMove.
 	 */
 	@Test
 	public void checkMoveTestGeneral() throws NoMoveException {
@@ -75,19 +72,64 @@ public class AthenaTest {
 
 		map.getCell(0,1).getBuilding().setDome(); //dome only: due to Atlas (hypothetically)
 
-		assertEquals(3, athena.checkMove(map, player.getWorker1(), turn).size());
+		assertEquals(9, athena.checkMove(map, player.getWorker1(), turn).size());
 
 		i=1; j=0;
 		Move newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
 		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
 
 		i=2; j=0;
-		Move newMove4 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove4));
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
 
 		i=2; j=2;
-		Move newMove5 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
-		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove5));
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		// new
+		i=0; j=0;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertFalse(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=0; j=2;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertFalse(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=0; j=3;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertFalse(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=1; j=3;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertFalse(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=1; j=2;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertFalse(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=2; j=1;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertFalse(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=2; j=3;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=3; j=0;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=3; j=1;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=3; j=2;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
+
+		i=3; j=3;
+		newMove3 = new Move(TypeMove.FORBIDDEN_MOVE, map.getCell(x, y), map.getCell(i, j), player.getWorker1());
+		assertTrue(athena.checkMove(map, player.getWorker1(), turn).contains(newMove3));
 
 	}
 }

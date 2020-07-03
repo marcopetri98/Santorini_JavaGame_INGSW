@@ -58,10 +58,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89.4%
+    90%
   </span>
   <span class="absValue">
-    (42/ 47)
+    (45/ 50)
   </span>
 </td>
 </tr>
@@ -184,66 +184,71 @@
 <b class="fc"><i>110</i>&nbsp;								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome</b>
 <b class="fc"><i>111</i>&nbsp;									if(m.getCell(x1, y1).getWorker() == null){   //Check there is no worker [of ANY player] on cell</b>
 <i>112</i>&nbsp;										//Demando tutto il check dell&#39;ulteriore cella e l&#39;aggiunta di tutte le celle a un altro metodo addCell
-<b class="fc"><i>113</i>&nbsp;										addCell(m, w, x1, y1, x, y, moves);</b>
-<i>114</i>&nbsp;									}
-<i>115</i>&nbsp;								}
-<i>116</i>&nbsp;							}
-<i>117</i>&nbsp;						}
-<i>118</i>&nbsp;					}
-<i>119</i>&nbsp;				}
-<i>120</i>&nbsp;			}
-<i>121</i>&nbsp;		}
-<i>122</i>&nbsp;
-<b class="fc"><i>123</i>&nbsp;		return moves;</b>
-<i>124</i>&nbsp;	}
-<i>125</i>&nbsp;
-<i>126</i>&nbsp;	/**
-<i>127</i>&nbsp;	 * This method adds the other cells of the Artemis power to the list moves
-<i>128</i>&nbsp;	 * @param m represents the map
-<i>129</i>&nbsp;	 * @param w represents the worker moved by the player during this turn
-<i>130</i>&nbsp;	 * @param x1 represent x the coordinate of the cell where the player may move
-<i>131</i>&nbsp;	 * @param y1 represent y the coordinate of the cell where the player may move
-<i>132</i>&nbsp;	 * @param x represent x the coordinate of the cell where the worker is
-<i>133</i>&nbsp;	 * @param y represent y the coordinate of the cell where the worker is
-<i>134</i>&nbsp;	 * @param moves the list of the moves found before the addCell is called
-<i>135</i>&nbsp;	 */
-<i>136</i>&nbsp;	private void addCell(Map m, Worker w, int x1, int y1, int x, int y, List&lt;Move&gt; moves) {
-<i>137</i>&nbsp;
-<b class="fc"><i>138</i>&nbsp;		moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));    //Adds default move: Artemis can indeed move without using her power</b>
-<i>139</i>&nbsp;
-<b class="fc"><i>140</i>&nbsp;		for (int i = -1; i &lt;= 1; i++) {</b>
-<b class="fc"><i>141</i>&nbsp;			int x2 = x1 + i;</b>
-<b class="fc"><i>142</i>&nbsp;			for (int j = -1; j &lt;= 1; j++) {</b>
-<b class="fc"><i>143</i>&nbsp;				int y2 = y1 + j;</b>
+<b class="fc"><i>113</i>&nbsp;										if (m.getCell(x1, y1).getBuilding().getLevel() != 3) {</b>
+<b class="fc"><i>114</i>&nbsp;											addCell(m, w, x1, y1, x, y, moves);</b>
+<i>115</i>&nbsp;										} else {
+<b class="fc"><i>116</i>&nbsp;											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w);</b>
+<b class="fc"><i>117</i>&nbsp;											moves.add(firstMove);</b>
+<i>118</i>&nbsp;										}
+<i>119</i>&nbsp;									}
+<i>120</i>&nbsp;								}
+<i>121</i>&nbsp;							}
+<i>122</i>&nbsp;						}
+<i>123</i>&nbsp;					}
+<i>124</i>&nbsp;				}
+<i>125</i>&nbsp;			}
+<i>126</i>&nbsp;		}
+<i>127</i>&nbsp;
+<b class="fc"><i>128</i>&nbsp;		return moves;</b>
+<i>129</i>&nbsp;	}
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;	/**
+<i>132</i>&nbsp;	 * This method adds the other cells of the Artemis power to the list moves
+<i>133</i>&nbsp;	 * @param m represents the map
+<i>134</i>&nbsp;	 * @param w represents the worker moved by the player during this turn
+<i>135</i>&nbsp;	 * @param x1 represent x the coordinate of the cell where the player may move
+<i>136</i>&nbsp;	 * @param y1 represent y the coordinate of the cell where the player may move
+<i>137</i>&nbsp;	 * @param x represent x the coordinate of the cell where the worker is
+<i>138</i>&nbsp;	 * @param y represent y the coordinate of the cell where the worker is
+<i>139</i>&nbsp;	 * @param moves the list of the moves found before the addCell is called
+<i>140</i>&nbsp;	 */
+<i>141</i>&nbsp;	private void addCell(Map m, Worker w, int x1, int y1, int x, int y, List&lt;Move&gt; moves) {
+<i>142</i>&nbsp;
+<b class="fc"><i>143</i>&nbsp;		moves.add(new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w));    //Adds default move: Artemis can indeed move without using her power</b>
 <i>144</i>&nbsp;
-<b class="fc"><i>145</i>&nbsp;				if (x2 != x1 || y2 != y1) { //I shall not move where I am already</b>
-<b class="fc"><i>146</i>&nbsp;					if (x2 != x || y2 != y) {    //I shall not move where I was at the beginning</b>
-<i>147</i>&nbsp;
-<b class="fc"><i>148</i>&nbsp;						if (0 &lt;= x2 &amp;&amp; x2 &lt;= 4 &amp;&amp; 0 &lt;= y2 &amp;&amp; y2 &lt;= 4) {    //Check I am inside the boundaries of the map</b>
-<b class="fc"><i>149</i>&nbsp;							if (-1 &lt;= (x2 - x1) &amp;&amp; (x2 - x1) &lt;= 1 &amp;&amp; -1 &lt;= (y2 - y1) &amp;&amp; (y2 - y1) &lt;= 1) {  //Check that distance from original is cell &lt;= 1: useless?</b>
-<b class="fc"><i>150</i>&nbsp;								if (m.getCell(x2, y2).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() &lt;= 1) { //Check height difference</b>
-<b class="fc"><i>151</i>&nbsp;									if (!m.getCell(x2, y2).getBuilding().getDome()) {   //Check there is NO dome</b>
-<b class="fc"><i>152</i>&nbsp;										if (m.getCell(x2, y2).getWorker() == null) {   //Check there is no worker on cell</b>
-<i>153</i>&nbsp;											//Adds a move with another linked move
-<b class="fc"><i>154</i>&nbsp;											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x2, y2), w);</b>
-<b class="fc"><i>155</i>&nbsp;											moves.add(firstMove);</b>
-<i>156</i>&nbsp;										}
-<i>157</i>&nbsp;									}
-<i>158</i>&nbsp;								}
-<i>159</i>&nbsp;							}
-<i>160</i>&nbsp;						}
-<i>161</i>&nbsp;					}
-<i>162</i>&nbsp;				}
-<i>163</i>&nbsp;			}
-<i>164</i>&nbsp;		}
-<b class="fc"><i>165</i>&nbsp;	}</b>
-<i>166</i>&nbsp;}
+<b class="fc"><i>145</i>&nbsp;		for (int i = -1; i &lt;= 1; i++) {</b>
+<b class="fc"><i>146</i>&nbsp;			int x2 = x1 + i;</b>
+<b class="fc"><i>147</i>&nbsp;			for (int j = -1; j &lt;= 1; j++) {</b>
+<b class="fc"><i>148</i>&nbsp;				int y2 = y1 + j;</b>
+<i>149</i>&nbsp;
+<b class="fc"><i>150</i>&nbsp;				if (x2 != x1 || y2 != y1) { //I shall not move where I am already</b>
+<b class="fc"><i>151</i>&nbsp;					if (x2 != x || y2 != y) {    //I shall not move where I was at the beginning</b>
+<i>152</i>&nbsp;
+<b class="fc"><i>153</i>&nbsp;						if (0 &lt;= x2 &amp;&amp; x2 &lt;= 4 &amp;&amp; 0 &lt;= y2 &amp;&amp; y2 &lt;= 4) {    //Check I am inside the boundaries of the map</b>
+<b class="fc"><i>154</i>&nbsp;							if (-1 &lt;= (x2 - x1) &amp;&amp; (x2 - x1) &lt;= 1 &amp;&amp; -1 &lt;= (y2 - y1) &amp;&amp; (y2 - y1) &lt;= 1) {  //Check that distance from original is cell &lt;= 1: useless?</b>
+<b class="fc"><i>155</i>&nbsp;								if (m.getCell(x2, y2).getBuilding().getLevel() - m.getCell(x1, y1).getBuilding().getLevel() &lt;= 1) { //Check height difference</b>
+<b class="fc"><i>156</i>&nbsp;									if (!m.getCell(x2, y2).getBuilding().getDome()) {   //Check there is NO dome</b>
+<b class="fc"><i>157</i>&nbsp;										if (m.getCell(x2, y2).getWorker() == null) {   //Check there is no worker on cell</b>
+<i>158</i>&nbsp;											//Adds a move with another linked move
+<b class="fc"><i>159</i>&nbsp;											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x2, y2), w);</b>
+<b class="fc"><i>160</i>&nbsp;											moves.add(firstMove);</b>
+<i>161</i>&nbsp;										}
+<i>162</i>&nbsp;									}
+<i>163</i>&nbsp;								}
+<i>164</i>&nbsp;							}
+<i>165</i>&nbsp;						}
+<i>166</i>&nbsp;					}
+<i>167</i>&nbsp;				}
+<i>168</i>&nbsp;			}
+<i>169</i>&nbsp;		}
+<b class="fc"><i>170</i>&nbsp;	}</b>
+<i>171</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2020-07-03 01:29</div>
+    <div style="float:right;">generated on 2020-07-03 03:57</div>
 </div>
 </body>
 </html>

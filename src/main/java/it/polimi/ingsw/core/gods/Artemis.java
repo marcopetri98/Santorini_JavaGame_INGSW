@@ -110,7 +110,12 @@ public class Artemis extends GodCard {
 								if(!m.getCell(x1, y1).getBuilding().getDome()){   //Check there is NO dome
 									if(m.getCell(x1, y1).getWorker() == null){   //Check there is no worker [of ANY player] on cell
 										//Demando tutto il check dell'ulteriore cella e l'aggiunta di tutte le celle a un altro metodo addCell
-										addCell(m, w, x1, y1, x, y, moves);
+										if (m.getCell(x1, y1).getBuilding().getLevel() != 3) {
+											addCell(m, w, x1, y1, x, y, moves);
+										} else {
+											Move firstMove = new Move(TypeMove.SIMPLE_MOVE, m.getCell(x, y), m.getCell(x1, y1), w);
+											moves.add(firstMove);
+										}
 									}
 								}
 							}
