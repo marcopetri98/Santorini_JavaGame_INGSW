@@ -1,5 +1,36 @@
-# Prova Finale di Ingegneria del Software - a.a. 2019-2020
+# Santorini board game (ING-SW Prova Finale 2019-2020)
 Project's aim is to develop an online distributed version of the table game Santorini from Cranio Creations, the software is developed using the Distributed MVC pattern with java programming language. We developed the "Complete Rules + CLI + GUI + Socket + 2 AF" implementation.
+
+### Images of the game
+The client application can be launched either via CLI or GUI. This is what the user sees as he/she launches the game.
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Home.png)
+
+Once the player starts a game on a server, and there are enough players on the server to start a match. Players will first choose a colors, and one player will be randomly chosen to select gods for the match. This is what the user sees:
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Choose_god.png)
+
+Then, all players will have to choose their god and the match will start. The first thing in the game will be to position the warriors. Here is what the first user will see:
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Preparation.png)
+
+After the prepration, the players will play in turns. The first thing the player have to do is to move. Here is the interface when the player has select a warrior that can move:
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Move.png)
+
+Before the turn ends, this is the interface the user will see (he can undo the movement in 5 seconds):
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Moved_with_undo_counter.png)
+
+Once the player has moved, he/she can build with a similar interface to that of moving: cells in which the user can build will be yellow. Here is the graphics after the player has built something:
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Build_with_undo_counter.png)
+
+Once the player's turn is ended, he needs to wait others turn. Here is the interface (on the left is highlighted the active player and its god):
+
+![alt text](https://github.com/marcoPetriPolimi/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Others_turn.png)
+
+## Project description requirements
 
 ### Software requirements
 The first thing to do to install Santorini software is to install java 14 version, it is downloadable from oracle website (https://www.oracle.com/java/technologies/javase-jdk14-downloads.html), no other software is needed to run the application.
