@@ -4,31 +4,31 @@ Project's aim is to develop an online distributed version of the table game Sant
 ### Images of the game
 The client application can be launched either via CLI or GUI. This is what the user sees as he/she launches the game.
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Home.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Home.png)
 
 Once the player starts a game on a server, and there are enough players on the server to start a match. Players will first choose a colors, and one player will be randomly chosen to select gods for the match. This is what the user sees:
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Choose_god.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Choose_god.png)
 
 Then, all players will have to choose their god and the match will start. The first thing in the game will be to position the warriors. Here is what the first user will see:
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Preparation.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Preparation.png)
 
 After the prepration, the players will play in turns. The first thing the player have to do is to move. Here is the interface when the player has select a warrior that can move:
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Move.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Move.png)
 
 Before the turn ends, this is the interface the user will see (he can undo the movement in 5 seconds):
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Moved_with_undo_counter.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Moved_with_undo_counter.png)
 
 Once the player has moved, he/she can build with a similar interface to that of moving: cells in which the user can build will be yellow. Here is the graphics after the player has built something:
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Build_with_undo_counter.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Build_with_undo_counter.png)
 
 Once the player's turn is ended, he needs to wait others turn. Here is the interface (on the left is highlighted the active player and its god):
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/images/Others_turn.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Others_turn.png)
 
 ## Project description requirements
 
@@ -38,8 +38,8 @@ The project uses maven to deploy, build and test with JUnit, this is the reason 
 
 ### Documentation
 Documentation for this software comes with this file readme and two different UML file that can be found in the following unordered list, one of this UML files is a general representation about the program's structure and the other is the definitive UML containing every element of the application (some arrows as well some trivial methods have been excluded in order to maintain a cleaner view).
-- [General UML](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/UML/UML_Generic.pdf)
-- [Detailed UML](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/UML/UML_Final.pdf)
+- [General UML](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/UML/UML_Generic.pdf)
+- [Detailed UML](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/UML/UML_Final.pdf)
 #### Compiling the application using maven
 This software has been developed with Maven. In order to deploy the application, both Maven and openJFX are needed. To compile the application open a terminal in the project directory and run this command:
 ```
@@ -80,7 +80,7 @@ We developed the following functionalities:
 ### Tests
 Here are the results obtained from the tests that have been done on our project using JUnit. It should be noticed that some god classes are tested with less than 90% of coverage because of the presence of many trivial untested getter and setter methods. The important methods present a minimum of 98% coverage.
 
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/Tests/tests_1.PNG)
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/Tests/tests_2.PNG)
-![alt text](https://github.com/marcopetri98/ing-sw-2020-petri-piccirillo-restifo/blob/master/deliveries/Tests/tests_3.PNG)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/Tests/tests_1.PNG)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/Tests/tests_2.PNG)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/Tests/tests_3.PNG)
 
