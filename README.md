@@ -4,31 +4,31 @@ Project's aim is to develop an online distributed version of the table game Sant
 ### Images of the game
 The client application can be launched either via CLI or GUI. This is what the user sees as he/she launches the game.
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Home.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Home.png)
 
 Once the player starts a game on a server, and there are enough players on the server to start a match. Players will first choose a colors, and one player will be randomly chosen to select gods for the match. This is what the user sees:
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Choose_god.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Choose_god.png)
 
 Then, all players will have to choose their god and the match will start. The first thing in the game will be to position the warriors. Here is what the first user will see:
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Preparation.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Preparation.png)
 
 After the prepration, the players will play in turns. The first thing the player have to do is to move. Here is the interface when the player has select a warrior that can move:
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Move.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Move.png)
 
 Before the turn ends, this is the interface the user will see (he can undo the movement in 5 seconds):
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Moved_with_undo_counter.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Moved_with_undo_counter.png)
 
 Once the player has moved, he/she can build with a similar interface to that of moving: cells in which the user can build will be yellow. Here is the graphics after the player has built something:
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Build_with_undo_counter.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Build_with_undo_counter.png)
 
 Once the player's turn is ended, he needs to wait others turn. Here is the interface (on the left is highlighted the active player and its god):
 
-![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/deliveries/images/Others_turn.png)
+![alt text](https://github.com/marcopetri98/Santorini_JavaGame_INGSW/blob/master/images/Others_turn.png)
 
 ## Project description requirements
 
